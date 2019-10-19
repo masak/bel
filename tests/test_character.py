@@ -3,7 +3,7 @@ from bel.runner import Runner, BelEvalError
 
 runner = Runner()
 
-class Quote(unittest.TestCase):
+class Character(unittest.TestCase):
     def test_bel(self):
         output = runner.run("\\bel")
         self.assertEqual("\\bel", output)
