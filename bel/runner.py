@@ -3,6 +3,7 @@ class BelEvalError(Exception):
         self.symbol = symbol
 
 CHARCODES = set(["bel", "tab", "lf", "cr", "sp"])
+SELF_EVALUATING = set(["nil", "t", "o", "apply"])
 
 class Runner:
     def run(self, source):
@@ -12,6 +13,8 @@ class Runner:
             rest = source[1:]
             if not (len(rest) == 1 or rest in CHARCODES):
                 raise BelEvalError("unknown-named-char")
+            return source
+        elif source in SELF_EVALUATING:
             return source
         elif source == "":
             return None
