@@ -1,4 +1,4 @@
-from runner import Runner
+from runner import Runner, BelEvalError
 import sys
 
 if __name__ == "__main__":
@@ -15,3 +15,5 @@ if __name__ == "__main__":
                 print(output)
         except ValueError as e:
             print("Error: invalid input", file=sys.stderr)
+        except BelEvalError as e:
+            print("Error:", e.symbol)
