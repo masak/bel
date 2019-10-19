@@ -1,3 +1,8 @@
 class Runner:
     def run(self, source):
-        return ""
+        if source.startswith("'"):
+            return source[1:]
+        elif source == "":
+            return None
+        else:
+            raise ValueError(f"invalid input: {source}")
