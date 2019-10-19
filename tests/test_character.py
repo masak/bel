@@ -26,3 +26,12 @@ class Quote(unittest.TestCase):
 
     def test_unknown_character(self):
         self.assertRaises(BelEvalError, lambda: runner.run("\\turqois"))
+
+    def test_character_h(self):
+        output = runner.run("\\h")
+        self.assertEqual("\\h", output)
+
+    def test_character_e(self):
+        output = runner.run("\\e")
+        self.assertEqual("\\e", output)
+

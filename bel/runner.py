@@ -10,7 +10,7 @@ class Runner:
             return source[1:]
         elif source.startswith("\\"):
             rest = source[1:]
-            if rest not in CHARCODES:
+            if not (len(rest) == 1 or rest in CHARCODES):
                 raise BelEvalError("unknown-named-char")
             return source
         elif source == "":
