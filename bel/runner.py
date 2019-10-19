@@ -3,6 +3,6 @@ class Runner:
         if source.startswith("'"):
             return source[1:]
         elif source == "":
-            return ""
+            return None
         else:
             raise ValueError(f"invalid input: {source}")
