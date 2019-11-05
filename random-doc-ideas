@@ -1,0 +1,47 @@
+* as a user, don't use dynamic variables too much
+    * if you do, then give them "special" names
+    * this implementation of Bel is able to run fast if it can detect no
+      dynamic variables in scope at call-time
+    * otherwise, it "deoptimizes", and you get the interpreter
+* list of "extension points"
+* list of exceptions
+* list of primitives
+* list of built-in functions and macros
+
+* some abbreviations apply
+
+* "sections" of the language guide
+    - data
+    - lists
+    - truth
+    - functions
+    - evaluation
+    - bindings and environments
+    - errors
+    - axioms; primitives
+    - axioms; special forms
+    - the definitions before the evaluator
+    - evaluator
+    - (parameter lists)
+    - functions for operating on functions
+    - numbers
+    - y combinator and recursively defined functions
+    - list operations
+    - atomic
+    - queues
+    - set, zap, and pull
+    - streams
+    - reader
+    - printer
+    - functions on functions
+    - functions involving numbers
+    - macros for iteration
+    - sorting
+    - files
+    - arrays
+    - tables
+    - templates and instances
+
+* list of predicates
+* list of comparison functions
+* list of helper functions
