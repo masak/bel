@@ -21,6 +21,8 @@ my $b = Language::Bel->new({ output => sub {
 } });
 
 while (defined (my $expr = prompt("> "))) {
+    next if $expr =~ /^\s*$/;
+
     eval {
         $b->eval($expr);
     };
