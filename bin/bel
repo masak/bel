@@ -21,5 +21,10 @@ my $b = Language::Bel->new({ output => sub {
 } });
 
 while (defined (my $expr = prompt("> "))) {
-    $b->eval($expr);
+    eval {
+        $b->eval($expr);
+    };
+    if ($@) {
+        print($@);
+    }
 }
