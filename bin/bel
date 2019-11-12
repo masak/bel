@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+use 5.006;
+use strict;
+use warnings;
+
+use Language::Bel;
+
+binmode STDOUT, ':encoding(utf-8)';
+
+sub prompt {
+    my ($prompt) = @_;
+
+    print($prompt);
+    my $input = <>;
+    return $input;
+}
+
+my $b = Language::Bel->new({ output => sub {
+    my ($string) = @_;
+    print($string, "\n");
+} });
+
+while (defined (my $expr = prompt("> "))) {
+    $b->eval($expr);
+}
