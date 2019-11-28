@@ -26,6 +26,7 @@ use Language::Bel::Primitives qw(
     prim_id
     prim_join
     prim_type
+    PRIM_FN
     PRIMITIVES
 );
 
@@ -35,11 +36,11 @@ Language::Bel - An interpreter for Paul Graham's language Bel
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 =head1 SYNOPSIS
@@ -175,66 +176,466 @@ sub read {
     }
 }
 
+my $GLOBALS = SYMBOL_NIL;
+for my $prim_name (qw(car cdr id join type)) {
+    $GLOBALS = make_pair(
+        make_pair(make_symbol($prim_name), PRIMITIVES->{$prim_name}),
+        $GLOBALS,
+    );
+}
+
+# (def bel (e (o g globe))
+#   (ev (list (list e nil))
+#       nil
+#       (list nil g)))
 sub eval_ast {
     my ($self, $ast) = @_;
 
-    if (is_pair($ast)) {
-        my $head = pair_car($ast);
-        my $rest = pair_cdr($ast);
-        if (is_symbol($head)) {
-            my $name = symbol_name($head);
-            if ($name eq "id") {
-                my $first_arg = $self->eval_ast(prim_car($rest));
-                my $second_arg = $self->eval_ast(prim_car(prim_cdr($rest)));
-                return prim_id($first_arg, $second_arg);
-            }
-            elsif ($name eq "join") {
-                my $first_arg = $self->eval_ast(prim_car($rest));
-                my $second_arg = $self->eval_ast(prim_car(prim_cdr($rest)));
-                return prim_join($first_arg, $second_arg);
-            }
-            elsif ($name eq "car") {
-                my $arg = $self->eval_ast(prim_car($rest));
-                return prim_car($arg);
-            }
-            elsif ($name eq "cdr") {
-                my $arg = $self->eval_ast(prim_car($rest));
-                return prim_cdr($arg);
-            }
-            elsif ($name eq "type") {
-                my $arg = $self->eval_ast(prim_car($rest));
-                return prim_type($arg);
-            }
-            elsif ($name eq "quote") {
-                my $first_arg = pair_car($rest);
-                return $first_arg;
-            }
-            elsif ($name eq "lit") {
-                return $ast;
-            }
-            else {
-                die "unhandled: unknown thing `$name` as head";
-            }
-        }
-        else {
-            die "unhandled: not a symbol as head";
-        }
+    my $expr_stack = [[$ast, SYMBOL_NIL]];
+    my $ret_stack = [];
+    my $m = [[], $GLOBALS];
+
+    while (@$expr_stack) {
+        _ev($expr_stack, $ret_stack, $m);
     }
-    elsif (is_symbol($ast)) {
-        my $name = symbol_name($ast);
-        if ($name eq "t" || $name eq "nil") {
-            return $ast;
-        }
-        if (exists PRIMITIVES->{$name}) {
-            return PRIMITIVES->{$name};
-        }
-        die "unhandled: variable lookup of `$name`";
-    }
-    elsif (is_char($ast)) {
-        return $ast;
+    return $ret_stack->[-1];
+}
+
+my %forms = (
+    # (form quote ((e) a s r m)
+    #   (mev s (cons e r) m))
+    quote => sub {
+        my ($es, $a, $s, $r, $m) = @_;
+
+        # XXX: skipping $es sanity check for now
+        my $e = pair_car($es);
+        push @$r, $e;
+    },
+);
+
+# (def ev (((e a) . s) r m)
+#   (aif (literal e)            (mev s (cons e r) m)
+#        (variable e)           (vref e a s r m)
+#        (no (proper e))        (sigerr 'malformed s r m)
+#        (get (car e) forms id) ((cdr it) (cdr e) a s r m)
+#                               (evcall e a s r m)))
+sub _ev {
+    my ($s, $r, $m) = @_;
+    my $e_a = pop @$s;
+    # the following corresponds to the `fut` case of `evmark`
+    if (ref($e_a) eq "CODE") {
+        $e_a->($s, $r, $m);
     }
     else {
-        die "unhandled: not a pair";
+        my $e = $e_a->[0];
+        my $a = $e_a->[1];
+
+        my $is_form = sub {
+            my ($e) = @_;
+
+            my $car = pair_car($e);
+            return unless is_symbol($car);
+
+            my $name = symbol_name($car);
+            return $forms{$name};
+        };
+
+        if (_literal($e)) {
+            push @$r, $e;
+        }
+        elsif (_variable($e)) {
+            _vref($e, $a, $s, $r, $m);
+        }
+        # XXX: skipping `proper` check for now
+        elsif (my $form = $is_form->($e)) {
+            $form->(pair_cdr($e), $a, $s, $r, $m);
+        }
+        else {
+            _evcall($e, $a, $s, $r, $m);
+        }
+    }
+}
+
+# (def literal (e)
+#   (or (in e t nil o apply)
+#       (in (type e) 'char 'stream)
+#       (caris e 'lit)
+#       (string e)))
+sub _literal {
+    my ($e) = @_;
+
+    my $is_self_evaluating = sub {
+        my ($e) = @_;
+
+        return unless is_symbol($e);
+
+        my $name = symbol_name($e);
+        return $name eq "t" || $name eq "nil" ||
+            $name eq "o" || $name eq "apply";
+    };
+
+    my $is_lit = sub {
+        my ($e) = @_;
+
+        return unless is_pair($e);
+
+        my $car = pair_car($e);
+        return unless is_symbol($car);
+
+        return symbol_name($car) eq "lit";
+    };
+
+    return (
+        $is_self_evaluating->($e) ||
+        is_char($e) ||
+        # XXX: skipping is_stream case for now
+        $is_lit->($e)
+        # XXX: skipping string case for now
+    );
+}
+
+# (def variable (e)
+#   (if (atom e)
+#       (no (literal e))
+#       (id (car e) vmark)))
+sub _variable {
+    my ($e) = @_;
+
+    # XXX: skipping the vmark case for now
+    return !is_pair($e) && !_literal($e);
+}
+
+# (def vref (v a s r m)
+#   (let g (cadr m)
+#     (if (inwhere s)
+#         (aif (or (lookup v a s g)
+#                  (and (car (inwhere s))
+#                       (let cell (cons v nil)
+#                         (xdr g (cons cell (cdr g)))
+#                         cell)))
+#              (mev (cdr s) (cons (list it 'd) r) m)
+#              (sigerr 'unbound s r m))
+#         (aif (lookup v a s g)
+#              (mev s (cons (cdr it) r) m)
+#              (sigerr (list 'unboundb v) s r m)))))
+sub _vref {
+    my ($v, $a, $s, $r, $m) = @_;
+
+    my $g = $m->[1];
+    # XXX: skipping `inwhere` case for now
+    my $it = _lookup($v, $a, $s, $g);
+    if (is_pair($it)) {
+        push @$r, pair_cdr($it);
+    }
+}
+
+# (def lookup (e a s g)
+#   (or (binding e s)
+#       (get e a id)
+#       (get e g id)
+#       (case e
+#         scope (cons e a)
+#         globe (cons e g))))
+sub _lookup {
+    my ($e, $a, $s, $g) = @_;
+
+    my $symbols_id = sub {
+        my ($first, $second) = @_;
+
+        return is_symbol($first)
+            && is_symbol($second)
+            && symbol_name($first) eq symbol_name($second);
+    };
+
+    # (def get (k kvs (o f =))
+    #   (find [f (car _) k] kvs))
+    my $get = sub {
+        my ($k, $kvs) = @_;
+
+        while (!is_symbol($kvs) || symbol_name($kvs) ne "nil") {
+            my $kv = pair_car($kvs);
+            my $key = pair_car($kv);
+
+            if ($symbols_id->($key, $k)) {
+                return $kv;
+            }
+            $kvs = pair_cdr($kvs);
+        }
+        return;
+    };
+
+    # XXX: skipping `binding` case for now
+    return $get->($e, $a)
+        || $get->($e, $g)
+        # XXX: skipping the `scope globe` defaults for now
+        || SYMBOL_NIL;
+}
+
+# (def evcall (e a s r m)
+#   (mev (cons (list (car e) a)
+#              (fu (s r m)
+#                (evcall2 (cdr e) a s r m))
+#              s)
+#        r
+#        m))
+sub _evcall {
+    my ($e, $a, $s, $r, $m) = @_;
+
+    my $fu1 = sub {
+        my ($s, $r, $m) = @_;
+
+        # (def evcall2 (es a s (op . r) m)
+        #   (if ((isa 'mac) op)
+        #       (applym op es a s r m)
+        #       (mev (append (map [list _ a] es)
+        #                    (cons (fu (s r m)
+        #                            (let (args r2) (snap es r)
+        #                              (applyf op (rev args) a s r2 m)))
+        #                          s))
+        #            r
+        #            m)))
+
+        # We're consuming `es` twice, once in each fut. So we capture it twice.
+        my $es1 = pair_cdr($e);
+        my $es2 = pair_cdr($e);
+        my $op = pop @$r;
+
+        # XXX: skipping `isa 'mac` check for now
+        my $fu2 = sub {
+            my ($s, $r, $m) = @_;
+
+            my $args = SYMBOL_NIL;
+            while (!is_symbol($es2) || symbol_name($es2) ne "nil") {
+                $args = make_pair(pop(@$r), $args);
+                $es2 = pair_cdr($es2);
+            }
+
+            _applyf($op, $args, $a, $s, $r, $m);
+        };
+
+        push @$s, $fu2;
+        my @unevaluated_arguments;
+        while (!is_symbol($es1) || symbol_name($es1) ne "nil") {
+            push @unevaluated_arguments, [pair_car($es1), $a];
+            $es1 = pair_cdr($es1);
+        }
+        # We want to evaluate the arguments in the order `a b c`, so we need
+        # to put them on expression stack in the order `c b a`. That's why we
+        # use `@unevaluated_arguments` as an intermediary, to reverse the
+        # order.
+        while (@unevaluated_arguments) {
+            push @$s, pop(@unevaluated_arguments);
+        }
+    };
+    push @$s, $fu1, [pair_car($e), $a];
+}
+
+# (def applyf (f args a s r m)
+#   (if (= f apply)    (applyf (car args) (reduce join (cdr args)) a s r m)
+#       (caris f 'lit) (if (proper f)
+#                          (applylit f args a s r m)
+#                          (sigerr 'bad-lit s r m))
+#                      (sigerr 'cannot-apply s r m)))
+sub _applyf {
+    my ($f, $args, $a, $s, $r, $m) = @_;
+
+    # XXX: skipping `apply` check for now
+    my $car_f = pair_car($f);
+    if (!is_symbol($car_f) || symbol_name($car_f) ne "lit") {
+        die "'cannot-apply\n";
+    }
+    # XXX: skipping `proper` check for now
+    _applylit($f, $args, $a, $s, $r, $m);
+}
+
+# (def applylit (f args a s r m)
+#   (aif (and (inwhere s) (find [(car _) f] locfns))
+#        ((cadr it) f args a s r m)
+#        (let (tag . rest) (cdr f)
+#          (case tag
+#            prim (applyprim (car rest) args s r m)
+#            clo  (let ((o env) (o parms) (o body) . extra) rest
+#                   (if (and (okenv env) (okparms parms))
+#                       (applyclo parms args env body s r m)
+#                       (sigerr 'bad-clo s r m)))
+#            mac  (applym f (map [list 'quote _] args) a s r m)
+#            cont (let ((o s2) (o r2) . extra) rest
+#                   (if (and (okstack s2) (proper r2))
+#                       (applycont s2 r2 args s r m)
+#                       (sigerr 'bad-cont s r m)))
+#                 (aif (get tag virfns)
+#                      (let e ((cdr it) f (map [list 'quote _] args))
+#                        (mev (cons (list e a) s) r m))
+#                      (sigerr 'unapplyable s r m))))))
+sub _applylit {
+    my ($f, $args, $a, $s, $r, $m) = @_;
+
+    # XXX: skipping `inwhere`/`locfns` for now
+    my $tag = pair_car(pair_cdr($f));
+    my $tag_name = symbol_name($tag);
+    my $rest = pair_cdr(pair_cdr($f));
+    if ($tag_name eq "prim") {
+        _applyprim(pair_car($rest), $args, $s, $r, $m);
+    }
+    elsif ($tag_name eq "clo") {
+        my $env = pair_car($rest);
+        my $parms = pair_car(pair_cdr($rest));
+        my $body = pair_car(pair_cdr(pair_cdr($rest)));
+
+        # XXX: skipping `okenv` and `okparms` checks for now
+        _applyclo($parms, $args, $env, $body, $s, $r, $m);
+    }
+    # XXX: skipping `mac` case for now
+    # XXX: skipping `cont` case for now
+}
+
+# (def applyprim (f args s r m)
+#   (aif (some [mem f _] prims)
+#        (if (udrop (cdr it) args)
+#            (sigerr 'overargs s r m)
+#            (with (a (car args)
+#                   b (cadr args))
+#              (eif v (case f
+#                       id   (id a b)
+#                       join (join a b)
+#                       car  (car a)
+#                       cdr  (cdr a)
+#                       type (type a)
+#                       xar  (xar a b)
+#                       xdr  (xdr a b)
+#                       sym  (sym a)
+#                       nom  (nom a)
+#                       wrb  (wrb a b)
+#                       rdb  (rdb a)
+#                       ops  (ops a b)
+#                       cls  (cls a)
+#                       stat (stat a)
+#                       coin (coin)
+#                       sys  (sys a))
+#                     (sigerr v s r m)
+#                     (mev s (cons v r) m))))
+#        (sigerr 'unknown-prim s r m)))
+sub _applyprim {
+    my ($f, $args, $s, $r, $m) = @_;
+
+    my $name = symbol_name($f);
+    my $_a = prim_car($args);
+    my $_b = prim_car(prim_cdr($args));
+
+    my $prim = PRIM_FN->{$name};
+    # XXX: skipping the 'unknown-prim case for now
+    my $fn = $prim->{fn};
+    my $v;
+    if ($prim->{arity} == 1) {
+        $v = $fn->($_a);
+    }
+    elsif ($prim->{arity} == 2) {
+        $v = $fn->($_a, $_b);
+    }
+    # XXX: skipping the `sigerr` case
+    push @$r, $v;
+}
+
+# (def applyclo (parms args env body s r m)
+#   (mev (cons (fu (s r m)
+#                (pass parms args env s r m))
+#              (fu (s r m)
+#                (mev (cons (list body (car r)) s)
+#                     (cdr r)
+#                     m))
+#              s)
+#        r
+#        m))
+sub _applyclo {
+    my ($parms, $args, $env, $body, $s, $r, $m) = @_;
+
+    my $fu1 = sub {
+        my ($s, $r, $m) = @_;
+
+        _pass($parms, $args, $env, $s, $r, $m);
+    };
+    my $fu2 = sub {
+        my ($s, $r, $m) = @_;
+
+        my $car_r = pop @$r;
+        push @$s, [
+            $body,
+            $car_r,
+        ];
+    };
+    push @$s, $fu2, $fu1;
+}
+
+# (def pass (pat arg env s r m)
+#   (let ret [mev s (cons _ r) m]
+#     (if (no pat)       (if arg
+#                            (sigerr 'overargs s r m)
+#                            (ret env))
+#         (literal pat)  (sigerr 'literal-parm s r m)
+#         (variable pat) (ret (cons (cons pat arg) env))
+#         (caris pat t)  (typecheck (cdr pat) arg env s r m)
+#         (caris pat o)  (pass (cadr pat) arg env s r m)
+#                        (destructure pat arg env s r m))))
+sub _pass {
+    my ($pat, $arg, $env, $s, $r, $m) = @_;
+
+    if (is_symbol($pat) && symbol_name($pat) eq "nil") {
+        # XXX: skipping the `'overargs` case for now
+        push @$r, $env;
+    }
+    # XXX: skipping the literal case for now
+    elsif (_variable($pat)) {
+        push @$r, make_pair(make_pair($pat, $arg), $env);
+    }
+    # XXX: skipping the `t` case for now
+    # XXX: skipping the `o` case for now
+    else {
+        _destructure($pat, $arg, $env, $s, $r, $m);
+    }
+}
+
+# (def destructure ((p . ps) arg env s r m)
+#   (if (no arg)   (if (caris p o)
+#                      (mev (cons (list (caddr p) env)
+#                                 (fu (s r m)
+#                                   (pass (cadr p) (car r) env s (cdr r) m))
+#                                 (fu (s r m)
+#                                   (pass ps nil (car r) s (cdr r) m))
+#                                 s)
+#                           r
+#                           m)
+#                      (sigerr 'underargs s r m))
+#       (atom arg) (sigerr 'atom-arg s r m)
+#                  (mev (cons (fu (s r m)
+#                               (pass p (car arg) env s r m))
+#                             (fu (s r m)
+#                               (pass ps (cdr arg) (car r) s (cdr r) m))
+#                             s)
+#                       r
+#                       m)))
+sub _destructure {
+    my ($ps, $arg, $env, $s, $r, $m) = @_;
+    my $p = pair_car($ps);
+    $ps = pair_cdr($ps);
+
+    if (is_symbol($arg) && symbol_name($arg) eq "nil") {
+        # XXX: skipping the `(caris p o)` case for now
+        die "'underargs\n";
+    }
+    # XXX: skipping the `(atom arg)` case for now
+    else {
+        my $fu1 = sub {
+            my ($s, $r, $m) = @_;
+
+            _pass($p, pair_car($arg), $env, $s, $r, $m);
+        };
+        my $fu2 = sub {
+            my ($s, $r, $m) = @_;
+
+            my $env = pop @$r;
+            _pass($ps, pair_cdr($arg), $env, $s, $r, $m);
+        };
+        push @$s, $fu2, $fu1;
     }
 }
 
