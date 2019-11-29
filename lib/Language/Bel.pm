@@ -36,11 +36,11 @@ Language::Bel - An interpreter for Paul Graham's language Bel
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 
 =head1 SYNOPSIS
@@ -81,7 +81,7 @@ sub new {
 sub eval {
     my ($self, $expr) = @_;
 
-    my $ast = $self->read($expr)->{ast};
+    my $ast = _read($expr);
     my $result = $self->eval_ast($ast);
     my $result_string = $self->ast_to_string($result);
 
@@ -93,10 +93,14 @@ sub eval {
     return;
 }
 
-sub read {
-    my ($self, $expr, $pos) = @_;
+sub _read {
+    my ($expr) = @_;
 
-    $pos = defined($pos) ? $pos : 0;
+    return _read_helper($expr, 0)->{ast};
+}
+
+sub _read_helper {
+    my ($expr, $pos) = @_;
 
     my $skip_whitespace = sub {
         while ($pos < length($expr) && substr($expr, $pos, 1) =~ /\s/) {
@@ -126,7 +130,7 @@ sub read {
             if ($seen_element_after_dot) {
                 die "only one element after dot allowed";
             }
-            my $r = $self->read($expr, $pos);
+            my $r = _read_helper($expr, $pos);
             if ($seen_dot) {
                 $seen_element_after_dot = 1;
             }
@@ -141,7 +145,7 @@ sub read {
     }
     elsif ($c eq "'") {
         ++$pos;
-        my $r = $self->read($expr, $pos);
+        my $r = _read_helper($expr, $pos);
         my $ast = make_pair(SYMBOL_QUOTE, make_pair($r->{ast}, SYMBOL_NIL));
         return { ast => $ast, pos => $r->{pos} };
     }
@@ -177,12 +181,20 @@ sub read {
 }
 
 my $GLOBALS = SYMBOL_NIL;
-for my $prim_name (qw(car cdr id join type)) {
+sub add_global {
+    my ($name, $value) = @_;
+
     $GLOBALS = make_pair(
-        make_pair(make_symbol($prim_name), PRIMITIVES->{$prim_name}),
+        make_pair(make_symbol($name), $value),
         $GLOBALS,
     );
 }
+
+for my $prim_name (qw(car cdr id join type)) {
+    add_global($prim_name, PRIMITIVES->{$prim_name});
+}
+
+add_global("no", _read("(lit clo nil (x) (id x nil))"));
 
 # (def bel (e (o g globe))
 #   (ev (list (list e nil))
