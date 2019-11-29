@@ -36,11 +36,11 @@ Language::Bel - An interpreter for Paul Graham's language Bel
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 
 =head1 SYNOPSIS
@@ -225,7 +225,56 @@ my %forms = (
         my $e = pair_car($es);
         push @$r, $e;
     },
+
+    # (form if (es a s r m)
+    #   (if (no es)
+    #       (mev s (cons nil r) m)
+    #       (mev (cons (list (car es) a)
+    #                  (if (cdr es)
+    #                      (cons (fu (s r m)
+    #                              (if2 (cdr es) a s r m))
+    #                            s)
+    #                      s))
+    #            r
+    #            m)))
+    if => sub {
+        my ($es, $a, $s, $r, $m) = @_;
+
+        if (is_symbol($es) && symbol_name($es) eq "nil") {
+            push @$r, SYMBOL_NIL;
+        }
+        else {
+            my $cdr_es = prim_cdr($es);
+            if (!is_symbol($cdr_es) || symbol_name($cdr_es) ne "nil") {
+                my $fu = sub {
+                    my ($s, $r, $m) = @_;
+
+                    _if2(prim_cdr($es), $a, $s, $r, $m);
+                };
+                push @$s, $fu;
+            }
+            push @$s, [prim_car($es), $a];
+        }
+    },
 );
+
+# (def if2 (es a s r m)
+#   (mev (cons (list (if (car r)
+#                        (car es)
+#                        (cons 'if (cdr es)))
+#                    a)
+#              s)
+#        (cdr r)
+#        m))
+sub _if2 {
+    my ($es, $a, $s, $r, $m) = @_;
+
+    my $car_r = pop(@$r);
+    my $e = !is_symbol($car_r) || symbol_name($car_r) ne "nil"
+        ? prim_car($es)
+        : make_pair(make_symbol("if"), prim_cdr($es));
+    push @$s, [$e, $a];
+}
 
 # (def ev (((e a) . s) r m)
 #   (aif (literal e)            (mev s (cons e r) m)
