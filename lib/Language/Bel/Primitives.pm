@@ -109,6 +109,18 @@ sub make_prim {
     );
 }
 
+my %prim_fn = (
+    "car" => { fn => \&prim_car, arity => 1 },
+    "cdr" => { fn => \&prim_cdr, arity => 1 },
+    "id" => { fn => \&prim_id, arity => 2 },
+    "join" => { fn => \&prim_join, arity => 2 },
+    "type" => { fn => \&prim_type, arity => 1 },
+);
+
+sub PRIM_FN {
+    return \%prim_fn;
+}
+
 my %primitives = (
     "car" => make_prim("car"),
     "cdr" => make_prim("cdr"),
@@ -127,6 +139,7 @@ our @EXPORT_OK = qw(
     prim_id 
     prim_join
     prim_type
+    PRIM_FN
     PRIMITIVES
 );
 
