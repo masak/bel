@@ -36,11 +36,11 @@ Language::Bel - An interpreter for Paul Graham's language Bel
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 
 =head1 SYNOPSIS
@@ -195,6 +195,8 @@ for my $prim_name (qw(car cdr id join type)) {
 }
 
 add_global("no", _read("(lit clo nil (x) (id x nil))"));
+
+add_global("atom", _read("(lit clo nil (x) (no (id (type x) 'pair)))"));
 
 # (def bel (e (o g globe))
 #   (ev (list (list e nil))
