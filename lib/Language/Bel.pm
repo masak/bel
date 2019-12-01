@@ -36,11 +36,11 @@ Language::Bel - An interpreter for Paul Graham's language Bel
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 SYNOPSIS
 
@@ -527,13 +527,47 @@ sub _evcall {
 sub _applyf {
     my ($f, $args, $a, $s, $r, $m) = @_;
 
-    # XXX: skipping `apply` check for now
-    my $car_f = pair_car($f);
-    if (!is_symbol($car_f) || symbol_name($car_f) ne "lit") {
-        die "'cannot-apply\n";
+    if (is_symbol($f) && symbol_name($f) eq "apply") {
+        my $apply_op = prim_car($args);
+        my $cdr_args = prim_cdr($args);
+        my $reduce_expr = [
+            make_pair(
+                make_symbol("reduce"),
+                make_pair(
+                    make_symbol("join"),
+                    make_pair(
+                        make_pair(
+                            make_symbol("quote"),
+                            make_pair(
+                                $cdr_args,
+                                SYMBOL_NIL,
+                            ),
+                        ),
+                        SYMBOL_NIL,
+                    ),
+                ),
+            ),
+            SYMBOL_NIL,     # not `$a`; we're not running `reduce join`
+                            # in the expression's environment
+        ];
+
+        my $fu = sub {
+            my ($s, $r, $m) = @_;
+
+            my $apply_args = pop(@$r);
+            _applyf($apply_op, $apply_args, $a, $s, $r, $m);
+        };
+
+        push @$s, $fu, $reduce_expr;
     }
-    # XXX: skipping `proper` check for now
-    _applylit($f, $args, $a, $s, $r, $m);
+    else {
+        my $car_f = pair_car($f);
+        if (!is_symbol($car_f) || symbol_name($car_f) ne "lit") {
+            die "'cannot-apply\n";
+        }
+        # XXX: skipping `proper` check for now
+        _applylit($f, $args, $a, $s, $r, $m);
+    }
 }
 
 # (def applylit (f args a s r m)
