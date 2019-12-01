@@ -29,6 +29,12 @@ use Language::Bel::Primitives qw(
     PRIM_FN
     PRIMITIVES
 );
+use Language::Bel::Reader qw(
+    _read
+);
+use Language::Bel::Globals qw(
+    GLOBALS
+);
 
 =head1 NAME
 
@@ -92,167 +98,6 @@ sub eval {
     return;
 }
 
-sub _read {
-    my ($expr) = @_;
-
-    return _read_helper($expr, 0)->{ast};
-}
-
-sub _read_helper {
-    my ($expr, $pos) = @_;
-
-    my $skip_whitespace = sub {
-        while ($pos < length($expr) && substr($expr, $pos, 1) =~ /\s/) {
-            ++$pos;
-        }
-    };
-
-    $skip_whitespace->();
-    my $c = substr($expr, $pos, 1);
-    if ($c eq "(") {
-        ++$pos;
-        my @list;
-        my $seen_dot = "";
-        my $seen_element_after_dot = "";
-        while ($pos < length($expr)) {
-            $skip_whitespace->();
-            my $cc = substr($expr, $pos, 1);
-            if ($cc eq ")") {
-                ++$pos;
-                last;
-            }
-            elsif ($cc eq ".") {
-                ++$pos;
-                $seen_dot = 1;
-            }
-
-            if ($seen_element_after_dot) {
-                die "only one element after dot allowed";
-            }
-            my $r = _read_helper($expr, $pos);
-            if ($seen_dot) {
-                $seen_element_after_dot = 1;
-            }
-            push @list, $r->{ast};
-            $pos = $r->{pos};
-        }
-        my $ast = $seen_dot ? pop(@list) : SYMBOL_NIL;
-        for my $e (reverse(@list)) {
-            $ast = make_pair($e, $ast);
-        }
-        return { ast => $ast, pos => $pos };
-    }
-    elsif ($c eq "'") {
-        ++$pos;
-        my $r = _read_helper($expr, $pos);
-        my $ast = make_pair(SYMBOL_QUOTE, make_pair($r->{ast}, SYMBOL_NIL));
-        return { ast => $ast, pos => $r->{pos} };
-    }
-    elsif ($c eq "\\") {
-        ++$pos;
-        my $start = $pos;
-        EAT_CHAR:
-        {
-            do {
-                my $cc = substr($expr, $pos, 1);
-                # XXX: cheat for now
-                last EAT_CHAR if $cc eq ")" or $cc =~ /\s/;
-                ++$pos;
-            } while ($pos < length($expr));
-        }
-        my $ast = make_char(substr($expr, $start, $pos - $start));
-        return { ast => $ast, pos => $pos };
-    }
-    else {  # symbol
-        my $start = $pos;
-        EAT_CHAR:
-        {
-            do {
-                my $cc = substr($expr, $pos, 1);
-                # XXX: cheat for now
-                last EAT_CHAR if $cc eq ")" or $cc =~ /\s/;
-                ++$pos;
-            } while ($pos < length($expr));
-        }
-        my $ast = make_symbol(substr($expr, $start, $pos - $start));
-        return { ast => $ast, pos => $pos };
-    }
-}
-
-my $GLOBALS = SYMBOL_NIL;
-sub add_global {
-    my ($name, $value) = @_;
-
-    $GLOBALS = make_pair(
-        make_pair(make_symbol($name), $value),
-        $GLOBALS,
-    );
-}
-
-for my $prim_name (qw(car cdr id join type)) {
-    add_global($prim_name, PRIMITIVES->{$prim_name});
-}
-
-add_global("no", _read("(lit clo nil (x) (id x nil))"));
-
-add_global("atom", _read("(lit clo nil (x) (no (id (type x) 'pair)))"));
-
-add_global("all", _read("
-    (lit clo nil (f xs)
-      (if (no xs)      t
-          (f (car xs)) (all f (cdr xs))
-                       nil))
-"));
-
-add_global("some", _read("
-    (lit clo nil (f xs)
-      (if (no xs)      nil
-          (f (car xs)) xs
-                       (some f (cdr xs))))
-"));
-
-add_global("reduce", _read("
-    (lit clo nil (f xs)
-      (if (no (cdr xs))
-          (car xs)
-          (f (car xs) (reduce f (cdr xs)))))
-"));
-
-add_global("cons", _read("
-    (lit clo nil args
-      (reduce join args))
-"));
-
-add_global("append", _read("
-    (lit clo nil args
-      (if (no (cdr args)) (car args)
-          (no (car args)) (apply append (cdr args))
-                          (cons (car (car args))
-                                (apply append (cdr (car args))
-                                              (cdr args)))))
-"));
-
-add_global("snoc", _read("
-    (lit clo nil args
-      (append (car args) (cdr args)))
-"));
-
-add_global("list", _read("
-    (lit clo nil args
-      (append args nil))
-"));
-
-add_global("map", _read("
-    (lit clo nil (f . ls)
-      (if (no ls)       nil
-          (some no ls)  nil
-          (no (cdr ls)) (cons (f (car (car ls)))
-                              (map f (cdr (car ls))))
-                        (cons (apply f (map car ls))
-                              (apply map f (map cdr ls)))))
-"));
-
-
 # (def bel (e (o g globe))
 #   (ev (list (list e nil))
 #       nil
@@ -262,7 +107,7 @@ sub eval_ast {
 
     my $expr_stack = [[$ast, SYMBOL_NIL]];
     my $ret_stack = [];
-    my $m = [[], $GLOBALS];
+    my $m = [[], GLOBALS];
 
     while (@$expr_stack) {
         _ev($expr_stack, $ret_stack, $m);
