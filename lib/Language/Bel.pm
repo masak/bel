@@ -36,11 +36,11 @@ Language::Bel - An interpreter for Paul Graham's language Bel
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 =head1 SYNOPSIS
 
@@ -240,6 +240,16 @@ add_global("snoc", _read("
 add_global("list", _read("
     (lit clo nil args
       (append args nil))
+"));
+
+add_global("map", _read("
+    (lit clo nil (f . ls)
+      (if (no ls)       nil
+          (some no ls)  nil
+          (no (cdr ls)) (cons (f (car (car ls)))
+                              (map f (cdr (car ls))))
+                        (cons (apply f (map car ls))
+                              (apply map f (map cdr ls)))))
 "));
 
 
