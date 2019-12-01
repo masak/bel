@@ -36,11 +36,11 @@ Language::Bel - An interpreter for Paul Graham's language Bel
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 SYNOPSIS
 
@@ -209,6 +209,13 @@ add_global("some", _read("
       (if (no xs)      nil
           (f (car xs)) xs
                        (some f (cdr xs))))
+"));
+
+add_global("reduce", _read("
+    (lit clo nil (f xs)
+      (if (no (cdr xs))
+          (car xs)
+          (f (car xs) (reduce f (cdr xs)))))
 "));
 
 # (def bel (e (o g globe))
