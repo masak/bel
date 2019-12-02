@@ -34,64 +34,21 @@ for my $prim_name (qw(car cdr id join type)) {
     add_global($prim_name, PRIMITIVES->{$prim_name});
 }
 
-add_global("no", _read("(lit clo nil (x) (id x nil))"));
+{
+    # XXX: I just discovered that all the source files are stored as
+    # DOS-newline format. I might decide to do something about this in
+    # the future; Unix/Linux style format seems more appropriate.
+    local $/ = "\r\n\r\n";  # paragraph mode
+    while (<Language::Bel::Globals::DATA>) {
+        s/(\r\n){1,2}$//;
+        /^\(set (\w+)\s+(.+)\)$/ms
+            or die "Unrecognized: $_";
 
-add_global("atom", _read("(lit clo nil (x) (no (id (type x) 'pair)))"));
-
-add_global("all", _read("
-    (lit clo nil (f xs)
-      (if (no xs)      t
-          (f (car xs)) (all f (cdr xs))
-                       nil))
-"));
-
-add_global("some", _read("
-    (lit clo nil (f xs)
-      (if (no xs)      nil
-          (f (car xs)) xs
-                       (some f (cdr xs))))
-"));
-
-add_global("reduce", _read("
-    (lit clo nil (f xs)
-      (if (no (cdr xs))
-          (car xs)
-          (f (car xs) (reduce f (cdr xs)))))
-"));
-
-add_global("cons", _read("
-    (lit clo nil args
-      (reduce join args))
-"));
-
-add_global("append", _read("
-    (lit clo nil args
-      (if (no (cdr args)) (car args)
-          (no (car args)) (apply append (cdr args))
-                          (cons (car (car args))
-                                (apply append (cdr (car args))
-                                              (cdr args)))))
-"));
-
-add_global("snoc", _read("
-    (lit clo nil args
-      (append (car args) (cdr args)))
-"));
-
-add_global("list", _read("
-    (lit clo nil args
-      (append args nil))
-"));
-
-add_global("map", _read("
-    (lit clo nil (f . ls)
-      (if (no ls)       nil
-          (some no ls)  nil
-          (no (cdr ls)) (cons (f (car (car ls)))
-                              (map f (cdr (car ls))))
-                        (cons (apply f (map car ls))
-                              (apply map f (map cdr ls)))))
-"));
+        my $name = $1;
+        my $value = $2;
+        add_global($name, _read($value));
+    }
+}
 
 sub GLOBALS {
     return $GLOBALS;
@@ -102,3 +59,54 @@ our @EXPORT_OK = qw(
 );
 
 1;
+__DATA__
+(set no (lit clo nil (x) (id x nil)))
+
+(set atom (lit clo nil (x) (no (id (type x) 'pair))))
+
+(set all
+     (lit clo nil (f xs)
+       (if (no xs)      t
+           (f (car xs)) (all f (cdr xs))
+                        nil)))
+
+(set some
+     (lit clo nil (f xs)
+       (if (no xs)      nil
+           (f (car xs)) xs
+                        (some f (cdr xs)))))
+
+(set reduce
+     (lit clo nil (f xs)
+       (if (no (cdr xs))
+           (car xs)
+           (f (car xs) (reduce f (cdr xs))))))
+
+(set cons
+     (lit clo nil args
+       (reduce join args)))
+
+(set append
+     (lit clo nil args
+       (if (no (cdr args)) (car args)
+           (no (car args)) (apply append (cdr args))
+                           (cons (car (car args))
+                                 (apply append (cdr (car args))
+                                               (cdr args))))))
+
+(set snoc
+     (lit clo nil args
+       (append (car args) (cdr args))))
+
+(set list
+     (lit clo nil args
+       (append args nil)))
+
+(set map
+     (lit clo nil (f . ls)
+       (if (no ls)       nil
+           (some no ls)  nil
+           (no (cdr ls)) (cons (f (car (car ls)))
+                               (map f (cdr (car ls))))
+                         (cons (apply f (map car ls))
+                               (apply map f (map cdr ls))))))
