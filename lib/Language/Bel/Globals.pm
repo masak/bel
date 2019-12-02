@@ -21,7 +21,7 @@ use Exporter 'import';
 
 my $GLOBALS = SYMBOL_NIL;
 
-sub add_global {
+sub set {
     my ($name, $value) = @_;
 
     $GLOBALS = make_pair(
@@ -31,7 +31,7 @@ sub add_global {
 }
 
 for my $prim_name (qw(car cdr id join type)) {
-    add_global($prim_name, PRIMITIVES->{$prim_name});
+    set($prim_name, PRIMITIVES->{$prim_name});
 }
 
 {
@@ -41,12 +41,45 @@ for my $prim_name (qw(car cdr id join type)) {
     local $/ = "\r\n\r\n";  # paragraph mode
     while (<Language::Bel::Globals::DATA>) {
         s/(\r\n){1,2}$//;
-        /^\(set (\w+)\s+(.+)\)$/ms
+        # XXX: Just hunting for the next closing parenthesis, like this
+        # regex does, it too simplistic for the general case. It'll work
+        # for a while, but it'll fail once we get to `mem`:
+        #
+        #     (def mem (x ys (o f =))
+        #       (some [f _ x] ys))
+        #
+        # A more general solution would involve the things Text::Balanced
+        # and Regexp::Common::balanced do, but I haven't evaluated those
+        # enough to choose one yet.
+        #
+        # Of course, we could also, do our own nested matcher using
+        # (?P<NAME>pattern) and (?P>NAME) syntxes, but that's 5.10+ syntax.
+        # Another option might be to capture everything and then do the
+        # parenthesis counting in a separate tokenizing-like postprocessing
+        # step.
+        /^\(def (\w+) (\w+|\([^)]+\))\s+(.+)\)$/ms
             or die "Unrecognized: $_";
 
-        my $name = $1;
-        my $value = $2;
-        add_global($name, _read($value));
+        # (From bellanguage.txt)
+        #
+        # In the source I try not to use things before I've defined them,
+        # but I've made a handful of exceptions to make the code easier
+        # to read.
+        # 
+        # When you see
+        # 
+        # (def n p e)
+        # 
+        # treat it as an abbreviation for 
+        # 
+        # (set n (lit clo nil p e))
+
+        my $n = $1;
+        my $p = $2;
+        my $e = $3;
+
+        my $lit = "(lit clo nil $p $e)";
+        set($n, _read($lit));
     }
 }
 
@@ -60,53 +93,47 @@ our @EXPORT_OK = qw(
 
 1;
 __DATA__
-(set no (lit clo nil (x) (id x nil)))
+(def no (x)
+  (id x nil))
 
-(set atom (lit clo nil (x) (no (id (type x) 'pair))))
+(def atom (x)
+  (no (id (type x) 'pair)))
 
-(set all
-     (lit clo nil (f xs)
-       (if (no xs)      t
-           (f (car xs)) (all f (cdr xs))
-                        nil)))
+(def all (f xs)
+  (if (no xs)      t
+      (f (car xs)) (all f (cdr xs))
+                   nil))
 
-(set some
-     (lit clo nil (f xs)
-       (if (no xs)      nil
-           (f (car xs)) xs
-                        (some f (cdr xs)))))
+(def some (f xs)
+  (if (no xs)      nil
+      (f (car xs)) xs
+                   (some f (cdr xs))))
 
-(set reduce
-     (lit clo nil (f xs)
-       (if (no (cdr xs))
-           (car xs)
-           (f (car xs) (reduce f (cdr xs))))))
+(def reduce (f xs)
+  (if (no (cdr xs))
+      (car xs)
+      (f (car xs) (reduce f (cdr xs)))))
 
-(set cons
-     (lit clo nil args
-       (reduce join args)))
+(def cons args
+  (reduce join args))
 
-(set append
-     (lit clo nil args
-       (if (no (cdr args)) (car args)
-           (no (car args)) (apply append (cdr args))
-                           (cons (car (car args))
-                                 (apply append (cdr (car args))
-                                               (cdr args))))))
+(def append args
+  (if (no (cdr args)) (car args)
+      (no (car args)) (apply append (cdr args))
+                      (cons (car (car args))
+                            (apply append (cdr (car args))
+                                          (cdr args)))))
 
-(set snoc
-     (lit clo nil args
-       (append (car args) (cdr args))))
+(def snoc args
+  (append (car args) (cdr args)))
 
-(set list
-     (lit clo nil args
-       (append args nil)))
+(def list args
+  (append args nil))
 
-(set map
-     (lit clo nil (f . ls)
-       (if (no ls)       nil
-           (some no ls)  nil
-           (no (cdr ls)) (cons (f (car (car ls)))
-                               (map f (cdr (car ls))))
-                         (cons (apply f (map car ls))
-                               (apply map f (map cdr ls))))))
+(def map (f . ls)
+  (if (no ls)       nil
+      (some no ls)  nil
+      (no (cdr ls)) (cons (f (car (car ls)))
+                          (map f (cdr (car ls))))
+                    (cons (apply f (map car ls))
+                          (apply map f (map cdr ls)))))
