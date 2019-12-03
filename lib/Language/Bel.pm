@@ -290,6 +290,9 @@ sub _vref {
     if (is_pair($it)) {
         push @$r, pair_cdr($it);
     }
+    else {
+        die "('unboundb ", symbol_name($v), ")\n";
+    }
 }
 
 # (def lookup (e a s g)
