@@ -42,11 +42,11 @@ Language::Bel - An interpreter for Paul Graham's language Bel
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 =head1 SYNOPSIS
 
@@ -362,39 +362,79 @@ sub _evcall {
         #            r
         #            m)))
 
-        # We're consuming `es` twice, once in each fut. So we capture it twice.
         my $es1 = pair_cdr($e);
-        my $es2 = pair_cdr($e);
         my $op = pop @$r;
 
-        # XXX: skipping `isa 'mac` check for now
-        my $fu2 = sub {
-            my ($s, $r, $m) = @_;
+        my $isa_mac = sub {
+            my ($v) = @_;
 
-            my $args = SYMBOL_NIL;
-            while (!is_symbol($es2) || symbol_name($es2) ne "nil") {
-                $args = make_pair(pop(@$r), $args);
-                $es2 = pair_cdr($es2);
-            }
-
-            _applyf($op, $args, $a, $s, $r, $m);
+            return is_pair($v)
+                && is_symbol(prim_car($v))
+                && symbol_name(prim_car($v)) eq "lit"
+                && is_pair(prim_cdr($v))
+                && is_symbol(prim_car(prim_cdr($v)))
+                && symbol_name(prim_car(prim_cdr($v))) eq "mac";
         };
 
-        push @$s, $fu2;
-        my @unevaluated_arguments;
-        while (!is_symbol($es1) || symbol_name($es1) ne "nil") {
-            push @unevaluated_arguments, [pair_car($es1), $a];
-            $es1 = pair_cdr($es1);
+        if ($isa_mac->($op)) {
+            _applym($op, $es1, $a, $s, $r, $m);
         }
-        # We want to evaluate the arguments in the order `a b c`, so we need
-        # to put them on expression stack in the order `c b a`. That's why we
-        # use `@unevaluated_arguments` as an intermediary, to reverse the
-        # order.
-        while (@unevaluated_arguments) {
-            push @$s, pop(@unevaluated_arguments);
+        else {
+            # We're consuming `es` twice, once in each fut.
+            # So we capture it twice.
+            my $es2 = pair_cdr($e);
+
+            my $fu2 = sub {
+                my ($s, $r, $m) = @_;
+
+                my $args = SYMBOL_NIL;
+                while (!is_symbol($es2) || symbol_name($es2) ne "nil") {
+                    $args = make_pair(pop(@$r), $args);
+                    $es2 = pair_cdr($es2);
+                }
+
+                _applyf($op, $args, $a, $s, $r, $m);
+            };
+
+            push @$s, $fu2;
+            my @unevaluated_arguments;
+            while (!is_symbol($es1) || symbol_name($es1) ne "nil") {
+                push @unevaluated_arguments, [pair_car($es1), $a];
+                $es1 = pair_cdr($es1);
+            }
+            # We want to evaluate the arguments in the order `a b c`,
+            # so we need to put them on expression stack in the order
+            # `c b a`. That's why we use `@unevaluated_arguments` as
+            # an intermediary, to reverse the order.
+            push @$s, reverse(@unevaluated_arguments);
         }
     };
     push @$s, $fu1, [pair_car($e), $a];
+}
+
+# (def applym (mac args a s r m)
+#   (applyf (caddr mac)
+#           args
+#           a
+#           (cons (fu (s r m)
+#                   (mev (cons (list (car r) a) s)
+#                        (cdr r)
+#                        m))
+#                 s)
+#           r
+#           m))
+sub _applym {
+    my ($mac, $args, $a, $s, $r, $m) = @_;
+
+    my $mac_clo = prim_car(prim_cdr(prim_cdr($mac)));
+    my $fu = sub {
+        my ($s, $r, $m) = @_;
+
+        my $macro_expansion = pop @$r;
+        push @$s, [$macro_expansion, $a];
+    };
+    push @$s, $fu;
+    _applyf($mac_clo, $args, $a, $s, $r, $m);
 }
 
 # (def applyf (f args a s r m)
