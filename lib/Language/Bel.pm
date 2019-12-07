@@ -333,7 +333,8 @@ sub _lookup {
     # XXX: skipping `binding` case for now
     return $get->($e, $a)
         || $get->($e, $g)
-        # XXX: skipping the `scope globe` defaults for now
+        || (symbol_name($e) eq "scope" && make_pair($e, $a))
+        # XXX: skipping the `globe` default for now
         || SYMBOL_NIL;
 }
 
