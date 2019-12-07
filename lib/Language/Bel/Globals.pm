@@ -80,6 +80,8 @@ sub initialize {
     }
 
     for my $declaration (@DECLARATIONS) {
+        my ($name, $value);
+
         # XXX: Just hunting for the next closing parenthesis, like this
         # regex does, it too simplistic for the general case. It'll work
         # for a while, but it'll fail once we get to `mem`:
@@ -107,16 +109,31 @@ sub initialize {
             #
             # (set n (lit clo nil p e))
 
-            my ($n, $p, $e) = ($1, $2, $3);
-            $self->set($n, _read("(lit clo nil $p $e)"));
+            $name = $1;
+            my ($p, $e) = ($2, $3);
+            $value = "(lit clo nil $p $e)";
+        }
+        elsif ($declaration =~ /^\(mac (\w+) (\w+|\([^)]*\))\s+(.+)\)$/ms) {
+            # and when you see
+            #
+            # (mac n p e)
+            #
+            # treat it as an abbreviation for
+            #
+            # (set n (lit mac (lit clo nil p e)))
+
+            $name = $1;
+            my ($p, $e) = ($2, $3);
+            $value = "(lit mac (lit clo nil $p $e))";
         }
         elsif ($declaration =~ /\(set (\w+) (.+)\)/ms) {
-            my ($n, $e) = ($1, $2);
-            $self->set($n, $self->{interpreter}->eval_ast(_read($e)));
+            ($name, $value) = ($1, $2);
         }
         else {
             die "Unrecognized: $declaration";
         }
+
+        $self->set($name, $self->{interpreter}->eval_ast(_read($value)));
     }
 }
 
@@ -166,6 +183,9 @@ __DATA__
                           (map f (cdr (car ls))))
                     (cons (apply f (map car ls))
                           (apply map f (map cdr ls)))))
+
+(mac fn (parms . body)
+  (cons 'list ''lit ''clo 'scope (list 'quote parms) (list 'quote (car body)) nil))
 
 (set vmark (join))
 
