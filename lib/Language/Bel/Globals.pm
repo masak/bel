@@ -191,3 +191,8 @@ __DATA__
 
 (def uvar ()
   (list vmark))
+
+(mac do args
+  (reduce (fn (x y)
+            (list (list 'fn (uvar) y) x))
+          args))
