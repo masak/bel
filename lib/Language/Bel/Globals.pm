@@ -17,30 +17,69 @@ use Language::Bel::Primitives qw(
 use Language::Bel::Reader qw(
     _read
 );
-use Exporter 'import';
 
-my $GLOBALS = SYMBOL_NIL;
+sub new {
+    my ($class, $options_ref) = @_;
+    my $self = {
+        ref($options_ref) eq "HASH" ? %$options_ref : (),
+    };
+
+    my $g = defined($self->{g})
+        ? $self->{g}
+        : SYMBOL_NIL;
+    $self->{g} = $g;
+
+    return bless($self, $class);
+}
+
+sub interpreter {
+    my ($self, $new_value) = @_;
+
+    if (defined($new_value)) {
+        $self->{interpreter} = $new_value;
+    }
+
+    return $self->{interpreter};
+}
+
+sub g {
+    my ($self, $new_value) = @_;
+
+    if (defined($new_value)) {
+        $self->{g} = $new_value;
+    }
+
+    return $self->{g};
+}
 
 sub set {
-    my ($name, $value) = @_;
+    my ($self, $name, $value) = @_;
 
-    $GLOBALS = make_pair(
+    $self->g(make_pair(
         make_pair(make_symbol($name), $value),
-        $GLOBALS,
-    );
+        $self->g(),
+    ));
 }
 
-for my $prim_name (qw(car cdr id join type)) {
-    set($prim_name, PRIMITIVES->{$prim_name});
-}
-
+my @DECLARATIONS;
 {
-    # XXX: I just discovered that all the source files are stored as
-    # DOS-newline format. I might decide to do something about this in
-    # the future; Unix/Linux style format seems more appropriate.
+    # XXX: I'm running this on Windows, but I need to write a portable
+    # solution that also considers Unix/Linux newlines.
     local $/ = "\r\n\r\n";  # paragraph mode
     while (<Language::Bel::Globals::DATA>) {
         s/(\r\n){1,2}$//;
+        push @DECLARATIONS, $_;
+    }
+}
+
+sub initialize {
+    my ($self) = @_;
+
+    for my $prim_name (qw(car cdr id join type)) {
+        $self->set($prim_name, PRIMITIVES->{$prim_name});
+    }
+
+    for my $declaration (@DECLARATIONS) {
         # XXX: Just hunting for the next closing parenthesis, like this
         # regex does, it too simplistic for the general case. It'll work
         # for a while, but it'll fail once we get to `mem`:
@@ -48,48 +87,38 @@ for my $prim_name (qw(car cdr id join type)) {
         #     (def mem (x ys (o f =))
         #       (some [f _ x] ys))
         #
-        # A more general solution would involve the things Text::Balanced
-        # and Regexp::Common::balanced do, but I haven't evaluated those
-        # enough to choose one yet.
-        #
-        # Of course, we could also, do our own nested matcher using
-        # (?P<NAME>pattern) and (?P>NAME) syntxes, but that's 5.10+ syntax.
-        # Another option might be to capture everything and then do the
-        # parenthesis counting in a separate tokenizing-like postprocessing
-        # step.
-        /^\(def (\w+) (\w+|\([^)]+\))\s+(.+)\)$/ms
-            or die "Unrecognized: $_";
+        # Luckily there's a much better way; we should read the expression
+        # and then do the replacement on the (cons pair) AST. This will
+        # require writing a small pattern matcher; it doesn't need to be
+        # so fancy for this use, just enough to do the replacements we
+        # need for the globals.
+        if ($declaration =~ /^\(def (\w+) (\w+|\([^)]*\))\s+(.+)\)$/ms) {
+            # (From bellanguage.txt)
+            #
+            # In the source I try not to use things before I've defined them,
+            # but I've made a handful of exceptions to make the code easier
+            # to read.
+            #
+            # When you see
+            #
+            # (def n p e)
+            #
+            # treat it as an abbreviation for
+            #
+            # (set n (lit clo nil p e))
 
-        # (From bellanguage.txt)
-        #
-        # In the source I try not to use things before I've defined them,
-        # but I've made a handful of exceptions to make the code easier
-        # to read.
-        # 
-        # When you see
-        # 
-        # (def n p e)
-        # 
-        # treat it as an abbreviation for 
-        # 
-        # (set n (lit clo nil p e))
-
-        my $n = $1;
-        my $p = $2;
-        my $e = $3;
-
-        my $lit = "(lit clo nil $p $e)";
-        set($n, _read($lit));
+            my ($n, $p, $e) = ($1, $2, $3);
+            $self->set($n, _read("(lit clo nil $p $e)"));
+        }
+        elsif ($declaration =~ /\(set (\w+) (.+)\)/ms) {
+            my ($n, $e) = ($1, $2);
+            $self->set($n, $self->{interpreter}->eval_ast(_read($e)));
+        }
+        else {
+            die "Unrecognized: $declaration";
+        }
     }
 }
-
-sub GLOBALS {
-    return $GLOBALS;
-}
-
-our @EXPORT_OK = qw(
-    GLOBALS
-);
 
 1;
 __DATA__
@@ -137,3 +166,8 @@ __DATA__
                           (map f (cdr (car ls))))
                     (cons (apply f (map car ls))
                           (apply map f (map cdr ls)))))
+
+(set vmark (join))
+
+(def uvar ()
+  (list vmark))
