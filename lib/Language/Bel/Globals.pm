@@ -185,7 +185,9 @@ __DATA__
                           (apply map f (map cdr ls)))))
 
 (mac fn (parms . body)
-  (cons 'list ''lit ''clo 'scope (list 'quote parms) (list 'quote (car body)) nil))
+  (if (no (cdr body))
+    (cons 'list ''lit ''clo 'scope (list 'quote parms) (list 'quote (car body)) nil)
+    (cons 'list ''lit ''clo 'scope (list 'quote parms) (list 'quote (cons 'do body)) nil)))
 
 (set vmark (join))
 
