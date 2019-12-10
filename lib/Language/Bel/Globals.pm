@@ -200,4 +200,21 @@ __DATA__
           args))
 
 (mac bquote (e)
-  (list 'quote e))
+  ((fn ((sub change))
+     (if change sub (list 'quote e)))
+   (bqex e)))
+
+(def bqex (e)
+  (if (no e)              (list nil nil)
+      (atom e)            (list (list 'quote e) nil)
+      (id (car e) 'comma) (list (car (cdr e)) t)
+                          (bqexpair e)))
+
+(def bqexpair (e)
+  ((fn ((a achange))
+    ((fn ((d dchange))
+      (if (if achange achange dchange)
+          (list (list 'cons a d) t)
+          (list (list 'quote e) nil)))
+     (bqex (cdr e))))
+    (bqex (car e))))
