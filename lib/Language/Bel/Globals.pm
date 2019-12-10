@@ -198,3 +198,6 @@ __DATA__
   (reduce (fn (x y)
             (list (list 'fn (uvar) y) x))
           args))
+
+(mac bquote (e)
+  (list 'quote e))

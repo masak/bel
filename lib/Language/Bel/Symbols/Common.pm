@@ -3,6 +3,12 @@ package Language::Bel::Symbols::Common;
 use Language::Bel::Types qw(make_symbol);
 use Exporter 'import';
 
+my $symbol_bquote = make_symbol("bquote");
+
+sub SYMBOL_BQUOTE {
+    return $symbol_bquote;
+}
+
 my $symbol_char = make_symbol("char");
 
 sub SYMBOL_CHAR {
@@ -40,6 +46,7 @@ sub SYMBOL_T {
 }
 
 our @EXPORT_OK = qw(
+    SYMBOL_BQUOTE
     SYMBOL_CHAR
     SYMBOL_NIL 
     SYMBOL_PAIR

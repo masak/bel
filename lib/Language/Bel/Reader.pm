@@ -10,6 +10,7 @@ use Language::Bel::Types qw(
     make_symbol
 );
 use Language::Bel::Symbols::Common qw(
+    SYMBOL_BQUOTE
     SYMBOL_NIL
     SYMBOL_QUOTE
 );
@@ -69,6 +70,12 @@ sub _read_helper {
         ++$pos;
         my $r = _read_helper($expr, $pos);
         my $ast = make_pair(SYMBOL_QUOTE, make_pair($r->{ast}, SYMBOL_NIL));
+        return { ast => $ast, pos => $r->{pos} };
+    }
+    elsif ($c eq "`") {
+        ++$pos;
+        my $r = _read_helper($expr, $pos);
+        my $ast = make_pair(SYMBOL_BQUOTE, make_pair($r->{ast}, SYMBOL_NIL));
         return { ast => $ast, pos => $r->{pos} };
     }
     elsif ($c eq "\\") {
