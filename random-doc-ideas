@@ -45,3 +45,9 @@
 * list of predicates
 * list of comparison functions
 * list of helper functions
+
+* places where we need to compensate in the implementing substrate for the
+  metacircularity in bel.bel
+    - `set` being used implicitly from the start
+    - backquoting being used from early on but defined later
+    - the evaluator using function calls everywhere, which needs the evaluator
