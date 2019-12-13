@@ -12,6 +12,7 @@ use Language::Bel::Types qw(
 use Language::Bel::Symbols::Common qw(
     SYMBOL_BQUOTE
     SYMBOL_COMMA
+    SYMBOL_COMMA_AT
     SYMBOL_NIL
     SYMBOL_QUOTE
 );
@@ -81,8 +82,14 @@ sub _read_helper {
     }
     elsif ($c eq ",") {
         ++$pos;
+        my $symbol = SYMBOL_COMMA;
+        my $cc = substr($expr, $pos, 1);
+        if ($cc eq "@") {
+            ++$pos;
+            $symbol = SYMBOL_COMMA_AT;
+        }
         my $r = _read_helper($expr, $pos);
-        my $ast = make_pair(SYMBOL_COMMA, make_pair($r->{ast}, SYMBOL_NIL));
+        my $ast = make_pair($symbol, make_pair($r->{ast}, SYMBOL_NIL));
         return { ast => $ast, pos => $r->{pos} };
     }
     elsif ($c eq "\\") {
