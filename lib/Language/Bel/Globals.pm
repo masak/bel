@@ -17,6 +17,9 @@ use Language::Bel::Primitives qw(
 use Language::Bel::Reader qw(
     _read
 );
+use Language::Bel::Expander::Bquote qw(
+    _bqexpand
+);
 
 sub new {
     my ($class, $options_ref) = @_;
@@ -80,7 +83,7 @@ sub initialize {
     }
 
     for my $declaration (@DECLARATIONS) {
-        my ($name, $value);
+        my ($name, $source);
 
         # XXX: Just hunting for the next closing parenthesis, like this
         # regex does, it too simplistic for the general case. It'll work
@@ -111,7 +114,7 @@ sub initialize {
 
             $name = $1;
             my ($p, $e) = ($2, $3);
-            $value = "(lit clo nil $p $e)";
+            $source = "(lit clo nil $p $e)";
         }
         elsif ($declaration =~ /^\(mac (\w+) (\w+|\([^)]*\))\s+(.+)\)$/ms) {
             # and when you see
@@ -124,16 +127,17 @@ sub initialize {
 
             $name = $1;
             my ($p, $e) = ($2, $3);
-            $value = "(lit mac (lit clo nil $p $e))";
+            $source = "(lit mac (lit clo nil $p $e))";
         }
         elsif ($declaration =~ /\(set (\w+) (.+)\)/ms) {
-            ($name, $value) = ($1, $2);
+            ($name, $source) = ($1, $2);
         }
         else {
             die "Unrecognized: $declaration";
         }
 
-        $self->set($name, $self->{interpreter}->eval_ast(_read($value)));
+        my $ast = _bqexpand(_read($source));
+        $self->set($name, $self->{interpreter}->eval_ast($ast));
     }
 }
 
@@ -198,34 +202,3 @@ __DATA__
   (reduce (fn (x y)
             (list (list 'fn (uvar) y) x))
           args))
-
-(mac bquote (e)
-  ((fn ((sub change))
-     (if change sub (list 'quote e)))
-   (bqex e)))
-
-(def caris (x y)
-  (if (no (atom x)) (id (car x) y)))
-
-(def bqex (e)
-  (if (no e)              (list nil nil)
-      (atom e)            (list (list 'quote e) nil)
-      (caris e 'comma)    (list (car (cdr e)) t)
-      (caris e 'comma-at) (list (list 'splice (car (cdr e))) t)
-                          (bqexpair e)))
-
-(def bqexpair (e)
-  ((fn ((a achange))
-    ((fn ((d dchange))
-      (if (if achange t dchange)
-          (list (if (caris d 'splice)
-                    (if (caris a 'splice)
-                        (list 'apply 'append (car (cdr a)) (car (cdr d)))
-                        (list 'apply 'cons a (car (cdr d))))
-                    (caris a 'splice)
-                    (list 'append (car (cdr a)) d)
-                    (list 'cons a d))
-                t)
-          (list (list 'quote e) nil)))
-     (bqex (cdr e))))
-    (bqex (car e))))
