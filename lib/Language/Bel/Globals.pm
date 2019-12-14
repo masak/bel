@@ -191,8 +191,8 @@ __DATA__
 
 (mac fn (parms . body)
   (if (no (cdr body))
-    (cons 'list ''lit ''clo 'scope (list 'quote parms) (list 'quote (car body)) nil)
-    (cons 'list ''lit ''clo 'scope (list 'quote parms) (list 'quote (cons 'do body)) nil)))
+    `(list 'lit 'clo scope ',parms ',(car body))
+    `(list 'lit 'clo scope ',parms '(do ,@body))))
 
 (set vmark (join))
 
