@@ -97,7 +97,7 @@ sub initialize {
         # require writing a small pattern matcher; it doesn't need to be
         # so fancy for this use, just enough to do the replacements we
         # need for the globals.
-        if ($declaration =~ /^\(def (\w+) (\w+|\([^)]*\))\s+(.+)\)$/ms) {
+        if ($declaration =~ /^\(def (\S+) (\w+|\([^)]*\))\s*(.*)\)$/ms) {
             # (From bellanguage.txt)
             #
             # In the source I try not to use things before I've defined them,
@@ -114,9 +114,10 @@ sub initialize {
 
             $name = $1;
             my ($p, $e) = ($2, $3);
+            $e ||= "nil";
             $source = "(lit clo nil $p $e)";
         }
-        elsif ($declaration =~ /^\(mac (\w+) (\w+|\([^)]*\))\s+(.+)\)$/ms) {
+        elsif ($declaration =~ /^\(mac (\S+) (\w+|\([^)]*\))\s+(.+)\)$/ms) {
             # and when you see
             #
             # (mac n p e)
@@ -129,7 +130,7 @@ sub initialize {
             my ($p, $e) = ($2, $3);
             $source = "(lit mac (lit clo nil $p $e))";
         }
-        elsif ($declaration =~ /\(set (\w+) (.+)\)/ms) {
+        elsif ($declaration =~ /\(set (\S+) (.+)\)/ms) {
             ($name, $source) = ($1, $2);
         }
         else {
@@ -202,3 +203,14 @@ __DATA__
   (reduce (fn (x y)
             (list (list 'fn (uvar) y) x))
           args))
+
+(def err args)
+
+(mac comma args
+  '(err 'comma-outside-backquote))
+
+(mac comma-at args
+  '(err 'comma-at-outside-backquote))
+
+(mac splice args
+  '(err 'comma-at-outside-list))

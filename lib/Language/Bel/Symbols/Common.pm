@@ -27,6 +27,12 @@ sub SYMBOL_COMMA_AT {
     return $symbol_comma_at;
 }
 
+my $symbol_err = make_symbol("err");
+
+sub SYMBOL_ERR {
+    return $symbol_err;
+}
+
 my $symbol_nil = make_symbol("nil");
 
 sub SYMBOL_NIL {
@@ -62,6 +68,7 @@ our @EXPORT_OK = qw(
     SYMBOL_CHAR
     SYMBOL_COMMA
     SYMBOL_COMMA_AT
+    SYMBOL_ERR
     SYMBOL_NIL 
     SYMBOL_PAIR
     SYMBOL_QUOTE
