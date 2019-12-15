@@ -204,6 +204,9 @@ __DATA__
             (list (list 'fn (uvar) y) x))
           args))
 
+(mac let (parms val . body)
+  `((fn (,parms) ,@body) ,val))
+
 (def err args)
 
 (mac comma args
