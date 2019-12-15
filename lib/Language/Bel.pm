@@ -34,6 +34,9 @@ use Language::Bel::Reader qw(
 );
 use Language::Bel::Globals;
 use Language::Bel::Interpreter;
+use Language::Bel::Expander::Bquote qw(
+    _bqexpand
+);
 
 =head1 NAME
 
@@ -102,7 +105,7 @@ Evaluates an expression, passed in as a string of Bel code.
 sub eval {
     my ($self, $expr) = @_;
 
-    my $ast = _read($expr);
+    my $ast = _bqexpand(_read($expr));
     my $result = $self->{interpreter}->eval_ast($ast);
     my $result_string = $self->ast_to_string($result);
 

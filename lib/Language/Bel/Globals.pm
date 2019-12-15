@@ -17,6 +17,9 @@ use Language::Bel::Primitives qw(
 use Language::Bel::Reader qw(
     _read
 );
+use Language::Bel::Expander::Bquote qw(
+    _bqexpand
+);
 
 sub new {
     my ($class, $options_ref) = @_;
@@ -80,7 +83,7 @@ sub initialize {
     }
 
     for my $declaration (@DECLARATIONS) {
-        my ($name, $value);
+        my ($name, $source);
 
         # XXX: Just hunting for the next closing parenthesis, like this
         # regex does, it too simplistic for the general case. It'll work
@@ -94,7 +97,7 @@ sub initialize {
         # require writing a small pattern matcher; it doesn't need to be
         # so fancy for this use, just enough to do the replacements we
         # need for the globals.
-        if ($declaration =~ /^\(def (\w+) (\w+|\([^)]*\))\s+(.+)\)$/ms) {
+        if ($declaration =~ /^\(def (\S+) (\w+|\([^)]*\))\s*(.*)\)$/ms) {
             # (From bellanguage.txt)
             #
             # In the source I try not to use things before I've defined them,
@@ -111,9 +114,10 @@ sub initialize {
 
             $name = $1;
             my ($p, $e) = ($2, $3);
-            $value = "(lit clo nil $p $e)";
+            $e ||= "nil";
+            $source = "(lit clo nil $p $e)";
         }
-        elsif ($declaration =~ /^\(mac (\w+) (\w+|\([^)]*\))\s+(.+)\)$/ms) {
+        elsif ($declaration =~ /^\(mac (\S+) (\w+|\([^)]*\))\s+(.+)\)$/ms) {
             # and when you see
             #
             # (mac n p e)
@@ -124,16 +128,17 @@ sub initialize {
 
             $name = $1;
             my ($p, $e) = ($2, $3);
-            $value = "(lit mac (lit clo nil $p $e))";
+            $source = "(lit mac (lit clo nil $p $e))";
         }
-        elsif ($declaration =~ /\(set (\w+) (.+)\)/ms) {
-            ($name, $value) = ($1, $2);
+        elsif ($declaration =~ /\(set (\S+) (.+)\)/ms) {
+            ($name, $source) = ($1, $2);
         }
         else {
             die "Unrecognized: $declaration";
         }
 
-        $self->set($name, $self->{interpreter}->eval_ast(_read($value)));
+        my $ast = _bqexpand(_read($source));
+        $self->set($name, $self->{interpreter}->eval_ast($ast));
     }
 }
 
@@ -198,3 +203,14 @@ __DATA__
   (reduce (fn (x y)
             (list (list 'fn (uvar) y) x))
           args))
+
+(def err args)
+
+(mac comma args
+  '(err 'comma-outside-backquote))
+
+(mac comma-at args
+  '(err 'comma-at-outside-backquote))
+
+(mac splice args
+  '(err 'comma-at-outside-list))

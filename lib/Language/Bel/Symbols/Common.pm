@@ -3,10 +3,34 @@ package Language::Bel::Symbols::Common;
 use Language::Bel::Types qw(make_symbol);
 use Exporter 'import';
 
+my $symbol_bquote = make_symbol("bquote");
+
+sub SYMBOL_BQUOTE {
+    return $symbol_bquote;
+}
+
 my $symbol_char = make_symbol("char");
 
 sub SYMBOL_CHAR {
     return $symbol_char;
+}
+
+my $symbol_comma = make_symbol("comma");
+
+sub SYMBOL_COMMA {
+    return $symbol_comma;
+}
+
+my $symbol_comma_at = make_symbol("comma-at");
+
+sub SYMBOL_COMMA_AT {
+    return $symbol_comma_at;
+}
+
+my $symbol_err = make_symbol("err");
+
+sub SYMBOL_ERR {
+    return $symbol_err;
 }
 
 my $symbol_nil = make_symbol("nil");
@@ -40,7 +64,11 @@ sub SYMBOL_T {
 }
 
 our @EXPORT_OK = qw(
+    SYMBOL_BQUOTE
     SYMBOL_CHAR
+    SYMBOL_COMMA
+    SYMBOL_COMMA_AT
+    SYMBOL_ERR
     SYMBOL_NIL 
     SYMBOL_PAIR
     SYMBOL_QUOTE

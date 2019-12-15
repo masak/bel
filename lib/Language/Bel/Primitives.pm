@@ -1,5 +1,9 @@
 package Language::Bel::Primitives;
 
+use 5.006;
+use strict;
+use warnings;
+
 use Language::Bel::Types qw(
     char_name
     is_char
@@ -19,12 +23,6 @@ use Language::Bel::Symbols::Common qw(
     SYMBOL_SYMBOL
 );
 use Exporter 'import';
-
-sub lift_boolean {
-    my ($bool) = @_;
-
-    return $bool ? SYMBOL_T : SYMBOL_NIL;
-}
 
 sub prim_car {
     my ($object) = @_;
@@ -54,21 +52,27 @@ sub prim_cdr {
     }
 }
 
-sub prim_id {
+sub _id {
     my ($first, $second) = @_;
 
     if (is_symbol($first) && is_symbol($second)) {
-        return lift_boolean(symbol_name($first) eq symbol_name($second));
+        return symbol_name($first) eq symbol_name($second);
     }
     elsif (is_char($first) && is_char($second)) {
-        return lift_boolean(char_name($first) eq char_name($second));
+        return char_name($first) eq char_name($second);
     }
     elsif (is_pair($first) && is_pair($second)) {
-        return lift_boolean($first eq $second);
+        return $first eq $second;
     }
     else {
-        return lift_boolean("");
+        return "";
     }
+}
+
+sub prim_id {
+    my ($first, $second) = @_;
+
+    return _id($first, $second) ? SYMBOL_T : SYMBOL_NIL;
 }
 
 sub prim_join {
@@ -134,6 +138,7 @@ sub PRIMITIVES {
 }
 
 our @EXPORT_OK = qw(
+    _id
     prim_car
     prim_cdr
     prim_id 

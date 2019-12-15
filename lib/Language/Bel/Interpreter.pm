@@ -15,9 +15,11 @@ use Language::Bel::Types qw(
     symbol_name
 );
 use Language::Bel::Symbols::Common qw(
+    SYMBOL_ERR
     SYMBOL_NIL
 );
 use Language::Bel::Primitives qw(
+    _id
     prim_car
     prim_cdr
     PRIM_FN
@@ -239,6 +241,31 @@ sub _vref {
     }
 }
 
+# (def get (k kvs (o f =))
+#   (find [f (car _) k] kvs))
+sub get {
+    my ($k, $kvs) = @_;
+
+    my $symbols_id = sub {
+        my ($first, $second) = @_;
+
+        return is_symbol($first)
+            && is_symbol($second)
+            && symbol_name($first) eq symbol_name($second);
+    };
+
+    while (!is_symbol($kvs) || symbol_name($kvs) ne "nil") {
+        my $kv = pair_car($kvs);
+        my $key = pair_car($kv);
+
+        if ($symbols_id->($key, $k)) {
+            return $kv;
+        }
+        $kvs = pair_cdr($kvs);
+    }
+    return;
+}
+
 # (def lookup (e a s g)
 #   (or (binding e s)
 #       (get e a id)
@@ -249,34 +276,9 @@ sub _vref {
 sub _lookup {
     my ($e, $a, $s, $g) = @_;
 
-    my $symbols_id = sub {
-        my ($first, $second) = @_;
-
-        return is_symbol($first)
-            && is_symbol($second)
-            && symbol_name($first) eq symbol_name($second);
-    };
-
-    # (def get (k kvs (o f =))
-    #   (find [f (car _) k] kvs))
-    my $get = sub {
-        my ($k, $kvs) = @_;
-
-        while (!is_symbol($kvs) || symbol_name($kvs) ne "nil") {
-            my $kv = pair_car($kvs);
-            my $key = pair_car($kv);
-
-            if ($symbols_id->($key, $k)) {
-                return $kv;
-            }
-            $kvs = pair_cdr($kvs);
-        }
-        return;
-    };
-
     # XXX: skipping `binding` case for now
-    return $get->($e, $a)
-        || $get->($e, $g)
+    return get($e, $a)
+        || get($e, $g)
         || (symbol_name($e) eq "scope" && make_pair($e, $a))
         || (symbol_name($e) eq "globe" && make_pair($e, $g))
         || SYMBOL_NIL;
@@ -320,6 +322,18 @@ sub _evcall {
                 && symbol_name(prim_car(prim_cdr($v))) eq "mac";
         };
 
+        my $is_err = sub {
+            my ($v) = @_;
+
+            my $g = $m->[1];
+            my $err = get(SYMBOL_ERR, $g);
+            if (!$err) {
+                return "";
+            }
+
+            return _id($v, prim_cdr($err));
+        };
+
         if ($isa_mac->($op)) {
             _applym($op, $es1, $a, $s, $r, $m);
         }
@@ -337,7 +351,13 @@ sub _evcall {
                     $es2 = pair_cdr($es2);
                 }
 
-                _applyf($op, $args, $a, $s, $r, $m);
+                if ($is_err->($op)) {
+                    # XXX: Need to do proper parameter handling here
+                    die symbol_name(prim_car($args)), "\n";
+                }
+                else {
+                    _applyf($op, $args, $a, $s, $r, $m);
+                }
             };
 
             push @$s, $fu2;
