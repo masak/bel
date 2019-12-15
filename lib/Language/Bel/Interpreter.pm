@@ -826,6 +826,9 @@ __DATA__
      (xdr globe (cons (cons ',v ,e) (cdr globe)))
      t))
 
+(mac def (n . rest)
+  `(set ,n (fn ,@rest)))
+
 (def err args)
 
 (mac comma args
