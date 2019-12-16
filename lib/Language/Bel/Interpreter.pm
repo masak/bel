@@ -829,6 +829,9 @@ __DATA__
 (mac def (n . rest)
   `(set ,n (fn ,@rest)))
 
+(mac mac (n . rest)
+  `(set ,n (macro ,@rest)))
+
 (def err args)
 
 (mac comma args
