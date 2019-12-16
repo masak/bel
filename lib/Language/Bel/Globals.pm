@@ -78,7 +78,7 @@ my @DECLARATIONS;
 sub initialize {
     my ($self) = @_;
 
-    for my $prim_name (qw(car cdr id join type)) {
+    for my $prim_name (keys(%{PRIMITIVES()})) {
         $self->set($prim_name, PRIMITIVES->{$prim_name});
     }
 
@@ -209,6 +209,9 @@ __DATA__
 
 (mac macro args
   `(list 'lit 'mac (fn ,@args)))
+
+(mac set (v e)
+  `(xdr globe (cons (cons ',v ,e) (cdr globe))))
 
 (def err args)
 

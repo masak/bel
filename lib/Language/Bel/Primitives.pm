@@ -13,6 +13,7 @@ use Language::Bel::Types qw(
     make_symbol
     pair_car
     pair_cdr
+    pair_set_cdr
     symbol_name
 );
 use Language::Bel::Symbols::Common qw(
@@ -98,6 +99,16 @@ sub prim_type {
     }
 }
 
+sub prim_xdr {
+    my ($object, $d_value) = @_;
+
+    if (!is_pair($object)) {
+        die "xdr-on-atom\n";
+    }
+    pair_set_cdr($object, $d_value);
+    return $d_value;
+}
+
 sub make_prim {
     my ($name) = @_;
 
@@ -119,6 +130,7 @@ my %prim_fn = (
     "id" => { fn => \&prim_id, arity => 2 },
     "join" => { fn => \&prim_join, arity => 2 },
     "type" => { fn => \&prim_type, arity => 1 },
+    "xdr" => { fn => \&prim_xdr, arity => 2 },
 );
 
 sub PRIM_FN {
@@ -131,6 +143,7 @@ my %primitives = (
     "id" => make_prim("id"),
     "join" => make_prim("join"),
     "type" => make_prim("type"),
+    "xdr" => make_prim("xdr"),
 );
 
 sub PRIMITIVES {
