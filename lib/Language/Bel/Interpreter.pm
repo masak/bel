@@ -15,7 +15,6 @@ use Language::Bel::Types qw(
     symbol_name
 );
 use Language::Bel::Symbols::Common qw(
-    SYMBOL_ERR
     SYMBOL_NIL
 );
 use Language::Bel::Primitives qw(
@@ -53,6 +52,7 @@ sub new {
 
     $self = bless($self, $class);
     if (!defined($self->{g})) {
+        $self->{globals_hash} = {};
         $self->{g} = SYMBOL_NIL;
 
         for my $prim_name (keys(%{PRIMITIVES()})) {
@@ -413,8 +413,8 @@ sub evcall {
                 my $is_err = sub {
                     my ($v) = @_;
 
-                    my $err = get(SYMBOL_ERR, $self->{g});
-                    return $err && _id($v, prim_cdr($err));
+                    my $err = $self->{globals_hash}{err};
+                    return $err && _id($v, $err);
                 };
 
                 if ($is_err->($op)) {
@@ -731,6 +731,7 @@ sub ast_to_string {
 sub set {
     my ($self, $name, $value) = @_;
 
+    $self->{globals_hash}{$name} = $value;
     $self->{g} = make_pair(
         make_pair(make_symbol($name), $value),
         $self->{g},
