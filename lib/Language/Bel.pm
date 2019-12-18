@@ -32,7 +32,6 @@ use Language::Bel::Primitives qw(
 use Language::Bel::Reader qw(
     _read
 );
-use Language::Bel::Globals;
 use Language::Bel::Interpreter;
 use Language::Bel::Expander::Bquote qw(
     _bqexpand
@@ -82,16 +81,6 @@ sub new {
         ? $self->{interpreter}
         : Language::Bel::Interpreter->new();
     $self->{interpreter} = $interpreter;
-
-    my $globals = defined $self->{globals}
-        ? $self->{globals}
-        : Language::Bel::Globals->new();
-    $self->{globals} = $globals;
-
-    $self->{interpreter}->globals($globals);
-    $self->{globals}->interpreter($interpreter);
-
-    $globals->initialize();
 
     return bless($self, $class);
 }
