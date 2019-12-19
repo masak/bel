@@ -807,7 +807,9 @@ __DATA__
   `(list 'lit 'mac (fn ,@args)))
 
 (mac set (v e)
-  `(xdr globe (cons (cons ',v ,e) (cdr globe))))
+  `(do
+     (xdr globe (cons (cons ',v ,e) (cdr globe)))
+     t))
 
 (def err args)
 
