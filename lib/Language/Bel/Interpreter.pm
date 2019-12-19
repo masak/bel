@@ -839,6 +839,10 @@ __DATA__
         `(let ,v ,(car args)
            (if ,v ,v (or ,@(cdr args)))))))
 
+(mac and args
+  (reduce (fn es (cons 'if es))
+          (or args '(t))))
+
 (def err args)
 
 (mac comma args
