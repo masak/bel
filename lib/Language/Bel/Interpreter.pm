@@ -832,6 +832,13 @@ __DATA__
 (mac mac (n . rest)
   `(set ,n (macro ,@rest)))
 
+(mac or args
+  (if (no args)
+      nil
+      (let v (uvar)
+        `(let ,v ,(car args)
+           (if ,v ,v (or ,@(cdr args)))))))
+
 (def err args)
 
 (mac comma args
