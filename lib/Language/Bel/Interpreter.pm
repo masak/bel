@@ -228,7 +228,7 @@ sub ev {
         if (literal($e)) {
             push @{$self->{r}}, $e;
         }
-        elsif (variable($e)) {
+        elsif ($self->variable($e)) {
             $self->vref($e, $a);
         }
         # XXX: skipping `proper` check for now
@@ -279,15 +279,23 @@ sub literal {
     );
 }
 
+sub is_global_value {
+    my ($self, $e, $global_name) = @_;
+
+    my $global = $self->{globals_hash}{$global_name};
+    return $global && _id($e, $global);
+}
+
 # (def variable (e)
 #   (if (atom e)
 #       (no (literal e))
 #       (id (car e) vmark)))
 sub variable {
-    my ($e) = @_;
+    my ($self, $e) = @_;
 
-    # XXX: skipping the vmark case for now
-    return !is_pair($e) && !literal($e);
+    return is_pair($e)
+        ? $self->is_global_value(pair_car($e), "vmark")
+        : !literal($e);
 }
 
 # (def vref (v a s r m)
@@ -312,7 +320,10 @@ sub vref {
         push @{$self->{r}}, pair_cdr($it);
     }
     else {
-        die "('unboundb ", symbol_name($v), ")\n";
+        my $name = is_symbol($v)
+            ? symbol_name($v)
+            : "<not a symbol>";
+        die "('unboundb $name)\n";
     }
 }
 
@@ -321,19 +332,26 @@ sub vref {
 sub get {
     my ($k, $kvs) = @_;
 
-    my $symbols_id = sub {
+    my $equal = sub {
         my ($first, $second) = @_;
 
-        return is_symbol($first)
+        return 1
+            if is_symbol($first)
             && is_symbol($second)
-            && symbol_name($first) eq symbol_name($second);
+            && _id($first, $second);
+        return is_pair($first)
+            && is_pair(pair_car($first))
+            && is_symbol(pair_cdr($first))
+            && symbol_name(pair_cdr($first)) eq "nil"
+            && is_pair($second)
+            && _id($first, $second);
     };
 
     while (!is_symbol($kvs) || symbol_name($kvs) ne "nil") {
         my $kv = pair_car($kvs);
         my $key = pair_car($kv);
 
-        if ($symbols_id->($key, $k)) {
+        if ($equal->($key, $k)) {
             return $kv;
         }
         $kvs = pair_cdr($kvs);
@@ -354,8 +372,12 @@ sub lookup {
     # XXX: skipping `binding` case for now
     return get($e, $a)
         || get($e, $self->{g})
-        || (symbol_name($e) eq "scope" && make_pair($e, $a))
-        || (symbol_name($e) eq "globe" && make_pair($e, $self->{g}))
+        || (is_symbol($e)
+            && symbol_name($e) eq "scope"
+            && make_pair($e, $a))
+        || (is_symbol($e)
+            && symbol_name($e) eq "globe"
+            && make_pair($e, $self->{g}))
         || SYMBOL_NIL;
 }
 
@@ -410,14 +432,7 @@ sub evcall {
                     $es2 = pair_cdr($es2);
                 }
 
-                my $is_err = sub {
-                    my ($v) = @_;
-
-                    my $err = $self->{globals_hash}{err};
-                    return $err && _id($v, $err);
-                };
-
-                if ($is_err->($op)) {
+                if ($self->is_global_value($op, "err")) {
                     # XXX: Need to do proper parameter handling here
                     die symbol_name(prim_car($args)), "\n";
                 }
@@ -647,7 +662,7 @@ sub pass {
         push @{$self->{r}}, $env;
     }
     # XXX: skipping the literal case for now
-    elsif (variable($pat)) {
+    elsif ($self->variable($pat)) {
         push @{$self->{r}}, make_pair(make_pair($pat, $arg), $env);
     }
     # XXX: skipping the `t` case for now
