@@ -77,10 +77,9 @@ sub new {
         ref($options_ref) eq "HASH" ? %$options_ref : (),
     };
 
-    my $interpreter = defined $self->{interpreter}
-        ? $self->{interpreter}
-        : Language::Bel::Interpreter->new();
-    $self->{interpreter} = $interpreter;
+    if (!defined $self->{interpreter}) {
+        $self->{interpreter} = Language::Bel::Interpreter->new();
+    }
 
     return bless($self, $class);
 }

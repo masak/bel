@@ -36,37 +36,11 @@ sub _read_helper {
     $skip_whitespace->();
     my $c = substr($expr, $pos, 1);
     if ($c eq "(") {
-        ++$pos;
-        my @list;
-        my $seen_dot = "";
-        my $seen_element_after_dot = "";
-        while ($pos < length($expr)) {
-            $skip_whitespace->();
-            my $cc = substr($expr, $pos, 1);
-            if ($cc eq ")") {
-                ++$pos;
-                last;
-            }
-            elsif ($cc eq ".") {
-                ++$pos;
-                $seen_dot = 1;
-            }
-
-            if ($seen_element_after_dot) {
-                die "only one element after dot allowed";
-            }
-            my $r = _read_helper($expr, $pos);
-            if ($seen_dot) {
-                $seen_element_after_dot = 1;
-            }
-            push @list, $r->{ast};
-            $pos = $r->{pos};
-        }
-        my $ast = $seen_dot ? pop(@list) : SYMBOL_NIL;
-        for my $e (reverse(@list)) {
-            $ast = make_pair($e, $ast);
-        }
-        return { ast => $ast, pos => $pos };
+        return _rdlist($expr, ")", $pos);
+    }
+    elsif ($c eq "[") {
+        my $r = _rdlist($expr, "]", $pos);
+        return { ast => wrap_in_fn($r->{ast}), pos => $r->{pos} };
     }
     elsif ($c eq "'") {
         ++$pos;
@@ -100,7 +74,7 @@ sub _read_helper {
             do {
                 my $cc = substr($expr, $pos, 1);
                 # XXX: cheat for now
-                last EAT_CHAR if $cc eq ")" or $cc =~ /\s/;
+                last EAT_CHAR if $cc eq ")" or $cc eq "]" or $cc =~ /\s/;
                 ++$pos;
             } while ($pos < length($expr));
         }
@@ -114,13 +88,73 @@ sub _read_helper {
             do {
                 my $cc = substr($expr, $pos, 1);
                 # XXX: cheat for now
-                last EAT_CHAR if $cc eq ")" or $cc =~ /\s/;
+                last EAT_CHAR if $cc eq ")" or $cc eq "]" or $cc =~ /\s/;
                 ++$pos;
             } while ($pos < length($expr));
         }
         my $ast = make_symbol(substr($expr, $start, $pos - $start));
         return { ast => $ast, pos => $pos };
     }
+}
+
+sub _rdlist {
+    my ($expr, $stopper, $pos) = @_;
+
+    my $skip_whitespace = sub {
+        while ($pos < length($expr) && substr($expr, $pos, 1) =~ /\s/) {
+            ++$pos;
+        }
+    };
+
+    ++$pos;
+    my @list;
+    my $seen_dot = "";
+    my $seen_element_after_dot = "";
+    while ($pos < length($expr)) {
+        $skip_whitespace->();
+        my $c = substr($expr, $pos, 1);
+        if ($c eq $stopper) {
+            ++$pos;
+            last;
+        }
+        elsif ($c eq ".") {
+            ++$pos;
+            $seen_dot = 1;
+        }
+
+        if ($seen_element_after_dot) {
+            die "only one element after dot allowed";
+        }
+        my $r = _read_helper($expr, $pos);
+        if ($seen_dot) {
+            $seen_element_after_dot = 1;
+        }
+        push @list, $r->{ast};
+        $pos = $r->{pos};
+    }
+    my $ast = $seen_dot ? pop(@list) : SYMBOL_NIL;
+    for my $e (reverse(@list)) {
+        $ast = make_pair($e, $ast);
+    }
+    return { ast => $ast, pos => $pos };
+}
+
+sub wrap_in_fn {
+    my ($expr) = @_;
+
+    return make_pair(
+        make_symbol("fn"),
+        make_pair(
+            make_pair(
+                make_symbol("_"),
+                SYMBOL_NIL,
+            ),
+            make_pair(
+                $expr,
+                SYMBOL_NIL,
+            ),
+        ),
+    );
 }
 
 our @EXPORT_OK = qw(
