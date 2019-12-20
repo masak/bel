@@ -826,6 +826,23 @@ __DATA__
      (xdr globe (cons (cons ',v ,e) (cdr globe)))
      t))
 
+(mac def (n . rest)
+  `(set ,n (fn ,@rest)))
+
+(mac mac (n . rest)
+  `(set ,n (macro ,@rest)))
+
+(mac or args
+  (if (no args)
+      nil
+      (let v (uvar)
+        `(let ,v ,(car args)
+           (if ,v ,v (or ,@(cdr args)))))))
+
+(mac and args
+  (reduce (fn es (cons 'if es))
+          (or args '(t))))
+
 (def err args)
 
 (mac comma args
