@@ -36,6 +36,7 @@ use Language::Bel::Interpreter;
 use Language::Bel::Expander::Bquote qw(
     _bqexpand
 );
+use Language::Bel::Logger;
 
 =head1 NAME
 
@@ -77,8 +78,14 @@ sub new {
         ref($options_ref) eq "HASH" ? %$options_ref : (),
     };
 
+    if (!defined($self->{logger})) {
+        $self->{logger} = Language::Bel::Logger->new();
+    }
+
     if (!defined $self->{interpreter}) {
-        $self->{interpreter} = Language::Bel::Interpreter->new();
+        $self->{interpreter} = Language::Bel::Interpreter->new({
+            logger => $self->{logger},
+        });
     }
 
     return bless($self, $class);

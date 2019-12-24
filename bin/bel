@@ -4,6 +4,9 @@ use strict;
 use warnings;
 
 use Language::Bel;
+use Language::Bel::Logger qw(
+    level_of
+);
 
 binmode STDOUT, ':encoding(utf-8)';
 
@@ -15,10 +18,26 @@ sub prompt {
     return $input;
 }
 
-my $b = Language::Bel->new({ output => sub {
-    my ($string) = @_;
-    print($string, "\n");
-} });
+my $level = $Language::Bel::Logger::NONE;
+for my $argument (@ARGV) {
+    if ($argument =~ /^--log(?:=(\w+))?/) {
+        $level = $1 eq ""
+            ? $Language::Bel::Logger::DEBUG
+            : level_of($1);
+    }
+    else {
+        die "Unrecognized argument: $argument\n";
+    }
+}
+@ARGV = ();
+
+my $b = Language::Bel->new({
+    output => sub {
+        my ($string) = @_;
+        print($string, "\n");
+    },
+    logger => Language::Bel::Logger->new({ level => $level }),
+});
 
 while (defined (my $expr = prompt("> "))) {
     next if $expr =~ /^\s*$/;

@@ -32,6 +32,7 @@ use Language::Bel::Reader qw(
 use Language::Bel::Expander::Bquote qw(
     _bqexpand
 );
+use Language::Bel::Logger;
 
 my @DECLARATIONS;
 {
@@ -49,6 +50,11 @@ sub new {
     my $self = {
         ref($options_ref) eq "HASH" ? %$options_ref : (),
     };
+
+    my $stashed_logger = defined($self->{logger})
+        ? $self->{logger}
+        : Language::Bel::Logger->new();
+    $self->{logger} = Language::Bel::Logger->new();
 
     $self = bless($self, $class);
     if (!defined($self->{g})) {
@@ -119,7 +125,15 @@ sub new {
         }
     }
 
+    $self->{logger} = $stashed_logger;
+
     return $self;
+}
+
+sub logger {
+    my ($self) = @_;
+
+    return $self->{logger};
 }
 
 # (def bel (e (o g globe))
@@ -133,6 +147,29 @@ sub eval_ast {
     $self->{r} = [];
 
     while (@{$self->{s}}) {
+        $self->logger()->log("debug", sub {
+            my $e_a = $self->{s}[0];
+            return if ref($e_a) eq "CODE";
+            my $e = $e_a->[0];
+            "tick `", $self->ast_to_string($e), "`";
+        });
+        $self->logger()->log("debug", sub {
+            my $e_a = $self->{s}[0];
+            return if ref($e_a) eq "CODE";
+            my $a = $e_a->[1];
+            return unless is_pair($a);
+            my @lexenv;
+            while (is_pair($a)) {
+                my $entry = pair_car($a);
+                push @lexenv,
+                    "'"
+                    . $self->ast_to_string(pair_car($entry))
+                    . ": "
+                    . $self->ast_to_string(pair_cdr($entry));
+                $a = pair_cdr($a);
+            }
+            "  lexenv: { ", join(", ", @lexenv), " }";
+        });
         $self->ev();
     }
     return $self->{r}[-1];
@@ -191,9 +228,16 @@ sub if2 {
     my ($interpreter, $es, $a) = @_;
 
     my $car_r = pop(@{$interpreter->{r}});
-    my $e = !is_symbol($car_r) || symbol_name($car_r) ne "nil"
-        ? prim_car($es)
-        : make_pair(make_symbol("if"), prim_cdr($es));
+    my $e;
+    if (!is_symbol($car_r) || symbol_name($car_r) ne "nil") {
+        $interpreter->logger()->log("debug", sub {
+            "  `if` is truthy";
+        });
+        $e = prim_car($es);
+    }
+    else {
+        $e = make_pair(make_symbol("if"), prim_cdr($es));
+    }
     push @{$interpreter->{s}}, [$e, $a];
 }
 
@@ -391,6 +435,11 @@ sub lookup {
 sub evcall {
     my ($self, $e, $a) = @_;
 
+    my $opname = "<unknown>";
+    $self->logger()->log("debug", sub {
+        $opname = $self->ast_to_string(pair_car($e));
+        return;
+    });
     my $fu1 = sub {
         # (def evcall2 (es a s (op . r) m)
         #   (if ((isa 'mac) op)
@@ -418,7 +467,7 @@ sub evcall {
         };
 
         if ($isa_mac->($op)) {
-            $self->applym($op, $es1, $a);
+            $self->applym($op, $es1, $a, $opname);
         }
         else {
             # We're consuming `es` twice, once in each fut.
@@ -437,7 +486,7 @@ sub evcall {
                     die symbol_name(prim_car($args)), "\n";
                 }
                 else {
-                    $self->applyf($op, $args, $a);
+                    $self->applyf($op, $args, $a, $opname);
                 }
             };
 
@@ -469,7 +518,7 @@ sub evcall {
 #           r
 #           m))
 sub applym {
-    my ($self, $mac, $args, $a) = @_;
+    my ($self, $mac, $args, $a, $opname) = @_;
 
     my $mac_clo = prim_car(prim_cdr(prim_cdr($mac)));
     my $fu = sub {
@@ -477,7 +526,7 @@ sub applym {
         push @{$self->{s}}, [$macro_expansion, $a];
     };
     push @{$self->{s}}, $fu;
-    $self->applyf($mac_clo, $args, $a);
+    $self->applyf($mac_clo, $args, $a, $opname);
 }
 
 # (def applyf (f args a s r m)
@@ -487,9 +536,13 @@ sub applym {
 #                          (sigerr 'bad-lit s r m))
 #                      (sigerr 'cannot-apply s r m)))
 sub applyf {
-    my ($self, $f, $args, $a) = @_;
+    my ($self, $f, $args, $a, $opname) = @_;
 
     if (is_symbol($f) && symbol_name($f) eq "apply") {
+        $self->logger()->log("debug", sub {
+            "  inside `apply` logic";
+        });
+
         my $apply_op = prim_car($args);
         my $cdr_args = prim_cdr($args);
         my $reduce_expr = [
@@ -514,8 +567,11 @@ sub applyf {
         ];
 
         my $fu = sub {
+            $self->logger()->log("debug", sub {
+                "  left `apply` logic";
+            });
             my $apply_args = pop(@{$self->{r}});
-            $self->applyf($apply_op, $apply_args, $a);
+            $self->applyf($apply_op, $apply_args, $a, "<op to apply>");
         };
 
         push @{$self->{s}}, $fu, $reduce_expr;
@@ -526,7 +582,7 @@ sub applyf {
             die "'cannot-apply\n";
         }
         # XXX: skipping `proper` check for now
-        $self->applylit($f, $args, $a);
+        $self->applylit($f, $args, $a, $opname);
     }
 }
 
@@ -550,7 +606,7 @@ sub applyf {
 #                        (mev (cons (list e a) s) r m))
 #                      (sigerr 'unapplyable s r m))))))
 sub applylit {
-    my ($self, $f, $args, $a) = @_;
+    my ($self, $f, $args, $a, $opname) = @_;
 
     # XXX: skipping `inwhere`/`locfns` for now
     my $tag = pair_car(pair_cdr($f));
@@ -563,6 +619,11 @@ sub applylit {
         my $env = pair_car($rest);
         my $parms = pair_car(pair_cdr($rest));
         my $body = pair_car(pair_cdr(pair_cdr($rest)));
+
+        $self->logger()->log("debug", sub {
+            my $parms_str = $self->ast_to_string($parms);
+            "  calling `$opname` $parms_str";
+        });
 
         # XXX: skipping `okenv` and `okparms` checks for now
         $self->applyclo($parms, $args, $env, $body);
@@ -635,7 +696,7 @@ sub applyclo {
         $self->pass($parms, $args, $env);
     };
     my $fu2 = sub {
-        my $car_r = pop @{$self->{r}};
+        my $car_r = pop(@{$self->{r}});
         push @{$self->{s}}, [
             $body,
             $car_r,
@@ -663,6 +724,12 @@ sub pass {
     }
     # XXX: skipping the literal case for now
     elsif ($self->variable($pat)) {
+        $self->logger()->log("debug", sub {
+            my $var_str = $self->ast_to_string($pat);
+            my $arg_str = $self->ast_to_string($arg);
+            "    binding `$var_str` to $arg_str";
+        });
+
         push @{$self->{r}}, make_pair(make_pair($pat, $arg), $env);
     }
     # XXX: skipping the `t` case for now
