@@ -494,34 +494,21 @@ sub applyf {
 
     if (is_symbol($f) && symbol_name($f) eq "apply") {
         my $apply_op = prim_car($args);
-        my $cdr_args = prim_cdr($args);
-        my $reduce_expr = [
-            make_pair(
-                make_symbol("reduce"),
-                make_pair(
-                    make_symbol("join"),
-                    make_pair(
-                        make_pair(
-                            make_symbol("quote"),
-                            make_pair(
-                                $cdr_args,
-                                SYMBOL_NIL,
-                            ),
-                        ),
-                        SYMBOL_NIL,
-                    ),
-                ),
-            ),
-            SYMBOL_NIL,     # not `$a`; we're not running `reduce join`
-                            # in the expression's environment
-        ];
+        my $it_arg = prim_cdr($args);
+        my @stack;
+        while (!is_symbol($it_arg) || symbol_name($it_arg) ne "nil") {
+            push @stack, prim_car($it_arg);
+            $it_arg = prim_cdr($it_arg);
+        }
+        my $apply_args = @stack ? pop(@stack) : SYMBOL_NIL;
+        while (@stack) {
+            $apply_args = make_pair(
+                pop(@stack),
+                $apply_args,
+            );
+        }
 
-        my $fu = sub {
-            my $apply_args = pop(@{$self->{r}});
-            $self->applyf($apply_op, $apply_args, $a);
-        };
-
-        push @{$self->{s}}, $fu, $reduce_expr;
+        $self->applyf($apply_op, $apply_args, $a);
     }
     else {
         my $car_f = pair_car($f);
