@@ -212,6 +212,9 @@ sub ev {
         $e_a->();
     }
     else {
+        die "s stack invariant broken: ", ref($e_a), "\n"
+            unless ref($e_a) eq "ARRAY";
+
         my $e = $e_a->[0];
         my $a = $e_a->[1];
 
@@ -666,7 +669,9 @@ sub pass {
         push @{$self->{r}}, make_pair(make_pair($pat, $arg), $env);
     }
     # XXX: skipping the `t` case for now
-    # XXX: skipping the `o` case for now
+    elsif (is_pair($pat) && is_symbol(pair_car($pat)) && symbol_name(pair_car($pat)) eq "o") {
+        $self->pass(prim_car(pair_cdr($pat)), $arg, $env);
+    }
     else {
         $self->destructure($pat, $arg, $env);
     }
@@ -697,8 +702,23 @@ sub destructure {
     $ps = pair_cdr($ps);
 
     if (is_symbol($arg) && symbol_name($arg) eq "nil") {
-        # XXX: skipping the `(caris p o)` case for now
-        die "'underargs\n";
+        if (is_pair($p)
+                && is_symbol(pair_car($p))
+                && symbol_name(pair_car($p)) eq "o") {
+            my $fu1 = sub {
+                $self->pass(prim_car(pair_cdr($p)), pop(@{$self->{r}}), $env);
+            };
+            my $fu2 = sub {
+                $self->pass($ps, SYMBOL_NIL, pop(@{$self->{r}}));
+            };
+            push @{$self->{s}}, $fu2, $fu1, [
+                prim_car(prim_cdr(pair_cdr($p))),
+                $env,
+            ];
+        }
+        else {
+            die "'underargs\n";
+        }
     }
     # XXX: skipping the `(atom arg)` case for now
     else {
