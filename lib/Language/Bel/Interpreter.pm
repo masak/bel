@@ -866,6 +866,12 @@ __DATA__
   (reduce (fn es (cons 'if es))
           (or args '(t))))
 
+(def = args
+  (if (no (cdr args))  t
+      (some atom args) (all [id _ (car args)] (cdr args))
+                       (and (apply = (map car args))
+                            (apply = (map cdr args)))))
+
 (def err args)
 
 (mac comma args
