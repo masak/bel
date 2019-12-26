@@ -872,6 +872,8 @@ __DATA__
                        (and (apply = (map car args))
                             (apply = (map cdr args)))))
 
+(def symbol (x) (= (type x) 'symbol))
+
 (def err args)
 
 (mac comma args
