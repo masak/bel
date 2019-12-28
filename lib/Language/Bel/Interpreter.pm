@@ -984,6 +984,8 @@ __DATA__
 
 (def symbol (x) (= (type x) 'symbol))
 
+(def pair   (x) (= (type x) 'pair))
+
 (def err args)
 
 (mac comma args
