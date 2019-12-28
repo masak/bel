@@ -90,7 +90,7 @@ sub new {
             # require writing a small pattern matcher; it doesn't need to be
             # so fancy for this use, just enough to do the replacements we
             # need for the globals.
-            if ($declaration =~ /^\(def (\S+) (\w+|\([^)]*\))\s*(.*)\)$/ms) {
+            if ($declaration =~ /^\(def (\S+)\s+(\w+|\([^)]*\))\s*(.*)\)$/ms) {
                 # (From bellanguage.txt)
                 #
                 # In the source I try not to use things before I've defined
@@ -110,7 +110,7 @@ sub new {
                 $e ||= "nil";
                 $source = "(lit clo nil $p $e)";
             }
-            elsif ($declaration =~ /^\(mac (\S+) (\w+|\([^)]*\))\s+(.+)\)$/ms) {
+            elsif ($declaration =~ /^\(mac (\S+)\s+(\w+|\([^)]*\))\s+(.+)\)$/ms) {
                 # and when you see
                 #
                 # (mac n p e)
@@ -123,7 +123,7 @@ sub new {
                 my ($p, $e) = ($2, $3);
                 $source = "(lit mac (lit clo nil $p $e))";
             }
-            elsif ($declaration =~ /\(set (\S+) (.+)\)/ms) {
+            elsif ($declaration =~ /\(set (\S+)\s+(.+)\)/ms) {
                 ($name, $source) = ($1, $2);
             }
             else {
@@ -873,6 +873,8 @@ __DATA__
                             (apply = (map cdr args)))))
 
 (def symbol (x) (= (type x) 'symbol))
+
+(def pair   (x) (= (type x) 'pair))
 
 (def err args)
 
