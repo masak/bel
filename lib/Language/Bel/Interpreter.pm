@@ -35,12 +35,28 @@ use Language::Bel::Expander::Bquote qw(
 
 my @DECLARATIONS;
 {
-    # XXX: I'm running this on Windows, but I need to write a portable
-    # solution that also considers Unix/Linux newlines.
-    local $/ = "\r\n\r\n";  # paragraph mode
+    my $para = "";
+    my $add_declaration = sub {
+        $para =~ s/\s+$//;
+        push @DECLARATIONS, $para;
+        $para = "";
+    };
+    my $accumulate_line = sub {
+        my ($line) = @_;
+
+        $para .= $line;
+    };
     while (<Language::Bel::Interpreter::DATA>) {
-        s/(\r\n){1,2}$//;
-        push @DECLARATIONS, $_;
+        s/^\s+//;
+        if ($_ eq "") {
+            $add_declaration->();
+        }
+        else {
+            $accumulate_line->($_);
+        }
+    }
+    if ($para ne "") {
+        $add_declaration->();
     }
 }
 
