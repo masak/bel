@@ -7,12 +7,11 @@ use warnings;
 use Language::Bel::Types qw(
     is_pair
     is_nil
-    is_symbol
+    is_symbol_of_name
     make_pair
     make_symbol
     pair_car
     pair_cdr
-    symbol_name
 );
 use Language::Bel::Symbols::Common qw(
     SYMBOL_NIL
@@ -27,7 +26,7 @@ sub _bqexpand {
         my $car_ast = pair_car($ast);
         my $cdr_ast = pair_cdr($ast);
 
-        if (is_symbol($car_ast) && symbol_name($car_ast) eq "bquote") {
+        if (is_symbol_of_name($car_ast, "bquote")) {
             die "bquote of nothing"
                 unless is_pair($cdr_ast);
             return bquote(pair_car($cdr_ast));
@@ -56,8 +55,7 @@ sub caris {
     my ($e, $car_sym_name) = @_;
 
     return is_pair($e)
-        && is_symbol(pair_car($e))
-        && symbol_name(pair_car($e)) eq $car_sym_name;
+        && is_symbol_of_name(pair_car($e), $car_sym_name);
 }
 
 my $NO_CHANGE = '';
