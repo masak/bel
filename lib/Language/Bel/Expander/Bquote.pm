@@ -6,6 +6,7 @@ use warnings;
 
 use Language::Bel::Types qw(
     is_pair
+    is_nil
     is_symbol
     make_pair
     make_symbol
@@ -65,7 +66,7 @@ my $CHANGED = 1;
 sub bqex {
     my ($e) = @_;
 
-    if (is_symbol($e) && symbol_name($e) eq "nil") {
+    if (is_nil($e)) {
         return SYMBOL_NIL, $NO_CHANGE;
     }
     elsif (!is_pair($e)) {

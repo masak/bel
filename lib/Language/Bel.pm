@@ -6,6 +6,7 @@ use warnings;
 
 use Language::Bel::Types qw(
     is_char
+    is_nil
     is_pair
     is_symbol
     make_char
@@ -123,7 +124,7 @@ sub ast_to_string {
             $ast = pair_cdr($ast);
             $first_elem = "";
         }
-        if (!is_symbol($ast) || symbol_name($ast) ne "nil") {
+        if (!is_nil($ast)) {
             push @fragments, " . ";
             push @fragments, $self->ast_to_string($ast);
         }

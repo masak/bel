@@ -7,6 +7,7 @@ use warnings;
 use Language::Bel::Types qw(
     is_char
     is_pair
+    is_nil
     is_symbol
     make_pair
     make_symbol
@@ -179,12 +180,12 @@ my %forms = (
     if => sub {
         my ($interpreter, $es, $a) = @_;
 
-        if (is_symbol($es) && symbol_name($es) eq "nil") {
+        if (is_nil($es) eq "nil") {
             push @{$interpreter->{r}}, SYMBOL_NIL;
         }
         else {
             my $cdr_es = prim_cdr($es);
-            if (!is_symbol($cdr_es) || symbol_name($cdr_es) ne "nil") {
+            if (!is_nil($cdr_es)) {
                 my $fu = sub {
                     if2($interpreter, prim_cdr($es), $a);
                 };
@@ -207,7 +208,7 @@ sub if2 {
     my ($interpreter, $es, $a) = @_;
 
     my $car_r = pop(@{$interpreter->{r}});
-    my $e = !is_symbol($car_r) || symbol_name($car_r) ne "nil"
+    my $e = !is_nil($car_r)
         ? prim_car($es)
         : make_pair(make_symbol("if"), prim_cdr($es));
     push @{$interpreter->{s}}, [$e, $a];
@@ -360,13 +361,12 @@ sub get {
             && _id($first, $second);
         return is_pair($first)
             && is_pair(pair_car($first))
-            && is_symbol(pair_cdr($first))
-            && symbol_name(pair_cdr($first)) eq "nil"
+            && is_nil(pair_cdr($first))
             && is_pair($second)
             && _id($first, $second);
     };
 
-    while (!is_symbol($kvs) || symbol_name($kvs) ne "nil") {
+    while (!is_nil($kvs)) {
         my $kv = pair_car($kvs);
         my $key = pair_car($kv);
 
@@ -446,7 +446,7 @@ sub evcall {
 
             my $fu2 = sub {
                 my $args = SYMBOL_NIL;
-                while (!is_symbol($es2) || symbol_name($es2) ne "nil") {
+                while (!is_nil($es2)) {
                     $args = make_pair(pop(@{$self->{r}}), $args);
                     $es2 = pair_cdr($es2);
                 }
@@ -462,7 +462,7 @@ sub evcall {
 
             push @{$self->{s}}, $fu2;
             my @unevaluated_arguments;
-            while (!is_symbol($es1) || symbol_name($es1) ne "nil") {
+            while (!is_nil($es1)) {
                 push @unevaluated_arguments, [pair_car($es1), $a];
                 $es1 = pair_cdr($es1);
             }
@@ -512,7 +512,7 @@ sub applyf {
         my $apply_op = prim_car($args);
         my $it_arg = prim_cdr($args);
         my @stack;
-        while (!is_symbol($it_arg) || symbol_name($it_arg) ne "nil") {
+        while (!is_nil($it_arg)) {
             push @stack, prim_car($it_arg);
             $it_arg = prim_cdr($it_arg);
         }
@@ -663,7 +663,7 @@ sub applyclo {
 sub pass {
     my ($self, $pat, $arg, $env) = @_;
 
-    if (is_symbol($pat) && symbol_name($pat) eq "nil") {
+    if (is_nil($pat)) {
         # XXX: skipping the `'overargs` case for now
         push @{$self->{r}}, $env;
     }
@@ -704,7 +704,7 @@ sub destructure {
     my $p = pair_car($ps);
     $ps = pair_cdr($ps);
 
-    if (is_symbol($arg) && symbol_name($arg) eq "nil") {
+    if (is_nil($arg)) {
         if (is_pair($p)
                 && is_symbol(pair_car($p))
                 && symbol_name(pair_car($p)) eq "o") {
@@ -754,7 +754,7 @@ sub ast_to_string {
             $ast = pair_cdr($ast);
             $first_elem = "";
         }
-        if (!is_symbol($ast) || symbol_name($ast) ne "nil") {
+        if (!is_nil($ast)) {
             push @fragments, " . ";
             push @fragments, $self->ast_to_string($ast);
         }

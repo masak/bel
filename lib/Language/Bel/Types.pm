@@ -18,6 +18,13 @@ sub is_char {
     return ref($object) eq "Language::Bel::Type::Char";
 }
 
+sub is_nil {
+    my ($object) = @_;
+
+    return ref($object) eq "Language::Bel::Type::Symbol"
+        && symbol_name($object) eq "nil";
+}
+
 sub is_pair {
     my ($object) = @_;
 
@@ -76,6 +83,7 @@ sub symbol_name {
 our @EXPORT_OK = qw(
     char_name
     is_char
+    is_nil
     is_pair
     is_symbol
     make_char
