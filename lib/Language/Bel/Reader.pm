@@ -90,6 +90,10 @@ sub _read_helper {
                 my $cc = substr($expr, $pos, 1);
                 ++$pos;
                 last EAT_CHAR if $cc eq q["];
+                if ($cc eq q[\\]) {
+                    $cc = substr($expr, $pos, 1);
+                    ++$pos;
+                }
                 push @chars, $cc;
             } while ($pos < length($expr));
         }

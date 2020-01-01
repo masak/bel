@@ -6,7 +6,7 @@ use Test::More;
 
 use Language::Bel;
 
-plan tests => 5;
+plan tests => 7;
 
 sub is_bel_output {
     my ($expr, $expected_output) = @_;
@@ -23,8 +23,12 @@ sub is_bel_output {
 
 {
     is_bel_output(q["Bel"], q["Bel"]);
-    is_bel_output(q[""], q[nil]);
+    is_bel_output(q[""], "nil");
     is_bel_output(q[(cons \\s "tring")], q["string"]);
     is_bel_output(q[(cons \\s \\t \\r \\i \\n \\g nil)], q["string"]);
     is_bel_output(q[(cdr "max")], q["ax"]);
+    my $backslash = q[\\];
+    my $quote = q["];
+    is_bel_output(qq[(cdr "$backslash$backslash")], "nil");
+    is_bel_output(qq[(car "$backslash$quote")], q[\\"]);
 }
