@@ -9,6 +9,7 @@ use Language::Bel::Types qw(
     is_pair
     is_nil
     is_symbol
+    is_symbol_of_name
     make_pair
     make_symbol
     pair_car
@@ -272,11 +273,10 @@ sub literal {
     my $is_self_evaluating = sub {
         my ($e) = @_;
 
-        return unless is_symbol($e);
-
-        my $name = symbol_name($e);
-        return $name eq "t" || $name eq "nil" ||
-            $name eq "o" || $name eq "apply";
+        return is_symbol_of_name($e, "t")
+            || is_symbol_of_name($e, "nil")
+            || is_symbol_of_name($e, "o")
+            || is_symbol_of_name($e, "apply");
     };
 
     my $is_lit = sub {
@@ -285,9 +285,7 @@ sub literal {
         return unless is_pair($e);
 
         my $car = pair_car($e);
-        return unless is_symbol($car);
-
-        return symbol_name($car) eq "lit";
+        return is_symbol_of_name($car, "lit");
     };
 
     return (
@@ -391,11 +389,9 @@ sub lookup {
     # XXX: skipping `binding` case for now
     return get($e, $a)
         || get($e, $self->{g})
-        || (is_symbol($e)
-            && symbol_name($e) eq "scope"
+        || (is_symbol_of_name($e, "scope")
             && make_pair($e, $a))
-        || (is_symbol($e)
-            && symbol_name($e) eq "globe"
+        || (is_symbol_of_name($e, "globe")
             && make_pair($e, $self->{g}))
         || SYMBOL_NIL;
 }
@@ -429,11 +425,9 @@ sub evcall {
             my ($v) = @_;
 
             return is_pair($v)
-                && is_symbol(prim_car($v))
-                && symbol_name(prim_car($v)) eq "lit"
+                && is_symbol_of_name(prim_car($v), "lit")
                 && is_pair(prim_cdr($v))
-                && is_symbol(prim_car(prim_cdr($v)))
-                && symbol_name(prim_car(prim_cdr($v))) eq "mac";
+                && is_symbol_of_name(prim_car(prim_cdr($v)), "mac");
         };
 
         if ($isa_mac->($op)) {
@@ -508,7 +502,7 @@ sub applym {
 sub applyf {
     my ($self, $f, $args, $a) = @_;
 
-    if (is_symbol($f) && symbol_name($f) eq "apply") {
+    if (is_symbol_of_name($f, "apply")) {
         my $apply_op = prim_car($args);
         my $it_arg = prim_cdr($args);
         my @stack;
@@ -528,7 +522,7 @@ sub applyf {
     }
     else {
         my $car_f = pair_car($f);
-        if (!is_symbol($car_f) || symbol_name($car_f) ne "lit") {
+        if (!is_symbol_of_name($car_f, "lit")) {
             die "'cannot-apply\n";
         }
         # XXX: skipping `proper` check for now
@@ -672,7 +666,7 @@ sub pass {
         push @{$self->{r}}, make_pair(make_pair($pat, $arg), $env);
     }
     # XXX: skipping the `t` case for now
-    elsif (is_pair($pat) && is_symbol(pair_car($pat)) && symbol_name(pair_car($pat)) eq "o") {
+    elsif (is_pair($pat) && is_symbol_of_name(pair_car($pat), "o")) {
         $self->pass(prim_car(pair_cdr($pat)), $arg, $env);
     }
     else {
@@ -705,9 +699,7 @@ sub destructure {
     $ps = pair_cdr($ps);
 
     if (is_nil($arg)) {
-        if (is_pair($p)
-                && is_symbol(pair_car($p))
-                && symbol_name(pair_car($p)) eq "o") {
+        if (is_pair($p) && is_symbol_of_name(pair_car($p), "o")) {
             my $fu1 = sub {
                 $self->pass(prim_car(pair_cdr($p)), pop(@{$self->{r}}), $env);
             };
