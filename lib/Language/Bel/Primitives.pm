@@ -7,6 +7,7 @@ use warnings;
 use Language::Bel::Types qw(
     char_name
     is_char
+    is_nil
     is_pair
     is_symbol
     make_pair
@@ -28,7 +29,7 @@ use Exporter 'import';
 sub prim_car {
     my ($object) = @_;
 
-    if (is_symbol($object) && symbol_name($object) eq "nil") {
+    if (is_nil($object)) {
         return SYMBOL_NIL;
     }
     elsif (!is_pair($object)) {
@@ -42,7 +43,7 @@ sub prim_car {
 sub prim_cdr {
     my ($object) = @_;
 
-    if (is_symbol($object) && symbol_name($object) eq "nil") {
+    if (is_nil($object)) {
         return SYMBOL_NIL;
     }
     elsif (!is_pair($object)) {
