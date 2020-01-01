@@ -30,6 +30,16 @@ sub is_pair {
     return ref($object) eq "Language::Bel::Type::Pair";
 }
 
+sub is_string {
+    my ($object) = @_;
+
+    while (is_pair($object)) {
+        return unless is_char(pair_car($object));
+        $object = pair_cdr($object);
+    }
+    return is_nil($object);
+}
+
 sub is_symbol {
     my ($object) = @_;
 
@@ -79,6 +89,17 @@ sub pair_set_cdr {
     return;
 }
 
+sub string_value {
+    my ($object) = @_;
+
+    my @chars;
+    while (is_pair($object)) {
+        push @chars, char_name(pair_car($object));
+        $object = pair_cdr($object);
+    }
+    return join "", @chars;
+}
+
 sub symbol_name {
     my ($symbol) = @_;
 
@@ -90,6 +111,7 @@ our @EXPORT_OK = qw(
     is_char
     is_nil
     is_pair
+    is_string
     is_symbol
     is_symbol_of_name
     make_char
@@ -98,6 +120,7 @@ our @EXPORT_OK = qw(
     pair_car
     pair_cdr
     pair_set_cdr
+    string_value
     symbol_name
 );
 

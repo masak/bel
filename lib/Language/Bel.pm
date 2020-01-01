@@ -5,15 +5,18 @@ use strict;
 use warnings;
 
 use Language::Bel::Types qw(
+    char_name
     is_char
     is_nil
     is_pair
+    is_string
     is_symbol
     make_char
     make_pair
     make_symbol
     pair_car
     pair_cdr
+    string_value
     symbol_name
 );
 use Language::Bel::Symbols::Common qw(
@@ -112,6 +115,15 @@ sub ast_to_string {
     if (is_symbol($ast)) {
         my $name = symbol_name($ast);
         return $name;
+    }
+    elsif (is_char($ast)) {
+        my $name = char_name($ast);
+        return "\\$name";
+    }
+    elsif (is_string($ast)) {
+        my $string = string_value($ast);
+        # XXX: actually wrong; needs escaping of " characters
+        return q["] . $string . q["];
     }
     elsif (is_pair($ast)) {
         my @fragments = ("(");
