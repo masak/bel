@@ -112,6 +112,14 @@ sub eval {
 sub ast_to_string {
     my ($self, $ast) = @_;
 
+    my $string_escape = sub {
+        my ($string) = @_;
+
+        return join("", map {
+            $_ eq q["] || $_ eq q[\\] ? "\\$_" : $_
+        } split("", $string));
+    };
+
     if (is_symbol($ast)) {
         my $name = symbol_name($ast);
         return $name;
@@ -122,8 +130,7 @@ sub ast_to_string {
     }
     elsif (is_string($ast)) {
         my $string = string_value($ast);
-        # XXX: actually wrong; needs escaping of " characters
-        return q["] . $string . q["];
+        return q["] . $string_escape->($string) . q["];
     }
     elsif (is_pair($ast)) {
         my @fragments = ("(");
