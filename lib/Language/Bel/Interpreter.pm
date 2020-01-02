@@ -988,6 +988,10 @@ __DATA__
 
 (def char   (x) (= (type x) 'char))
 
+(def proper (x)
+  (or (no x)
+      (and (pair x) (proper (cdr x)))))
+
 (def err args)
 
 (mac comma args
