@@ -81,6 +81,31 @@ sub _read_helper {
         my $ast = make_char(substr($expr, $start, $pos - $start));
         return { ast => $ast, pos => $pos };
     }
+    elsif ($c eq q["]) {
+        ++$pos;
+        my @chars;
+        EAT_CHAR:
+        {
+            do {
+                my $cc = substr($expr, $pos, 1);
+                ++$pos;
+                last EAT_CHAR if $cc eq q["];
+                if ($cc eq q[\\]) {
+                    $cc = substr($expr, $pos, 1);
+                    ++$pos;
+                }
+                push @chars, $cc;
+            } while ($pos < length($expr));
+        }
+        my $ast = SYMBOL_NIL;
+        for my $char (reverse @chars) {
+            $ast = make_pair(
+                make_char($char),
+                $ast,
+            );
+        }
+        return { ast => $ast, pos => $pos };
+    }
     else {  # symbol
         my $start = $pos;
         EAT_CHAR:

@@ -8,6 +8,7 @@ use Language::Bel::Types qw(
     is_char
     is_pair
     is_nil
+    is_string
     is_symbol
     is_symbol_of_name
     make_pair
@@ -288,8 +289,6 @@ sub literal {
     my ($e) = @_;
 
     my $is_self_evaluating = sub {
-        my ($e) = @_;
-
         return is_symbol_of_name($e, "t")
             || is_symbol_of_name($e, "nil")
             || is_symbol_of_name($e, "o")
@@ -297,8 +296,6 @@ sub literal {
     };
 
     my $is_lit = sub {
-        my ($e) = @_;
-
         return unless is_pair($e);
 
         my $car = pair_car($e);
@@ -306,11 +303,11 @@ sub literal {
     };
 
     return (
-        $is_self_evaluating->($e) ||
+        $is_self_evaluating->() ||
         is_char($e) ||
         # XXX: skipping is_stream case for now
-        $is_lit->($e)
-        # XXX: skipping string case for now
+        $is_lit->() ||
+        is_string($e)
     );
 }
 
