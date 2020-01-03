@@ -78,21 +78,17 @@ sub new {
         }
 
         for my $declaration (@DECLARATIONS) {
-            my ($name, $source);
+            my $ast = _read($declaration);
+            my $car_ast = prim_car($ast);
 
-            # XXX: Just hunting for the next closing parenthesis, like this
-            # regex does, it too simplistic for the general case. It'll work
-            # for a while, but it'll fail once we get to `mem`:
-            #
-            #     (def mem (x ys (o f =))
-            #       (some [f _ x] ys))
-            #
-            # Luckily there's a much better way; we should read the expression
-            # and then do the replacement on the (cons pair) AST. This will
-            # require writing a small pattern matcher; it doesn't need to be
-            # so fancy for this use, just enough to do the replacements we
-            # need for the globals.
-            if ($declaration =~ /^\(def (\S+) (\w+|\([^)]*\))\s*(.*)\)$/ms) {
+            die "First element of list is not a symbol"
+                unless is_symbol($car_ast);
+
+            my $name = symbol_name(prim_car(prim_cdr($ast)));
+            my $cddr_ast = prim_cdr(prim_cdr($ast));
+            my $new_ast;
+
+            if (symbol_name($car_ast) eq "def") {
                 # (From bellanguage.txt)
                 #
                 # In the source I try not to use things before I've defined
@@ -107,12 +103,18 @@ sub new {
                 #
                 # (set n (lit clo nil p e))
 
-                $name = $1;
-                my ($p, $e) = ($2, $3);
-                $e ||= "nil";
-                $source = "(lit clo nil $p $e)";
+                $new_ast = make_pair(
+                    make_symbol("lit"),
+                    make_pair(
+                        make_symbol("clo"),
+                        make_pair(
+                            SYMBOL_NIL,
+                            $cddr_ast,
+                        ),
+                    ),
+                );
             }
-            elsif ($declaration =~ /^\(mac (\S+) (\w+|\([^)]*\))\s+(.+)\)$/ms) {
+            elsif (symbol_name($car_ast) eq "mac") {
                 # and when you see
                 #
                 # (mac n p e)
@@ -121,19 +123,34 @@ sub new {
                 #
                 # (set n (lit mac (lit clo nil p e)))
 
-                $name = $1;
-                my ($p, $e) = ($2, $3);
-                $source = "(lit mac (lit clo nil $p $e))";
+                $new_ast = make_pair(
+                    make_symbol("lit"),
+                    make_pair(
+                        make_symbol("mac"),
+                        make_pair(
+                            make_pair(
+                                make_symbol("lit"),
+                                make_pair(
+                                    make_symbol("clo"),
+                                    make_pair(
+                                        SYMBOL_NIL,
+                                        $cddr_ast,
+                                    ),
+                                ),
+                            ),
+                            SYMBOL_NIL,
+                        ),
+                    ),
+                );
             }
-            elsif ($declaration =~ /\(set (\S+) (.+)\)/ms) {
-                ($name, $source) = ($1, $2);
+            elsif (symbol_name($car_ast) eq "set") {
+                $new_ast = prim_car($cddr_ast);
             }
             else {
                 die "Unrecognized: $declaration";
             }
 
-            my $ast = _bqexpand(_read($source));
-            $self->set($name, $self->eval_ast($ast));
+            $self->set($name, $self->eval_ast(_bqexpand($new_ast)));
         }
     }
 
