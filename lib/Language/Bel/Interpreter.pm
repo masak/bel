@@ -992,6 +992,12 @@ __DATA__
   (or (no x)
       (and (pair x) (proper (cdr x)))))
 
+(def string (x)
+  (and (proper x) (all char x)))
+
+(def mem (x ys (o f =))
+  (some [f _ x] ys))
+
 (def err args)
 
 (mac comma args
