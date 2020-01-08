@@ -270,7 +270,9 @@ sub ev {
         elsif ($self->variable($e)) {
             $self->vref($e, $a);
         }
-        # XXX: skipping `proper` check for now
+        elsif (!proper($e)) {
+            die "'malformed\n";
+        }
         elsif (my $form = $is_form->($e)) {
             $form->($self, pair_cdr($e), $a);
         }
@@ -328,6 +330,20 @@ sub variable {
     return is_pair($e)
         ? $self->is_global_value(pair_car($e), "vmark")
         : !literal($e);
+}
+
+# (def proper (x)
+#   (or (no x)
+#       (and (pair x) (proper (cdr x)))))
+sub proper {
+    my ($e) = @_;
+
+    while (!is_nil($e)) {
+        return
+            if (!is_pair($e));
+        $e = pair_cdr($e);
+    }
+    return 1;
 }
 
 # (def vref (v a s r m)
