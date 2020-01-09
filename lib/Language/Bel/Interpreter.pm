@@ -1034,6 +1034,9 @@ __DATA__
 (mac aif args
   `(iflet it ,@args))
 
+(def find (f xs)
+  (aif (some f xs) (car it)))
+
 (def err args)
 
 (mac comma args
