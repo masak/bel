@@ -1004,6 +1004,9 @@ __DATA__
 (def mem (x ys (o f =))
   (some [f _ x] ys))
 
+(def in (x . ys)
+  (mem x ys))
+
 (def err args)
 
 (mac comma args
