@@ -1013,6 +1013,15 @@ __DATA__
 
 (def caddr (x) (car (cddr x)))
 
+(mac case (expr . args)
+  (if (no (cdr args))
+      (car args)
+      (let v (uvar)
+        `(let ,v ,expr
+           (if (= ,v ',(car args))
+               ,(cadr args)
+               (case ,v ,@(cddr args)))))))
+
 (def err args)
 
 (mac comma args
