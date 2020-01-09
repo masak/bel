@@ -1022,6 +1022,15 @@ __DATA__
                ,(cadr args)
                (case ,v ,@(cddr args)))))))
 
+(mac iflet (var . args)
+  (if (no (cdr args))
+      (car args)
+      (let v (uvar)
+        `(let ,v ,(car args)
+           (if ,v
+               (let ,var ,v ,(cadr args))
+               (iflet ,var ,@(cddr args)))))))
+
 (def err args)
 
 (mac comma args
