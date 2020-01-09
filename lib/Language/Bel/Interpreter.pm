@@ -1007,6 +1007,8 @@ __DATA__
 (def in (x . ys)
   (mem x ys))
 
+(def cadr  (x) (car (cdr x)))
+
 (def err args)
 
 (mac comma args
