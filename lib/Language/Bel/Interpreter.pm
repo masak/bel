@@ -1011,6 +1011,8 @@ __DATA__
 
 (def cddr  (x) (cdr (cdr x)))
 
+(def caddr (x) (car (cddr x)))
+
 (def err args)
 
 (mac comma args
