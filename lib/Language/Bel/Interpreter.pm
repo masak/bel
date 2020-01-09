@@ -1031,6 +1031,9 @@ __DATA__
                (let ,var ,v ,(cadr args))
                (iflet ,var ,@(cddr args)))))))
 
+(mac aif args
+  `(iflet it ,@args))
+
 (def err args)
 
 (mac comma args
