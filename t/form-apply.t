@@ -6,7 +6,7 @@ use Test::More;
 
 use Language::Bel;
 
-plan tests => 6;
+plan tests => 7;
 
 sub is_bel_output {
     my ($expr, $expected_output) = @_;
@@ -28,4 +28,5 @@ sub is_bel_output {
     is_bel_output("(apply no '(t))", "nil");
     is_bel_output("(apply cons '(a b c (d e f)))", "(a b c d e f)");
     is_bel_output("(apply cons '())", "nil");
+    is_bel_output("(map apply (list (fn () 'x) (fn () 'y))", "(x y)");
 }
