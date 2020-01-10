@@ -1043,6 +1043,9 @@ __DATA__
       (f (car xs) (car pat)) (begins (cdr xs) (cdr pat) f)
                              nil))
 
+(def caris (x y (o f =))
+  (begins x (list y) f))
+
 (def err args)
 
 (mac comma args
