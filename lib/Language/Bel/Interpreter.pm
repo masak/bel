@@ -1037,6 +1037,12 @@ __DATA__
 (def find (f xs)
   (aif (some f xs) (car it)))
 
+(def begins (xs pat (o f =))
+  (if (no pat)               t
+      (atom xs)              nil
+      (f (car xs) (car pat)) (begins (cdr xs) (cdr pat) f)
+                             nil))
+
 (def err args)
 
 (mac comma args
