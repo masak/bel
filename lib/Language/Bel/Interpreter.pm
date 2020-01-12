@@ -179,6 +179,12 @@ sub eval_ast {
     return $self->{r}[-1];
 }
 
+sub fut {
+    my ($sub) = @_;
+
+    return [make_smark_of_type("fut", $sub), SYMBOL_NIL];
+}
+
 my %forms = (
     # (form quote ((e) a s r m)
     #   (mev s (cons e r) m))
@@ -210,9 +216,9 @@ my %forms = (
         else {
             my $cdr_es = prim_cdr($es);
             if (!is_nil($cdr_es)) {
-                my $fu = sub {
+                my $fu = fut(sub {
                     if2($interpreter, prim_cdr($es), $a);
-                };
+                });
                 push @{$interpreter->{s}}, $fu;
             }
             push @{$interpreter->{s}}, [prim_car($es), $a];
@@ -236,9 +242,9 @@ my %forms = (
         my $e2 = prim_car(prim_cdr(prim_cdr($es)));
 
         if ($interpreter->variable($v)) {
-            my $fu = sub {
+            my $fu = fut(sub {
                 dyn2($interpreter, $v, $e2, $a);
-            };
+            });
             push @{$interpreter->{s}}, $fu, [$e1, $a];
         }
         else {
@@ -291,58 +297,54 @@ sub ev {
     my ($self) = @_;
 
     my $entry = pop @{$self->{s}};
-    # the following corresponds to the `fut` case of `evmark`
-    if (ref($entry) eq "CODE") {
-        $entry->();
+    die "s stack invariant broken: ", ref($entry), "\n"
+        unless ref($entry) eq "ARRAY";
+
+    my $e = $entry->[0];
+    my $a = $entry->[1];
+
+    my $is_form = sub {
+        my ($e) = @_;
+
+        my $car = pair_car($e);
+        return unless is_symbol($car);
+
+        my $name = symbol_name($car);
+        return $forms{$name};
+    };
+
+    if (literal($e)) {
+        push @{$self->{r}}, $e;
+    }
+    elsif ($self->variable($e)) {
+        $self->vref($e, $a);
+    }
+    # (def evmark (e a s r m)
+    #   (case (car e)
+    #     fut  ((cadr e) s r m)
+    #     bind (mev s r m)
+    #     loc  (sigerr 'unfindable s r m)
+    #     prot (mev (cons (list (cadr e) a)
+    #                     (fu (s r m) (mev s (cdr r) m))
+    #                     s)
+    #               r
+    #               m)
+    #          (sigerr 'unknown-mark s r m)))
+    elsif (is_smark_of_type($e, "fut")) {
+        $e->value()->();
+    }
+    elsif (is_smark_of_type($e, "bind")) {
+        # do nothing; already popped it off the stack
+    }
+    # XXX: skipping `loc`, `prot` for now
+    elsif (!proper($e)) {
+        die "'malformed\n";
+    }
+    elsif (my $form = $is_form->($e)) {
+        $form->($self, pair_cdr($e), $a);
     }
     else {
-        die "s stack invariant broken: ", ref($entry), "\n"
-            unless ref($entry) eq "ARRAY";
-
-        my $e = $entry->[0];
-        my $a = $entry->[1];
-
-        my $is_form = sub {
-            my ($e) = @_;
-
-            my $car = pair_car($e);
-            return unless is_symbol($car);
-
-            my $name = symbol_name($car);
-            return $forms{$name};
-        };
-
-        if (literal($e)) {
-            push @{$self->{r}}, $e;
-        }
-        elsif ($self->variable($e)) {
-            $self->vref($e, $a);
-        }
-        # (def evmark (e a s r m)
-        #   (case (car e)
-        #     fut  ((cadr e) s r m)
-        #     bind (mev s r m)
-        #     loc  (sigerr 'unfindable s r m)
-        #     prot (mev (cons (list (cadr e) a)
-        #                     (fu (s r m) (mev s (cdr r) m))
-        #                     s)
-        #               r
-        #               m)
-        #          (sigerr 'unknown-mark s r m)))
-        # XXX: skipping `fut` for now (it's handled elsewhere)
-        elsif (is_smark_of_type($e, "bind")) {
-            # do nothing; already popped it off the stack
-        }
-        # XXX: skipping `loc`, `prot` for now
-        elsif (!proper($e)) {
-            die "'malformed\n";
-        }
-        elsif (my $form = $is_form->($e)) {
-            $form->($self, pair_cdr($e), $a);
-        }
-        else {
-            $self->evcall($e, $a);
-        }
+        $self->evcall($e, $a);
     }
 }
 
@@ -522,7 +524,7 @@ sub binding {
 sub evcall {
     my ($self, $e, $a) = @_;
 
-    my $fu1 = sub {
+    my $fu1 = fut(sub {
         # (def evcall2 (es a s (op . r) m)
         #   (if ((isa 'mac) op)
         #       (applym op es a s r m)
@@ -554,7 +556,7 @@ sub evcall {
             # So we capture it twice.
             my $es2 = pair_cdr($e);
 
-            my $fu2 = sub {
+            my $fu2 = fut(sub {
                 my $args = SYMBOL_NIL;
                 while (!is_nil($es2)) {
                     $args = make_pair(pop(@{$self->{r}}), $args);
@@ -568,7 +570,7 @@ sub evcall {
                 else {
                     $self->applyf($op, $args, $a);
                 }
-            };
+            });
 
             push @{$self->{s}}, $fu2;
             my @unevaluated_arguments;
@@ -582,7 +584,7 @@ sub evcall {
             # an intermediary, to reverse the order.
             push @{$self->{s}}, reverse(@unevaluated_arguments);
         }
-    };
+    });
     push @{$self->{s}}, $fu1, [pair_car($e), $a];
 }
 
@@ -601,10 +603,10 @@ sub applym {
     my ($self, $mac, $args, $a) = @_;
 
     my $mac_clo = prim_car(prim_cdr(prim_cdr($mac)));
-    my $fu = sub {
+    my $fu = fut(sub {
         my $macro_expansion = pop @{$self->{r}};
         push @{$self->{s}}, [$macro_expansion, $a];
-    };
+    });
     push @{$self->{s}}, $fu;
     $self->applyf($mac_clo, $args, $a);
 }
@@ -747,16 +749,16 @@ sub applyprim {
 sub applyclo {
     my ($self, $parms, $args, $env, $body) = @_;
 
-    my $fu1 = sub {
+    my $fu1 = fut(sub {
         $self->pass($parms, $args, $env);
-    };
-    my $fu2 = sub {
+    });
+    my $fu2 = fut(sub {
         my $car_r = pop @{$self->{r}};
         push @{$self->{s}}, [
             $body,
             $car_r,
         ];
-    };
+    });
     push @{$self->{s}}, $fu2, $fu1;
 }
 
@@ -816,12 +818,12 @@ sub destructure {
 
     if (is_nil($arg)) {
         if (is_pair($p) && is_symbol_of_name(pair_car($p), "o")) {
-            my $fu1 = sub {
+            my $fu1 = fut(sub {
                 $self->pass(prim_car(pair_cdr($p)), pop(@{$self->{r}}), $env);
-            };
-            my $fu2 = sub {
+            });
+            my $fu2 = fut(sub {
                 $self->pass($ps, SYMBOL_NIL, pop(@{$self->{r}}));
-            };
+            });
             push @{$self->{s}}, $fu2, $fu1, [
                 prim_car(prim_cdr(pair_cdr($p))),
                 $env,
@@ -833,13 +835,13 @@ sub destructure {
     }
     # XXX: skipping the `(atom arg)` case for now
     else {
-        my $fu1 = sub {
+        my $fu1 = fut(sub {
             $self->pass($p, pair_car($arg), $env);
-        };
-        my $fu2 = sub {
+        });
+        my $fu2 = fut(sub {
             my $env = pop @{$self->{r}};
             $self->pass($ps, pair_cdr($arg), $env);
-        };
+        });
         push @{$self->{s}}, $fu2, $fu1;
     }
 }
