@@ -1057,6 +1057,11 @@ __DATA__
     `((fn ,(map car ps) ,@body)
       ,@(map cadr ps))))
 
+(def keep (f xs)
+  (if (no xs)      nil
+      (f (car xs)) (cons (car xs) (keep f (cdr xs)))
+                   (keep f (cdr xs))))
+
 (def err args)
 
 (mac comma args
