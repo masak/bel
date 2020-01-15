@@ -1062,6 +1062,9 @@ __DATA__
       (f (car xs)) (cons (car xs) (keep f (cdr xs)))
                    (keep f (cdr xs))))
 
+(def rem (x ys (o f =))
+  (keep [no (f _ x)] ys))
+
 (def err args)
 
 (mac comma args
