@@ -1052,6 +1052,11 @@ __DATA__
                     (cons (f (car xs) (cadr xs))
                           (hug (cddr xs) f))))
 
+(mac with (parms . body)
+  (let ps (hug parms)
+    `((fn ,(map car ps) ,@body)
+      ,@(map cadr ps))))
+
 (def err args)
 
 (mac comma args
