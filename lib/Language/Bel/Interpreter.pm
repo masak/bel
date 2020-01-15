@@ -1046,6 +1046,12 @@ __DATA__
 (def caris (x y (o f =))
   (begins x (list y) f))
 
+(def hug (xs (o f list))
+  (if (no xs)       nil
+      (no (cdr xs)) (list (f (car xs)))
+                    (cons (f (car xs) (cadr xs))
+                          (hug (cddr xs) f))))
+
 (def err args)
 
 (mac comma args
