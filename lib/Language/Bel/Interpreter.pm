@@ -1065,6 +1065,9 @@ __DATA__
 (def rem (x ys (o f =))
   (keep [no (f _ x)] ys))
 
+(def get (k kvs (o f =))
+  (find [f (car _) k] kvs))
+
 (def err args)
 
 (mac comma args
