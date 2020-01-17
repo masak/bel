@@ -35,6 +35,11 @@ use Language::Bel::Reader qw(
 use Language::Bel::Expander::Bquote qw(
     _bqexpand
 );
+use Language::Bel::Interpreter::Smark qw(
+    is_smark
+    is_smark_of_type
+    make_smark_of_type
+);
 
 my @DECLARATIONS;
 {
@@ -213,6 +218,33 @@ my %forms = (
             push @{$interpreter->{s}}, [prim_car($es), $a];
         }
     },
+
+    # (form dyn ((v e1 e2) a s r m)
+    #   (if (variable v)
+    #       (mev (cons (list e1 a)
+    #                  (fu (s r m) (dyn2 v e2 a s r m))
+    #                  s)
+    #            r
+    #            m)
+    #       (sigerr 'cannot-bind s r m)))
+    dyn => sub {
+        my ($interpreter, $es, $a) = @_;
+
+        # XXX: skipping $es sanity check for now
+        my $v = prim_car($es);
+        my $e1 = prim_car(prim_cdr($es));
+        my $e2 = prim_car(prim_cdr(prim_cdr($es)));
+
+        if ($interpreter->variable($v)) {
+            my $fu = sub {
+                dyn2($interpreter, $v, $e2, $a);
+            };
+            push @{$interpreter->{s}}, $fu, [$e1, $a];
+        }
+        else {
+            die "'cannot-bind\n";
+        }
+    },
 );
 
 # (def if2 (es a s r m)
@@ -233,6 +265,22 @@ sub if2 {
     push @{$interpreter->{s}}, [$e, $a];
 }
 
+# (def dyn2 (v e2 a s r m)
+#   (mev (cons (list e2 a)
+#              (list (list smark 'bind (cons v (car r)))
+#                    nil)
+#              s)
+#        (cdr r)
+#        m))
+sub dyn2 {
+    my ($interpreter, $v, $e2, $a) = @_;
+
+    my $car_r = pop(@{$interpreter->{r}});
+    push @{$interpreter->{s}},
+        [make_smark_of_type("bind", make_pair($v, $car_r)), SYMBOL_NIL],
+        [$e2, $a];
+}
+
 # (def ev (((e a) . s) r m)
 #   (aif (literal e)            (mev s (cons e r) m)
 #        (variable e)           (vref e a s r m)
@@ -242,17 +290,17 @@ sub if2 {
 sub ev {
     my ($self) = @_;
 
-    my $e_a = pop @{$self->{s}};
+    my $entry = pop @{$self->{s}};
     # the following corresponds to the `fut` case of `evmark`
-    if (ref($e_a) eq "CODE") {
-        $e_a->();
+    if (ref($entry) eq "CODE") {
+        $entry->();
     }
     else {
-        die "s stack invariant broken: ", ref($e_a), "\n"
-            unless ref($e_a) eq "ARRAY";
+        die "s stack invariant broken: ", ref($entry), "\n"
+            unless ref($entry) eq "ARRAY";
 
-        my $e = $e_a->[0];
-        my $a = $e_a->[1];
+        my $e = $entry->[0];
+        my $a = $entry->[1];
 
         my $is_form = sub {
             my ($e) = @_;
@@ -270,6 +318,22 @@ sub ev {
         elsif ($self->variable($e)) {
             $self->vref($e, $a);
         }
+        # (def evmark (e a s r m)
+        #   (case (car e)
+        #     fut  ((cadr e) s r m)
+        #     bind (mev s r m)
+        #     loc  (sigerr 'unfindable s r m)
+        #     prot (mev (cons (list (cadr e) a)
+        #                     (fu (s r m) (mev s (cdr r) m))
+        #                     s)
+        #               r
+        #               m)
+        #          (sigerr 'unknown-mark s r m)))
+        # XXX: skipping `fut` for now (it's handled elsewhere)
+        elsif (is_smark_of_type($e, "bind")) {
+            # do nothing; already popped it off the stack
+        }
+        # XXX: skipping `loc`, `prot` for now
         elsif (!proper($e)) {
             die "'malformed\n";
         }
@@ -326,6 +390,9 @@ sub is_global_value {
 #       (id (car e) vmark)))
 sub variable {
     my ($self, $e) = @_;
+
+    # Smarks are not pairs in this interpreter
+    return if is_smark($e);
 
     return is_pair($e)
         ? $self->is_global_value(pair_car($e), "vmark")
@@ -416,14 +483,33 @@ sub get {
 sub lookup {
     my ($self, $e, $a) = @_;
 
-    # XXX: skipping `binding` case for now
-    return get($e, $a)
+    return $self->binding($e)
+        || get($e, $a)
         || get($e, $self->{g})
-        || (is_symbol_of_name($e, "scope")
-            && make_pair($e, $a))
-        || (is_symbol_of_name($e, "globe")
-            && make_pair($e, $self->{g}))
+        || (is_symbol_of_name($e, "scope") && make_pair($e, $a))
+        || (is_symbol_of_name($e, "globe") && make_pair($e, $self->{g}))
         || SYMBOL_NIL;
+}
+
+# (def binding (v s)
+#   (get v
+#        (map caddr (keep [begins _ (list smark 'bind) id]
+#                         (map car s)))
+#        id))
+sub binding {
+    my ($self, $v) = @_;
+
+    for my $entry (reverse @{$self->{s}}) {
+        next if ref($entry) eq "CODE";
+        my $e = $entry->[0];
+
+        next unless is_smark_of_type($e, "bind");
+        my $smark_value = $e->value();
+        next unless _id(pair_car($smark_value), $v);
+        return $smark_value;
+    }
+
+    return;
 }
 
 # (def evcall (e a s r m)
