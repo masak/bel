@@ -1082,6 +1082,9 @@ __DATA__
       (list acc ys)
       (snap (cdr xs) (cdr ys) (snoc acc (car ys)))))
 
+(def udrop (xs ys)
+  (cadr (snap xs ys)))
+
 (def err args)
 
 (mac comma args
