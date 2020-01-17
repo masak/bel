@@ -1088,6 +1088,9 @@ __DATA__
 (def idfn (x)
   x)
 
+(def is (x)
+  [= _ x])
+
 (def err args)
 
 (mac comma args
