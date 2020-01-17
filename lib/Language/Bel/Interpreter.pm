@@ -1072,6 +1072,11 @@ __DATA__
   (cons (cons k v)
         (rem k kvs (fn (x y) (f (car x) y)))))
 
+(def rev (xs)
+  (if (no xs)
+      nil
+      (snoc (rev (cdr xs)) (car xs))))
+
 (def err args)
 
 (mac comma args
