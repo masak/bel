@@ -1085,6 +1085,9 @@ __DATA__
 (def udrop (xs ys)
   (cadr (snap xs ys)))
 
+(def idfn (x)
+  x)
+
 (def err args)
 
 (mac comma args
