@@ -1077,6 +1077,11 @@ __DATA__
       nil
       (snoc (rev (cdr xs)) (car xs))))
 
+(def snap (xs ys (o acc))
+  (if (no xs)
+      (list acc ys)
+      (snap (cdr xs) (cdr ys) (snoc acc (car ys)))))
+
 (def err args)
 
 (mac comma args
