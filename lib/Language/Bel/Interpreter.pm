@@ -1068,6 +1068,10 @@ __DATA__
 (def get (k kvs (o f =))
   (find [f (car _) k] kvs))
 
+(def put (k v kvs (o f =))
+  (cons (cons k v)
+        (rem k kvs (fn (x y) (f (car x) y)))))
+
 (def err args)
 
 (mac comma args
