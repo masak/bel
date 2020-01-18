@@ -85,8 +85,12 @@ sub new {
 
         for my $declaration (@DECLARATIONS) {
             my $ast = _read($declaration);
-            my $car_ast = prim_car($ast);
+            next
+                if is_nil($ast);   # `;` comment
+            die "Malformed global declaration\n"
+                unless is_pair($ast);
 
+            my $car_ast = prim_car($ast);
             die "First element of list is not a symbol"
                 unless is_symbol($car_ast);
 
@@ -987,6 +991,8 @@ __DATA__
 (def pair   (x) (= (type x) 'pair))
 
 (def char   (x) (= (type x) 'char))
+
+; not doing `stream` right now; waiting until we have streams
 
 (def proper (x)
   (or (no x)
