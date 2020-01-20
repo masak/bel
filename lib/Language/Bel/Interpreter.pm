@@ -1091,6 +1091,15 @@ __DATA__
 (def is (x)
   [= _ x])
 
+; skipping `eif`, `onerr`, `safe`; these require overriding `err` dynamically, and `ccc`
+
+; skipping `literal`, `variable`; very low-yield without the evaluator
+
+(def isa (name)
+  [begins _ `(lit ,name) id])
+
+; skipping the evaluator for now
+
 (def err args)
 
 (mac comma args
