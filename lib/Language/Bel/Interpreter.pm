@@ -1100,6 +1100,9 @@ __DATA__
 
 ; skipping the evaluator for now
 
+(def function (x)
+  (find [(isa _) x] '(prim clo)))
+
 (def err args)
 
 (mac comma args
