@@ -1111,6 +1111,13 @@ __DATA__
             (fn args (f (apply g args))))
           (or fs (list idfn))))
 
+(def combine (op)
+  (fn fs
+    (reduce (fn (f g)
+              (fn args
+                (op (apply f args) (apply g args))))
+            (or fs (list (con (op)))))))
+
 ; we are here currently, implementing things
 
 (def err args)
