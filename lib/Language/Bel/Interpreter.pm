@@ -1137,6 +1137,12 @@ __DATA__
                    (apply f (snoc (map car args) base))
                    (map cdr args))))
 
+(def foldr (f base . args)
+  (if (or (no args) (some no args))
+      base
+      (apply f (snoc (map car args)
+                     (apply foldr f base (map cdr args))))))
+
 ; we are here currently, implementing things
 
 (def err args)
