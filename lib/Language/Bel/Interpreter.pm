@@ -1130,6 +1130,13 @@ __DATA__
 (set cand (combine and)
      cor  (combine or))
 
+(def foldl (f base . args)
+  (if (or (no args) (some no args))
+      base
+      (apply foldl f
+                   (apply f (snoc (map car args) base))
+                   (map cdr args))))
+
 ; we are here currently, implementing things
 
 (def err args)
