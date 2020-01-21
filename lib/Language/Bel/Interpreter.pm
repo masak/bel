@@ -83,6 +83,7 @@ sub new {
             $self->set($prim_name, PRIMITIVES->{$prim_name});
         }
 
+        DECLARATION:
         for my $declaration (@DECLARATIONS) {
             my $ast = _read($declaration);
             next
@@ -154,7 +155,15 @@ sub new {
                 );
             }
             elsif (symbol_name($car_ast) eq "set") {
-                $new_ast = prim_car($cddr_ast);
+                while (!is_nil(prim_cdr($ast))) {
+                    $new_ast = prim_car($cddr_ast);
+                    $self->set($name, $self->eval_ast(_bqexpand($new_ast)));
+
+                    $ast = prim_cdr(prim_cdr($ast));
+                    $name = symbol_name(prim_car(prim_cdr($ast)));
+                    $cddr_ast = prim_cdr(prim_cdr($ast));
+                }
+                next DECLARATION;
             }
             else {
                 die "Unrecognized: $declaration";
@@ -1117,6 +1126,9 @@ __DATA__
               (fn args
                 (op (apply f args) (apply g args))))
             (or fs (list (con (op)))))))
+
+(set cand (combine and)
+     cor  (combine or))
 
 ; we are here currently, implementing things
 
