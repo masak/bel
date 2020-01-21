@@ -1143,6 +1143,9 @@ __DATA__
       (apply f (snoc (map car args)
                      (apply foldr f base (map cdr args))))))
 
+(def of (f g)
+  (fn args (apply f (map g args))))
+
 ; we are here currently, implementing things
 
 (def err args)
