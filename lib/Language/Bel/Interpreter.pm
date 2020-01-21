@@ -1103,6 +1103,11 @@ __DATA__
 (def function (x)
   (find [(isa _) x] '(prim clo)))
 
+(def con (x)
+  (fn args x))
+
+; we are here currently, implementing things
+
 (def err args)
 
 (mac comma args
