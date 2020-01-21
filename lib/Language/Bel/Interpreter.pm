@@ -1106,6 +1106,11 @@ __DATA__
 (def con (x)
   (fn args x))
 
+(def compose fs
+  (reduce (fn (f g)
+            (fn args (f (apply g args))))
+          (or fs (list idfn))))
+
 ; we are here currently, implementing things
 
 (def err args)
