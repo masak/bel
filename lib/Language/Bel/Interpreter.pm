@@ -1146,6 +1146,9 @@ __DATA__
 (def of (f g)
   (fn args (apply f (map g args))))
 
+(def upon args
+  [apply _ args])
+
 ; we are here currently, implementing things
 
 (def err args)
