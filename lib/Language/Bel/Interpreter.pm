@@ -1149,6 +1149,11 @@ __DATA__
 (def upon args
   [apply _ args])
 
+(def pairwise (f xs)
+  (or (no (cdr xs))
+      (and (f (car xs) (cadr xs))
+           (pairwise f (cdr xs)))))
+
 ; we are here currently, implementing things
 
 (def err args)
