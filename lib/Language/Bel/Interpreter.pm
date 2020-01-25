@@ -1102,7 +1102,16 @@ __DATA__
 
 ; skipping `eif`, `onerr`, `safe`; these require overriding `err` dynamically, and `ccc`
 
-; skipping `literal`, `variable`; very low-yield without the evaluator
+(def literal (e)
+  (or (in e t nil o apply)
+      (in (type e) 'char 'stream)
+      (caris e 'lit)
+      (string e)))
+
+(def variable (e)
+  (if (atom e)
+      (no (literal e))
+      (id (car e) vmark)))
 
 (def isa (name)
   [begins _ `(lit ,name) id])
@@ -1156,6 +1165,12 @@ __DATA__
 
 (def fuse (f . args)
   (apply append (apply map f args)))
+
+(mac letu (v . body)
+  (if ((cor variable atom) v)
+      `(let ,v (uvar) ,@body)
+      `(with ,(fuse [list _ '(uvar)] v)
+         ,@body)))
 
 ; we are here currently, implementing things
 
