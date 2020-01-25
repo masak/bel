@@ -1181,6 +1181,13 @@ __DATA__
                ,(cadr args)
                (pcase ,v ,@(cddr args)))))))
 
+(def match (x pat)
+  (if (= pat t)                t
+      (function pat)           (pat x)
+      (or (atom x) (atom pat)) (= x pat)
+                               (and (match (car x) (car pat))
+                                    (match (cdr x) (cdr pat)))))
+
 ; we are here currently, implementing things
 
 (def err args)
