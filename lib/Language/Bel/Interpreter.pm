@@ -1154,6 +1154,9 @@ __DATA__
       (and (f (car xs) (cadr xs))
            (pairwise f (cdr xs)))))
 
+(def fuse (f . args)
+  (apply append (apply map f args)))
+
 ; we are here currently, implementing things
 
 (def err args)
