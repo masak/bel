@@ -1172,6 +1172,15 @@ __DATA__
       `(with ,(fuse [list _ '(uvar)] v)
          ,@body)))
 
+(mac pcase (expr . args)
+  (if (no (cdr args))
+      (car args)
+      (letu v
+        `(let ,v ,expr
+           (if (,(car args) ,v)
+               ,(cadr args)
+               (pcase ,v ,@(cddr args)))))))
+
 ; we are here currently, implementing things
 
 (def err args)
