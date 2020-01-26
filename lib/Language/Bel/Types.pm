@@ -15,7 +15,7 @@ sub char_name {
 sub is_char {
     my ($object) = @_;
 
-    return ref($object) eq "Language::Bel::Type::Char";
+    return $object->isa("Language::Bel::Type::Char");
 }
 
 sub is_nil {
@@ -27,7 +27,7 @@ sub is_nil {
 sub is_pair {
     my ($object) = @_;
 
-    return ref($object) eq "Language::Bel::Type::Pair";
+    return $object->isa("Language::Bel::Type::Pair");
 }
 
 sub is_string {
@@ -43,7 +43,7 @@ sub is_string {
 sub is_symbol {
     my ($object) = @_;
 
-    return ref($object) eq "Language::Bel::Type::Symbol";
+    return $object->isa("Language::Bel::Type::Symbol");
 }
 
 sub is_symbol_of_name {
