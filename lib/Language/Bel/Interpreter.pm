@@ -6,8 +6,9 @@ use warnings;
 
 use Language::Bel::Types qw(
     is_char
-    is_pair
+    is_fastfunc
     is_nil
+    is_pair
     is_string
     is_symbol
     is_symbol_of_name
@@ -19,6 +20,7 @@ use Language::Bel::Types qw(
 );
 use Language::Bel::Symbols::Common qw(
     SYMBOL_NIL
+    SYMBOL_T
 );
 use Language::Bel::Primitives qw(
     PRIMITIVES
@@ -458,12 +460,15 @@ sub evcall {
         else {
             # We're consuming `es` twice, once in each fut.
             # So we capture it twice.
-            my $es2 = pair_cdr($e);
+            my $es2 = $es1;
 
             my $fu2 = fut(sub {
                 my $args = SYMBOL_NIL;
+                my @args;
                 while (!is_nil($es2)) {
-                    $args = make_pair(pop(@{$self->{r}}), $args);
+                    my $arg = pop(@{$self->{r}});
+                    $args = make_pair($arg, $args);
+                    unshift @args, $arg;
                     $es2 = pair_cdr($es2);
                 }
 
@@ -471,12 +476,15 @@ sub evcall {
                     # XXX: Need to do proper parameter handling here
                     die symbol_name(prim_car($args)), "\n";
                 }
+                elsif (is_fastfunc($op)) {
+                    my $e = $op->apply(@args);
+                    push @{$self->{r}}, $e;
+                }
                 else {
                     $self->applyf($op, $args, $a);
                 }
             });
 
-            push @{$self->{s}}, $fu2;
             my @unevaluated_arguments;
             while (!is_nil($es1)) {
                 push @unevaluated_arguments, [pair_car($es1), $a];
@@ -486,7 +494,7 @@ sub evcall {
             # so we need to put them on expression stack in the order
             # `c b a`. That's why we use `@unevaluated_arguments` as
             # an intermediary, to reverse the order.
-            push @{$self->{s}}, reverse(@unevaluated_arguments);
+            push @{$self->{s}}, $fu2, reverse(@unevaluated_arguments);
         }
     });
     push @{$self->{s}}, $fu1, [pair_car($e), $a];

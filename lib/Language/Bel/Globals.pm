@@ -7,6 +7,7 @@ use warnings;
 use Language::Bel::Types qw(
     make_pair
     make_symbol
+    make_fastfunc
 );
 use Language::Bel::Symbols::Common qw(
     SYMBOL_CHAR
@@ -18,6 +19,9 @@ use Language::Bel::Symbols::Common qw(
 );
 use Language::Bel::Primitives qw(
     PRIMITIVES
+);
+use Language::Bel::Globals::FastFuncs qw(
+    FASTFUNCS
 );
 
 use Exporter 'import';
@@ -41,10 +45,11 @@ $globals{"type"} = PRIMITIVES->{"type"};
 $globals{"xdr"} = PRIMITIVES->{"xdr"};
 
 $globals{"no"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
     make_pair(make_pair(make_symbol("id"), make_pair(make_symbol("x"),
-    make_pair(SYMBOL_NIL, SYMBOL_NIL))), SYMBOL_NIL)))));
+    make_pair(SYMBOL_NIL, SYMBOL_NIL))), SYMBOL_NIL))))), FASTFUNCS->{'no'});
 
 $globals{"atom"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),

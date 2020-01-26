@@ -9,6 +9,7 @@ use Language::Bel::Types qw(
     is_pair
     is_symbol
     is_symbol_of_name
+    make_fastfunc
     make_pair
     make_symbol
     pair_car
@@ -37,6 +38,9 @@ use Language::Bel::Expander::Bquote qw(
     _bqexpand
 );
 use Language::Bel::Globals::Source;
+use Language::Bel::Globals::FastFuncs qw(
+    FASTFUNCS
+);
 use Language::Bel::Interpreter;
 
 use Exporter 'import';
@@ -90,6 +94,7 @@ use warnings;
 use Language::Bel::Types qw(
     make_pair
     make_symbol
+    make_fastfunc
 );
 use Language::Bel::Symbols::Common qw(
     SYMBOL_CHAR
@@ -101,6 +106,9 @@ use Language::Bel::Symbols::Common qw(
 );
 use Language::Bel::Primitives qw(
     PRIMITIVES
+);
+use Language::Bel::Globals::FastFuncs qw(
+    FASTFUNCS
 );
 
 use Exporter 'import';
@@ -226,7 +234,10 @@ sub print_global {
     my ($name, $value) = @_;
 
     my $serialized = serialize($value);
-    my $formatted = break_lines($serialized);
+    my $maybe_ff_d = FASTFUNCS->{$name}
+        ? "make_fastfunc($serialized, FASTFUNCS->{'$name'})"
+        : $serialized;
+    my $formatted = break_lines($maybe_ff_d);
     print('$globals{"', $name, '"} =', "\n");
     print("$formatted;\n");
     print("\n");

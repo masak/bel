@@ -8,4 +8,10 @@ sub new {
     return bless($obj, $class);
 }
 
+sub apply {
+    my ($self, @args) = @_;
+
+    return $self->{fn}->(@args);
+}
+
 1;
