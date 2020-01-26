@@ -9,9 +9,9 @@ sub new {
 }
 
 sub apply {
-    my ($self, @args) = @_;
+    my ($self, $interpreter, @args) = @_;
 
-    return $self->{fn}->(@args);
+    return $self->{fn}->($interpreter, @args);
 }
 
 1;

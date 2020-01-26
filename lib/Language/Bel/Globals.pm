@@ -52,32 +52,35 @@ $globals{"no"} =
     make_pair(SYMBOL_NIL, SYMBOL_NIL))), SYMBOL_NIL))))), FASTFUNCS->{'no'});
 
 $globals{"atom"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
     make_pair(make_pair(make_symbol("no"),
     make_pair(make_pair(make_symbol("id"),
     make_pair(make_pair(make_symbol("type"), make_pair(make_symbol("x"),
     SYMBOL_NIL)), make_pair(make_pair(SYMBOL_QUOTE, make_pair(SYMBOL_PAIR,
-    SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL)), SYMBOL_NIL)))));
+    SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL)), SYMBOL_NIL))))),
+    FASTFUNCS->{'atom'});
 
 $globals{"all"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("f"),
-    make_pair(make_symbol("xs"), SYMBOL_NIL)),
-    make_pair(make_pair(make_symbol("if"),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("f"), make_pair(make_symbol("xs"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("if"),
     make_pair(make_pair(make_symbol("no"), make_pair(make_symbol("xs"),
     SYMBOL_NIL)), make_pair(SYMBOL_T, make_pair(make_pair(make_symbol("f"),
     make_pair(make_pair(make_symbol("car"), make_pair(make_symbol("xs"),
     SYMBOL_NIL)), SYMBOL_NIL)), make_pair(make_pair(make_symbol("all"),
     make_pair(make_symbol("f"), make_pair(make_pair(make_symbol("cdr"),
     make_pair(make_symbol("xs"), SYMBOL_NIL)), SYMBOL_NIL))),
-    make_pair(SYMBOL_NIL, SYMBOL_NIL)))))), SYMBOL_NIL)))));
+    make_pair(SYMBOL_NIL, SYMBOL_NIL)))))), SYMBOL_NIL))))),
+    FASTFUNCS->{'all'});
 
 $globals{"some"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("f"),
-    make_pair(make_symbol("xs"), SYMBOL_NIL)),
-    make_pair(make_pair(make_symbol("if"),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("f"), make_pair(make_symbol("xs"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("if"),
     make_pair(make_pair(make_symbol("no"), make_pair(make_symbol("xs"),
     SYMBOL_NIL)), make_pair(SYMBOL_NIL,
     make_pair(make_pair(make_symbol("f"),
@@ -85,13 +88,14 @@ $globals{"some"} =
     SYMBOL_NIL)), SYMBOL_NIL)), make_pair(make_symbol("xs"),
     make_pair(make_pair(make_symbol("some"), make_pair(make_symbol("f"),
     make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("xs"),
-    SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL)))))), SYMBOL_NIL)))));
+    SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL)))))), SYMBOL_NIL))))),
+    FASTFUNCS->{'some'});
 
 $globals{"reduce"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("f"),
-    make_pair(make_symbol("xs"), SYMBOL_NIL)),
-    make_pair(make_pair(make_symbol("if"),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("f"), make_pair(make_symbol("xs"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("if"),
     make_pair(make_pair(make_symbol("no"),
     make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("xs"),
     SYMBOL_NIL)), SYMBOL_NIL)), make_pair(make_pair(make_symbol("car"),
@@ -101,19 +105,20 @@ $globals{"reduce"} =
     SYMBOL_NIL)), make_pair(make_pair(make_symbol("reduce"),
     make_pair(make_symbol("f"), make_pair(make_pair(make_symbol("cdr"),
     make_pair(make_symbol("xs"), SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL))),
-    SYMBOL_NIL)))), SYMBOL_NIL)))));
+    SYMBOL_NIL)))), SYMBOL_NIL))))), FASTFUNCS->{'reduce'});
 
 $globals{"cons"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_symbol("args"),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_symbol("args"),
     make_pair(make_pair(make_symbol("reduce"),
     make_pair(make_symbol("join"), make_pair(make_symbol("args"),
-    SYMBOL_NIL))), SYMBOL_NIL)))));
+    SYMBOL_NIL))), SYMBOL_NIL))))), FASTFUNCS->{'cons'});
 
 $globals{"append"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_symbol("args"),
-    make_pair(make_pair(make_symbol("if"),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_symbol("args"), make_pair(make_pair(make_symbol("if"),
     make_pair(make_pair(make_symbol("no"),
     make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("args"),
     SYMBOL_NIL)), SYMBOL_NIL)), make_pair(make_pair(make_symbol("car"),
@@ -131,28 +136,31 @@ $globals{"append"} =
     make_pair(make_pair(make_symbol("car"), make_pair(make_symbol("args"),
     SYMBOL_NIL)), SYMBOL_NIL)), make_pair(make_pair(make_symbol("cdr"),
     make_pair(make_symbol("args"), SYMBOL_NIL)), SYMBOL_NIL)))),
-    SYMBOL_NIL))), SYMBOL_NIL)))))), SYMBOL_NIL)))));
+    SYMBOL_NIL))), SYMBOL_NIL)))))), SYMBOL_NIL))))), FASTFUNCS->{'append'});
 
 $globals{"snoc"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_symbol("args"),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_symbol("args"),
     make_pair(make_pair(make_symbol("append"),
     make_pair(make_pair(make_symbol("car"), make_pair(make_symbol("args"),
     SYMBOL_NIL)), make_pair(make_pair(make_symbol("cdr"),
     make_pair(make_symbol("args"), SYMBOL_NIL)), SYMBOL_NIL))),
-    SYMBOL_NIL)))));
+    SYMBOL_NIL))))), FASTFUNCS->{'snoc'});
 
 $globals{"list"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_symbol("args"),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_symbol("args"),
     make_pair(make_pair(make_symbol("append"),
     make_pair(make_symbol("args"), make_pair(SYMBOL_NIL, SYMBOL_NIL))),
-    SYMBOL_NIL)))));
+    SYMBOL_NIL))))), FASTFUNCS->{'list'});
 
 $globals{"map"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("f"),
-    make_symbol("ls")), make_pair(make_pair(make_symbol("if"),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("f"), make_symbol("ls")),
+    make_pair(make_pair(make_symbol("if"),
     make_pair(make_pair(make_symbol("no"), make_pair(make_symbol("ls"),
     SYMBOL_NIL)), make_pair(SYMBOL_NIL,
     make_pair(make_pair(make_symbol("some"), make_pair(make_symbol("no"),
@@ -176,7 +184,7 @@ $globals{"map"} =
     make_pair(make_symbol("f"), make_pair(make_pair(make_symbol("map"),
     make_pair(make_symbol("cdr"), make_pair(make_symbol("ls"),
     SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL))), SYMBOL_NIL)))))))),
-    SYMBOL_NIL)))));
+    SYMBOL_NIL))))), FASTFUNCS->{'map'});
 
 $globals{"fn"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("mac"),
@@ -405,9 +413,9 @@ $globals{"and"} =
     SYMBOL_NIL))))), SYMBOL_NIL)));
 
 $globals{"="} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_symbol("args"),
-    make_pair(make_pair(make_symbol("if"),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_symbol("args"), make_pair(make_pair(make_symbol("if"),
     make_pair(make_pair(make_symbol("no"),
     make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("args"),
     SYMBOL_NIL)), SYMBOL_NIL)), make_pair(SYMBOL_T,
@@ -427,35 +435,39 @@ $globals{"="} =
     make_pair(make_pair(make_symbol("apply"), make_pair(make_symbol("="),
     make_pair(make_pair(make_symbol("map"), make_pair(make_symbol("cdr"),
     make_pair(make_symbol("args"), SYMBOL_NIL))), SYMBOL_NIL))),
-    SYMBOL_NIL))), SYMBOL_NIL)))))), SYMBOL_NIL)))));
+    SYMBOL_NIL))), SYMBOL_NIL)))))), SYMBOL_NIL))))), FASTFUNCS->{'='});
 
 $globals{"symbol"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
     make_pair(make_pair(make_symbol("="),
     make_pair(make_pair(make_symbol("type"), make_pair(make_symbol("x"),
     SYMBOL_NIL)), make_pair(make_pair(SYMBOL_QUOTE, make_pair(SYMBOL_SYMBOL,
-    SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL)))));
+    SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL))))), FASTFUNCS->{'symbol'});
 
 $globals{"pair"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
     make_pair(make_pair(make_symbol("="),
     make_pair(make_pair(make_symbol("type"), make_pair(make_symbol("x"),
     SYMBOL_NIL)), make_pair(make_pair(SYMBOL_QUOTE, make_pair(SYMBOL_PAIR,
-    SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL)))));
+    SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL))))), FASTFUNCS->{'pair'});
 
 $globals{"char"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
     make_pair(make_pair(make_symbol("="),
     make_pair(make_pair(make_symbol("type"), make_pair(make_symbol("x"),
     SYMBOL_NIL)), make_pair(make_pair(SYMBOL_QUOTE, make_pair(SYMBOL_CHAR,
-    SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL)))));
+    SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL))))), FASTFUNCS->{'char'});
 
 $globals{"proper"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
     make_pair(make_pair(make_symbol("or"),
     make_pair(make_pair(make_symbol("no"), make_pair(make_symbol("x"),
     SYMBOL_NIL)), make_pair(make_pair(make_symbol("and"),
@@ -463,56 +475,63 @@ $globals{"proper"} =
     SYMBOL_NIL)), make_pair(make_pair(make_symbol("proper"),
     make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("x"),
     SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL))),
-    SYMBOL_NIL)))));
+    SYMBOL_NIL))))), FASTFUNCS->{'proper'});
 
 $globals{"string"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
     make_pair(make_pair(make_symbol("and"),
     make_pair(make_pair(make_symbol("proper"), make_pair(make_symbol("x"),
     SYMBOL_NIL)), make_pair(make_pair(make_symbol("all"),
     make_pair(SYMBOL_CHAR, make_pair(make_symbol("x"), SYMBOL_NIL))),
-    SYMBOL_NIL))), SYMBOL_NIL)))));
+    SYMBOL_NIL))), SYMBOL_NIL))))), FASTFUNCS->{'string'});
 
 $globals{"mem"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"),
-    make_pair(make_symbol("ys"), make_pair(make_pair(make_symbol("o"),
-    make_pair(make_symbol("f"), make_pair(make_symbol("="), SYMBOL_NIL))),
-    SYMBOL_NIL))), make_pair(make_pair(make_symbol("some"),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("x"), make_pair(make_symbol("ys"),
+    make_pair(make_pair(make_symbol("o"), make_pair(make_symbol("f"),
+    make_pair(make_symbol("="), SYMBOL_NIL))), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("some"),
     make_pair(make_pair(make_symbol("fn"),
     make_pair(make_pair(make_symbol("_"), SYMBOL_NIL),
     make_pair(make_pair(make_symbol("f"), make_pair(make_symbol("_"),
     make_pair(make_symbol("x"), SYMBOL_NIL))), SYMBOL_NIL))),
-    make_pair(make_symbol("ys"), SYMBOL_NIL))), SYMBOL_NIL)))));
+    make_pair(make_symbol("ys"), SYMBOL_NIL))), SYMBOL_NIL))))),
+    FASTFUNCS->{'mem'});
 
 $globals{"in"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"),
-    make_symbol("ys")), make_pair(make_pair(make_symbol("mem"),
-    make_pair(make_symbol("x"), make_pair(make_symbol("ys"), SYMBOL_NIL))),
-    SYMBOL_NIL)))));
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("x"), make_symbol("ys")),
+    make_pair(make_pair(make_symbol("mem"), make_pair(make_symbol("x"),
+    make_pair(make_symbol("ys"), SYMBOL_NIL))), SYMBOL_NIL))))),
+    FASTFUNCS->{'in'});
 
 $globals{"cadr"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
     make_pair(make_pair(make_symbol("car"),
     make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("x"),
-    SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL)))));
+    SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL))))), FASTFUNCS->{'cadr'});
 
 $globals{"cddr"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
     make_pair(make_pair(make_symbol("cdr"),
     make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("x"),
-    SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL)))));
+    SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL))))), FASTFUNCS->{'cddr'});
 
 $globals{"caddr"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
     make_pair(make_pair(make_symbol("car"),
     make_pair(make_pair(make_symbol("cddr"), make_pair(make_symbol("x"),
-    SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL)))));
+    SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL))))), FASTFUNCS->{'caddr'});
 
 $globals{"case"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("mac"),
@@ -610,14 +629,14 @@ $globals{"aif"} =
     SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))))), SYMBOL_NIL)));
 
 $globals{"find"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("f"),
-    make_pair(make_symbol("xs"), SYMBOL_NIL)),
-    make_pair(make_pair(make_symbol("aif"),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("f"), make_pair(make_symbol("xs"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("aif"),
     make_pair(make_pair(make_symbol("some"), make_pair(make_symbol("f"),
     make_pair(make_symbol("xs"), SYMBOL_NIL))),
     make_pair(make_pair(make_symbol("car"), make_pair(make_symbol("it"),
-    SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL)))));
+    SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL))))), FASTFUNCS->{'find'});
 
 $globals{"begins"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),

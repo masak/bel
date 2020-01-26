@@ -29,6 +29,7 @@ use Language::Bel::Primitives qw(
     _id
     prim_car
     prim_cdr
+    prim_type
     PRIM_FN
 );
 use Language::Bel::Reader qw(
@@ -85,6 +86,24 @@ sub eval_ast {
     return $self->{r}[-1];
 }
 
+sub run_function_and_return {
+    my ($self, $fn, @args) = @_;
+
+    my $args = SYMBOL_NIL;
+    for my $arg (reverse(@args)) {
+        $args = make_pair($arg, $args);
+    }
+
+    my $s_level = scalar(@{$self->{s}});
+    $self->applyf($fn, $args, SYMBOL_NIL);
+
+    while (scalar(@{$self->{s}}) > $s_level) {
+        $self->ev();
+    }
+    my $retval = pop(@{$self->{r}});
+    return $retval;
+}
+
 sub fut {
     my ($sub) = @_;
 
@@ -116,7 +135,7 @@ my %forms = (
     if => sub {
         my ($interpreter, $es, $a) = @_;
 
-        if (is_nil($es) eq "nil") {
+        if (is_nil($es)) {
             push @{$interpreter->{r}}, SYMBOL_NIL;
         }
         else {
@@ -477,7 +496,7 @@ sub evcall {
                     die symbol_name(prim_car($args)), "\n";
                 }
                 elsif (is_fastfunc($op)) {
-                    my $e = $op->apply(@args);
+                    my $e = $op->apply($self, @args);
                     push @{$self->{r}}, $e;
                 }
                 else {
