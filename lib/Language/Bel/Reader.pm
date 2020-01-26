@@ -34,6 +34,9 @@ sub _read_helper {
     };
 
     $skip_whitespace->();
+    return { ast => SYMBOL_NIL, pos => $pos }
+        if $pos >= length($expr);
+
     my $c = substr($expr, $pos, 1);
     if ($c eq "(") {
         return _rdlist($expr, ")", $pos);
@@ -105,6 +108,12 @@ sub _read_helper {
             );
         }
         return { ast => $ast, pos => $pos };
+    }
+    elsif ($c eq ";") {
+        while ($pos < length($expr) && substr($expr, $pos, 1) ne "\n") {
+            ++$pos;
+        }
+        return _read_helper($expr, $pos);
     }
     else {  # symbol
         my $start = $pos;
