@@ -8,10 +8,11 @@ use Language::Bel;
 
 plan tests => 3;
 
+my $b = Language::Bel->new({ output => undef });
+
 sub is_bel_error {
     my ($expr, $expected_error) = @_;
 
-    my $b = Language::Bel->new({ output => undef });
     eval {
         $b->eval($expr);
     };
