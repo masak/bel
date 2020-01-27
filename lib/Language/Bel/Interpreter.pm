@@ -1196,6 +1196,9 @@ __DATA__
 (mac when (expr . body)
   `(if ,expr (do ,@body)))
 
+(mac unless (expr . body)
+  `(when (no ,expr) ,@body))
+
 ; we are here currently, implementing things
 
 (def err args)
