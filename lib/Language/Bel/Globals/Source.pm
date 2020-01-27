@@ -304,6 +304,14 @@ __DATA__
 (mac unless (expr . body)
   `(when (no ,expr) ,@body))
 
+(set i0  nil
+     i1  '(t)
+     i2  '(t t)
+     i10 '(t t t t t t t t t t)
+     i16 '(t t t t t t t t t t t t t t t t))
+
+(set i< udrop)
+
 ; we are here currently, implementing things
 
 (def err args)

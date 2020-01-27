@@ -1245,6 +1245,38 @@ $globals{"unless"} =
     make_pair(make_symbol("body"), make_pair(SYMBOL_NIL, SYMBOL_NIL))),
     SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))))), SYMBOL_NIL)));
 
+$globals{"i0"} =
+    SYMBOL_NIL;
+
+$globals{"i1"} =
+    make_pair(SYMBOL_T, SYMBOL_NIL);
+
+$globals{"i2"} =
+    make_pair(SYMBOL_T, make_pair(SYMBOL_T, SYMBOL_NIL));
+
+$globals{"i10"} =
+    make_pair(SYMBOL_T, make_pair(SYMBOL_T, make_pair(SYMBOL_T,
+    make_pair(SYMBOL_T, make_pair(SYMBOL_T, make_pair(SYMBOL_T,
+    make_pair(SYMBOL_T, make_pair(SYMBOL_T, make_pair(SYMBOL_T,
+    make_pair(SYMBOL_T, SYMBOL_NIL))))))))));
+
+$globals{"i16"} =
+    make_pair(SYMBOL_T, make_pair(SYMBOL_T, make_pair(SYMBOL_T,
+    make_pair(SYMBOL_T, make_pair(SYMBOL_T, make_pair(SYMBOL_T,
+    make_pair(SYMBOL_T, make_pair(SYMBOL_T, make_pair(SYMBOL_T,
+    make_pair(SYMBOL_T, make_pair(SYMBOL_T, make_pair(SYMBOL_T,
+    make_pair(SYMBOL_T, make_pair(SYMBOL_T, make_pair(SYMBOL_T,
+    make_pair(SYMBOL_T, SYMBOL_NIL))))))))))))))));
+
+$globals{"i<"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("xs"),
+    make_pair(make_symbol("ys"), SYMBOL_NIL)),
+    make_pair(make_pair(make_symbol("cadr"),
+    make_pair(make_pair(make_symbol("snap"), make_pair(make_symbol("xs"),
+    make_pair(make_symbol("ys"), SYMBOL_NIL))), SYMBOL_NIL)),
+    SYMBOL_NIL)))));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"), SYMBOL_NIL))));
