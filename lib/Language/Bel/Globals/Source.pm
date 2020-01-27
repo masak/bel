@@ -315,6 +315,11 @@ __DATA__
 (def i+ args
   (apply append args))
 
+(def i- (x y)
+  (if (no x) (list '- y)
+      (no y) (list '+ x)
+             (i- (cdr x) (cdr y))))
+
 ; we are here currently, implementing things
 
 (def err args)
