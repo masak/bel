@@ -312,6 +312,9 @@ __DATA__
 
 (set i< udrop)
 
+(def i+ args
+  (apply append args))
+
 ; we are here currently, implementing things
 
 (def err args)
