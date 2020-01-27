@@ -1193,6 +1193,9 @@ __DATA__
       (list acc xs)
       (split f (cdr xs) (snoc acc (car xs)))))
 
+(mac when (expr . body)
+  `(if ,expr (do ,@body)))
+
 ; we are here currently, implementing things
 
 (def err args)
