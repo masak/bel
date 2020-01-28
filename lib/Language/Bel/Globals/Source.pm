@@ -333,6 +333,20 @@ __DATA__
 (def i^ (x y)
   (foldr i* i1 (map (con x) y)))
 
+(def r+ ((xn xd) (yn yd))
+  (list (i+ (i* xn yd) (i* yn xd))
+        (i* xd yd)))
+
+(def r- ((xn xd) (yn yd))
+  (let (s n) (i- (i* xn yd) (i* yn xd))
+    (list s n (i* xd yd))))
+
+(def r* ((xn xd) (yn yd))
+  (list (i* xn yn) (i* xd yd)))
+
+(def r/ ((xn xd) (yn yd))
+  (list (i* xn yd) (i* xd yn)))
+
 ; we are here currently, implementing things
 
 (def err args)
