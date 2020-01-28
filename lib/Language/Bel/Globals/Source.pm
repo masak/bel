@@ -330,6 +330,9 @@ __DATA__
       (i< x y) (list q x)
                (i/ (udrop y x) y (i+ q i1))))
 
+(def i^ (x y)
+  (foldr i* i1 (map (con x) y)))
+
 ; we are here currently, implementing things
 
 (def err args)
