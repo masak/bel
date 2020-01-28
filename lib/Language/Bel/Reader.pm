@@ -126,7 +126,10 @@ sub _read_helper {
                 ++$pos;
             } while ($pos < length($expr));
         }
-        my $ast = make_symbol(substr($expr, $start, $pos - $start));
+        my $word = substr($expr, $start, $pos - $start);
+        my $ast = index($word, ":") != -1
+            ? wrap_in_compose(split /:/, $word)
+            : maybe_wrap_in_no($word);
         return { ast => $ast, pos => $pos };
     }
 }
@@ -189,6 +192,33 @@ sub wrap_in_fn {
             ),
         ),
     );
+}
+
+sub wrap_in_compose {
+    my (@parts) = @_;
+
+    my $result = SYMBOL_NIL;
+    while (@parts) {
+        my $part = pop(@parts);
+        $result = make_pair(
+            maybe_wrap_in_no($part),
+            $result,
+        );
+    }
+    return make_pair(
+        make_symbol("compose"),
+        $result,
+    );
+}
+
+sub maybe_wrap_in_no {
+    my ($part) = @_;
+
+    return $part eq "~"
+        ? make_symbol("no")
+        : substr($part, 0, 1) eq "~"
+            ? wrap_in_compose("no", substr($part, 1))
+            : make_symbol($part);
 }
 
 our @EXPORT_OK = qw(
