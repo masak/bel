@@ -325,6 +325,11 @@ __DATA__
          i1
          args))
 
+(def i/ (x y (o q))
+  (if (no x)   (list q nil)
+      (i< x y) (list q x)
+               (i/ (udrop y x) y (i+ q i1))))
+
 ; we are here currently, implementing things
 
 (def err args)

@@ -1315,6 +1315,26 @@ $globals{"i*"} =
     make_pair(make_symbol("i1"), make_pair(make_symbol("args"),
     SYMBOL_NIL)))), SYMBOL_NIL)))));
 
+$globals{"i/"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"),
+    make_pair(make_symbol("y"), make_pair(make_pair(make_symbol("o"),
+    make_pair(make_symbol("q"), SYMBOL_NIL)), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("if"),
+    make_pair(make_pair(make_symbol("no"), make_pair(make_symbol("x"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("list"),
+    make_pair(make_symbol("q"), make_pair(SYMBOL_NIL, SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("i<"), make_pair(make_symbol("x"),
+    make_pair(make_symbol("y"), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("list"), make_pair(make_symbol("q"),
+    make_pair(make_symbol("x"), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("i/"),
+    make_pair(make_pair(make_symbol("udrop"), make_pair(make_symbol("y"),
+    make_pair(make_symbol("x"), SYMBOL_NIL))), make_pair(make_symbol("y"),
+    make_pair(make_pair(make_symbol("i+"), make_pair(make_symbol("q"),
+    make_pair(make_symbol("i1"), SYMBOL_NIL))), SYMBOL_NIL)))),
+    SYMBOL_NIL)))))), SYMBOL_NIL)))));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"), SYMBOL_NIL))));
