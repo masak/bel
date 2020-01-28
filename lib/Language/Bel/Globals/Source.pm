@@ -320,6 +320,11 @@ __DATA__
       (no y) (list '+ x)
              (i- (cdr x) (cdr y))))
 
+(def i* args
+  (foldr (fn (x y) (fuse (con x) y))
+         i1
+         args))
+
 ; we are here currently, implementing things
 
 (def err args)
