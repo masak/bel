@@ -1188,6 +1188,17 @@ __DATA__
                                (and (match (car x) (car pat))
                                     (match (cdr x) (cdr pat)))))
 
+(def split (f xs (o acc))
+  (if ((cor atom f:car) xs)
+      (list acc xs)
+      (split f (cdr xs) (snoc acc (car xs)))))
+
+(mac when (expr . body)
+  `(if ,expr (do ,@body)))
+
+(mac unless (expr . body)
+  `(when (no ,expr) ,@body))
+
 ; we are here currently, implementing things
 
 (def err args)
