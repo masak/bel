@@ -347,6 +347,50 @@ __DATA__
 (def r/ ((xn xd) (yn yd))
   (list (i* xn yd) (i* xd yn)))
 
+(set srzero (list '+ i0 i1)
+     srone  (list '+ i1 i1))
+
+(def sr+ ((xs . xr) (ys . yr))
+  (if (= xs '-)
+      (if (= ys '-)
+          (cons '- (r+ xr yr))
+          (r- yr xr))
+      (if (= ys '-)
+          (r- xr yr)
+          (cons '+ (r+ xr yr)))))
+
+(def sr- (x y)
+  (sr+ x (srinv y)))
+
+(def srinv ((s n d))
+  (list (if (and (= s '+) (~= n i0)) '- '+)
+        n
+        d))
+
+(def sr* ((xs . xr) (ys . yr))
+  (cons (if (= xs '-)
+            (case ys - '+ '-)
+            ys)
+        (r* xr yr)))
+
+(def sr/ (x y)
+  (sr* x (srrecip y)))
+
+(def srrecip ((s (t n [~= _ i0]) d))
+  (list s d n))
+
+(def sr< ((xs xn xd) (ys yn yd))
+  (if (= xs '+)
+      (if (= ys '+)
+          (i< (i* xn yd) (i* yn xd))
+          nil)
+      (if (= ys '+)
+          (~= xn yn i0)
+          (i< (i* yn xd) (i* xn yd)))))
+
+(set srnum cadr
+     srden caddr)
+
 ; we are here currently, implementing things
 
 (def err args)

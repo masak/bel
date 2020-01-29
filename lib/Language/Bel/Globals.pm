@@ -1401,6 +1401,156 @@ $globals{"r/"} =
     make_pair(make_symbol("yn"), SYMBOL_NIL))), SYMBOL_NIL))),
     SYMBOL_NIL)))));
 
+$globals{"srzero"} =
+    make_pair(make_symbol("+"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(SYMBOL_T, SYMBOL_NIL), SYMBOL_NIL)));
+
+$globals{"srone"} =
+    make_pair(make_symbol("+"), make_pair(make_pair(SYMBOL_T, SYMBOL_NIL),
+    make_pair(make_pair(SYMBOL_T, SYMBOL_NIL), SYMBOL_NIL)));
+
+$globals{"sr+"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_pair(make_symbol("xs"),
+    make_symbol("xr")), make_pair(make_pair(make_symbol("ys"),
+    make_symbol("yr")), SYMBOL_NIL)), make_pair(make_pair(make_symbol("if"),
+    make_pair(make_pair(make_symbol("="), make_pair(make_symbol("xs"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("-"),
+    SYMBOL_NIL)), SYMBOL_NIL))), make_pair(make_pair(make_symbol("if"),
+    make_pair(make_pair(make_symbol("="), make_pair(make_symbol("ys"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("-"),
+    SYMBOL_NIL)), SYMBOL_NIL))), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("-"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("r+"),
+    make_pair(make_symbol("xr"), make_pair(make_symbol("yr"), SYMBOL_NIL))),
+    SYMBOL_NIL))), make_pair(make_pair(make_symbol("r-"),
+    make_pair(make_symbol("yr"), make_pair(make_symbol("xr"), SYMBOL_NIL))),
+    SYMBOL_NIL)))), make_pair(make_pair(make_symbol("if"),
+    make_pair(make_pair(make_symbol("="), make_pair(make_symbol("ys"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("-"),
+    SYMBOL_NIL)), SYMBOL_NIL))), make_pair(make_pair(make_symbol("r-"),
+    make_pair(make_symbol("xr"), make_pair(make_symbol("yr"), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("+"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("r+"),
+    make_pair(make_symbol("xr"), make_pair(make_symbol("yr"), SYMBOL_NIL))),
+    SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL)))), SYMBOL_NIL)))));
+
+$globals{"sr-"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"),
+    make_pair(make_symbol("y"), SYMBOL_NIL)),
+    make_pair(make_pair(make_symbol("sr+"), make_pair(make_symbol("x"),
+    make_pair(make_pair(make_symbol("srinv"), make_pair(make_symbol("y"),
+    SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL)))));
+
+$globals{"srinv"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_pair(make_symbol("s"),
+    make_pair(make_symbol("n"), make_pair(make_symbol("d"), SYMBOL_NIL))),
+    SYMBOL_NIL), make_pair(make_pair(make_symbol("list"),
+    make_pair(make_pair(make_symbol("if"),
+    make_pair(make_pair(make_symbol("and"),
+    make_pair(make_pair(make_symbol("="), make_pair(make_symbol("s"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("+"),
+    SYMBOL_NIL)), SYMBOL_NIL))),
+    make_pair(make_pair(make_pair(make_symbol("compose"),
+    make_pair(make_symbol("no"), make_pair(make_symbol("="), SYMBOL_NIL))),
+    make_pair(make_symbol("n"), make_pair(make_symbol("i0"), SYMBOL_NIL))),
+    SYMBOL_NIL))), make_pair(make_pair(SYMBOL_QUOTE,
+    make_pair(make_symbol("-"), SYMBOL_NIL)),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("+"),
+    SYMBOL_NIL)), SYMBOL_NIL)))), make_pair(make_symbol("n"),
+    make_pair(make_symbol("d"), SYMBOL_NIL)))), SYMBOL_NIL)))));
+
+$globals{"sr*"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_pair(make_symbol("xs"),
+    make_symbol("xr")), make_pair(make_pair(make_symbol("ys"),
+    make_symbol("yr")), SYMBOL_NIL)),
+    make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(make_symbol("if"),
+    make_pair(make_pair(make_symbol("="), make_pair(make_symbol("xs"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("-"),
+    SYMBOL_NIL)), SYMBOL_NIL))), make_pair(make_pair(make_symbol("case"),
+    make_pair(make_symbol("ys"), make_pair(make_symbol("-"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("+"),
+    SYMBOL_NIL)), make_pair(make_pair(SYMBOL_QUOTE,
+    make_pair(make_symbol("-"), SYMBOL_NIL)), SYMBOL_NIL))))),
+    make_pair(make_symbol("ys"), SYMBOL_NIL)))),
+    make_pair(make_pair(make_symbol("r*"), make_pair(make_symbol("xr"),
+    make_pair(make_symbol("yr"), SYMBOL_NIL))), SYMBOL_NIL))),
+    SYMBOL_NIL)))));
+
+$globals{"sr/"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"),
+    make_pair(make_symbol("y"), SYMBOL_NIL)),
+    make_pair(make_pair(make_symbol("sr*"), make_pair(make_symbol("x"),
+    make_pair(make_pair(make_symbol("srrecip"), make_pair(make_symbol("y"),
+    SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL)))));
+
+$globals{"srrecip"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_pair(make_symbol("s"),
+    make_pair(make_pair(SYMBOL_T, make_pair(make_symbol("n"),
+    make_pair(make_pair(make_symbol("fn"),
+    make_pair(make_pair(make_symbol("_"), SYMBOL_NIL),
+    make_pair(make_pair(make_pair(make_symbol("compose"),
+    make_pair(make_symbol("no"), make_pair(make_symbol("="), SYMBOL_NIL))),
+    make_pair(make_symbol("_"), make_pair(make_symbol("i0"), SYMBOL_NIL))),
+    SYMBOL_NIL))), SYMBOL_NIL))), make_pair(make_symbol("d"), SYMBOL_NIL))),
+    SYMBOL_NIL), make_pair(make_pair(make_symbol("list"),
+    make_pair(make_symbol("s"), make_pair(make_symbol("d"),
+    make_pair(make_symbol("n"), SYMBOL_NIL)))), SYMBOL_NIL)))));
+
+$globals{"sr<"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_pair(make_symbol("xs"),
+    make_pair(make_symbol("xn"), make_pair(make_symbol("xd"), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("ys"), make_pair(make_symbol("yn"),
+    make_pair(make_symbol("yd"), SYMBOL_NIL))), SYMBOL_NIL)),
+    make_pair(make_pair(make_symbol("if"),
+    make_pair(make_pair(make_symbol("="), make_pair(make_symbol("xs"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("+"),
+    SYMBOL_NIL)), SYMBOL_NIL))), make_pair(make_pair(make_symbol("if"),
+    make_pair(make_pair(make_symbol("="), make_pair(make_symbol("ys"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("+"),
+    SYMBOL_NIL)), SYMBOL_NIL))), make_pair(make_pair(make_symbol("i<"),
+    make_pair(make_pair(make_symbol("i*"), make_pair(make_symbol("xn"),
+    make_pair(make_symbol("yd"), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("i*"), make_pair(make_symbol("yn"),
+    make_pair(make_symbol("xd"), SYMBOL_NIL))), SYMBOL_NIL))),
+    make_pair(SYMBOL_NIL, SYMBOL_NIL)))),
+    make_pair(make_pair(make_symbol("if"),
+    make_pair(make_pair(make_symbol("="), make_pair(make_symbol("ys"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("+"),
+    SYMBOL_NIL)), SYMBOL_NIL))),
+    make_pair(make_pair(make_pair(make_symbol("compose"),
+    make_pair(make_symbol("no"), make_pair(make_symbol("="), SYMBOL_NIL))),
+    make_pair(make_symbol("xn"), make_pair(make_symbol("yn"),
+    make_pair(make_symbol("i0"), SYMBOL_NIL)))),
+    make_pair(make_pair(make_symbol("i<"),
+    make_pair(make_pair(make_symbol("i*"), make_pair(make_symbol("yn"),
+    make_pair(make_symbol("xd"), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("i*"), make_pair(make_symbol("xn"),
+    make_pair(make_symbol("yd"), SYMBOL_NIL))), SYMBOL_NIL))),
+    SYMBOL_NIL)))), SYMBOL_NIL)))), SYMBOL_NIL)))));
+
+$globals{"srnum"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
+    make_pair(make_pair(make_symbol("car"),
+    make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("x"),
+    SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL)))));
+
+$globals{"srden"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
+    make_pair(make_pair(make_symbol("car"),
+    make_pair(make_pair(make_symbol("cddr"), make_pair(make_symbol("x"),
+    SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL)))));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"), SYMBOL_NIL))));
