@@ -391,6 +391,13 @@ __DATA__
 (set srnum cadr
      srden caddr)
 
+(def c+ ((xr xi) (yr yi))
+  (list (sr+ xr yr) (sr+ xi yi)))
+
+(def c* ((xr xi) (yr yi))
+  (list (sr- (sr* xr yr) (sr* xi yi))
+        (sr+ (sr* xi yr) (sr* xr yi))))
+
 ; we are here currently, implementing things
 
 (def err args)

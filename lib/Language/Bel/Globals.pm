@@ -1551,6 +1551,36 @@ $globals{"srden"} =
     make_pair(make_pair(make_symbol("cddr"), make_pair(make_symbol("x"),
     SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL)))));
 
+$globals{"c+"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_pair(make_symbol("xr"),
+    make_pair(make_symbol("xi"), SYMBOL_NIL)),
+    make_pair(make_pair(make_symbol("yr"), make_pair(make_symbol("yi"),
+    SYMBOL_NIL)), SYMBOL_NIL)), make_pair(make_pair(make_symbol("list"),
+    make_pair(make_pair(make_symbol("sr+"), make_pair(make_symbol("xr"),
+    make_pair(make_symbol("yr"), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("sr+"), make_pair(make_symbol("xi"),
+    make_pair(make_symbol("yi"), SYMBOL_NIL))), SYMBOL_NIL))),
+    SYMBOL_NIL)))));
+
+$globals{"c*"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_pair(make_symbol("xr"),
+    make_pair(make_symbol("xi"), SYMBOL_NIL)),
+    make_pair(make_pair(make_symbol("yr"), make_pair(make_symbol("yi"),
+    SYMBOL_NIL)), SYMBOL_NIL)), make_pair(make_pair(make_symbol("list"),
+    make_pair(make_pair(make_symbol("sr-"),
+    make_pair(make_pair(make_symbol("sr*"), make_pair(make_symbol("xr"),
+    make_pair(make_symbol("yr"), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("sr*"), make_pair(make_symbol("xi"),
+    make_pair(make_symbol("yi"), SYMBOL_NIL))), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("sr+"),
+    make_pair(make_pair(make_symbol("sr*"), make_pair(make_symbol("xi"),
+    make_pair(make_symbol("yr"), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("sr*"), make_pair(make_symbol("xr"),
+    make_pair(make_symbol("yi"), SYMBOL_NIL))), SYMBOL_NIL))),
+    SYMBOL_NIL))), SYMBOL_NIL)))));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"), SYMBOL_NIL))));
