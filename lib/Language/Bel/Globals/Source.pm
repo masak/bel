@@ -415,6 +415,9 @@ __DATA__
 (def real (x)
   (and (number x) (= (numi x) srzero)))
 
+(def inv (x)
+  (litnum (srinv:numr x) (srinv:numi x)))
+
 ; we are here currently, implementing things
 
 (def err args)

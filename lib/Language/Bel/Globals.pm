@@ -1840,6 +1840,18 @@ $globals{"real"} =
     SYMBOL_NIL)), make_pair(make_symbol("srzero"), SYMBOL_NIL))),
     SYMBOL_NIL))), SYMBOL_NIL)))));
 
+$globals{"inv"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
+    make_pair(make_pair(make_symbol("litnum"),
+    make_pair(make_pair(make_pair(make_symbol("compose"),
+    make_pair(make_symbol("srinv"), make_pair(make_symbol("numr"),
+    SYMBOL_NIL))), make_pair(make_symbol("x"), SYMBOL_NIL)),
+    make_pair(make_pair(make_pair(make_symbol("compose"),
+    make_pair(make_symbol("srinv"), make_pair(make_symbol("numi"),
+    SYMBOL_NIL))), make_pair(make_symbol("x"), SYMBOL_NIL)), SYMBOL_NIL))),
+    SYMBOL_NIL)))));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"), SYMBOL_NIL))));
