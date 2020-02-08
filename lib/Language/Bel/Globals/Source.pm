@@ -418,6 +418,9 @@ __DATA__
 (def inv (x)
   (litnum (srinv:numr x) (srinv:numi x)))
 
+(def abs (x)
+  (litnum (cons '+ (cdr (numr x)))))
+
 ; we are here currently, implementing things
 
 (def err args)
