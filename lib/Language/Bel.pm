@@ -37,6 +37,9 @@ use Language::Bel::Reader qw(
     _read
 );
 use Language::Bel::Interpreter;
+use Language::Bel::Printer qw(
+    _print
+);
 use Language::Bel::Expander::Bquote qw(
     _bqexpand
 );
@@ -99,7 +102,7 @@ sub eval {
 
     my $ast = _bqexpand(_read($expr));
     my $result = $self->{interpreter}->eval_ast($ast);
-    my $result_string = $self->ast_to_string($result);
+    my $result_string = _print($result);
 
     my $output = $self->{output};
     if (ref($output) eq "CODE") {
@@ -107,52 +110,6 @@ sub eval {
     }
 
     return;
-}
-
-sub ast_to_string {
-    my ($self, $ast) = @_;
-
-    my $string_escape = sub {
-        my ($string) = @_;
-
-        return join("", map {
-            $_ eq q["] || $_ eq q[\\] ? "\\$_" : $_
-        } split("", $string));
-    };
-
-    if (is_symbol($ast)) {
-        my $name = symbol_name($ast);
-        return $name;
-    }
-    elsif (is_char($ast)) {
-        my $name = char_name($ast);
-        return "\\$name";
-    }
-    elsif (is_string($ast)) {
-        my $string = string_value($ast);
-        return q["] . $string_escape->($string) . q["];
-    }
-    elsif (is_pair($ast)) {
-        my @fragments = ("(");
-        my $first_elem = 1;
-        while (is_pair($ast)) {
-            if (!$first_elem) {
-                push @fragments, " ";
-            }
-            push @fragments, $self->ast_to_string(pair_car($ast));
-            $ast = pair_cdr($ast);
-            $first_elem = "";
-        }
-        if (!is_nil($ast)) {
-            push @fragments, " . ";
-            push @fragments, $self->ast_to_string($ast);
-        }
-        push @fragments, ")";
-        return join("", @fragments);
-    }
-    else {
-        die "unhandled: not a symbol";
-    }
 }
 
 =head1 AUTHOR
