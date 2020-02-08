@@ -421,6 +421,14 @@ __DATA__
 (def abs (x)
   (litnum (cons '+ (cdr (numr x)))))
 
+(def factor (x (o d i2))
+  (if (i< x d)
+      nil
+      (let (q r) (i/ x d)
+        (if (= r i0)
+            (cons d (factor q d))
+            (factor x (i+ d i1))))))
+
 ; we are here currently, implementing things
 
 (def err args)
