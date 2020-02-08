@@ -1830,6 +1830,16 @@ $globals{"ipart"} =
     make_pair(make_symbol("args"), SYMBOL_NIL))), SYMBOL_NIL)),
     SYMBOL_NIL)))));
 
+$globals{"real"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
+    make_pair(make_pair(make_symbol("and"),
+    make_pair(make_pair(make_symbol("number"), make_pair(make_symbol("x"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("="),
+    make_pair(make_pair(make_symbol("numi"), make_pair(make_symbol("x"),
+    SYMBOL_NIL)), make_pair(make_symbol("srzero"), SYMBOL_NIL))),
+    SYMBOL_NIL))), SYMBOL_NIL)))));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"), SYMBOL_NIL))));

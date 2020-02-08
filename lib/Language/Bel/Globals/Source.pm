@@ -412,6 +412,9 @@ __DATA__
 (set rpart litnum:numr
      ipart litnum:numi)
 
+(def real (x)
+  (and (number x) (= (numi x) srzero)))
+
 ; we are here currently, implementing things
 
 (def err args)
