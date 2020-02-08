@@ -398,6 +398,9 @@ __DATA__
   (list (sr- (sr* xr yr) (sr* xi yi))
         (sr+ (sr* xi yr) (sr* xr yi))))
 
+(def litnum (r (o i srzero))
+  (list 'lit 'num r i))
+
 ; we are here currently, implementing things
 
 (def err args)

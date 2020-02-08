@@ -1581,6 +1581,17 @@ $globals{"c*"} =
     make_pair(make_symbol("yi"), SYMBOL_NIL))), SYMBOL_NIL))),
     SYMBOL_NIL))), SYMBOL_NIL)))));
 
+$globals{"litnum"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("r"),
+    make_pair(make_pair(make_symbol("o"), make_pair(make_symbol("i"),
+    make_pair(make_symbol("srzero"), SYMBOL_NIL))), SYMBOL_NIL)),
+    make_pair(make_pair(make_symbol("list"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("lit"),
+    SYMBOL_NIL)), make_pair(make_pair(SYMBOL_QUOTE,
+    make_pair(make_symbol("num"), SYMBOL_NIL)), make_pair(make_symbol("r"),
+    make_pair(make_symbol("i"), SYMBOL_NIL))))), SYMBOL_NIL)))));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"), SYMBOL_NIL))));
