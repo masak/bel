@@ -409,6 +409,9 @@ __DATA__
 (set numr car:cddr
      numi cadr:cddr)
 
+(set rpart litnum:numr
+     ipart litnum:numi)
+
 ; we are here currently, implementing things
 
 (def err args)
