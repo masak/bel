@@ -796,13 +796,55 @@ sub pass {
     elsif ($self->variable($pat)) {
         push @{$self->{r}}, make_pair(make_pair($pat, $arg), $env);
     }
-    # XXX: skipping the `t` case for now
+    elsif (is_pair($pat) && is_symbol_of_name(pair_car($pat), "t")) {
+        $self->typecheck(pair_cdr($pat), $arg, $env);
+    }
     elsif (is_pair($pat) && is_symbol_of_name(pair_car($pat), "o")) {
         $self->pass(prim_car(pair_cdr($pat)), $arg, $env);
     }
     else {
         $self->destructure($pat, $arg, $env);
     }
+}
+
+# (def typecheck ((var f) arg env s r m)
+#   (mev (cons (list (list f (list 'quote arg)) env)
+#              (fu (s r m)
+#                (if (car r)
+#                    (pass var arg env s (cdr r) m)
+#                    (sigerr 'mistype s r m)))
+#              s)
+#        r
+#        m))
+sub typecheck {
+    my ($self, $var_f, $arg, $env) = @_;
+    my $var = prim_car($var_f);
+    my $f = prim_car(prim_cdr($var_f));
+
+    my $fu = fut(sub {
+        if (!is_nil(pop(@{$self->{r}}))) {
+            $self->pass($var, $arg, $env);
+        }
+        else {
+            die "'mistype\n";
+        }
+    });
+    push @{$self->{s}}, $fu, [
+        make_pair(
+            $f,
+            make_pair(
+                make_pair(
+                    make_symbol("quote"),
+                    make_pair(
+                        $arg,
+                        SYMBOL_NIL,
+                    ),
+                ),
+                SYMBOL_NIL,
+            ),
+        ),
+        $env,
+    ];
 }
 
 # (def destructure ((p . ps) arg env s r m)
