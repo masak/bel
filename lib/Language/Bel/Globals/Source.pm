@@ -406,6 +406,9 @@ __DATA__
            (match y (list [in _ '+ '-] proper proper)))
     (match x `(lit num ,r ,r))))
 
+(set numr car:cddr
+     numi cadr:cddr)
+
 ; we are here currently, implementing things
 
 (def err args)
