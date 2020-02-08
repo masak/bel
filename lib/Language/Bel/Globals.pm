@@ -1592,6 +1592,33 @@ $globals{"litnum"} =
     make_pair(make_symbol("num"), SYMBOL_NIL)), make_pair(make_symbol("r"),
     make_pair(make_symbol("i"), SYMBOL_NIL))))), SYMBOL_NIL)))));
 
+$globals{"number"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
+    make_pair(make_pair(make_symbol("let"), make_pair(make_symbol("r"),
+    make_pair(make_pair(make_symbol("fn"),
+    make_pair(make_pair(make_symbol("y"), SYMBOL_NIL),
+    make_pair(make_pair(make_symbol("match"), make_pair(make_symbol("y"),
+    make_pair(make_pair(make_symbol("list"),
+    make_pair(make_pair(make_symbol("fn"),
+    make_pair(make_pair(make_symbol("_"), SYMBOL_NIL),
+    make_pair(make_pair(make_symbol("in"), make_pair(make_symbol("_"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("+"),
+    SYMBOL_NIL)), make_pair(make_pair(SYMBOL_QUOTE,
+    make_pair(make_symbol("-"), SYMBOL_NIL)), SYMBOL_NIL)))), SYMBOL_NIL))),
+    make_pair(make_symbol("proper"), make_pair(make_symbol("proper"),
+    SYMBOL_NIL)))), SYMBOL_NIL))), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("match"), make_pair(make_symbol("x"),
+    make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("lit"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("num"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_symbol("r"), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_symbol("r"), make_pair(SYMBOL_NIL, SYMBOL_NIL))),
+    SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))),
+    SYMBOL_NIL)))), SYMBOL_NIL)))));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"), SYMBOL_NIL))));

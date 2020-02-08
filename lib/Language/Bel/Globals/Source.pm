@@ -401,6 +401,11 @@ __DATA__
 (def litnum (r (o i srzero))
   (list 'lit 'num r i))
 
+(def number (x)
+  (let r (fn (y)
+           (match y (list [in _ '+ '-] proper proper)))
+    (match x `(lit num ,r ,r))))
+
 ; we are here currently, implementing things
 
 (def err args)
