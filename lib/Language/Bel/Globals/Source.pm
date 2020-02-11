@@ -429,6 +429,15 @@ __DATA__
             (cons d (factor q d))
             (factor x (i+ d i1))))))
 
+(def common (xs ys)
+  (if (in nil xs ys)
+      nil
+      (let (a b) (split (is (car xs)) ys)
+        (if b
+            (cons (car xs)
+                  (common (cdr xs) (append a (cdr b))))
+            (common (cdr xs) ys)))))
+
 ; we are here currently, implementing things
 
 (def err args)

@@ -1885,6 +1885,33 @@ $globals{"factor"} =
     make_pair(make_symbol("i1"), SYMBOL_NIL))), SYMBOL_NIL))),
     SYMBOL_NIL)))), SYMBOL_NIL)))), SYMBOL_NIL)))), SYMBOL_NIL)))));
 
+$globals{"common"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("xs"),
+    make_pair(make_symbol("ys"), SYMBOL_NIL)),
+    make_pair(make_pair(make_symbol("if"),
+    make_pair(make_pair(make_symbol("in"), make_pair(SYMBOL_NIL,
+    make_pair(make_symbol("xs"), make_pair(make_symbol("ys"),
+    SYMBOL_NIL)))), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("let"),
+    make_pair(make_pair(make_symbol("a"), make_pair(make_symbol("b"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("split"),
+    make_pair(make_pair(make_symbol("is"),
+    make_pair(make_pair(make_symbol("car"), make_pair(make_symbol("xs"),
+    SYMBOL_NIL)), SYMBOL_NIL)), make_pair(make_symbol("ys"), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("if"), make_pair(make_symbol("b"),
+    make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(make_symbol("car"), make_pair(make_symbol("xs"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("common"),
+    make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("xs"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("append"),
+    make_pair(make_symbol("a"), make_pair(make_pair(make_symbol("cdr"),
+    make_pair(make_symbol("b"), SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL))),
+    SYMBOL_NIL))), make_pair(make_pair(make_symbol("common"),
+    make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("xs"),
+    SYMBOL_NIL)), make_pair(make_symbol("ys"), SYMBOL_NIL))),
+    SYMBOL_NIL)))), SYMBOL_NIL)))), SYMBOL_NIL)))), SYMBOL_NIL)))));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"), SYMBOL_NIL))));
