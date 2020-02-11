@@ -421,6 +421,12 @@ __DATA__
 (def abs (x)
   (litnum (cons '+ (cdr (numr x)))))
 
+(def simplify ((s n d))
+  (if (= n i0) (list '+ n i1)
+      (= n d)  (list s i1 i1)
+               (let g (apply i* ((of common factor) n d))
+                 (list s (car:i/ n g) (car:i/ d g)))))
+
 (def factor (x (o d i2))
   (if (i< x d)
       nil
