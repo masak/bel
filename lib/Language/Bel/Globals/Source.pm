@@ -444,6 +444,8 @@ __DATA__
                   (common (cdr xs) (append a (cdr b))))
             (common (cdr xs) ys)))))
 
+(set buildnum (of litnum simplify))
+
 ; we are here currently, implementing things
 
 (def err args)
