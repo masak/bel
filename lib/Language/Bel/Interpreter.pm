@@ -901,36 +901,6 @@ sub destructure {
     }
 }
 
-sub ast_to_string {
-    my ($self, $ast) = @_;
-
-    if (is_symbol($ast)) {
-        my $name = symbol_name($ast);
-        return $name;
-    }
-    elsif (is_pair($ast)) {
-        my @fragments = ("(");
-        my $first_elem = 1;
-        while (is_pair($ast)) {
-            if (!$first_elem) {
-                push @fragments, " ";
-            }
-            push @fragments, $self->ast_to_string(pair_car($ast));
-            $ast = pair_cdr($ast);
-            $first_elem = "";
-        }
-        if (!is_nil($ast)) {
-            push @fragments, " . ";
-            push @fragments, $self->ast_to_string($ast);
-        }
-        push @fragments, ")";
-        return join("", @fragments);
-    }
-    else {
-        die "unhandled: not a symbol";
-    }
-}
-
 sub set {
     my ($self, $name, $value) = @_;
 
