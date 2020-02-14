@@ -446,6 +446,13 @@ __DATA__
 
 (set buildnum (of litnum simplify))
 
+(def recip (x)
+  (with (r (numr x)
+         i (numi x))
+    (let d (sr+ (sr* r r) (sr* i i))
+      (buildnum (sr/ r d)
+                (sr/ (srinv i) d)))))
+
 ; we are here currently, implementing things
 
 (def err args)

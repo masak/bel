@@ -1990,6 +1990,28 @@ $globals{"buildnum"} =
     make_pair(make_symbol("args"), SYMBOL_NIL))), SYMBOL_NIL))),
     SYMBOL_NIL)))));
 
+$globals{"recip"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
+    make_pair(make_pair(make_symbol("with"),
+    make_pair(make_pair(make_symbol("r"),
+    make_pair(make_pair(make_symbol("numr"), make_pair(make_symbol("x"),
+    SYMBOL_NIL)), make_pair(make_symbol("i"),
+    make_pair(make_pair(make_symbol("numi"), make_pair(make_symbol("x"),
+    SYMBOL_NIL)), SYMBOL_NIL)))), make_pair(make_pair(make_symbol("let"),
+    make_pair(make_symbol("d"), make_pair(make_pair(make_symbol("sr+"),
+    make_pair(make_pair(make_symbol("sr*"), make_pair(make_symbol("r"),
+    make_pair(make_symbol("r"), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("sr*"), make_pair(make_symbol("i"),
+    make_pair(make_symbol("i"), SYMBOL_NIL))), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("buildnum"),
+    make_pair(make_pair(make_symbol("sr/"), make_pair(make_symbol("r"),
+    make_pair(make_symbol("d"), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("sr/"),
+    make_pair(make_pair(make_symbol("srinv"), make_pair(make_symbol("i"),
+    SYMBOL_NIL)), make_pair(make_symbol("d"), SYMBOL_NIL))), SYMBOL_NIL))),
+    SYMBOL_NIL)))), SYMBOL_NIL))), SYMBOL_NIL)))));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"), SYMBOL_NIL))));
