@@ -2012,6 +2012,26 @@ $globals{"recip"} =
     SYMBOL_NIL)), make_pair(make_symbol("d"), SYMBOL_NIL))), SYMBOL_NIL))),
     SYMBOL_NIL)))), SYMBOL_NIL))), SYMBOL_NIL)))));
 
+$globals{"+"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_symbol("ns"),
+    make_pair(make_pair(make_symbol("foldr"),
+    make_pair(make_pair(make_symbol("fn"),
+    make_pair(make_pair(make_symbol("x"), make_pair(make_symbol("y"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("apply"),
+    make_pair(make_symbol("buildnum"),
+    make_pair(make_pair(make_pair(make_symbol("of"),
+    make_pair(make_symbol("c+"), make_pair(make_symbol("cddr"),
+    SYMBOL_NIL))), make_pair(make_symbol("x"), make_pair(make_symbol("y"),
+    SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("lit"), make_pair(make_symbol("num"),
+    make_pair(make_pair(make_symbol("+"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(SYMBOL_T, SYMBOL_NIL), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("+"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(SYMBOL_T, SYMBOL_NIL), SYMBOL_NIL))),
+    SYMBOL_NIL)))), make_pair(make_symbol("ns"), SYMBOL_NIL)))),
+    SYMBOL_NIL)))));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"), SYMBOL_NIL))));

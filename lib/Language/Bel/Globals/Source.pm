@@ -453,6 +453,12 @@ __DATA__
       (buildnum (sr/ r d)
                 (sr/ (srinv i) d)))))
 
+(def + ns
+  (foldr (fn (x y)
+           (apply buildnum ((of c+ cddr) x y)))
+         0
+         ns))
+
 ; we are here currently, implementing things
 
 (def err args)
