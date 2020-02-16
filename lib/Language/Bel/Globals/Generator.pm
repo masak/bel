@@ -219,8 +219,10 @@ FOOTER
 sub print_global {
     my ($name, $value) = @_;
 
+    my $serialized = serialize($value);
+    my $formatted = break_lines($serialized);
     print('$globals{"', $name, '"} =', "\n");
-    print(indent(serialize($value)), ";\n");
+    print("$formatted;\n");
     print("\n");
 }
 
@@ -230,13 +232,7 @@ sub serialize {
     if (is_pair($value)) {
         my $car = serialize(pair_car($value));
         my $cdr = serialize(pair_cdr($value));
-        return join("",
-            "make_pair(\n",
-            indent($car),
-            ",\n",
-            indent($cdr),
-            ")",
-        );
+        return "make_pair($car, $cdr)";
     }
     elsif (is_symbol($value)) {
         my $name = symbol_name($value);
@@ -249,10 +245,25 @@ sub serialize {
     }
 }
 
-sub indent {
-    my ($string) = @_;
+sub break_lines {
+    my ($text) = @_;
 
-    return join "\n", map { (" " x 4) . $_ } split "\n", $string;
+    my $MAX_LINE_LENGTH = 72;
+    my @lines;
+    while (length($text) > $MAX_LINE_LENGTH) {
+        my $break_pos = $MAX_LINE_LENGTH;
+        while (substr($text, $break_pos, 1) ne " ") {
+            --$break_pos;
+            if ($break_pos < 0) {
+                die "Didn't find a single space in the whole line to break";
+            }
+        }
+        push @lines, substr($text, 0, $break_pos);
+        $text = substr($text, $break_pos + 1);
+    }
+    push @lines, $text;
+
+    return join "\n", map { "    $_" } @lines;
 }
 
 our @EXPORT_OK = qw(
