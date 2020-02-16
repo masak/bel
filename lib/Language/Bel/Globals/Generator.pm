@@ -113,7 +113,7 @@ sub GLOBALS {
 
 HEADER
 
-    for my $prim_name (keys(%{PRIMITIVES()})) {
+    for my $prim_name (sort(keys(%{PRIMITIVES()}))) {
         print_global($prim_name, PRIMITIVES->{$prim_name});
     }
 
