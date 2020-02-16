@@ -100,7 +100,7 @@ use Language::Bel::Symbols::Common qw(
     SYMBOL_T
 );
 use Language::Bel::Primitives qw(
-    PRIM_FN
+    PRIMITIVES
 );
 
 use Exporter 'import';
@@ -114,7 +114,7 @@ sub GLOBALS {
 HEADER
 
     for my $prim_name (sort(keys(%{PRIMITIVES()}))) {
-        print_global($prim_name, PRIMITIVES->{$prim_name});
+        print_primitive($prim_name);
     }
 
     DECLARATION:
@@ -207,13 +207,19 @@ HEADER
     }
 
     print <<'FOOTER';
-
 our @EXPORT_OK = qw(
     GLOBALS
 );
 
 1;
 FOOTER
+}
+
+sub print_primitive {
+    my ($name) = @_;
+
+    print('$globals{"', $name, '"} = PRIMITIVES->{"', $name, '"};', "\n");
+    print("\n");
 }
 
 sub print_global {
