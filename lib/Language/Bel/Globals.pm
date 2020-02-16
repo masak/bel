@@ -28,29 +28,29 @@ sub GLOBALS {
     return \%globals;
 }
 
-$globals{"xdr"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("prim"),
-    make_pair(make_symbol("xdr"), SYMBOL_NIL)));
-
 $globals{"car"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("prim"),
     make_pair(make_symbol("car"), SYMBOL_NIL)));
-
-$globals{"type"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("prim"),
-    make_pair(make_symbol("type"), SYMBOL_NIL)));
-
-$globals{"id"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("prim"),
-    make_pair(make_symbol("id"), SYMBOL_NIL)));
 
 $globals{"cdr"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("prim"),
     make_pair(make_symbol("cdr"), SYMBOL_NIL)));
 
+$globals{"id"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("prim"),
+    make_pair(make_symbol("id"), SYMBOL_NIL)));
+
 $globals{"join"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("prim"),
     make_pair(make_symbol("join"), SYMBOL_NIL)));
+
+$globals{"type"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("prim"),
+    make_pair(make_symbol("type"), SYMBOL_NIL)));
+
+$globals{"xdr"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("prim"),
+    make_pair(make_symbol("xdr"), SYMBOL_NIL)));
 
 $globals{"no"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
