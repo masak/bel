@@ -17,7 +17,7 @@ use Language::Bel::Symbols::Common qw(
     SYMBOL_T
 );
 use Language::Bel::Primitives qw(
-    PRIM_FN
+    PRIMITIVES
 );
 
 use Exporter 'import';
@@ -28,29 +28,17 @@ sub GLOBALS {
     return \%globals;
 }
 
-$globals{"car"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("prim"),
-    make_pair(make_symbol("car"), SYMBOL_NIL)));
+$globals{"car"} = PRIMITIVES->{"car"};
 
-$globals{"cdr"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("prim"),
-    make_pair(make_symbol("cdr"), SYMBOL_NIL)));
+$globals{"cdr"} = PRIMITIVES->{"cdr"};
 
-$globals{"id"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("prim"),
-    make_pair(make_symbol("id"), SYMBOL_NIL)));
+$globals{"id"} = PRIMITIVES->{"id"};
 
-$globals{"join"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("prim"),
-    make_pair(make_symbol("join"), SYMBOL_NIL)));
+$globals{"join"} = PRIMITIVES->{"join"};
 
-$globals{"type"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("prim"),
-    make_pair(make_symbol("type"), SYMBOL_NIL)));
+$globals{"type"} = PRIMITIVES->{"type"};
 
-$globals{"xdr"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("prim"),
-    make_pair(make_symbol("xdr"), SYMBOL_NIL)));
+$globals{"xdr"} = PRIMITIVES->{"xdr"};
 
 $globals{"no"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
@@ -1254,7 +1242,6 @@ $globals{"splice"} =
     make_pair(make_pair(SYMBOL_QUOTE,
     make_pair(make_symbol("comma-at-outside-list"), SYMBOL_NIL)),
     SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL))))), SYMBOL_NIL)));
-
 
 our @EXPORT_OK = qw(
     GLOBALS
