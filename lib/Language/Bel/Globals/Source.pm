@@ -459,6 +459,11 @@ __DATA__
          0
          ns))
 
+(def - ns
+  (if (no ns)       0
+      (no (cdr ns)) (inv (car ns))
+                    (+ (car ns) (inv (apply + (cdr ns))))))
+
 ; we are here currently, implementing things
 
 (def err args)
