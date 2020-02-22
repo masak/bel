@@ -1,0 +1,12 @@
+#!/usr/bin/perl
+use 5.006;
+use strict;
+use warnings;
+
+use Language::Bel::Globals::Generator qw(generate_globals);
+
+binmode STDOUT, ':encoding(utf-8)';
+
+my $interpreter = Language::Bel::Interpreter->new();
+
+generate_globals($interpreter);
