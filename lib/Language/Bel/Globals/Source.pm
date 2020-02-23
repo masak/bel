@@ -464,6 +464,12 @@ __DATA__
       (no (cdr ns)) (inv (car ns))
                     (+ (car ns) (inv (apply + (cdr ns))))))
 
+(def * ns
+  (foldr (fn (x y)
+           (apply buildnum ((of c* cddr) x y)))
+         1
+         ns))
+
 ; we are here currently, implementing things
 
 (def err args)
