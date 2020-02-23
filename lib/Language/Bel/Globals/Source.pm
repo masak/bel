@@ -475,6 +475,10 @@ __DATA__
       1
       (* (car ns) (recip (apply * (cdr ns))))))
 
+(def inc (n) (+ n 1))
+
+(def dec (n) (- n 1))
+
 ; we are here currently, implementing things
 
 (def err args)
