@@ -470,6 +470,11 @@ __DATA__
          1
          ns))
 
+(def / ns
+  (if (no ns)
+      1
+      (* (car ns) (recip (apply * (cdr ns))))))
+
 ; we are here currently, implementing things
 
 (def err args)
