@@ -52,7 +52,7 @@ sub _print {
     elsif (is_pair($ast)) {
         my @fragments = ("(");
         my $first_elem = 1;
-        while (is_pair($ast)) {
+        while (is_pair($ast) && !is_number($ast)) {
             if (!$first_elem) {
                 push @fragments, " ";
             }
