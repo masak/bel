@@ -6,7 +6,7 @@ use Test::More;
 
 use Language::Bel;
 
-plan tests => 4;
+plan tests => 6;
 
 my $actual_output = "";
 my $b = Language::Bel->new({ output => sub {
@@ -25,7 +25,9 @@ sub is_bel_output {
 
 {
     is_bel_output(q[(rem \\a "abracadabra")], q["brcdbr"]);
-    is_bel_output(q[(rem 'b '(a b c b a b))], "(a c a)");
-    is_bel_output(q[(rem 'b '(a c a))], "(a c a)");
-    is_bel_output(q[(rem 'x nil)], "nil");
+    is_bel_output("(rem 'b '(a b c b a b))", "(a c a)");
+    is_bel_output("(rem 'b '(a c a))", "(a c a)");
+    is_bel_output("(rem 'x nil)", "nil");
+    is_bel_output("(rem '() '(a () c () a ()))", "(a c a)");
+    is_bel_output("(rem '(z) '(a (z) c) id)", "(a (z) c)");
 }
