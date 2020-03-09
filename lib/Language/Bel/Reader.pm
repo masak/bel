@@ -157,7 +157,13 @@ sub _rdlist {
         }
         elsif ($c eq ".") {
             ++$pos;
-            $seen_dot = 1;
+            my $cc = substr($expr, $pos, 1);
+            if ($cc eq " ") {   # XXX: should be all `breakc`
+                $seen_dot = 1;
+            }
+            else {
+                --$pos;
+            }
         }
 
         if ($seen_element_after_dot) {
