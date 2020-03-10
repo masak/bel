@@ -26,22 +26,22 @@ use Exporter 'import';
 
 my %FASTFUNCS = (
     "no" => sub {
-        my ($interpreter, $x) = @_;
+        my ($call, $x) = @_;
 
         return is_nil($x) ? SYMBOL_T : SYMBOL_NIL;
     },
 
     "atom" => sub {
-        my ($interpreter, $x) = @_;
+        my ($call, $x) = @_;
 
         return is_pair($x) ? SYMBOL_NIL : SYMBOL_T;
     },
 
     "all" => sub {
-        my ($interpreter, $f, $xs) = @_;
+        my ($call, $f, $xs) = @_;
 
         while (!is_nil($xs)) {
-            my $p = $interpreter->run_function_and_return($f, prim_car($xs));
+            my $p = $call->($f, prim_car($xs));
             if (is_nil($p)) {
                 return SYMBOL_NIL;
             }
@@ -52,10 +52,10 @@ my %FASTFUNCS = (
     },
 
     "some" => sub {
-        my ($interpreter, $f, $xs) = @_;
+        my ($call, $f, $xs) = @_;
 
         while (!is_nil($xs)) {
-            my $p = $interpreter->run_function_and_return($f, prim_car($xs));
+            my $p = $call->($f, prim_car($xs));
             if (!is_nil($p)) {
                 return $xs;
             }
@@ -66,7 +66,7 @@ my %FASTFUNCS = (
     },
 
     "reduce" => sub {
-        my ($interpreter, $f, $xs) = @_;
+        my ($call, $f, $xs) = @_;
 
         my @values;
         while (!is_nil($xs)) {
@@ -77,14 +77,14 @@ my %FASTFUNCS = (
         my $result = @values ? pop(@values) : SYMBOL_NIL;
         while (@values) {
             my $value = pop(@values);
-            $result = $interpreter->run_function_and_return($f, $value, $result);
+            $result = $call->($f, $value, $result);
         }
 
         return $result;
     },
 
     "cons" => sub {
-        my ($interpreter, @args) = @_;
+        my ($call, @args) = @_;
 
         my $result = @args ? pop(@args) : SYMBOL_NIL;
         while (@args) {
@@ -96,7 +96,7 @@ my %FASTFUNCS = (
     },
 
     "append" => sub {
-        my ($interpreter, @args) = @_;
+        my ($call, @args) = @_;
 
         my $result = @args ? pop(@args) : SYMBOL_NIL;
         while (@args) {
@@ -116,7 +116,7 @@ my %FASTFUNCS = (
     },
 
     "snoc" => sub {
-        my ($interpreter, @args) = @_;
+        my ($call, @args) = @_;
 
         my $result = SYMBOL_NIL;
         while (scalar(@args) > 1) {
@@ -140,7 +140,7 @@ my %FASTFUNCS = (
     },
 
     "list" => sub {
-        my ($interpreter, @args) = @_;
+        my ($call, @args) = @_;
 
         my $result = SYMBOL_NIL;
         while (@args) {
@@ -152,7 +152,7 @@ my %FASTFUNCS = (
     },
 
     "map" => sub {
-        my ($interpreter, $f, @ls) = @_;
+        my ($call, $f, @ls) = @_;
 
         return SYMBOL_NIL
             unless @ls;
@@ -172,7 +172,7 @@ my %FASTFUNCS = (
         }
         my @result;
         for my $i (0..$min_length-1) {
-            push @result, $interpreter->run_function_and_return(
+            push @result, $call->(
                 $f,
                 map { $sublists[$_]->[$i] } 0..$#sublists
             );
@@ -186,7 +186,7 @@ my %FASTFUNCS = (
     },
 
     "=" => sub {
-        my ($interpreter, @args) = @_;
+        my ($call, @args) = @_;
 
         my @stack = [@args];
         while (@stack) {
@@ -217,25 +217,25 @@ my %FASTFUNCS = (
     },
 
     "symbol" => sub {
-        my ($interpreter, $x) = @_;
+        my ($call, $x) = @_;
 
         return is_symbol($x) ? SYMBOL_T : SYMBOL_NIL;
     },
 
     "pair" => sub {
-        my ($interpreter, $x) = @_;
+        my ($call, $x) = @_;
 
         return is_pair($x) ? SYMBOL_T : SYMBOL_NIL;
     },
 
     "char" => sub {
-        my ($interpreter, $x) = @_;
+        my ($call, $x) = @_;
 
         return is_char($x) ? SYMBOL_T : SYMBOL_NIL;
     },
 
     "proper" => sub {
-        my ($interpreter, $x) = @_;
+        my ($call, $x) = @_;
 
         while (!is_nil($x)) {
             if (!is_pair($x)) {
@@ -248,7 +248,7 @@ my %FASTFUNCS = (
     },
 
     "string" => sub {
-        my ($interpreter, $x) = @_;
+        my ($call, $x) = @_;
 
         while (!is_nil($x)) {
             if (!is_pair($x)) {
@@ -264,12 +264,12 @@ my %FASTFUNCS = (
     },
 
     "mem" => sub {
-        my ($interpreter, $x, $ys, $f) = @_;
+        my ($call, $x, $ys, $f) = @_;
 
         while (!is_nil($ys)) {
             my $p;
             if (defined($f)) {
-                $p = $interpreter->run_function_and_return($f, prim_car($ys), $x);
+                $p = $call->($f, prim_car($ys), $x);
             }
             else {
                 my @stack = [prim_car($ys), $x];
@@ -311,7 +311,7 @@ my %FASTFUNCS = (
     },
 
     "in" => sub {
-        my ($interpreter, @args) = @_;
+        my ($call, @args) = @_;
 
         my $x = @args ? shift(@args) : SYMBOL_NIL;
 
@@ -353,29 +353,29 @@ my %FASTFUNCS = (
     },
 
     "cadr" => sub {
-        my ($interpreter, $x) = @_;
+        my ($call, $x) = @_;
 
         return prim_car(prim_cdr($x));
     },
 
     "cddr" => sub {
-        my ($interpreter, $x) = @_;
+        my ($call, $x) = @_;
 
         return prim_cdr(prim_cdr($x));
     },
 
     "caddr" => sub {
-        my ($interpreter, $x) = @_;
+        my ($call, $x) = @_;
 
         return prim_car(prim_cdr(prim_cdr($x)));
     },
 
     "find" => sub {
-        my ($interpreter, $f, $xs) = @_;
+        my ($call, $f, $xs) = @_;
 
         while (!is_nil($xs)) {
             my $value = prim_car($xs);
-            if (!is_nil($interpreter->run_function_and_return($f, $value))) {
+            if (!is_nil($call->($f, $value))) {
                 return $value;
             }
             $xs = prim_cdr($xs);
