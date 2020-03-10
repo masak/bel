@@ -639,11 +639,12 @@ $globals{"find"} =
     SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL))))), FASTFUNCS->{'find'});
 
 $globals{"begins"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("xs"),
-    make_pair(make_symbol("pat"), make_pair(make_pair(make_symbol("o"),
-    make_pair(make_symbol("f"), make_pair(make_symbol("="), SYMBOL_NIL))),
-    SYMBOL_NIL))), make_pair(make_pair(make_symbol("if"),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("xs"), make_pair(make_symbol("pat"),
+    make_pair(make_pair(make_symbol("o"), make_pair(make_symbol("f"),
+    make_pair(make_symbol("="), SYMBOL_NIL))), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("if"),
     make_pair(make_pair(make_symbol("no"), make_pair(make_symbol("pat"),
     SYMBOL_NIL)), make_pair(SYMBOL_T,
     make_pair(make_pair(make_symbol("atom"), make_pair(make_symbol("xs"),
@@ -657,17 +658,18 @@ $globals{"begins"} =
     SYMBOL_NIL)), make_pair(make_pair(make_symbol("cdr"),
     make_pair(make_symbol("pat"), SYMBOL_NIL)), make_pair(make_symbol("f"),
     SYMBOL_NIL)))), make_pair(SYMBOL_NIL, SYMBOL_NIL)))))))),
-    SYMBOL_NIL)))));
+    SYMBOL_NIL))))), FASTFUNCS->{'begins'});
 
 $globals{"caris"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"),
-    make_pair(make_symbol("y"), make_pair(make_pair(make_symbol("o"),
-    make_pair(make_symbol("f"), make_pair(make_symbol("="), SYMBOL_NIL))),
-    SYMBOL_NIL))), make_pair(make_pair(make_symbol("begins"),
-    make_pair(make_symbol("x"), make_pair(make_pair(make_symbol("list"),
-    make_pair(make_symbol("y"), SYMBOL_NIL)), make_pair(make_symbol("f"),
-    SYMBOL_NIL)))), SYMBOL_NIL)))));
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("x"), make_pair(make_symbol("y"),
+    make_pair(make_pair(make_symbol("o"), make_pair(make_symbol("f"),
+    make_pair(make_symbol("="), SYMBOL_NIL))), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("begins"), make_pair(make_symbol("x"),
+    make_pair(make_pair(make_symbol("list"), make_pair(make_symbol("y"),
+    SYMBOL_NIL)), make_pair(make_symbol("f"), SYMBOL_NIL)))),
+    SYMBOL_NIL))))), FASTFUNCS->{'caris'});
 
 $globals{"hug"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),

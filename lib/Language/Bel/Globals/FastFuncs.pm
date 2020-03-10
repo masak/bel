@@ -383,6 +383,103 @@ my %FASTFUNCS = (
         }
         return SYMBOL_NIL;
     },
+
+    "begins" => sub {
+        my ($call, $xs, $pat, $f) = @_;
+
+        if (defined($f)) {
+            while (!is_nil($pat)) {
+                if (!is_pair($xs)) {
+                    return SYMBOL_NIL;
+                }
+                else {
+                    my $p = $call->($f, prim_car($xs), prim_car($pat));
+                    if (is_nil($p)) {
+                        return SYMBOL_NIL;
+                    }
+                }
+                $xs = prim_cdr($xs);
+                $pat = prim_cdr($pat);
+            }
+        }
+        else {
+            while (!is_nil($pat)) {
+                if (!is_pair($xs)) {
+                    return SYMBOL_NIL;
+                }
+
+                my @stack = [prim_car($xs), prim_car($pat)];
+                while (@stack) {
+                    my @values = @{pop(@stack)};
+                    next unless @values;
+                    my $some_atom = "";
+                    for my $value (@values) {
+                        if (!is_pair($value)) {
+                            $some_atom = 1;
+                            last;
+                        }
+                    }
+                    if ($some_atom) {
+                        my $car_values = $values[0];
+                        for my $value (@values) {
+                            if (!_id($value, $car_values)) {
+                                return SYMBOL_NIL;
+                            }
+                        }
+                    }
+                    else {
+                        push @stack, [map { prim_cdr($_) } @values];
+                        push @stack, [map { prim_car($_) } @values];
+                    }
+                }
+
+                $xs = prim_cdr($xs);
+                $pat = prim_cdr($pat);
+            }
+        }
+
+        return SYMBOL_T;
+    },
+
+    "caris" => sub {
+        my ($call, $x, $y, $f) = @_;
+
+        if (!is_pair($x)) {
+            return SYMBOL_NIL;
+        }
+
+        if (defined($f)) {
+            return $call->($f, prim_car($x), $y);
+        }
+        else {
+            my @stack = [prim_car($x), $y];
+            while (@stack) {
+                my @values = @{pop(@stack)};
+                next unless @values;
+                my $some_atom = "";
+                for my $value (@values) {
+                    if (!is_pair($value)) {
+                        $some_atom = 1;
+                        last;
+                    }
+                }
+                if ($some_atom) {
+                    my $car_values = $values[0];
+                    for my $value (@values) {
+                        if (!_id($value, $car_values)) {
+                            return SYMBOL_NIL;
+                        }
+                    }
+                }
+                else {
+                    push @stack, [map { prim_cdr($_) } @values];
+                    push @stack, [map { prim_car($_) } @values];
+                }
+            }
+
+            return SYMBOL_T;
+        }
+    },
 );
 
 sub FASTFUNCS {
