@@ -266,12 +266,18 @@ my %FASTFUNCS = (
     "mem" => sub {
         my ($call, $x, $ys, $f) = @_;
 
-        while (!is_nil($ys)) {
-            my $p;
-            if (defined($f)) {
-                $p = $call->($f, prim_car($ys), $x);
+        if (defined($f)) {
+            while (!is_nil($ys)) {
+                my $p = $call->($f, prim_car($ys), $x);
+                if (!is_nil($p)) {
+                    return $ys;
+                }
+                $ys = prim_cdr($ys);
             }
-            else {
+        }
+        else {
+            ELEMENT:
+            while (!is_nil($ys)) {
                 my @stack = [prim_car($ys), $x];
                 while (@stack) {
                     my @values = @{pop(@stack)};
@@ -287,8 +293,8 @@ my %FASTFUNCS = (
                         my $car_values = $values[0];
                         for my $value (@values) {
                             if (!_id($value, $car_values)) {
-                                $p = SYMBOL_NIL;
-                                goto COMPARED;
+                                $ys = prim_cdr($ys);
+                                next ELEMENT;
                             }
                         }
                     }
@@ -298,13 +304,8 @@ my %FASTFUNCS = (
                     }
                 }
 
-                $p = SYMBOL_T;
-            }
-            COMPARED:
-            if (!is_nil($p)) {
                 return $ys;
             }
-            $ys = prim_cdr($ys);
         }
 
         return SYMBOL_NIL;
