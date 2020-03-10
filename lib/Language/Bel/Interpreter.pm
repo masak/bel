@@ -70,19 +70,24 @@ sub new {
         $self->{call} = sub {
             my ($fn, @args) = @_;
 
-            my $args = SYMBOL_NIL;
-            for my $arg (reverse(@args)) {
-                $args = make_pair($arg, $args);
+            if (is_fastfunc($fn)) {
+                return $fn->apply($self->{call}, @args);
             }
+            else {
+                my $args = SYMBOL_NIL;
+                for my $arg (reverse(@args)) {
+                    $args = make_pair($arg, $args);
+                }
 
-            my $s_level = scalar(@{$self->{s}});
-            $self->applyf($fn, $args, SYMBOL_NIL);
+                my $s_level = scalar(@{$self->{s}});
+                $self->applyf($fn, $args, SYMBOL_NIL);
 
-            while (scalar(@{$self->{s}}) > $s_level) {
-                $self->ev();
+                while (scalar(@{$self->{s}}) > $s_level) {
+                    $self->ev();
+                }
+                my $retval = pop(@{$self->{r}});
+                return $retval;
             }
-            my $retval = pop(@{$self->{r}});
-            return $retval;
         };
     }
 
