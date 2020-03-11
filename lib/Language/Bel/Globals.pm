@@ -1186,11 +1186,11 @@ $globals{"match"} =
     SYMBOL_NIL))), SYMBOL_NIL)))))))), SYMBOL_NIL)))));
 
 $globals{"split"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("f"),
-    make_pair(make_symbol("xs"), make_pair(make_pair(make_symbol("o"),
-    make_pair(make_symbol("acc"), SYMBOL_NIL)), SYMBOL_NIL))),
-    make_pair(make_pair(make_symbol("if"),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("f"), make_pair(make_symbol("xs"),
+    make_pair(make_pair(make_symbol("o"), make_pair(make_symbol("acc"),
+    SYMBOL_NIL)), SYMBOL_NIL))), make_pair(make_pair(make_symbol("if"),
     make_pair(make_pair(make_pair(make_symbol("cor"),
     make_pair(make_symbol("atom"),
     make_pair(make_pair(make_symbol("compose"), make_pair(make_symbol("f"),
@@ -1203,7 +1203,7 @@ $globals{"split"} =
     SYMBOL_NIL)), make_pair(make_pair(make_symbol("snoc"),
     make_pair(make_symbol("acc"), make_pair(make_pair(make_symbol("car"),
     make_pair(make_symbol("xs"), SYMBOL_NIL)), SYMBOL_NIL))),
-    SYMBOL_NIL)))), SYMBOL_NIL)))), SYMBOL_NIL)))));
+    SYMBOL_NIL)))), SYMBOL_NIL)))), SYMBOL_NIL))))), FASTFUNCS->{'split'});
 
 $globals{"when"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("mac"),

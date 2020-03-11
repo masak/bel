@@ -480,6 +480,41 @@ my %FASTFUNCS = (
             return SYMBOL_T;
         }
     },
+
+    "split" => sub {
+        my ($call, $f, $xs, $acc) = @_;
+
+        if (!defined($acc)) {
+            $acc = SYMBOL_NIL;
+        }
+        my @acc;
+        while (!is_nil($xs)) {
+            last
+                if !is_pair($xs) || !is_nil($call->($f, prim_car($xs)));
+            push(@acc, prim_car($xs));
+            $xs = prim_cdr($xs);
+        }
+
+        my @prefix;
+        while (!is_nil($acc)) {
+            push(@prefix, prim_car($acc));
+            $acc = prim_cdr($acc);
+        }
+        my $first = SYMBOL_NIL;
+        while (@acc) {
+            $first = make_pair(pop(@acc), $first);
+        }
+        while (@prefix) {
+            $first = make_pair(pop(@prefix), $first);
+        }
+        return make_pair(
+            $first,
+            make_pair(
+                $xs,
+                SYMBOL_NIL,
+            ),
+        );
+    },
 );
 
 sub FASTFUNCS {
