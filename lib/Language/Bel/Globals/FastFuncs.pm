@@ -9,6 +9,7 @@ use Language::Bel::Types qw(
     is_nil
     is_pair
     is_symbol
+    is_symbol_of_name
     make_pair
 );
 use Language::Bel::Primitives qw(
@@ -515,6 +516,39 @@ my %FASTFUNCS = (
             ),
         );
     },
+
+    "match" => sub {
+        my ($call, $x, $pat) = @_;
+
+        my @stack = [$x, $pat];
+        while (@stack) {
+            my ($v0, $v1) = @{pop(@stack)};
+            if (is_symbol_of_name($v1, "t")) {
+                # succeed
+            }
+            elsif (is_pair($v1)
+                && is_symbol_of_name(prim_car($v1), "lit")
+                && is_pair(prim_cdr($v1))
+                && (is_symbol_of_name(prim_car(prim_cdr($v1)), "prim")
+                    || is_symbol_of_name(prim_car(prim_cdr($v1)), "clo"))) {
+                if (is_nil($call->($v1, $v0))) {
+                    return SYMBOL_NIL;
+                }
+            }
+            elsif (!is_pair($v0) || !is_pair($v1)) {
+                if (!_id($v0, $v1)) {
+                    return SYMBOL_NIL;
+                }
+            }
+            else {
+                push @stack, [prim_cdr($v0), prim_cdr($v1)];
+                push @stack, [prim_car($v0), prim_car($v1)];
+            }
+        }
+
+        return SYMBOL_T;
+    },
+
 );
 
 sub FASTFUNCS {
