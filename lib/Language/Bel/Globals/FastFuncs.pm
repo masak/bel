@@ -563,6 +563,39 @@ my %FASTFUNCS = (
         return SYMBOL_T;
     },
 
+    "foldl" => sub {
+        my ($call, $f, $base, @args) = @_;
+
+        return $base
+            unless @args;
+
+        while (!grep { is_nil($_) } @args) {
+            my @car_args = map { prim_car($_) } @args;
+            $base = $call->($f, @car_args, $base);
+            @args = map { prim_cdr($_) } @args;
+        }
+
+        return $base;
+    },
+
+    "foldr" => sub {
+        my ($call, $f, $base, @args) = @_;
+
+        return $base
+            unless @args;
+
+        my @cars;
+        while (!grep { is_nil($_) } @args) {
+            push @cars, [map { prim_car($_) } @args];
+            @args = map { prim_cdr($_) } @args;
+        }
+
+        for my $cars (reverse(@cars)) {
+            $base = $call->($f, @{$cars}, $base);
+        }
+
+        return $base;
+    },
 );
 
 sub FASTFUNCS {

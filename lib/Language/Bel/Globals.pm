@@ -1004,10 +1004,10 @@ $globals{"cor"} =
     SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL)))));
 
 $globals{"foldl"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("f"),
-    make_pair(make_symbol("base"), make_symbol("args"))),
-    make_pair(make_pair(make_symbol("if"),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("f"), make_pair(make_symbol("base"),
+    make_symbol("args"))), make_pair(make_pair(make_symbol("if"),
     make_pair(make_pair(make_symbol("or"),
     make_pair(make_pair(make_symbol("no"), make_pair(make_symbol("args"),
     SYMBOL_NIL)), make_pair(make_pair(make_symbol("some"),
@@ -1022,13 +1022,13 @@ $globals{"foldl"} =
     make_pair(make_symbol("base"), SYMBOL_NIL))), SYMBOL_NIL))),
     make_pair(make_pair(make_symbol("map"), make_pair(make_symbol("cdr"),
     make_pair(make_symbol("args"), SYMBOL_NIL))), SYMBOL_NIL))))),
-    SYMBOL_NIL)))), SYMBOL_NIL)))));
+    SYMBOL_NIL)))), SYMBOL_NIL))))), FASTFUNCS->{'foldl'});
 
 $globals{"foldr"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("f"),
-    make_pair(make_symbol("base"), make_symbol("args"))),
-    make_pair(make_pair(make_symbol("if"),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("f"), make_pair(make_symbol("base"),
+    make_symbol("args"))), make_pair(make_pair(make_symbol("if"),
     make_pair(make_pair(make_symbol("or"),
     make_pair(make_pair(make_symbol("no"), make_pair(make_symbol("args"),
     SYMBOL_NIL)), make_pair(make_pair(make_symbol("some"),
@@ -1043,7 +1043,7 @@ $globals{"foldr"} =
     make_pair(make_symbol("base"), make_pair(make_pair(make_symbol("map"),
     make_pair(make_symbol("cdr"), make_pair(make_symbol("args"),
     SYMBOL_NIL))), SYMBOL_NIL))))), SYMBOL_NIL))), SYMBOL_NIL))),
-    SYMBOL_NIL)))), SYMBOL_NIL)))));
+    SYMBOL_NIL)))), SYMBOL_NIL))))), FASTFUNCS->{'foldr'});
 
 $globals{"of"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
