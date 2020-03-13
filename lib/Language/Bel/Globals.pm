@@ -718,10 +718,10 @@ $globals{"with"} =
     SYMBOL_NIL)));
 
 $globals{"keep"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("f"),
-    make_pair(make_symbol("xs"), SYMBOL_NIL)),
-    make_pair(make_pair(make_symbol("if"),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("f"), make_pair(make_symbol("xs"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("if"),
     make_pair(make_pair(make_symbol("no"), make_pair(make_symbol("xs"),
     SYMBOL_NIL)), make_pair(SYMBOL_NIL,
     make_pair(make_pair(make_symbol("f"),
@@ -733,7 +733,8 @@ $globals{"keep"} =
     make_pair(make_symbol("xs"), SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL))),
     make_pair(make_pair(make_symbol("keep"), make_pair(make_symbol("f"),
     make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("xs"),
-    SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL)))))), SYMBOL_NIL)))));
+    SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL)))))), SYMBOL_NIL))))),
+    FASTFUNCS->{'keep'});
 
 $globals{"rem"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
