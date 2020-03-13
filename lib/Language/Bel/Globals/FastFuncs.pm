@@ -549,6 +549,20 @@ my %FASTFUNCS = (
         return SYMBOL_T;
     },
 
+    "pairwise" => sub {
+        my ($call, $f, $xs) = @_;
+
+        my $cdr_xs;
+        while (!is_nil($cdr_xs = prim_cdr($xs))) {
+            if (is_nil($call->($f, prim_car($xs), prim_car($cdr_xs)))) {
+                return SYMBOL_NIL;
+            }
+            $xs = $cdr_xs;
+        }
+
+        return SYMBOL_T;
+    },
+
 );
 
 sub FASTFUNCS {

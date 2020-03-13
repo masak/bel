@@ -1065,10 +1065,10 @@ $globals{"upon"} =
     SYMBOL_NIL)))));
 
 $globals{"pairwise"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("f"),
-    make_pair(make_symbol("xs"), SYMBOL_NIL)),
-    make_pair(make_pair(make_symbol("or"),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("f"), make_pair(make_symbol("xs"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("or"),
     make_pair(make_pair(make_symbol("no"),
     make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("xs"),
     SYMBOL_NIL)), SYMBOL_NIL)), make_pair(make_pair(make_symbol("and"),
@@ -1079,7 +1079,7 @@ $globals{"pairwise"} =
     make_pair(make_pair(make_symbol("pairwise"), make_pair(make_symbol("f"),
     make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("xs"),
     SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))),
-    SYMBOL_NIL)))));
+    SYMBOL_NIL))))), FASTFUNCS->{'pairwise'});
 
 $globals{"fuse"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
