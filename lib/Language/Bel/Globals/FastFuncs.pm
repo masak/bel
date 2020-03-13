@@ -482,6 +482,41 @@ my %FASTFUNCS = (
         }
     },
 
+    "hug" => sub {
+        my ($call, $xs, $f) = @_;
+
+        my @values;
+        my $cdr_xs;
+        if (defined($f)) {
+            while (!is_nil($cdr_xs = prim_cdr($xs))) {
+                push @values, $call->($f, prim_car($xs), prim_car($cdr_xs));
+                $xs = prim_cdr($cdr_xs);
+            }
+            if (!is_nil($xs)) {
+                push @values, $call->($f, prim_car($xs));
+            }
+        }
+        else {
+            while (!is_nil($cdr_xs = prim_cdr($xs))) {
+                push @values, make_pair(
+                    prim_car($xs),
+                    make_pair(
+                        prim_car($cdr_xs),
+                        SYMBOL_NIL));
+                $xs = prim_cdr($cdr_xs);
+            }
+            if (!is_nil($xs)) {
+                push @values, make_pair(prim_car($xs), SYMBOL_NIL);
+            }
+        }
+
+        my $result = SYMBOL_NIL;
+        for my $value (reverse(@values)) {
+            $result = make_pair($value, $result);
+        }
+        return $result;
+    },
+
     "split" => sub {
         my ($call, $f, $xs, $acc) = @_;
 

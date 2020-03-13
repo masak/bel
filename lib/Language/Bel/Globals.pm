@@ -672,8 +672,9 @@ $globals{"caris"} =
     SYMBOL_NIL))))), FASTFUNCS->{'caris'});
 
 $globals{"hug"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("xs"),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("xs"),
     make_pair(make_pair(make_symbol("o"), make_pair(make_symbol("f"),
     make_pair(make_symbol("list"), SYMBOL_NIL))), SYMBOL_NIL)),
     make_pair(make_pair(make_symbol("if"),
@@ -693,7 +694,7 @@ $globals{"hug"} =
     make_pair(make_pair(make_symbol("hug"),
     make_pair(make_pair(make_symbol("cddr"), make_pair(make_symbol("xs"),
     SYMBOL_NIL)), make_pair(make_symbol("f"), SYMBOL_NIL))), SYMBOL_NIL))),
-    SYMBOL_NIL)))))), SYMBOL_NIL)))));
+    SYMBOL_NIL)))))), SYMBOL_NIL))))), FASTFUNCS->{'hug'});
 
 $globals{"with"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("mac"),
