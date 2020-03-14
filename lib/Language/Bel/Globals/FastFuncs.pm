@@ -831,6 +831,50 @@ my %FASTFUNCS = (
 
         return $base;
     },
+
+    "fuse" => sub {
+        my ($call, $f, @args) = @_;
+
+        return SYMBOL_NIL
+            unless @args;
+        my @sublists;
+        my $min_length = -1;
+        for my $list (@args) {
+            my @sublist;
+            while (!is_nil($list)) {
+                push @sublist, prim_car($list);
+                $list = prim_cdr($list);
+            }
+            push @sublists, \@sublist;
+            my $length = scalar(@sublist);
+            $min_length = $min_length == -1 || $length < $min_length
+                ? $length
+                : $min_length;
+        }
+        my @result;
+        for my $i (0..$min_length-1) {
+            push @result, $call->(
+                $f,
+                map { $sublists[$_]->[$i] } 0..$#sublists
+            );
+        }
+        my $result = @result ? pop(@result) : SYMBOL_NIL;
+        while (@result) {
+            my $list = pop(@result);
+            my @values;
+            while (!is_nil($list)) {
+                push @values, prim_car($list);
+                $list = prim_cdr($list);
+            }
+            while (@values) {
+                my $value = pop(@values);
+                $result = make_pair($value, $result);
+            }
+        }
+
+        return $result;
+    },
+
 );
 
 sub FASTFUNCS {
