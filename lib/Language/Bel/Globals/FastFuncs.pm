@@ -536,6 +536,187 @@ my %FASTFUNCS = (
         return $result;
     },
 
+    "rem" => sub {
+        my ($call, $x, $ys, $f) = @_;
+
+        my @values;
+        if (defined($f)) {
+            while (!is_nil($ys)) {
+                my $value = prim_car($ys);
+                if (is_nil($call->($f, $x, $value))) {
+                    push @values, $value;
+                }
+                $ys = prim_cdr($ys);
+            }
+        }
+        else {
+            while (!is_nil($ys)) {
+                my $value = prim_car($ys);
+                my @stack = [$x, $value];
+                while (@stack) {
+                    my ($v0, $v1) = @{pop(@stack)};
+                    if (!is_pair($v0) || !is_pair($v1)) {
+                        if (!_id($v0, $v1)) {
+                            push @values, $value;
+                            last;
+                        }
+                    }
+                    else {
+                        push @stack, [prim_cdr($v0), prim_cdr($v1)];
+                        push @stack, [prim_car($v0), prim_car($v1)];
+                    }
+                }
+                $ys = prim_cdr($ys);
+            }
+        }
+
+        my $result = SYMBOL_NIL;
+        for my $value (reverse(@values)) {
+            $result = make_pair($value, $result);
+        }
+        return $result;
+    },
+
+    "get" => sub {
+        my ($call, $k, $kvs, $f) = @_;
+
+        if (defined($f)) {
+            while (!is_nil($kvs)) {
+                my $kv = prim_car($kvs);
+                if (!is_nil($call->($f, prim_car($kv), $k))) {
+                    return $kv;
+                }
+                $kvs = prim_cdr($kvs);
+            }
+        }
+        else {
+            ELEM:
+            while (!is_nil($kvs)) {
+                my $kv = prim_car($kvs);
+                my @stack = [prim_car($kv), $k];
+                while (@stack) {
+                    my ($v0, $v1) = @{pop(@stack)};
+                    if (!is_pair($v0) || !is_pair($v1)) {
+                        if (!_id($v0, $v1)) {
+                            $kvs = prim_cdr($kvs);
+                            next ELEM;
+                        }
+                    }
+                    else {
+                        push @stack, [prim_cdr($v0), prim_cdr($v1)];
+                        push @stack, [prim_car($v0), prim_car($v1)];
+                    }
+                }
+                return $kv;
+            }
+        }
+
+        return SYMBOL_NIL;
+    },
+
+    "put" => sub {
+        my ($call, $k, $v, $kvs, $f) = @_;
+
+        my @values = make_pair($k, $v);
+        if (defined($f)) {
+            while (!is_nil($kvs)) {
+                my $kv = prim_car($kvs);
+                if (is_nil($call->($f, $k, prim_car($kv)))) {
+                    push @values, $kv;
+                }
+                $kvs = prim_cdr($kvs);
+            }
+        }
+        else {
+            while (!is_nil($kvs)) {
+                my $kv = prim_car($kvs);
+                my @stack = [$k, prim_car($kv)];
+                while (@stack) {
+                    my ($v0, $v1) = @{pop(@stack)};
+                    if (!is_pair($v0) || !is_pair($v1)) {
+                        if (!_id($v0, $v1)) {
+                            push @values, $kv;
+                            last;
+                        }
+                    }
+                    else {
+                        push @stack, [prim_cdr($v0), prim_cdr($v1)];
+                        push @stack, [prim_car($v0), prim_car($v1)];
+                    }
+                }
+                $kvs = prim_cdr($kvs);
+            }
+        }
+
+        my $result = SYMBOL_NIL;
+        for my $value (reverse(@values)) {
+            $result = make_pair($value, $result);
+        }
+        return $result;
+    },
+
+    "rev" => sub {
+        my ($call, $xs) = @_;
+
+        my $result = SYMBOL_NIL;
+        while (!is_nil($xs)) {
+            $result = make_pair(prim_car($xs), $result);
+            $xs = prim_cdr($xs);
+        }
+
+        return $result;
+    },
+
+    "snap" => sub {
+        my ($call, $xs, $ys, $acc) = @_;
+
+        if (!defined($acc)) {
+            $acc = SYMBOL_NIL;
+        }
+
+        my @values;
+        while (!is_nil($acc)) {
+            push @values, prim_car($acc);
+            $acc = prim_cdr($acc);
+        }
+
+        while (!is_nil($xs)) {
+            push @values, prim_car($ys);
+            $xs = prim_cdr($xs);
+            $ys = prim_cdr($ys);
+        }
+
+        my $result = SYMBOL_NIL;
+        for my $value (reverse(@values)) {
+            $result = make_pair($value, $result);
+        }
+
+        return make_pair(
+            $result,
+            make_pair(
+                $ys,
+                SYMBOL_NIL,
+            ),
+        );
+    },
+
+    "udrop" => sub {
+        my ($call, $xs, $ys) = @_;
+
+        while (!is_nil($xs)) {
+            $xs = prim_cdr($xs);
+            $ys = prim_cdr($ys);
+        }
+
+        return $ys;
+    },
+
+    "idfn" => sub {
+        my ($call, $x) = @_;
+
+        return $x;
+    },
+
     "split" => sub {
         my ($call, $f, $xs, $acc) = @_;
 
