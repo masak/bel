@@ -2,6 +2,7 @@ package Language::Bel::Types;
 
 use Language::Bel::Type::Char;
 use Language::Bel::Type::Pair;
+use Language::Bel::Type::Pair::FastFunc;
 use Language::Bel::Type::Symbol;
 
 use Exporter 'import';
@@ -15,7 +16,13 @@ sub char_name {
 sub is_char {
     my ($object) = @_;
 
-    return ref($object) eq "Language::Bel::Type::Char";
+    return $object->isa("Language::Bel::Type::Char");
+}
+
+sub is_fastfunc {
+    my ($object) = @_;
+
+    return $object->isa("Language::Bel::Type::Pair::FastFunc");
 }
 
 sub is_nil {
@@ -27,7 +34,7 @@ sub is_nil {
 sub is_pair {
     my ($object) = @_;
 
-    return ref($object) eq "Language::Bel::Type::Pair";
+    return $object->isa("Language::Bel::Type::Pair");
 }
 
 sub is_string {
@@ -43,7 +50,7 @@ sub is_string {
 sub is_symbol {
     my ($object) = @_;
 
-    return ref($object) eq "Language::Bel::Type::Symbol";
+    return $object->isa("Language::Bel::Type::Symbol");
 }
 
 sub is_symbol_of_name {
@@ -56,6 +63,12 @@ sub make_char {
     my ($name) = @_;
 
     return Language::Bel::Type::Char->new($name);
+}
+
+sub make_fastfunc {
+    my ($pair, $fn) = @_;
+
+    return Language::Bel::Type::Pair::FastFunc->new($pair, $fn);
 }
 
 sub make_pair {
@@ -109,12 +122,14 @@ sub symbol_name {
 our @EXPORT_OK = qw(
     char_name
     is_char
+    is_fastfunc
     is_nil
     is_pair
     is_string
     is_symbol
     is_symbol_of_name
     make_char
+    make_fastfunc
     make_pair
     make_symbol
     pair_car

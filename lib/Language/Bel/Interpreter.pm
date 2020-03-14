@@ -6,8 +6,9 @@ use warnings;
 
 use Language::Bel::Types qw(
     is_char
-    is_pair
+    is_fastfunc
     is_nil
+    is_pair
     is_string
     is_symbol
     is_symbol_of_name
@@ -19,6 +20,7 @@ use Language::Bel::Types qw(
 );
 use Language::Bel::Symbols::Common qw(
     SYMBOL_NIL
+    SYMBOL_T
 );
 use Language::Bel::Primitives qw(
     PRIMITIVES
@@ -27,6 +29,7 @@ use Language::Bel::Primitives qw(
     _id
     prim_car
     prim_cdr
+    prim_type
     PRIM_FN
 );
 use Language::Bel::Reader qw(
@@ -62,6 +65,30 @@ sub new {
                 $self->{g},
             );
         }
+    }
+    if (!defined($self->{call})) {
+        $self->{call} = sub {
+            my ($fn, @args) = @_;
+
+            if (is_fastfunc($fn)) {
+                return $fn->apply($self->{call}, @args);
+            }
+            else {
+                my $args = SYMBOL_NIL;
+                for my $arg (reverse(@args)) {
+                    $args = make_pair($arg, $args);
+                }
+
+                my $s_level = scalar(@{$self->{s}});
+                $self->applyf($fn, $args, SYMBOL_NIL);
+
+                while (scalar(@{$self->{s}}) > $s_level) {
+                    $self->ev();
+                }
+                my $retval = pop(@{$self->{r}});
+                return $retval;
+            }
+        };
     }
 
     return $self;
@@ -114,7 +141,7 @@ my %forms = (
     if => sub {
         my ($interpreter, $es, $a) = @_;
 
-        if (is_nil($es) eq "nil") {
+        if (is_nil($es)) {
             push @{$interpreter->{r}}, SYMBOL_NIL;
         }
         else {
@@ -458,12 +485,15 @@ sub evcall {
         else {
             # We're consuming `es` twice, once in each fut.
             # So we capture it twice.
-            my $es2 = pair_cdr($e);
+            my $es2 = $es1;
 
             my $fu2 = fut(sub {
                 my $args = SYMBOL_NIL;
+                my @args;
                 while (!is_nil($es2)) {
-                    $args = make_pair(pop(@{$self->{r}}), $args);
+                    my $arg = pop(@{$self->{r}});
+                    $args = make_pair($arg, $args);
+                    unshift @args, $arg;
                     $es2 = pair_cdr($es2);
                 }
 
@@ -471,12 +501,15 @@ sub evcall {
                     # XXX: Need to do proper parameter handling here
                     die symbol_name(prim_car($args)), "\n";
                 }
+                elsif (is_fastfunc($op)) {
+                    my $e = $op->apply($self->{call}, @args);
+                    push @{$self->{r}}, $e;
+                }
                 else {
                     $self->applyf($op, $args, $a);
                 }
             });
 
-            push @{$self->{s}}, $fu2;
             my @unevaluated_arguments;
             while (!is_nil($es1)) {
                 push @unevaluated_arguments, [pair_car($es1), $a];
@@ -486,7 +519,7 @@ sub evcall {
             # so we need to put them on expression stack in the order
             # `c b a`. That's why we use `@unevaluated_arguments` as
             # an intermediary, to reverse the order.
-            push @{$self->{s}}, reverse(@unevaluated_arguments);
+            push @{$self->{s}}, $fu2, reverse(@unevaluated_arguments);
         }
     });
     push @{$self->{s}}, $fu1, [pair_car($e), $a];
