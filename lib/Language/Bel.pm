@@ -54,7 +54,7 @@ Version 0.24
 
 =cut
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 =head1 SYNOPSIS
 
