@@ -479,6 +479,11 @@ __DATA__
 
 (def dec (n) (- n 1))
 
+(def pos (x ys (o f =))
+  (if (no ys)        nil
+      (f (car ys) x) 1
+                     (aif (pos x (cdr ys) f) (+ it 1))))
+
 ; we are here currently, implementing things
 
 (def err args)

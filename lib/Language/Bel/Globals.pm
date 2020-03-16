@@ -2114,6 +2114,35 @@ $globals{"dec"} =
     make_pair(make_pair(SYMBOL_T, SYMBOL_NIL), SYMBOL_NIL))),
     SYMBOL_NIL)))), SYMBOL_NIL))), SYMBOL_NIL)))));
 
+$globals{"pos"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"),
+    make_pair(make_symbol("ys"), make_pair(make_pair(make_symbol("o"),
+    make_pair(make_symbol("f"), make_pair(make_symbol("="), SYMBOL_NIL))),
+    SYMBOL_NIL))), make_pair(make_pair(make_symbol("if"),
+    make_pair(make_pair(make_symbol("no"), make_pair(make_symbol("ys"),
+    SYMBOL_NIL)), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("f"),
+    make_pair(make_pair(make_symbol("car"), make_pair(make_symbol("ys"),
+    SYMBOL_NIL)), make_pair(make_symbol("x"), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("lit"), make_pair(make_symbol("num"),
+    make_pair(make_pair(make_symbol("+"), make_pair(make_pair(SYMBOL_T,
+    SYMBOL_NIL), make_pair(make_pair(SYMBOL_T, SYMBOL_NIL), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("+"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(SYMBOL_T, SYMBOL_NIL), SYMBOL_NIL))),
+    SYMBOL_NIL)))), make_pair(make_pair(make_symbol("aif"),
+    make_pair(make_pair(make_symbol("pos"), make_pair(make_symbol("x"),
+    make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("ys"),
+    SYMBOL_NIL)), make_pair(make_symbol("f"), SYMBOL_NIL)))),
+    make_pair(make_pair(make_symbol("+"), make_pair(make_symbol("it"),
+    make_pair(make_pair(make_symbol("lit"), make_pair(make_symbol("num"),
+    make_pair(make_pair(make_symbol("+"), make_pair(make_pair(SYMBOL_T,
+    SYMBOL_NIL), make_pair(make_pair(SYMBOL_T, SYMBOL_NIL), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("+"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(SYMBOL_T, SYMBOL_NIL), SYMBOL_NIL))),
+    SYMBOL_NIL)))), SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL)))))),
+    SYMBOL_NIL)))));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"), SYMBOL_NIL))));
