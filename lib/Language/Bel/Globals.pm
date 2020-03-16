@@ -2143,6 +2143,23 @@ $globals{"pos"} =
     SYMBOL_NIL)))), SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL)))))),
     SYMBOL_NIL)))));
 
+$globals{"len"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("xs"),
+    SYMBOL_NIL), make_pair(make_pair(make_symbol("if"),
+    make_pair(make_pair(make_symbol("no"), make_pair(make_symbol("xs"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("num"), make_pair(make_pair(make_symbol("+"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(SYMBOL_T, SYMBOL_NIL),
+    SYMBOL_NIL))), make_pair(make_pair(make_symbol("+"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(SYMBOL_T, SYMBOL_NIL),
+    SYMBOL_NIL))), SYMBOL_NIL)))),
+    make_pair(make_pair(make_pair(make_symbol("compose"),
+    make_pair(make_symbol("inc"), make_pair(make_symbol("len"),
+    make_pair(make_symbol("cdr"), SYMBOL_NIL)))),
+    make_pair(make_symbol("xs"), SYMBOL_NIL)), SYMBOL_NIL)))),
+    SYMBOL_NIL)))));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"), SYMBOL_NIL))));

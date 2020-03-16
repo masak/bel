@@ -484,6 +484,9 @@ __DATA__
       (f (car ys) x) 1
                      (aif (pos x (cdr ys) f) (+ it 1))))
 
+(def len (xs)
+  (if (no xs) 0 (inc:len:cdr xs)))
+
 ; we are here currently, implementing things
 
 (def err args)
