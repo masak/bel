@@ -526,6 +526,9 @@ __DATA__
 (def int (n)
   (and (real n) (= (srden:numr n) i1)))
 
+(def whole (n)
+  (and (int n) (~< n 0)))
+
 (def yc (f)
   ([_ _] [f (fn a (apply (_ _) a))]))
 
