@@ -2160,6 +2160,18 @@ $globals{"len"} =
     make_pair(make_symbol("xs"), SYMBOL_NIL)), SYMBOL_NIL)))),
     SYMBOL_NIL)))));
 
+$globals{"int"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("n"), SYMBOL_NIL),
+    make_pair(make_pair(make_symbol("and"),
+    make_pair(make_pair(make_symbol("real"), make_pair(make_symbol("n"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("="),
+    make_pair(make_pair(make_pair(make_symbol("compose"),
+    make_pair(make_symbol("srden"), make_pair(make_symbol("numr"),
+    SYMBOL_NIL))), make_pair(make_symbol("n"), SYMBOL_NIL)),
+    make_pair(make_symbol("i1"), SYMBOL_NIL))), SYMBOL_NIL))),
+    SYMBOL_NIL)))));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"), SYMBOL_NIL))));

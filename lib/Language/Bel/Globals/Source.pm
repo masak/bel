@@ -487,6 +487,13 @@ __DATA__
 (def len (xs)
   (if (no xs) 0 (inc:len:cdr xs)))
 
+; skipping charn
+
+; skipping comparison functions
+
+(def int (n)
+  (and (real n) (= (srden:numr n) i1)))
+
 ; we are here currently, implementing things
 
 (def err args)
