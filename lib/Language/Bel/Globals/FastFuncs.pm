@@ -717,73 +717,6 @@ my %FASTFUNCS = (
         return $x;
     },
 
-    "split" => sub {
-        my ($call, $f, $xs, $acc) = @_;
-
-        if (!defined($acc)) {
-            $acc = SYMBOL_NIL;
-        }
-        my @acc;
-        while (!is_nil($xs)) {
-            last
-                if !is_pair($xs) || !is_nil($call->($f, prim_car($xs)));
-            push(@acc, prim_car($xs));
-            $xs = prim_cdr($xs);
-        }
-
-        my @prefix;
-        while (!is_nil($acc)) {
-            push(@prefix, prim_car($acc));
-            $acc = prim_cdr($acc);
-        }
-        my $first = SYMBOL_NIL;
-        while (@acc) {
-            $first = make_pair(pop(@acc), $first);
-        }
-        while (@prefix) {
-            $first = make_pair(pop(@prefix), $first);
-        }
-        return make_pair(
-            $first,
-            make_pair(
-                $xs,
-                SYMBOL_NIL,
-            ),
-        );
-    },
-
-    "match" => sub {
-        my ($call, $x, $pat) = @_;
-
-        my @stack = [$x, $pat];
-        while (@stack) {
-            my ($v0, $v1) = @{pop(@stack)};
-            if (is_symbol_of_name($v1, "t")) {
-                # succeed
-            }
-            elsif (is_pair($v1)
-                && is_symbol_of_name(prim_car($v1), "lit")
-                && is_pair(prim_cdr($v1))
-                && (is_symbol_of_name(prim_car(prim_cdr($v1)), "prim")
-                    || is_symbol_of_name(prim_car(prim_cdr($v1)), "clo"))) {
-                if (is_nil($call->($v1, $v0))) {
-                    return SYMBOL_NIL;
-                }
-            }
-            elsif (!is_pair($v0) || !is_pair($v1)) {
-                if (!_id($v0, $v1)) {
-                    return SYMBOL_NIL;
-                }
-            }
-            else {
-                push @stack, [prim_cdr($v0), prim_cdr($v1)];
-                push @stack, [prim_car($v0), prim_car($v1)];
-            }
-        }
-
-        return SYMBOL_T;
-    },
-
     "pairwise" => sub {
         my ($call, $f, $xs) = @_;
 
@@ -873,6 +806,73 @@ my %FASTFUNCS = (
         }
 
         return $result;
+    },
+
+    "match" => sub {
+        my ($call, $x, $pat) = @_;
+
+        my @stack = [$x, $pat];
+        while (@stack) {
+            my ($v0, $v1) = @{pop(@stack)};
+            if (is_symbol_of_name($v1, "t")) {
+                # succeed
+            }
+            elsif (is_pair($v1)
+                && is_symbol_of_name(prim_car($v1), "lit")
+                && is_pair(prim_cdr($v1))
+                && (is_symbol_of_name(prim_car(prim_cdr($v1)), "prim")
+                    || is_symbol_of_name(prim_car(prim_cdr($v1)), "clo"))) {
+                if (is_nil($call->($v1, $v0))) {
+                    return SYMBOL_NIL;
+                }
+            }
+            elsif (!is_pair($v0) || !is_pair($v1)) {
+                if (!_id($v0, $v1)) {
+                    return SYMBOL_NIL;
+                }
+            }
+            else {
+                push @stack, [prim_cdr($v0), prim_cdr($v1)];
+                push @stack, [prim_car($v0), prim_car($v1)];
+            }
+        }
+
+        return SYMBOL_T;
+    },
+
+    "split" => sub {
+        my ($call, $f, $xs, $acc) = @_;
+
+        if (!defined($acc)) {
+            $acc = SYMBOL_NIL;
+        }
+        my @acc;
+        while (!is_nil($xs)) {
+            last
+                if !is_pair($xs) || !is_nil($call->($f, prim_car($xs)));
+            push(@acc, prim_car($xs));
+            $xs = prim_cdr($xs);
+        }
+
+        my @prefix;
+        while (!is_nil($acc)) {
+            push(@prefix, prim_car($acc));
+            $acc = prim_cdr($acc);
+        }
+        my $first = SYMBOL_NIL;
+        while (@acc) {
+            $first = make_pair(pop(@acc), $first);
+        }
+        while (@prefix) {
+            $first = make_pair(pop(@prefix), $first);
+        }
+        return make_pair(
+            $first,
+            make_pair(
+                $xs,
+                SYMBOL_NIL,
+            ),
+        );
     },
 
 );
