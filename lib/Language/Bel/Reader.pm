@@ -82,6 +82,11 @@ sub _read_helper {
                 ++$pos;
             } while ($pos < length($expr));
         }
+        my $name = substr($expr, $start, $pos - $start);
+        if (length($name) > 1) {
+            die "'unknown-named-char\n"
+                unless $name eq "bel" || $name eq "tab" || $name eq "lf" || $name eq "cr" || $name eq "sp";
+        }
         my $ast = make_char(substr($expr, $start, $pos - $start));
         return { ast => $ast, pos => $pos };
     }
