@@ -1,9 +1,9 @@
 package Language::Bel::Type::Char;
 
 sub new {
-    my ($class, $name) = @_;
+    my ($class, $codepoint) = @_;
 
-    my $obj = { name => $name };
+    my $obj = { codepoint => $codepoint };
     return bless($obj, $class);
 }
 

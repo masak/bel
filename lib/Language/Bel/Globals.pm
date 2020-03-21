@@ -2260,8 +2260,8 @@ $globals{"whitec"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("c"), SYMBOL_NIL),
     make_pair(make_pair(make_symbol("in"), make_pair(make_symbol("c"),
-    make_pair(make_char("sp"), make_pair(make_char("lf"),
-    make_pair(make_char("tab"), make_pair(make_char("cr"), SYMBOL_NIL)))))),
+    make_pair(make_char(32), make_pair(make_char(10),
+    make_pair(make_char(9), make_pair(make_char(13), SYMBOL_NIL)))))),
     SYMBOL_NIL)))));
 
 $globals{"err"} =

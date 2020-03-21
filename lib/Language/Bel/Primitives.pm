@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use Language::Bel::Types qw(
-    char_name
+    char_codepoint
     is_char
     is_nil
     is_pair
@@ -61,7 +61,7 @@ sub _id {
         return symbol_name($first) eq symbol_name($second);
     }
     elsif (is_char($first) && is_char($second)) {
-        return char_name($first) eq char_name($second);
+        return char_codepoint($first) == char_codepoint($second);
     }
     elsif (is_pair($first) && is_pair($second)) {
         return $first eq $second;

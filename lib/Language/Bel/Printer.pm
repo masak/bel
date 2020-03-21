@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use Language::Bel::Types qw(
-    char_name
+    char_codepoint
     is_char
     is_nil
     is_pair
@@ -19,6 +19,14 @@ use Language::Bel::Types qw(
 );
 
 use Exporter 'import';
+
+my %codepoint_chars = (
+    7 => "bel",
+    9 => "tab",
+    10 => "lf",
+    13 => "cr",
+    32 => "sp",
+);
 
 sub _print {
     my ($ast) = @_;
@@ -37,8 +45,11 @@ sub _print {
         return $name;
     }
     elsif (is_char($ast)) {
-        my $name = char_name($ast);
-        return "\\$name";
+        my $codepoint = char_codepoint($ast);
+        my $name = $codepoint_chars{$codepoint};
+        return $name
+            ? "\\$name"
+            : "\\" . chr($codepoint);
     }
     elsif (is_string($ast)) {
         my $string = string_value($ast);

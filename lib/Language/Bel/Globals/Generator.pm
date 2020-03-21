@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use Language::Bel::Types qw(
-    char_name
+    char_codepoint
     is_char
     is_nil
     is_pair
@@ -261,8 +261,8 @@ sub serialize {
             : qq[make_symbol("$name")];
     }
     elsif (is_char($value)) {
-        my $name = char_name($value);
-        return qq[make_char("$name")];
+        my $codepoint = char_codepoint($value);
+        return qq[make_char($codepoint)];
     }
     else {
         die "Unknown value: ", ref($value), "\n";
