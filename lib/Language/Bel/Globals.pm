@@ -2264,6 +2264,25 @@ $globals{"whitec"} =
     make_pair(make_char(9), make_pair(make_char(13), SYMBOL_NIL)))))),
     SYMBOL_NIL)))));
 
+$globals{"tokens"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("xs"),
+    make_pair(make_pair(make_symbol("o"), make_pair(make_symbol("break"),
+    make_pair(make_symbol("whitec"), SYMBOL_NIL))), SYMBOL_NIL)),
+    make_pair(make_pair(make_symbol("let"), make_pair(make_symbol("f"),
+    make_pair(make_pair(make_symbol("if"),
+    make_pair(make_pair(make_symbol("function"),
+    make_pair(make_symbol("break"), SYMBOL_NIL)),
+    make_pair(make_symbol("break"), make_pair(make_pair(make_symbol("is"),
+    make_pair(make_symbol("break"), SYMBOL_NIL)), SYMBOL_NIL)))),
+    make_pair(make_pair(make_symbol("keep"),
+    make_pair(make_pair(make_symbol("compose"),
+    make_pair(make_pair(make_symbol("compose"), make_pair(make_symbol("no"),
+    make_pair(make_symbol("f"), SYMBOL_NIL))), make_pair(make_symbol("car"),
+    SYMBOL_NIL))), make_pair(make_pair(make_symbol("runs"),
+    make_pair(make_symbol("f"), make_pair(make_symbol("xs"), SYMBOL_NIL))),
+    SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL)))));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"), SYMBOL_NIL))));

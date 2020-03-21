@@ -516,6 +516,10 @@ __DATA__
 (def whitec (c)
   (in c \sp \lf \tab \cr))
 
+(def tokens (xs (o break whitec))
+  (let f (if (function break) break (is break))
+    (keep ~f:car (runs f xs))))
+
 ; we are here currently, implementing things
 
 (def err args)
