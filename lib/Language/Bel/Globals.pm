@@ -5,6 +5,7 @@ use strict;
 use warnings;
 
 use Language::Bel::Types qw(
+    make_char
     make_pair
     make_symbol
     make_fastfunc
@@ -2254,6 +2255,14 @@ $globals{"runs"} =
     make_pair(make_symbol("bs"), make_pair(make_pair(make_symbol("no"),
     make_pair(make_symbol("fon"), SYMBOL_NIL)), SYMBOL_NIL)))),
     SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL)))), SYMBOL_NIL)))));
+
+$globals{"whitec"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("c"), SYMBOL_NIL),
+    make_pair(make_pair(make_symbol("in"), make_pair(make_symbol("c"),
+    make_pair(make_char("sp"), make_pair(make_char("lf"),
+    make_pair(make_char("tab"), make_pair(make_char("cr"), SYMBOL_NIL)))))),
+    SYMBOL_NIL)))));
 
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),

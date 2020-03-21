@@ -513,6 +513,9 @@ __DATA__
       (let (as bs) (split (if fon ~f f) xs)
         (cons as (runs f bs (no fon))))))
 
+(def whitec (c)
+  (in c \sp \lf \tab \cr))
+
 ; we are here currently, implementing things
 
 (def err args)

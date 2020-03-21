@@ -5,6 +5,8 @@ use strict;
 use warnings;
 
 use Language::Bel::Types qw(
+    char_name
+    is_char
     is_nil
     is_pair
     is_symbol
@@ -92,6 +94,7 @@ use strict;
 use warnings;
 
 use Language::Bel::Types qw(
+    make_char
     make_pair
     make_symbol
     make_fastfunc
@@ -256,6 +259,10 @@ sub serialize {
         return $KNOWN_SYMBOL{$name}
             ? "SYMBOL_" . uc($name)
             : qq[make_symbol("$name")];
+    }
+    elsif (is_char($value)) {
+        my $name = char_name($value);
+        return qq[make_char("$name")];
     }
     else {
         die "Unknown value: ", ref($value), "\n";
