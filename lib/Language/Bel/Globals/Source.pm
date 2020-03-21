@@ -494,6 +494,19 @@ __DATA__
 (def int (n)
   (and (real n) (= (srden:numr n) i1)))
 
+(def yc (f)
+  ([_ _] [f (fn a (apply (_ _) a))]))
+
+(mac rfn (name . rest)
+  `(yc (fn (,name) (fn ,@rest))))
+
+(mac afn args
+  `(rfn self ,@args))
+
+(def wait (f)
+  ((afn (v) (if v v (self (f))))
+   (f)))
+
 ; we are here currently, implementing things
 
 (def err args)
