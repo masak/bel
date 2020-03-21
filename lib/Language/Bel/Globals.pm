@@ -2231,6 +2231,30 @@ $globals{"wait"} =
     SYMBOL_NIL)))), SYMBOL_NIL))), make_pair(make_pair(make_symbol("f"),
     SYMBOL_NIL), SYMBOL_NIL)), SYMBOL_NIL)))));
 
+$globals{"runs"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("f"),
+    make_pair(make_symbol("xs"), make_pair(make_pair(make_symbol("o"),
+    make_pair(make_symbol("fon"), make_pair(make_pair(make_symbol("and"),
+    make_pair(make_symbol("xs"), make_pair(make_pair(make_symbol("f"),
+    make_pair(make_pair(make_symbol("car"), make_pair(make_symbol("xs"),
+    SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("if"),
+    make_pair(make_pair(make_symbol("no"), make_pair(make_symbol("xs"),
+    SYMBOL_NIL)), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("let"),
+    make_pair(make_pair(make_symbol("as"), make_pair(make_symbol("bs"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("split"),
+    make_pair(make_pair(make_symbol("if"), make_pair(make_symbol("fon"),
+    make_pair(make_pair(make_symbol("compose"), make_pair(make_symbol("no"),
+    make_pair(make_symbol("f"), SYMBOL_NIL))), make_pair(make_symbol("f"),
+    SYMBOL_NIL)))), make_pair(make_symbol("xs"), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("cons"), make_pair(make_symbol("as"),
+    make_pair(make_pair(make_symbol("runs"), make_pair(make_symbol("f"),
+    make_pair(make_symbol("bs"), make_pair(make_pair(make_symbol("no"),
+    make_pair(make_symbol("fon"), SYMBOL_NIL)), SYMBOL_NIL)))),
+    SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL)))), SYMBOL_NIL)))));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"), SYMBOL_NIL))));

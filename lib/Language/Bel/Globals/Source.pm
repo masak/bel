@@ -507,6 +507,12 @@ __DATA__
   ((afn (v) (if v v (self (f))))
    (f)))
 
+(def runs (f xs (o fon (and xs (f (car xs)))))
+  (if (no xs)
+      nil
+      (let (as bs) (split (if fon ~f f) xs)
+        (cons as (runs f bs (no fon))))))
+
 ; we are here currently, implementing things
 
 (def err args)
