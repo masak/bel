@@ -526,6 +526,8 @@ __DATA__
                                       (dups (rem (car xs) (cdr xs) f) f))
                                 (dups (cdr xs) f)))
 
+(set simple (cor atom number))
+
 ; we are here currently, implementing things
 
 (def err args)
