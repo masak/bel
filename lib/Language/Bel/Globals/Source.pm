@@ -520,6 +520,12 @@ __DATA__
   (let f (if (function break) break (is break))
     (keep ~f:car (runs f xs))))
 
+(def dups (xs (o f =))
+  (if (no xs)                   nil
+      (mem (car xs) (cdr xs) f) (cons (car xs)
+                                      (dups (rem (car xs) (cdr xs) f) f))
+                                (dups (cdr xs) f)))
+
 ; we are here currently, implementing things
 
 (def err args)
