@@ -528,6 +528,12 @@ __DATA__
 
 (set simple (cor atom number))
 
+(mac do1 args
+  (letu v
+    `(let ,v ,(car args)
+       ,@(cdr args)
+       ,v)))
+
 ; we are here currently, implementing things
 
 (def err args)
