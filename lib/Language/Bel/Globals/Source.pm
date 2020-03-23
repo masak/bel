@@ -540,6 +540,11 @@ __DATA__
 (def consif (x y)
   (if x (cons x y) y))
 
+(mac check (x f (o alt))
+  (letu v
+    `(let ,v ,x
+       (if (,f ,v) ,v ,alt))))
+
 ; we are here currently, implementing things
 
 (def err args)
