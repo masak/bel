@@ -537,6 +537,9 @@ __DATA__
 (def gets (v kvs (o f =))
   (find [f (cdr _) v] kvs))
 
+(def consif (x y)
+  (if x (cons x y) y))
+
 ; we are here currently, implementing things
 
 (def err args)

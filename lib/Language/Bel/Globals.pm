@@ -2441,6 +2441,15 @@ $globals{"gets"} =
     SYMBOL_NIL)), make_pair(make_symbol("v"), SYMBOL_NIL))), SYMBOL_NIL))),
     make_pair(make_symbol("kvs"), SYMBOL_NIL))), SYMBOL_NIL)))));
 
+$globals{"consif"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"),
+    make_pair(make_symbol("y"), SYMBOL_NIL)),
+    make_pair(make_pair(make_symbol("if"), make_pair(make_symbol("x"),
+    make_pair(make_pair(make_symbol("cons"), make_pair(make_symbol("x"),
+    make_pair(make_symbol("y"), SYMBOL_NIL))), make_pair(make_symbol("y"),
+    SYMBOL_NIL)))), SYMBOL_NIL)))));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"), SYMBOL_NIL))));
