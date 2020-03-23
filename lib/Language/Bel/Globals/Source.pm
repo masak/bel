@@ -534,6 +534,9 @@ __DATA__
        ,@(cdr args)
        ,v)))
 
+(def gets (v kvs (o f =))
+  (find [f (cdr _) v] kvs))
+
 ; we are here currently, implementing things
 
 (def err args)

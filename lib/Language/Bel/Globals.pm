@@ -2428,6 +2428,19 @@ $globals{"do1"} =
     SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))),
     SYMBOL_NIL))), SYMBOL_NIL))))), SYMBOL_NIL)));
 
+$globals{"gets"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("v"),
+    make_pair(make_symbol("kvs"), make_pair(make_pair(make_symbol("o"),
+    make_pair(make_symbol("f"), make_pair(make_symbol("="), SYMBOL_NIL))),
+    SYMBOL_NIL))), make_pair(make_pair(make_symbol("find"),
+    make_pair(make_pair(make_symbol("fn"),
+    make_pair(make_pair(make_symbol("_"), SYMBOL_NIL),
+    make_pair(make_pair(make_symbol("f"),
+    make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("_"),
+    SYMBOL_NIL)), make_pair(make_symbol("v"), SYMBOL_NIL))), SYMBOL_NIL))),
+    make_pair(make_symbol("kvs"), SYMBOL_NIL))), SYMBOL_NIL)))));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"), SYMBOL_NIL))));
