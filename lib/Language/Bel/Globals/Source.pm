@@ -545,6 +545,12 @@ __DATA__
     `(let ,v ,x
        (if (,f ,v) ,v ,alt))))
 
+(mac withs (parms . body)
+  (if (no parms)
+      `(do ,@body)
+      `(let ,(car parms) ,(cadr parms)
+         (withs ,(cddr parms) ,@body))))
+
 ; we are here currently, implementing things
 
 (def err args)
