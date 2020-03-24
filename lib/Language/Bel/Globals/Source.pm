@@ -562,6 +562,8 @@ __DATA__
       (f xs)  xs
               (tail f (cdr xs))))
 
+(set dock rev:cdr:rev)
+
 ; we are here currently, implementing things
 
 (def err args)
