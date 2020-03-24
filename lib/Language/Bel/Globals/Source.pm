@@ -554,6 +554,9 @@ __DATA__
 (mac bind (var expr . body)
   `(dyn ,var ,expr (do ,@body)))
 
+(mac atomic body
+  `(bind lock t ,@body))
+
 ; we are here currently, implementing things
 
 (def err args)
