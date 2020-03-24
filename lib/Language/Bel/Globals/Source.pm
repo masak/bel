@@ -551,6 +551,9 @@ __DATA__
       `(let ,(car parms) ,(cadr parms)
          (withs ,(cddr parms) ,@body))))
 
+(mac bind (var expr . body)
+  `(dyn ,var ,expr (do ,@body)))
+
 ; we are here currently, implementing things
 
 (def err args)
