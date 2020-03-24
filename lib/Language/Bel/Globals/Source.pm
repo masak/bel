@@ -557,6 +557,11 @@ __DATA__
 (mac atomic body
   `(bind lock t ,@body))
 
+(def tail (f xs)
+  (if (no xs) nil
+      (f xs)  xs
+              (tail f (cdr xs))))
+
 ; we are here currently, implementing things
 
 (def err args)
