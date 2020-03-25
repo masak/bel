@@ -238,6 +238,32 @@ HEADER
             }
             next DECLARATION;
         }
+        elsif (symbol_name($car_ast) eq "vir") {
+            my $tag = prim_car(prim_cdr($ast));
+            my $rest = prim_cdr(prim_cdr($ast));
+            for my $global (@globals) {
+                if ($global->{name} eq "virfns") {
+                    $global->{expr} = make_pair(
+                        make_pair(
+                            $tag,
+                            make_pair(
+                                make_symbol("lit"),
+                                make_pair(
+                                    make_symbol("clo"),
+                                    make_pair(
+                                        SYMBOL_NIL,
+                                        _bqexpand($rest),
+                                    ),
+                                ),
+                            ),
+                        ),
+                        $global->{expr},
+                    );
+                    last;
+                }
+            }
+            next;
+        }
         else {
             die "Unrecognized: $declaration";
         }

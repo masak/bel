@@ -857,6 +857,44 @@ $globals{"isa"} =
     SYMBOL_NIL))), make_pair(make_symbol("id"), SYMBOL_NIL)))),
     SYMBOL_NIL))), SYMBOL_NIL)))));
 
+$globals{"virfns"} =
+    make_pair(make_pair(make_symbol("num"), make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("f"), make_pair(make_symbol("args"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("nth"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_symbol("f"), make_pair(make_pair(make_symbol("append"),
+    make_pair(make_symbol("args"), make_pair(SYMBOL_NIL, SYMBOL_NIL))),
+    SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL)))))), SYMBOL_NIL);
+
+$globals{"vir"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("mac"),
+    make_pair(make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("tag"),
+    make_symbol("rest")), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("set"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("virfns"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("put"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(SYMBOL_QUOTE, SYMBOL_NIL)),
+    make_pair(make_pair(make_symbol("cons"), make_pair(make_symbol("tag"),
+    make_pair(SYMBOL_NIL, SYMBOL_NIL))), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("fn"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("append"),
+    make_pair(make_symbol("rest"), make_pair(SYMBOL_NIL, SYMBOL_NIL))),
+    SYMBOL_NIL))), make_pair(make_pair(SYMBOL_QUOTE,
+    make_pair(make_pair(make_symbol("virfns"), SYMBOL_NIL), SYMBOL_NIL)),
+    SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))), make_pair(SYMBOL_NIL,
+    SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))))),
+    SYMBOL_NIL)));
+
 $globals{"function"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),

@@ -218,6 +218,13 @@ __DATA__
 
 ; skipping the evaluator for now
 
+(set virfns nil)
+
+(mac vir (tag . rest)
+  `(set virfns (put ',tag (fn ,@rest) virfns)))
+
+; back to skipping the evaluator
+
 (def function (x)
   (find [(isa _) x] '(prim clo)))
 
@@ -614,11 +621,18 @@ __DATA__
 
 ; we are here currently, implementing things
 
+(vir num (f args)
+  `(nth ,f ,@args))
+
+; skip
+
 (mac pop (place)
   `(let (cell loc) (where ,place)
      (let xs ((case loc a car d cdr) cell)
        ((case loc a xar d xdr) cell (cdr xs))
        (car xs))))
+
+; skip
 
 (def err args)
 
