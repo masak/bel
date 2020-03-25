@@ -128,6 +128,8 @@ HEADER
         print_primitive($prim_name);
     }
 
+    my @globals;
+
     DECLARATION:
     for my $declaration (@DECLARATIONS) {
         my $ast = _read($declaration);
@@ -225,7 +227,10 @@ HEADER
         elsif (symbol_name($car_ast) eq "set") {
             while (!is_nil(prim_cdr($ast))) {
                 $new_ast = prim_car($cddr_ast);
-                print_global($name, $interpreter->eval_ast(_bqexpand($new_ast)));
+                push @globals, {
+                    name => $name,
+                    expr => $interpreter->eval_ast(_bqexpand($new_ast)),
+                };
 
                 $ast = prim_cdr(prim_cdr($ast));
                 $name = symbol_name(prim_car(prim_cdr($ast)));
@@ -237,7 +242,14 @@ HEADER
             die "Unrecognized: $declaration";
         }
 
-        print_global($name, $interpreter->eval_ast(_bqexpand($new_ast)));
+        push @globals, {
+            name => $name,
+            expr => $interpreter->eval_ast(_bqexpand($new_ast)),
+        };
+    }
+
+    for my $global (@globals) {
+        print_global($global->{name}, $global->{expr});
     }
 
     print <<'FOOTER';
