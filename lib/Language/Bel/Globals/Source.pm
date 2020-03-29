@@ -564,6 +564,11 @@ __DATA__
 
 (set dock rev:cdr:rev)
 
+(def lastcdr (xs)
+  (if (no (cdr xs))
+      xs
+      (lastcdr (cdr xs))))
+
 ; we are here currently, implementing things
 
 (def err args)

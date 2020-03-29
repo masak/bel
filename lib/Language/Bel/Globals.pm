@@ -2634,6 +2634,17 @@ $globals{"dock"} =
     make_pair(make_symbol("args"), SYMBOL_NIL))), SYMBOL_NIL)),
     SYMBOL_NIL)))));
 
+$globals{"lastcdr"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("xs"),
+    SYMBOL_NIL), make_pair(make_pair(make_symbol("if"),
+    make_pair(make_pair(make_symbol("no"),
+    make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("xs"),
+    SYMBOL_NIL)), SYMBOL_NIL)), make_pair(make_symbol("xs"),
+    make_pair(make_pair(make_symbol("lastcdr"),
+    make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("xs"),
+    SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL)))), SYMBOL_NIL)))));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"), SYMBOL_NIL))));
