@@ -569,6 +569,8 @@ __DATA__
       xs
       (lastcdr (cdr xs))))
 
+(set last car:lastcdr)
+
 ; we are here currently, implementing things
 
 (def err args)
