@@ -574,6 +574,10 @@ __DATA__
 (def newq ()
   (list nil))
 
+(def enq (x q)
+  (atomic (xar q (snoc (car q) x)))
+  q)
+
 ; we are here currently, implementing things
 
 (def err args)

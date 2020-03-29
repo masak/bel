@@ -95,6 +95,13 @@ sub pair_cdr {
     return $pair->{cdr};
 }
 
+sub pair_set_car {
+    my ($pair, $car) = @_;
+
+    $pair->{car} = $car;
+    return;
+}
+
 sub pair_set_cdr {
     my ($pair, $cdr) = @_;
 
@@ -134,6 +141,7 @@ our @EXPORT_OK = qw(
     make_symbol
     pair_car
     pair_cdr
+    pair_set_car
     pair_set_cdr
     string_value
     symbol_name

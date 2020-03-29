@@ -43,6 +43,8 @@ $globals{"join"} = PRIMITIVES->{"join"};
 
 $globals{"type"} = PRIMITIVES->{"type"};
 
+$globals{"xar"} = PRIMITIVES->{"xar"};
+
 $globals{"xdr"} = PRIMITIVES->{"xdr"};
 
 $globals{"no"} =
@@ -2683,9 +2685,22 @@ $globals{"newq"} =
     make_pair(make_pair(make_symbol("list"), make_pair(SYMBOL_NIL,
     SYMBOL_NIL)), SYMBOL_NIL)))));
 
+$globals{"enq"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"),
+    make_pair(make_symbol("q"), SYMBOL_NIL)),
+    make_pair(make_pair(make_symbol("do"),
+    make_pair(make_pair(make_symbol("atomic"),
+    make_pair(make_pair(make_symbol("xar"), make_pair(make_symbol("q"),
+    make_pair(make_pair(make_symbol("snoc"),
+    make_pair(make_pair(make_symbol("car"), make_pair(make_symbol("q"),
+    SYMBOL_NIL)), make_pair(make_symbol("x"), SYMBOL_NIL))), SYMBOL_NIL))),
+    SYMBOL_NIL)), make_pair(make_symbol("q"), SYMBOL_NIL))), SYMBOL_NIL)))));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_symbol("args"), SYMBOL_NIL))));
+    make_pair(SYMBOL_NIL, make_pair(make_symbol("args"),
+    make_pair(SYMBOL_NIL, SYMBOL_NIL)))));
 
 $globals{"comma"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("mac"),

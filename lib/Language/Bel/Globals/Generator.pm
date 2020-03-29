@@ -159,13 +159,36 @@ HEADER
             #
             # (set n (lit clo nil p e))
 
+            # [masak] Yes, but then it also says, "The actual def and mac
+            # operators are more powerful, but this is as much as we need
+            # to start with." The place where it falls down, it turns out,
+            # is the definition of `enq`, the first function to use the
+            # implicit `do` semantics of `def`. In that case, (just as with
+            # the real `def`), we wrap `e` in a `do`.
+            my $params = pair_car($cddr_ast);
+            my $rest = pair_cdr($cddr_ast);
+            my $body = is_nil($rest)
+                ? SYMBOL_NIL
+                : is_nil(pair_cdr($rest))
+                    ? pair_car($rest)
+                    : make_pair(
+                        make_symbol("do"),
+                        $rest,
+                    );
+
             $new_ast = make_pair(
                 make_symbol("lit"),
                 make_pair(
                     make_symbol("clo"),
                     make_pair(
                         SYMBOL_NIL,
-                        $cddr_ast,
+                        make_pair(
+                            $params,
+                            make_pair(
+                                $body,
+                                SYMBOL_NIL,
+                            )
+                        ),
                     ),
                 ),
             );
