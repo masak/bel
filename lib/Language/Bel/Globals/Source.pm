@@ -571,6 +571,9 @@ __DATA__
 
 (set last car:lastcdr)
 
+(def newq ()
+  (list nil))
+
 ; we are here currently, implementing things
 
 (def err args)
