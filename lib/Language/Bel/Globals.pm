@@ -2697,6 +2697,19 @@ $globals{"enq"} =
     SYMBOL_NIL)), make_pair(make_symbol("x"), SYMBOL_NIL))), SYMBOL_NIL))),
     SYMBOL_NIL)), make_pair(make_symbol("q"), SYMBOL_NIL))), SYMBOL_NIL)))));
 
+$globals{"deq"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("q"), SYMBOL_NIL),
+    make_pair(make_pair(make_symbol("atomic"),
+    make_pair(make_pair(make_symbol("do1"),
+    make_pair(make_pair(make_symbol("car"),
+    make_pair(make_pair(make_symbol("car"), make_pair(make_symbol("q"),
+    SYMBOL_NIL)), SYMBOL_NIL)), make_pair(make_pair(make_symbol("xar"),
+    make_pair(make_symbol("q"), make_pair(make_pair(make_symbol("cdr"),
+    make_pair(make_pair(make_symbol("car"), make_pair(make_symbol("q"),
+    SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL)),
+    SYMBOL_NIL)))));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"),

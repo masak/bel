@@ -578,6 +578,10 @@ __DATA__
   (atomic (xar q (snoc (car q) x)))
   q)
 
+(def deq (q)
+  (atomic (do1 (car (car q))
+               (xar q (cdr (car q))))))
+
 ; we are here currently, implementing things
 
 (def err args)
