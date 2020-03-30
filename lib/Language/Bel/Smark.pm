@@ -1,4 +1,4 @@
-package Language::Bel::Interpreter::Smark;
+package Language::Bel::Smark;
 
 use 5.006;
 use strict;
@@ -22,7 +22,7 @@ sub value {
 sub is_smark {
     my ($value) = @_;
 
-    return ref($value) eq "Language::Bel::Interpreter::Smark";
+    return ref($value) eq "Language::Bel::Smark";
 }
 
 sub is_smark_of_type {
@@ -34,7 +34,7 @@ sub is_smark_of_type {
 sub make_smark_of_type {
     my ($type, $value) = @_;
 
-    return Language::Bel::Interpreter::Smark->new($type, $value);
+    return Language::Bel::Smark->new($type, $value);
 }
 
 our @EXPORT_OK = qw(
