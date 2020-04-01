@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use Language::Bel::Types qw(
-    char_name
+    char_codepoint
     is_char
     is_nil
     is_pair
@@ -14,6 +14,7 @@ use Language::Bel::Types qw(
     make_symbol
     pair_car
     pair_cdr
+    pair_set_car
     pair_set_cdr
     symbol_name
 );
@@ -61,7 +62,7 @@ sub _id {
         return symbol_name($first) eq symbol_name($second);
     }
     elsif (is_char($first) && is_char($second)) {
-        return char_name($first) eq char_name($second);
+        return char_codepoint($first) == char_codepoint($second);
     }
     elsif (is_pair($first) && is_pair($second)) {
         return $first eq $second;
@@ -100,6 +101,16 @@ sub prim_type {
     }
 }
 
+sub prim_xar {
+    my ($object, $a_value) = @_;
+
+    if (!is_pair($object)) {
+        die "xar-on-atom\n";
+    }
+    pair_set_car($object, $a_value);
+    return $a_value;
+}
+
 sub prim_xdr {
     my ($object, $d_value) = @_;
 
@@ -131,6 +142,7 @@ my %prim_fn = (
     "id" => { fn => \&prim_id, arity => 2 },
     "join" => { fn => \&prim_join, arity => 2 },
     "type" => { fn => \&prim_type, arity => 1 },
+    "xar" => { fn => \&prim_xar, arity => 2 },
     "xdr" => { fn => \&prim_xdr, arity => 2 },
 );
 
@@ -144,6 +156,7 @@ my %primitives = (
     "id" => make_prim("id"),
     "join" => make_prim("join"),
     "type" => make_prim("type"),
+    "xar" => make_prim("xar"),
     "xdr" => make_prim("xdr"),
 );
 
@@ -158,6 +171,8 @@ our @EXPORT_OK = qw(
     prim_id 
     prim_join
     prim_type
+    prim_xar
+    prim_xdr
     PRIM_FN
     PRIMITIVES
 );

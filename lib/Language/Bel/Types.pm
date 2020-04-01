@@ -7,10 +7,10 @@ use Language::Bel::Type::Symbol;
 
 use Exporter 'import';
 
-sub char_name {
+sub char_codepoint {
     my ($char) = @_;
 
-    return $char->{name};
+    return $char->{codepoint};
 }
 
 sub is_char {
@@ -60,9 +60,9 @@ sub is_symbol_of_name {
 }
 
 sub make_char {
-    my ($name) = @_;
+    my ($codepoint) = @_;
 
-    return Language::Bel::Type::Char->new($name);
+    return Language::Bel::Type::Char->new($codepoint);
 }
 
 sub make_fastfunc {
@@ -95,6 +95,13 @@ sub pair_cdr {
     return $pair->{cdr};
 }
 
+sub pair_set_car {
+    my ($pair, $car) = @_;
+
+    $pair->{car} = $car;
+    return;
+}
+
 sub pair_set_cdr {
     my ($pair, $cdr) = @_;
 
@@ -107,7 +114,7 @@ sub string_value {
 
     my @chars;
     while (is_pair($object)) {
-        push @chars, char_name(pair_car($object));
+        push @chars, chr(char_codepoint(pair_car($object)));
         $object = pair_cdr($object);
     }
     return join "", @chars;
@@ -120,7 +127,7 @@ sub symbol_name {
 }
 
 our @EXPORT_OK = qw(
-    char_name
+    char_codepoint
     is_char
     is_fastfunc
     is_nil
@@ -134,6 +141,7 @@ our @EXPORT_OK = qw(
     make_symbol
     pair_car
     pair_cdr
+    pair_set_car
     pair_set_cdr
     string_value
     symbol_name

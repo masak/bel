@@ -25,6 +25,14 @@ sub _read {
     return _read_helper($expr, 0)->{ast};
 }
 
+my %char_codepoints = (
+    bel => 7,
+    tab => 9,
+    lf => 10,
+    cr => 13,
+    sp => 32,
+);
+
 sub _read_helper {
     my ($expr, $pos) = @_;
 
@@ -82,7 +90,13 @@ sub _read_helper {
                 ++$pos;
             } while ($pos < length($expr));
         }
-        my $ast = make_char(substr($expr, $start, $pos - $start));
+        my $name = substr($expr, $start, $pos - $start);
+        my $ord = length($name) == 1
+            ? ord($name)
+            : $char_codepoints{$name};
+        die "'unknown-named-char\n"
+            if !defined($ord);
+        my $ast = make_char($ord);
         return { ast => $ast, pos => $pos };
     }
     elsif ($c eq q["]) {
@@ -104,7 +118,7 @@ sub _read_helper {
         my $ast = SYMBOL_NIL;
         for my $char (reverse @chars) {
             $ast = make_pair(
-                make_char($char),
+                make_char(ord($char)),
                 $ast,
             );
         }

@@ -479,6 +479,109 @@ __DATA__
 
 (def dec (n) (- n 1))
 
+(def pos (x ys (o f =))
+  (if (no ys)        nil
+      (f (car ys) x) 1
+                     (aif (pos x (cdr ys) f) (+ it 1))))
+
+(def len (xs)
+  (if (no xs) 0 (inc:len:cdr xs)))
+
+; skipping charn
+
+; skipping comparison functions
+
+(def int (n)
+  (and (real n) (= (srden:numr n) i1)))
+
+(def yc (f)
+  ([_ _] [f (fn a (apply (_ _) a))]))
+
+(mac rfn (name . rest)
+  `(yc (fn (,name) (fn ,@rest))))
+
+(mac afn args
+  `(rfn self ,@args))
+
+(def wait (f)
+  ((afn (v) (if v v (self (f))))
+   (f)))
+
+(def runs (f xs (o fon (and xs (f (car xs)))))
+  (if (no xs)
+      nil
+      (let (as bs) (split (if fon ~f f) xs)
+        (cons as (runs f bs (no fon))))))
+
+(def whitec (c)
+  (in c \sp \lf \tab \cr))
+
+(def tokens (xs (o break whitec))
+  (let f (if (function break) break (is break))
+    (keep ~f:car (runs f xs))))
+
+(def dups (xs (o f =))
+  (if (no xs)                   nil
+      (mem (car xs) (cdr xs) f) (cons (car xs)
+                                      (dups (rem (car xs) (cdr xs) f) f))
+                                (dups (cdr xs) f)))
+
+(set simple (cor atom number))
+
+(mac do1 args
+  (letu v
+    `(let ,v ,(car args)
+       ,@(cdr args)
+       ,v)))
+
+(def gets (v kvs (o f =))
+  (find [f (cdr _) v] kvs))
+
+(def consif (x y)
+  (if x (cons x y) y))
+
+(mac check (x f (o alt))
+  (letu v
+    `(let ,v ,x
+       (if (,f ,v) ,v ,alt))))
+
+(mac withs (parms . body)
+  (if (no parms)
+      `(do ,@body)
+      `(let ,(car parms) ,(cadr parms)
+         (withs ,(cddr parms) ,@body))))
+
+(mac bind (var expr . body)
+  `(dyn ,var ,expr (do ,@body)))
+
+(mac atomic body
+  `(bind lock t ,@body))
+
+(def tail (f xs)
+  (if (no xs) nil
+      (f xs)  xs
+              (tail f (cdr xs))))
+
+(set dock rev:cdr:rev)
+
+(def lastcdr (xs)
+  (if (no (cdr xs))
+      xs
+      (lastcdr (cdr xs))))
+
+(set last car:lastcdr)
+
+(def newq ()
+  (list nil))
+
+(def enq (x q)
+  (atomic (xar q (snoc (car q) x)))
+  q)
+
+(def deq (q)
+  (atomic (do1 (car (car q))
+               (xar q (cdr (car q))))))
+
 ; we are here currently, implementing things
 
 (def err args)
