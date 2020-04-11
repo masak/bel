@@ -30,6 +30,7 @@ use Language::Bel::Primitives qw(
     prim_car
     prim_cdr
     prim_type
+    prim_xdr
     PRIM_FN
 );
 use Language::Bel::Reader qw(
@@ -56,11 +57,11 @@ Language::Bel - An interpreter for Paul Graham's language Bel
 
 =head1 VERSION
 
-Version 0.27
+Version 0.28
 
 =cut
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 =head1 SYNOPSIS
 
@@ -214,6 +215,21 @@ my %forms = (
         }
     },
 
+    # (form where ((e (o new)) a s r m)
+    #   (mev (cons (list e a)
+    #              (list (list smark 'loc new) nil)
+    #              s)
+    #        r
+    #        m))
+    where => sub {
+        my ($interpreter, $e_new, $a) = @_;
+        my $e = prim_car($e_new);
+        my $new = prim_car(prim_cdr($e_new));
+
+        push @{$interpreter->{s}}, [make_smark_of_type("loc", $new), SYMBOL_NIL];
+        push @{$interpreter->{s}}, [$e, $a];
+    },
+
     # (form dyn ((v e1 e2) a s r m)
     #   (if (variable v)
     #       (mev (cons (list e1 a)
@@ -325,6 +341,12 @@ sub ev {
     elsif (is_smark_of_type($e, "bind")) {
         # do nothing; already popped it off the stack
     }
+    elsif (is_smark_of_type($e, "loc")) {
+        die "'unfindable\n";
+    }
+    elsif (is_smark($e)) {
+        die "Unknown smark";
+    }
     # XXX: skipping `loc`, `prot` for now
     elsif (!proper($e)) {
         die "'malformed\n";
@@ -420,9 +442,25 @@ sub proper {
 sub vref {
     my ($self, $v, $a) = @_;
 
-    # XXX: skipping `inwhere` case for now
-    my $it = $self->lookup($v, $a);
-    if (is_pair($it)) {
+    my $it;
+    if ($it = inwhere($self->{s})) {
+        my $car_inwhere = prim_car($it);
+        if (is_pair($it = $self->lookup($v, $a))
+            || !is_nil($car_inwhere) && ($it = $self->install_global($v))) {
+            pop @{$self->{s}};  # get rid of the (smark 'loc)
+            push @{$self->{r}}, make_pair(
+                $it,
+                make_pair(
+                    make_symbol("d"),
+                    SYMBOL_NIL,
+                ),
+            );
+        }
+        else {
+            die "'unbound\n";
+        }
+    }
+    elsif (is_pair($it = $self->lookup($v, $a))) {
         push @{$self->{r}}, pair_cdr($it);
     }
     else {
@@ -431,6 +469,34 @@ sub vref {
             : "<not a symbol>";
         die "('unboundb $name)\n";
     }
+}
+
+# (def inwhere (s)
+#   (let e (car (car s))
+#     (and (begins e (list smark 'loc))
+#          (cddr e))))
+sub inwhere {
+    my ($s_ref) = @_;
+
+    my $smark;
+    return @$s_ref
+        && is_smark_of_type($smark = $s_ref->[-1][0], "loc")
+        && make_pair($smark->value(), SYMBOL_NIL);
+}
+
+#                       (let cell (cons v nil)
+#                         (xdr g (cons cell (cdr g)))
+#                         cell)))
+sub install_global {
+    my ($self, $v) = @_;
+
+    my $cell = make_pair($v, SYMBOL_NIL);
+    prim_xdr($self->{g}, make_pair(
+        $cell,
+        prim_cdr($self->{g}),
+    ));
+
+    return $cell;
 }
 
 # (def get (k kvs (o f =))
@@ -665,23 +731,56 @@ sub applyf {
 sub applylit {
     my ($self, $f, $args, $a) = @_;
 
-    # XXX: skipping `inwhere`/`locfns` for now
-    my $tag = pair_car(pair_cdr($f));
-    my $tag_name = symbol_name($tag);
-    my $rest = pair_cdr(pair_cdr($f));
-    if ($tag_name eq "prim") {
-        $self->applyprim(pair_car($rest), $args);
+    my $it;
+    if (inwhere($self->{s}) && ($it = findlocfn($f))) {
+        pop @{$self->{s}};  # get rid of the (smark 'loc)
+        push @{$self->{r}}, make_pair(
+            prim_car($args),
+            make_pair(
+                $it,
+                SYMBOL_NIL,
+            ),
+        );
     }
-    elsif ($tag_name eq "clo") {
-        my $env = pair_car($rest);
-        my $parms = pair_car(pair_cdr($rest));
-        my $body = pair_car(pair_cdr(pair_cdr($rest)));
+    else {
+        my $tag = pair_car(pair_cdr($f));
+        my $tag_name = symbol_name($tag);
+        my $rest = pair_cdr(pair_cdr($f));
+        if ($tag_name eq "prim") {
+            $self->applyprim(pair_car($rest), $args);
+        }
+        elsif ($tag_name eq "clo") {
+            my $env = pair_car($rest);
+            my $parms = pair_car(pair_cdr($rest));
+            my $body = pair_car(pair_cdr(pair_cdr($rest)));
 
-        # XXX: skipping `okenv` and `okparms` checks for now
-        $self->applyclo($parms, $args, $env, $body);
+            # XXX: skipping `okenv` and `okparms` checks for now
+            $self->applyclo($parms, $args, $env, $body);
+        }
+        # XXX: skipping `mac` case for now
+        # XXX: skipping `cont` case for now
     }
-    # XXX: skipping `mac` case for now
-    # XXX: skipping `cont` case for now
+}
+
+# (loc (is car) (f args a s r m)
+#   (mev (cdr s) (cons (list (car args) 'a) r) m))
+#
+# (loc (is cdr) (f args a s r m)
+#   (mev (cdr s) (cons (list (car args) 'd) r) m))
+sub findlocfn {
+    my ($f) = @_;
+
+    if (is_pair($f)
+        && is_symbol_of_name(prim_car($f), "lit")
+        && is_symbol_of_name(prim_car(prim_cdr($f)), "prim")) {
+        my $caddr_f = prim_car(prim_cdr(prim_cdr($f)));
+        if (is_symbol_of_name($caddr_f, "car")) {
+            return make_symbol("a");
+        }
+        elsif (is_symbol_of_name($caddr_f, "cdr")) {
+            return make_symbol("d");
+        }
+    }
 }
 
 # (def applyprim (f args s r m)
