@@ -626,7 +626,16 @@ sub evcall {
                     die symbol_name(prim_car($args)), "\n";
                 }
                 elsif (is_fastfunc($op)) {
-                    my $e = $op->apply($self->{call}, @args);
+                    my $e;
+                    if (inwhere($self->{s}) && $op->handles_where()) {
+                        $e = $op->where_apply($self->{call}, @args);
+                        if (!is_nil($e)) {
+                            pop @{$self->{s}};  # get rid of the (smark 'loc)
+                        }
+                    }
+                    else {
+                        $e = $op->apply($self->{call}, @args);
+                    }
                     push @{$self->{r}}, $e;
                 }
                 else {

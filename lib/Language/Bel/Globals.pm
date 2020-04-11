@@ -92,7 +92,7 @@ $globals{"some"} =
     make_pair(make_pair(make_symbol("some"), make_pair(make_symbol("f"),
     make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("xs"),
     SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL)))))), SYMBOL_NIL))))),
-    FASTFUNCS->{'some'});
+    FASTFUNCS->{'some'}, FASTFUNCS->{'where__some'});
 
 $globals{"reduce"} =
     make_fastfunc(make_pair(make_symbol("lit"),
@@ -502,7 +502,7 @@ $globals{"mem"} =
     make_pair(make_pair(make_symbol("f"), make_pair(make_symbol("_"),
     make_pair(make_symbol("x"), SYMBOL_NIL))), SYMBOL_NIL))),
     make_pair(make_symbol("ys"), SYMBOL_NIL))), SYMBOL_NIL))))),
-    FASTFUNCS->{'mem'});
+    FASTFUNCS->{'mem'}, FASTFUNCS->{'where__mem'});
 
 $globals{"in"} =
     make_fastfunc(make_pair(make_symbol("lit"),
@@ -510,7 +510,7 @@ $globals{"in"} =
     make_pair(make_pair(make_symbol("x"), make_symbol("ys")),
     make_pair(make_pair(make_symbol("mem"), make_pair(make_symbol("x"),
     make_pair(make_symbol("ys"), SYMBOL_NIL))), SYMBOL_NIL))))),
-    FASTFUNCS->{'in'});
+    FASTFUNCS->{'in'}, FASTFUNCS->{'where__in'});
 
 $globals{"cadr"} =
     make_fastfunc(make_pair(make_symbol("lit"),
@@ -518,7 +518,8 @@ $globals{"cadr"} =
     make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
     make_pair(make_pair(make_symbol("car"),
     make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("x"),
-    SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL))))), FASTFUNCS->{'cadr'});
+    SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL))))), FASTFUNCS->{'cadr'},
+    FASTFUNCS->{'where__cadr'});
 
 $globals{"cddr"} =
     make_fastfunc(make_pair(make_symbol("lit"),
@@ -526,7 +527,8 @@ $globals{"cddr"} =
     make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
     make_pair(make_pair(make_symbol("cdr"),
     make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("x"),
-    SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL))))), FASTFUNCS->{'cddr'});
+    SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL))))), FASTFUNCS->{'cddr'},
+    FASTFUNCS->{'where__cddr'});
 
 $globals{"caddr"} =
     make_fastfunc(make_pair(make_symbol("lit"),
@@ -534,7 +536,8 @@ $globals{"caddr"} =
     make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
     make_pair(make_pair(make_symbol("car"),
     make_pair(make_pair(make_symbol("cddr"), make_pair(make_symbol("x"),
-    SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL))))), FASTFUNCS->{'caddr'});
+    SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL))))), FASTFUNCS->{'caddr'},
+    FASTFUNCS->{'where__caddr'});
 
 $globals{"case"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("mac"),
@@ -639,7 +642,8 @@ $globals{"find"} =
     make_pair(make_pair(make_symbol("some"), make_pair(make_symbol("f"),
     make_pair(make_symbol("xs"), SYMBOL_NIL))),
     make_pair(make_pair(make_symbol("car"), make_pair(make_symbol("it"),
-    SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL))))), FASTFUNCS->{'find'});
+    SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL))))), FASTFUNCS->{'find'},
+    FASTFUNCS->{'where__find'});
 
 $globals{"begins"} =
     make_fastfunc(make_pair(make_symbol("lit"),
@@ -767,7 +771,7 @@ $globals{"get"} =
     make_pair(make_pair(make_symbol("car"), make_pair(make_symbol("_"),
     SYMBOL_NIL)), make_pair(make_symbol("k"), SYMBOL_NIL))), SYMBOL_NIL))),
     make_pair(make_symbol("kvs"), SYMBOL_NIL))), SYMBOL_NIL))))),
-    FASTFUNCS->{'get'});
+    FASTFUNCS->{'get'}, FASTFUNCS->{'where__get'});
 
 $globals{"put"} =
     make_fastfunc(make_pair(make_symbol("lit"),
@@ -831,7 +835,8 @@ $globals{"idfn"} =
     make_fastfunc(make_pair(make_symbol("lit"),
     make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
     make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
-    make_pair(make_symbol("x"), SYMBOL_NIL))))), FASTFUNCS->{'idfn'});
+    make_pair(make_symbol("x"), SYMBOL_NIL))))), FASTFUNCS->{'idfn'},
+    FASTFUNCS->{'where__idfn'});
 
 $globals{"is"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),

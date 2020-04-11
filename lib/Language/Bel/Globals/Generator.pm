@@ -260,7 +260,9 @@ sub print_global {
     my ($name, $value) = @_;
 
     my $serialized = serialize($value);
-    my $maybe_ff_d = FASTFUNCS->{$name}
+    my $maybe_ff_d = FASTFUNCS->{$name} && FASTFUNCS->{"where__$name"}
+        ? "make_fastfunc($serialized, FASTFUNCS->{'$name'}, FASTFUNCS->{'where__$name'})"
+        : FASTFUNCS->{$name}
         ? "make_fastfunc($serialized, FASTFUNCS->{'$name'})"
         : $serialized;
     my $formatted = break_lines($maybe_ff_d);

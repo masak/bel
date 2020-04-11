@@ -11,6 +11,7 @@ use Language::Bel::Types qw(
     is_symbol
     is_symbol_of_name
     make_pair
+    make_symbol
 );
 use Language::Bel::Primitives qw(
     _id
@@ -19,6 +20,8 @@ use Language::Bel::Primitives qw(
     prim_id
 );
 use Language::Bel::Symbols::Common qw(
+    SYMBOL_A
+    SYMBOL_D
     SYMBOL_NIL
     SYMBOL_T
 );
@@ -59,6 +62,29 @@ my %FASTFUNCS = (
             my $p = $call->($f, prim_car($xs));
             if (!is_nil($p)) {
                 return $xs;
+            }
+            $xs = prim_cdr($xs);
+        }
+
+        return SYMBOL_NIL;
+    },
+
+    "where__some" => sub {
+        my ($call, $f, $xs) = @_;
+
+        while (!is_nil($xs)) {
+            my $p = $call->($f, prim_car($xs));
+            if (!is_nil($p)) {
+                return make_pair(
+                    make_pair(
+                        make_symbol("xs"),
+                        $xs,
+                    ),
+                    make_pair(
+                        SYMBOL_D,
+                        SYMBOL_NIL,
+                    ),
+                );
             }
             $xs = prim_cdr($xs);
         }
@@ -312,6 +338,72 @@ my %FASTFUNCS = (
         return SYMBOL_NIL;
     },
 
+    "where__mem" => sub {
+        my ($call, $x, $ys, $f) = @_;
+
+        if (defined($f)) {
+            while (!is_nil($ys)) {
+                my $p = $call->($f, prim_car($ys), $x);
+                if (!is_nil($p)) {
+                    return make_pair(
+                        make_pair(
+                            make_symbol("xs"),
+                            $ys,
+                        ),
+                        make_pair(
+                            SYMBOL_D,
+                            SYMBOL_NIL,
+                        ),
+                    );
+                }
+                $ys = prim_cdr($ys);
+            }
+        }
+        else {
+            ELEMENT:
+            while (!is_nil($ys)) {
+                my @stack = [prim_car($ys), $x];
+                while (@stack) {
+                    my @values = @{pop(@stack)};
+                    next unless @values;
+                    my $some_atom = "";
+                    for my $value (@values) {
+                        if (!is_pair($value)) {
+                            $some_atom = 1;
+                            last;
+                        }
+                    }
+                    if ($some_atom) {
+                        my $car_values = $values[0];
+                        for my $value (@values) {
+                            if (!_id($value, $car_values)) {
+                                $ys = prim_cdr($ys);
+                                next ELEMENT;
+                            }
+                        }
+                    }
+                    else {
+                        push @stack, [map { prim_cdr($_) } @values];
+                        push @stack, [map { prim_car($_) } @values];
+                    }
+                }
+
+                return make_pair(
+                    make_pair(
+                        make_symbol("xs"),
+                        $ys,
+                    ),
+                    make_pair(
+                        SYMBOL_D,
+                        SYMBOL_NIL,
+                    ),
+                );
+            }
+        }
+
+        return SYMBOL_NIL;
+    },
+
     "in" => sub {
         my ($call, @args) = @_;
 
@@ -354,10 +446,69 @@ my %FASTFUNCS = (
         return $ys;
     },
 
+    "where__in" => sub {
+        my ($call, @args) = @_;
+
+        my $x = @args ? shift(@args) : SYMBOL_NIL;
+
+        ARG:
+        while (@args) {
+            my @stack = [$args[0], $x];
+            while (@stack) {
+                my @values = @{pop(@stack)};
+                next unless @values;
+                my $some_atom = "";
+                for my $value (@values) {
+                    if (!is_pair($value)) {
+                        $some_atom = 1;
+                        last;
+                    }
+                }
+                if ($some_atom) {
+                    my $car_values = $values[0];
+                    for my $value (@values) {
+                        if (!_id($value, $car_values)) {
+                            shift(@args);
+                            next ARG;
+                        }
+                    }
+                }
+                else {
+                    push @stack, [map { prim_cdr($_) } @values];
+                    push @stack, [map { prim_car($_) } @values];
+                }
+            }
+            last ARG;
+        }
+
+        my $ys = SYMBOL_NIL;
+        while (@args) {
+            $ys = make_pair(pop(@args), $ys);
+        }
+        return is_nil($ys) ? $ys : (
+            make_pair(
+                make_pair(make_symbol("xs"), $ys),
+                make_pair(SYMBOL_D, SYMBOL_NIL),
+            )
+        );
+    },
+
     "cadr" => sub {
         my ($call, $x) = @_;
 
         return prim_car(prim_cdr($x));
+    },
+
+    "where__cadr" => sub {
+        my ($call, $x) = @_;
+
+        return make_pair(
+            prim_cdr($x),
+            make_pair(
+                SYMBOL_A,
+                SYMBOL_NIL,
+            ),
+        );
     },
 
     "cddr" => sub {
@@ -366,10 +517,34 @@ my %FASTFUNCS = (
         return prim_cdr(prim_cdr($x));
     },
 
+    "where__cddr" => sub {
+        my ($call, $x) = @_;
+
+        return make_pair(
+            prim_cdr($x),
+            make_pair(
+                SYMBOL_D,
+                SYMBOL_NIL,
+            ),
+        );
+    },
+
     "caddr" => sub {
         my ($call, $x) = @_;
 
         return prim_car(prim_cdr(prim_cdr($x)));
+    },
+
+    "where__caddr" => sub {
+        my ($call, $x) = @_;
+
+        return make_pair(
+            prim_cdr(prim_cdr($x)),
+            make_pair(
+                SYMBOL_A,
+                SYMBOL_NIL,
+            ),
+        );
     },
 
     "find" => sub {
@@ -379,6 +554,25 @@ my %FASTFUNCS = (
             my $value = prim_car($xs);
             if (!is_nil($call->($f, $value))) {
                 return $value;
+            }
+            $xs = prim_cdr($xs);
+        }
+        return SYMBOL_NIL;
+    },
+
+    "where__find" => sub {
+        my ($call, $f, $xs) = @_;
+
+        while (!is_nil($xs)) {
+            my $value = prim_car($xs);
+            if (!is_nil($call->($f, $value))) {
+                return make_pair(
+                    $xs,
+                    make_pair(
+                        SYMBOL_A,
+                        SYMBOL_NIL,
+                    ),
+                );
             }
             $xs = prim_cdr($xs);
         }
@@ -614,6 +808,55 @@ my %FASTFUNCS = (
         return SYMBOL_NIL;
     },
 
+    "where__get" => sub {
+        my ($call, $k, $kvs, $f) = @_;
+
+        if (defined($f)) {
+            while (!is_nil($kvs)) {
+                my $kv = prim_car($kvs);
+                if (!is_nil($call->($f, prim_car($kv), $k))) {
+                    return make_pair(
+                        $kvs,
+                        make_pair(
+                            SYMBOL_A,
+                            SYMBOL_NIL,
+                        ),
+                    );
+                }
+                $kvs = prim_cdr($kvs);
+            }
+        }
+        else {
+            ELEM:
+            while (!is_nil($kvs)) {
+                my $kv = prim_car($kvs);
+                my @stack = [prim_car($kv), $k];
+                while (@stack) {
+                    my ($v0, $v1) = @{pop(@stack)};
+                    if (!is_pair($v0) || !is_pair($v1)) {
+                        if (!_id($v0, $v1)) {
+                            $kvs = prim_cdr($kvs);
+                            next ELEM;
+                        }
+                    }
+                    else {
+                        push @stack, [prim_cdr($v0), prim_cdr($v1)];
+                        push @stack, [prim_car($v0), prim_car($v1)];
+                    }
+                }
+                return make_pair(
+                    $kvs,
+                    make_pair(
+                        SYMBOL_A,
+                        SYMBOL_NIL,
+                    ),
+                );
+            }
+        }
+
+        return SYMBOL_NIL;
+    },
+
     "put" => sub {
         my ($call, $k, $v, $kvs, $f) = @_;
 
@@ -715,6 +958,21 @@ my %FASTFUNCS = (
         my ($call, $x) = @_;
 
         return $x;
+    },
+
+    "where__idfn" => sub {
+        my ($call, $x) = @_;
+
+        return make_pair(
+            make_pair(
+                make_symbol("x"),
+                $x,
+            ),
+            make_pair(
+                SYMBOL_D,
+                SYMBOL_NIL,
+            ),
+        );
     },
 
     "pairwise" => sub {

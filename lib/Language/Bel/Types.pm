@@ -66,9 +66,9 @@ sub make_char {
 }
 
 sub make_fastfunc {
-    my ($pair, $fn) = @_;
+    my ($pair, $fn, $where_fn) = @_;
 
-    return Language::Bel::Type::Pair::FastFunc->new($pair, $fn);
+    return Language::Bel::Type::Pair::FastFunc->new($pair, $fn, $where_fn);
 }
 
 sub make_pair {

@@ -3,6 +3,12 @@ package Language::Bel::Symbols::Common;
 use Language::Bel::Types qw(make_symbol);
 use Exporter 'import';
 
+my $symbol_a = make_symbol("a");
+
+sub SYMBOL_A {
+    return $symbol_a;
+}
+
 my $symbol_bquote = make_symbol("bquote");
 
 sub SYMBOL_BQUOTE {
@@ -25,6 +31,12 @@ my $symbol_comma_at = make_symbol("comma-at");
 
 sub SYMBOL_COMMA_AT {
     return $symbol_comma_at;
+}
+
+my $symbol_d = make_symbol("d");
+
+sub SYMBOL_D {
+    return $symbol_d;
 }
 
 my $symbol_nil = make_symbol("nil");
@@ -58,10 +70,12 @@ sub SYMBOL_T {
 }
 
 our @EXPORT_OK = qw(
+    SYMBOL_A
     SYMBOL_BQUOTE
     SYMBOL_CHAR
     SYMBOL_COMMA
     SYMBOL_COMMA_AT
+    SYMBOL_D
     SYMBOL_NIL 
     SYMBOL_PAIR
     SYMBOL_QUOTE
