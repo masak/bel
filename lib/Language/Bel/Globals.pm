@@ -1260,10 +1260,10 @@ $globals{"i+"} =
     SYMBOL_NIL))), SYMBOL_NIL))))), FASTFUNCS->{'i+'});
 
 $globals{"i-"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"),
-    make_pair(make_symbol("y"), SYMBOL_NIL)),
-    make_pair(make_pair(make_symbol("if"),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("x"), make_pair(make_symbol("y"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("if"),
     make_pair(make_pair(make_symbol("no"), make_pair(make_symbol("x"),
     SYMBOL_NIL)), make_pair(make_pair(make_symbol("list"),
     make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("-"),
@@ -1276,7 +1276,7 @@ $globals{"i-"} =
     make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("x"),
     SYMBOL_NIL)), make_pair(make_pair(make_symbol("cdr"),
     make_pair(make_symbol("y"), SYMBOL_NIL)), SYMBOL_NIL))),
-    SYMBOL_NIL)))))), SYMBOL_NIL)))));
+    SYMBOL_NIL)))))), SYMBOL_NIL))))), FASTFUNCS->{'i-'});
 
 $globals{"i*"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),

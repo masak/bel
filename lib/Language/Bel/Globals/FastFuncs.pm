@@ -1163,6 +1163,33 @@ my %FASTFUNCS = (
 
         return $result;
     },
+
+    "i-" => sub {
+        my ($call, $x, $y) = @_;
+
+        while (!is_nil($x)) {
+            if (is_nil($y)) {
+                return make_pair(
+                    make_symbol("+"),
+                    make_pair(
+                        $x,
+                        SYMBOL_NIL,
+                    ),
+                );
+            }
+
+            $x = prim_cdr($x);
+            $y = prim_cdr($y);
+        }
+
+        return make_pair(
+            make_symbol("-"),
+            make_pair(
+                $y,
+                SYMBOL_NIL,
+            ),
+        );
+    },
 );
 
 sub FASTFUNCS {
