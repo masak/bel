@@ -586,6 +586,16 @@ __DATA__
                               ((case loc a xar d xdr) cell ,v))))))
              (hug args))))
 
+(mac zap (op place . args)
+  (letu (vo vc vl va)
+    `(atomic (with (,vo       ,op
+                    (,vc ,vl) (where ,place)
+                    ,va       (list ,@args))
+               (case ,vl
+                 a (xar ,vc (apply ,vo (car ,vc) ,va))
+                 d (xdr ,vc (apply ,vo (cdr ,vc) ,va))
+                   (err 'bad-place))))))
+
 ; we are here currently, implementing things
 
 (def err args)
