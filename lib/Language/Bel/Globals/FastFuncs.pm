@@ -1190,6 +1190,26 @@ my %FASTFUNCS = (
             ),
         );
     },
+
+    "i*" => sub {
+        my ($call, @args) = @_;
+
+        my $product = 1;
+        for my $arg (@args) {
+            my $factor = 0;
+            while (!is_nil($arg)) {
+                $factor += 1;
+                $arg = prim_cdr($arg);
+            }
+            $product *= $factor;
+        }
+
+        my $result = SYMBOL_NIL;
+        for (1..$product) {
+            $result = make_pair(SYMBOL_T, $result);
+        }
+        return $result;
+    },
 );
 
 sub FASTFUNCS {

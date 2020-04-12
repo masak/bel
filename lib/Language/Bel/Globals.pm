@@ -1279,16 +1279,16 @@ $globals{"i-"} =
     SYMBOL_NIL)))))), SYMBOL_NIL))))), FASTFUNCS->{'i-'});
 
 $globals{"i*"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_symbol("args"),
-    make_pair(make_pair(make_symbol("foldr"),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_symbol("args"), make_pair(make_pair(make_symbol("foldr"),
     make_pair(make_pair(make_symbol("fn"),
     make_pair(make_pair(make_symbol("x"), make_pair(make_symbol("y"),
     SYMBOL_NIL)), make_pair(make_pair(make_symbol("fuse"),
     make_pair(make_pair(make_symbol("con"), make_pair(make_symbol("x"),
     SYMBOL_NIL)), make_pair(make_symbol("y"), SYMBOL_NIL))), SYMBOL_NIL))),
     make_pair(make_symbol("i1"), make_pair(make_symbol("args"),
-    SYMBOL_NIL)))), SYMBOL_NIL)))));
+    SYMBOL_NIL)))), SYMBOL_NIL))))), FASTFUNCS->{'i*'});
 
 $globals{"i/"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
