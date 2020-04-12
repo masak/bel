@@ -43,7 +43,7 @@ use Language::Bel::Globals::Source;
 use Language::Bel::Globals::FastFuncs qw(
     FASTFUNCS
 );
-use Language::Bel::Interpreter;
+use Language::Bel;
 
 use Exporter 'import';
 
