@@ -1210,6 +1210,45 @@ my %FASTFUNCS = (
         }
         return $result;
     },
+
+    "i/" => sub {
+        my ($call, $x, $y, $q) = @_;
+
+        if (!defined($q)) {
+            $q = SYMBOL_NIL;
+        }
+
+        my $xn = 0;
+        while (!is_nil($x)) {
+            $xn += 1;
+            $x = prim_cdr($x);
+        }
+
+        my $yn = 0;
+        while (!is_nil($y)) {
+            $yn += 1;
+            $y = prim_cdr($y);
+        }
+
+        my $n = int($xn / $yn);
+        for (1..$n) {
+            $q = make_pair(SYMBOL_T, $q);
+        }
+
+        my $m = $xn % $yn;
+        my $remainder = SYMBOL_NIL;
+        for (1..$m) {
+            $remainder = make_pair(SYMBOL_T, $remainder);
+        }
+
+        return make_pair(
+            $q,
+            make_pair(
+                $remainder,
+                SYMBOL_NIL,
+            ),
+        );
+    },
 );
 
 sub FASTFUNCS {
