@@ -1244,13 +1244,13 @@ $globals{"i16"} =
     make_pair(SYMBOL_T, SYMBOL_NIL))))))))))))))));
 
 $globals{"i<"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("xs"),
-    make_pair(make_symbol("ys"), SYMBOL_NIL)),
-    make_pair(make_pair(make_symbol("cadr"),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("xs"), make_pair(make_symbol("ys"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("cadr"),
     make_pair(make_pair(make_symbol("snap"), make_pair(make_symbol("xs"),
     make_pair(make_symbol("ys"), SYMBOL_NIL))), SYMBOL_NIL)),
-    SYMBOL_NIL)))));
+    SYMBOL_NIL))))), FASTFUNCS->{'i<'});
 
 $globals{"i+"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),

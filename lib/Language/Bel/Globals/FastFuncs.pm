@@ -1133,6 +1133,16 @@ my %FASTFUNCS = (
         );
     },
 
+    "i<" => sub {
+        my ($call, $xs, $ys) = @_;
+
+        while (!is_nil($xs)) {
+            $xs = prim_cdr($xs);
+            $ys = prim_cdr($ys);
+        }
+
+        return $ys;
+    },
 );
 
 sub FASTFUNCS {
