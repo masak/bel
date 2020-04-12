@@ -1143,6 +1143,26 @@ my %FASTFUNCS = (
 
         return $ys;
     },
+
+    "i+" => sub {
+        my ($call, @args) = @_;
+
+        my $result = @args ? pop(@args) : SYMBOL_NIL;
+        while (@args) {
+            my $list = pop(@args);
+            my @values;
+            while (!is_nil($list)) {
+                push @values, prim_car($list);
+                $list = prim_cdr($list);
+            }
+            while (@values) {
+                my $value = pop(@values);
+                $result = make_pair($value, $result);
+            }
+        }
+
+        return $result;
+    },
 );
 
 sub FASTFUNCS {
