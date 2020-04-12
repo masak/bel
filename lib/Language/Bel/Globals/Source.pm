@@ -72,11 +72,6 @@ __DATA__
 (mac macro args
   `(list 'lit 'mac (fn ,@args)))
 
-(mac set (v e)
-  `(do
-     (xdr globe (cons (cons ',v ,e) (cdr globe)))
-     t))
-
 (mac def (n . rest)
   `(set ,n (fn ,@rest)))
 
@@ -581,6 +576,15 @@ __DATA__
 (def deq (q)
   (atomic (do1 (car (car q))
                (xar q (cdr (car q))))))
+
+(mac set args
+  (cons 'do
+        (map (fn ((p (o e t)))
+               (letu v
+                 `(atomic (let ,v ,e
+                            (let (cell loc) (where ,p t)
+                              ((case loc a xar d xdr) cell ,v))))))
+             (hug args))))
 
 ; we are here currently, implementing things
 
