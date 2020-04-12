@@ -2815,6 +2815,48 @@ $globals{"zap"} =
     SYMBOL_NIL))), make_pair(SYMBOL_NIL, SYMBOL_NIL))), SYMBOL_NIL))),
     SYMBOL_NIL))), SYMBOL_NIL))))), SYMBOL_NIL)));
 
+$globals{"++"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("mac"),
+    make_pair(make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("place"),
+    make_pair(make_pair(make_symbol("o"), make_pair(make_symbol("n"),
+    make_pair(make_pair(make_symbol("lit"), make_pair(make_symbol("num"),
+    make_pair(make_pair(make_symbol("+"), make_pair(make_pair(SYMBOL_T,
+    SYMBOL_NIL), make_pair(make_pair(SYMBOL_T, SYMBOL_NIL), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("+"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(SYMBOL_T, SYMBOL_NIL), SYMBOL_NIL))),
+    SYMBOL_NIL)))), SYMBOL_NIL))), SYMBOL_NIL)),
+    make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("zap"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("+"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_symbol("place"), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_symbol("n"), make_pair(SYMBOL_NIL, SYMBOL_NIL))),
+    SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))))),
+    SYMBOL_NIL)));
+
+$globals{"--"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("mac"),
+    make_pair(make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("place"),
+    make_pair(make_pair(make_symbol("o"), make_pair(make_symbol("n"),
+    make_pair(make_pair(make_symbol("lit"), make_pair(make_symbol("num"),
+    make_pair(make_pair(make_symbol("+"), make_pair(make_pair(SYMBOL_T,
+    SYMBOL_NIL), make_pair(make_pair(SYMBOL_T, SYMBOL_NIL), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("+"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(SYMBOL_T, SYMBOL_NIL), SYMBOL_NIL))),
+    SYMBOL_NIL)))), SYMBOL_NIL))), SYMBOL_NIL)),
+    make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("zap"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("-"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_symbol("place"), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_symbol("n"), make_pair(SYMBOL_NIL, SYMBOL_NIL))),
+    SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))))),
+    SYMBOL_NIL)));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"),

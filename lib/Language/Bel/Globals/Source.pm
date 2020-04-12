@@ -596,6 +596,12 @@ __DATA__
                  d (xdr ,vc (apply ,vo (cdr ,vc) ,va))
                    (err 'bad-place))))))
 
+(mac ++ (place (o n 1))
+  `(zap + ,place ,n))
+
+(mac -- (place (o n 1))
+  `(zap - ,place ,n))
+
 ; we are here currently, implementing things
 
 (def err args)
