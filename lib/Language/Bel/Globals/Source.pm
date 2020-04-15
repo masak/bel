@@ -602,6 +602,11 @@ __DATA__
 (mac -- (place (o n 1))
   `(zap - ,place ,n))
 
+(mac push (x place)
+  (letu v
+    `(let ,v ,x
+       (zap [cons ,v _] ,place))))
+
 ; we are here currently, implementing things
 
 (def err args)
