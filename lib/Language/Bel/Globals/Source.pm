@@ -607,6 +607,11 @@ __DATA__
     `(let ,v ,x
        (zap [cons ,v _] ,place))))
 
+(mac pull (x place . rest)
+  (letu v
+    `(let ,v ,x
+       (zap [rem ,v _ ,@rest] ,place))))
+
 ; we are here currently, implementing things
 
 (mac pop (place)
