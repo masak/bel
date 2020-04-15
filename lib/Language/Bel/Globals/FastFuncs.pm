@@ -1249,6 +1249,30 @@ my %FASTFUNCS = (
             ),
         );
     },
+
+    "i^" => sub {
+        my ($call, $x, $y) = @_;
+
+        my $xn = 0;
+        while (!is_nil($x)) {
+            $xn += 1;
+            $x = prim_cdr($x);
+        }
+
+        my $yn = 0;
+        while (!is_nil($y)) {
+            $yn += 1;
+            $y = prim_cdr($y);
+        }
+
+        my $n = $xn ** $yn;
+
+        my $result = SYMBOL_NIL;
+        for (1..$n) {
+            $result = make_pair(SYMBOL_T, $result);
+        }
+        return $result;
+    },
 );
 
 sub FASTFUNCS {
