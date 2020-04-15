@@ -2888,6 +2888,38 @@ $globals{"push"} =
     SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))),
     SYMBOL_NIL))))), SYMBOL_NIL)));
 
+$globals{"pop"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("mac"),
+    make_pair(make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("place"),
+    SYMBOL_NIL), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("let"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(SYMBOL_QUOTE,
+    make_pair(make_pair(make_symbol("cell"), make_pair(make_symbol("loc"),
+    SYMBOL_NIL)), SYMBOL_NIL)), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("where"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_symbol("place"), make_pair(SYMBOL_NIL, SYMBOL_NIL))),
+    SYMBOL_NIL))), make_pair(make_pair(SYMBOL_QUOTE,
+    make_pair(make_pair(make_pair(make_symbol("let"),
+    make_pair(make_symbol("xs"),
+    make_pair(make_pair(make_pair(make_symbol("case"),
+    make_pair(make_symbol("loc"), make_pair(make_symbol("a"),
+    make_pair(make_symbol("car"), make_pair(make_symbol("d"),
+    make_pair(make_symbol("cdr"), SYMBOL_NIL)))))),
+    make_pair(make_symbol("cell"), SYMBOL_NIL)),
+    make_pair(make_pair(make_pair(make_symbol("case"),
+    make_pair(make_symbol("loc"), make_pair(make_symbol("a"),
+    make_pair(make_symbol("xar"), make_pair(make_symbol("d"),
+    make_pair(make_symbol("xdr"), SYMBOL_NIL)))))),
+    make_pair(make_symbol("cell"), make_pair(make_pair(make_symbol("cdr"),
+    make_pair(make_symbol("xs"), SYMBOL_NIL)), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("car"), make_pair(make_symbol("xs"),
+    SYMBOL_NIL)), SYMBOL_NIL))))), SYMBOL_NIL), SYMBOL_NIL)), SYMBOL_NIL))),
+    SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))))), SYMBOL_NIL)));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"),

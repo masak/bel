@@ -609,6 +609,12 @@ __DATA__
 
 ; we are here currently, implementing things
 
+(mac pop (place)
+  `(let (cell loc) (where ,place)
+     (let xs ((case loc a car d cdr) cell)
+       ((case loc a xar d xdr) cell (cdr xs))
+       (car xs))))
+
 (def err args)
 
 (mac comma args
