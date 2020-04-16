@@ -72,11 +72,6 @@ __DATA__
 (mac macro args
   `(list 'lit 'mac (fn ,@args)))
 
-(mac set (v e)
-  `(do
-     (xdr globe (cons (cons ',v ,e) (cdr globe)))
-     t))
-
 (mac def (n . rest)
   `(set ,n (fn ,@rest)))
 
@@ -582,7 +577,48 @@ __DATA__
   (atomic (do1 (car (car q))
                (xar q (cdr (car q))))))
 
+(mac set args
+  (cons 'do
+        (map (fn ((p (o e t)))
+               (letu v
+                 `(atomic (let ,v ,e
+                            (let (cell loc) (where ,p t)
+                              ((case loc a xar d xdr) cell ,v))))))
+             (hug args))))
+
+(mac zap (op place . args)
+  (letu (vo vc vl va)
+    `(atomic (with (,vo       ,op
+                    (,vc ,vl) (where ,place)
+                    ,va       (list ,@args))
+               (case ,vl
+                 a (xar ,vc (apply ,vo (car ,vc) ,va))
+                 d (xdr ,vc (apply ,vo (cdr ,vc) ,va))
+                   (err 'bad-place))))))
+
+(mac ++ (place (o n 1))
+  `(zap + ,place ,n))
+
+(mac -- (place (o n 1))
+  `(zap - ,place ,n))
+
+(mac push (x place)
+  (letu v
+    `(let ,v ,x
+       (zap [cons ,v _] ,place))))
+
+(mac pull (x place . rest)
+  (letu v
+    `(let ,v ,x
+       (zap [rem ,v _ ,@rest] ,place))))
+
 ; we are here currently, implementing things
+
+(mac pop (place)
+  `(let (cell loc) (where ,place)
+     (let xs ((case loc a car d cdr) cell)
+       ((case loc a xar d xdr) cell (cdr xs))
+       (car xs))))
 
 (def err args)
 
