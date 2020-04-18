@@ -1133,6 +1133,207 @@ my %FASTFUNCS = (
         );
     },
 
+    "i<" => sub {
+        my ($call, $xs, $ys) = @_;
+
+        while (!is_nil($xs)) {
+            $xs = prim_cdr($xs);
+            $ys = prim_cdr($ys);
+        }
+
+        return $ys;
+    },
+
+    "i+" => sub {
+        my ($call, @args) = @_;
+
+        my $result = @args ? pop(@args) : SYMBOL_NIL;
+        while (@args) {
+            my $list = pop(@args);
+            my @values;
+            while (!is_nil($list)) {
+                push @values, prim_car($list);
+                $list = prim_cdr($list);
+            }
+            while (@values) {
+                my $value = pop(@values);
+                $result = make_pair($value, $result);
+            }
+        }
+
+        return $result;
+    },
+
+    "i-" => sub {
+        my ($call, $x, $y) = @_;
+
+        while (!is_nil($x)) {
+            if (is_nil($y)) {
+                return make_pair(
+                    make_symbol("+"),
+                    make_pair(
+                        $x,
+                        SYMBOL_NIL,
+                    ),
+                );
+            }
+
+            $x = prim_cdr($x);
+            $y = prim_cdr($y);
+        }
+
+        return make_pair(
+            make_symbol("-"),
+            make_pair(
+                $y,
+                SYMBOL_NIL,
+            ),
+        );
+    },
+
+    "i*" => sub {
+        my ($call, @args) = @_;
+
+        my $product = 1;
+        for my $arg (@args) {
+            my $factor = 0;
+            while (!is_nil($arg)) {
+                $factor += 1;
+                $arg = prim_cdr($arg);
+            }
+            $product *= $factor;
+        }
+
+        my $result = SYMBOL_NIL;
+        for (1..$product) {
+            $result = make_pair(SYMBOL_T, $result);
+        }
+        return $result;
+    },
+
+    "i/" => sub {
+        my ($call, $x, $y, $q) = @_;
+
+        if (!defined($q)) {
+            $q = SYMBOL_NIL;
+        }
+
+        my $xn = 0;
+        while (!is_nil($x)) {
+            $xn += 1;
+            $x = prim_cdr($x);
+        }
+
+        my $yn = 0;
+        while (!is_nil($y)) {
+            $yn += 1;
+            $y = prim_cdr($y);
+        }
+
+        my $n = int($xn / $yn);
+        for (1..$n) {
+            $q = make_pair(SYMBOL_T, $q);
+        }
+
+        my $m = $xn % $yn;
+        my $remainder = SYMBOL_NIL;
+        for (1..$m) {
+            $remainder = make_pair(SYMBOL_T, $remainder);
+        }
+
+        return make_pair(
+            $q,
+            make_pair(
+                $remainder,
+                SYMBOL_NIL,
+            ),
+        );
+    },
+
+    "i^" => sub {
+        my ($call, $x, $y) = @_;
+
+        my $xn = 0;
+        while (!is_nil($x)) {
+            $xn += 1;
+            $x = prim_cdr($x);
+        }
+
+        my $yn = 0;
+        while (!is_nil($y)) {
+            $yn += 1;
+            $y = prim_cdr($y);
+        }
+
+        my $n = $xn ** $yn;
+
+        my $result = SYMBOL_NIL;
+        for (1..$n) {
+            $result = make_pair(SYMBOL_T, $result);
+        }
+        return $result;
+    },
+
+    "r+" => sub {
+        my ($call, $x, $y) = @_;
+
+        my $xn = prim_car($x);
+        my $xd = prim_car(prim_cdr($x));
+
+        my $yn = prim_car($y);
+        my $yd = prim_car(prim_cdr($y));
+
+        my $xn_n = 0;
+        while (!is_nil($xn)) {
+            ++$xn_n;
+            $xn = prim_cdr($xn);
+        }
+
+        my $xd_n = 0;
+        while (!is_nil($xd)) {
+            ++$xd_n;
+            $xd = prim_cdr($xd);
+        }
+
+        my $yn_n = 0;
+        while (!is_nil($yn)) {
+            ++$yn_n;
+            $yn = prim_cdr($yn);
+        }
+
+        my $yd_n = 0;
+        while (!is_nil($yd)) {
+            ++$yd_n;
+            $yd = prim_cdr($yd);
+        }
+
+        my $n_n = $xn_n * $yd_n + $yn_n * $xd_n;
+        my $d_n = $xd_n * $yd_n;
+
+        my $n = SYMBOL_NIL;
+        for (1..$n_n) {
+            $n = make_pair(
+                SYMBOL_T,
+                $n,
+            );
+        }
+
+        my $d = SYMBOL_NIL;
+        for (1..$d_n) {
+            $d = make_pair(
+                SYMBOL_T,
+                $d,
+            );
+        }
+
+        return make_pair(
+            $n,
+            make_pair(
+                $d,
+                SYMBOL_NIL,
+            ),
+        );
+    },
 );
 
 sub FASTFUNCS {
