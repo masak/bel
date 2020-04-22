@@ -119,6 +119,7 @@ sub is_number {
         && $sr->($r = pair_car($x2))
         && is_pair($x3 = pair_cdr($x2))
         && $sr->($i = pair_car($x3))
+        && is_nil(pair_cdr($x3))
         && [$r, $i];
 }
 
