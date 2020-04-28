@@ -143,9 +143,9 @@ sub read_partial {
             } while ($pos < length($expr));
         }
         my $word = substr($expr, $start, $pos - $start);
-        my $ast = index($word, ":") != -1
-            ? wrap_in_compose(split /:/, $word)
-            : maybe_wrap_in_no($word);
+        my $ast = index($word, "|") != -1
+            ? parset($word)
+            : parseword($word);
         return { ast => $ast, pos => $pos };
     }
 }
@@ -196,6 +196,199 @@ sub _rdlist {
         $ast = make_pair($e, $ast);
     }
     return { ast => $ast, pos => $pos };
+}
+
+# (def parset (cs base)
+#   (if (cdr (keep (is \|) cs))
+#       (err 'multiple-bars)
+#       (let vt (tokens cs \|)
+#         (if (= (len vt) 2)
+#             (cons t (map [parseword _ base] vt))
+#             (err 'bad-tspec)))))
+sub parset {
+    my ($word) = @_;
+
+    if (($word =~ tr/|/|/) > 1) {
+        die "multiple-bars";
+    }
+    my @vt = split(/\|/, $word);
+    if (@vt != 2) {
+        die "bad-tspec";
+    }
+    return make_pair(
+        SYMBOL_T,
+        make_pair(
+            parseword($vt[0]),
+            make_pair(
+                parseword($vt[1]),
+                SYMBOL_NIL,
+            ),
+        ),
+    );
+}
+
+sub intrac {
+    my ($c) = @_;
+
+    return $c eq "." || $c eq "!";
+}
+
+sub contains_intrac {
+    my ($cs) = @_;
+
+    return index($cs, ".") != -1 || index($cs, "!") != -1;
+}
+
+# (def parseword (cs base)
+#   (or (parsenum cs base)
+#       (if (= cs ".")       (err 'unexpected-dot)
+#           (mem \| cs)      (parset cs base)
+#           (some intrac cs) (parseslist (runs intrac cs) base)
+#                            (parsecom cs base))))
+sub parseword {
+    my ($cs) = @_;
+
+    if (my $n = parsenum($cs)) {
+        return $n;
+    }
+    elsif ($cs eq ".") {
+        die "unexpected-dot";
+    }
+    elsif (index($cs, "|") != -1) {
+        return parset($cs);
+    }
+    elsif (contains_intrac($cs)) {
+        my @runs;
+        while ($cs) {
+            my $next = substr($cs, 0, 1);
+            $cs = substr($cs, 1);
+            while ($cs && intrac(substr($cs, 0, 1)) == intrac(substr($next, 0, 1))) {
+                $next .= substr($cs, 0, 1);
+                $cs = substr($cs, 1);
+            }
+            push @runs, $next;
+        }
+        return parseslist(\@runs);
+    }
+    else {
+        return parsecom($cs);
+    }
+}
+
+# (def parseslist (rs base)
+#   (if (intrac (car (last rs)))
+#       (err 'final-intrasymbol)
+#       (map (fn ((cs ds))
+#              (if (cdr cs)      (err 'double-intrasymbol)
+#                  (caris cs \!) (list 'quote (parsecom ds base))
+#                                (parsecom ds base)))
+#            (hug (if (intrac (car (car rs)))
+#                     (cons "." "upon" rs)
+#                     (cons "." rs))))))
+sub parseslist {
+    my ($runs_ref) = @_;
+
+    my @runs = @$runs_ref;
+    my $last_rs = $runs[-1];
+    if (intrac(substr($last_rs, 0, 1))) {
+        die "final-intrasymbol";
+    }
+    else {
+        my $first_rs = $runs[0];
+        if (intrac(substr($first_rs, 0, 1))) {
+            unshift @runs, "upon";
+        }
+        unshift @runs, ".";
+
+        my @result;
+        while (@runs >= 2) {
+            my $cs = shift @runs;
+            my $ds = shift @runs;
+            if (length($cs) > 1) {
+                die "double-intrasymbol";
+            }
+            elsif ($cs eq "!") {
+                push @result, make_pair(
+                    SYMBOL_QUOTE,
+                    make_pair(
+                        parsecom($ds),
+                        SYMBOL_NIL,
+                    ),
+                );
+            }
+            else {
+                push @result, parsecom($ds);
+            }
+        }
+
+        my $result = SYMBOL_NIL;
+        while (@result) {
+            $result = make_pair(
+                pop(@result),
+                $result,
+            );
+        }
+        return $result;
+    }
+}
+
+# (def parsecom (cs base)
+#   (if (mem \: cs)
+#       (cons 'compose (map [parseno _ base] (tokens cs \:)))
+#       (parseno cs base)))
+sub parsecom {
+    my ($cs) = @_;
+
+    if (index($cs, ":") != -1) {
+        my @tokens = split /:/, $cs;
+
+        my $tokens = SYMBOL_NIL;
+        while (@tokens) {
+            $tokens = make_pair(
+                parseno(pop(@tokens)),
+                $tokens,
+            );
+        }
+
+        return make_pair(
+            make_symbol("compose"),
+            $tokens,
+        );
+    }
+    else {
+        return parseno($cs);
+    }
+}
+
+# (def parseno (cs base)
+#   (if (caris cs \~)
+#       (if (cdr cs)
+#           (list 'compose 'no (parseno (cdr cs) base))
+#           'no)
+#       (or (parsenum cs base) (sym cs))))
+sub parseno {
+    my ($cs) = @_;
+
+    if (substr($cs, 0, 1) eq "~") {
+        if (length($cs) > 1) {
+            return make_pair(
+                make_symbol("compose"),
+                make_pair(
+                    make_symbol("no"),
+                    make_pair(
+                        parseno(substr($cs, 1)),
+                        SYMBOL_NIL,
+                    ),
+                ),
+            );
+        }
+        else {
+            return make_symbol("no");
+        }
+    }
+    else {
+        return parsenum($cs) || make_symbol($cs);
+    }
 }
 
 sub wrap_in_fn {

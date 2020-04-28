@@ -76,12 +76,9 @@ sub bel_todo {
     is_bel_output("(with (x 1 y 2) (+ x y))", "3");
     is_bel_output("(let ((x y) . z) '((a b) c) (list x y z))", "(a b (c))");
     is_bel_output("((fn (x) (cons x 'b)) 'a)", "(a . b)");
-    # TODO: `x|symbol` syntax not implemented
-    bel_todo("((fn (x|symbol) (cons x 'b)) 'a)", "(a . b)", "('unboundb x)");
-    # TODO: `x|symbol` syntax not implemented
-    bel_todo("((fn (x|int) (cons x 'b)) 'a)", "'mistype", "('unboundb x)");
-    # TODO: `x|symbol` syntax not implemented
-    bel_todo("((fn (f x|f) (cons x 'b)) symbol 'a)", "(a . b)", "('unboundb x)");
+    is_bel_output("((fn (x|symbol) (cons x 'b)) 'a)", "(a . b)");
+    is_bel_error("((fn (x|int) (cons x 'b)) 'a)", "'mistype");
+    is_bel_output("((fn (f x|f) (cons x 'b)) symbol 'a)", "(a . b)");
     is_bel_output("((macro (v) `(set ,v 7)) x)", "7");
     is_bel_output("x", "7");
     # TODO: `sym` not implemented
@@ -93,21 +90,19 @@ sub bel_todo {
     # TODO: `best` not implemented
     bel_todo("(best (of > len) '((a b) (a b c d) (a) (a b c)))", "(a b c d)", "('unboundb best)");
     # TODO: `!3` syntax not implemented
-    bel_todo("(!3 (part + 2))", "5", "('unboundb !3)");
+    bel_todo("(!3 (part + 2))", "5", "('unboundb part)");
     # TODO: `to` not implemented
     bel_todo(q[(to "testfile" (print 'hello))], "nil", "('unboundb to)");
     # TODO: `from` not implemented
     bel_todo(q[(from "testfile" (read))], "hello", "('unboundb from)");
     # TODO: `table` not implemented
     bel_todo("(set y (table))", "(lit tab)", "('unboundb table)");
-    # (this one unexpectedly succeeds, because `y!b` is taken to be a whole symbol
-    is_bel_output("(set y!a 1 y!b 2)", "2");
+    bel_todo("(set y!a 1 y!b 2)", "2", "('unboundb y)");
     # TODO: goes with the previous one
     bel_todo("(map y '(a b))", "(1 2)", "('unboundb y)");
     # TODO: goes with the previous one
     bel_todo("(map ++:y '(a b))", "(2 3)", "('unboundb y)");
-    # TODO: since `y!b` is read the wrong way, this still comes out as 2
-    bel_todo("y!b", "3");
+    bel_todo("y!b", "3", "('unboundb y)");
     # TODO: `array` not implemented
     bel_todo("(set z (array '(2 2) 0))", "(lit arr (lit arr 0 0) (lit arr 0 0))", "('unboundb array)");
     # TODO: goes with the previous one
