@@ -676,6 +676,9 @@ __DATA__
 (mac awhen args
   `(whenlet it ,@args))
 
+(mac each (var expr . body)
+  `(map (fn (,var) ,@body) ,expr))
+
 ; we are here currently, implementing things
 
 (def drop (n xs)    ; n|whole xs
