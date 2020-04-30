@@ -670,6 +670,9 @@ __DATA__
             start)
          (drop (- start 1) xs)))
 
+(mac whenlet (var expr . body)
+  `(iflet ,var ,expr (do ,@body)))
+
 ; we are here currently, implementing things
 
 (def drop (n xs)    ; n|whole xs
