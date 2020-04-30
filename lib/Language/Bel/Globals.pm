@@ -3376,6 +3376,14 @@ $globals{"each"} =
     make_pair(make_symbol("expr"), make_pair(SYMBOL_NIL, SYMBOL_NIL))),
     SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))))), SYMBOL_NIL)));
 
+$globals{"flip"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("f"), SYMBOL_NIL),
+    make_pair(make_pair(make_symbol("fn"), make_pair(make_symbol("args"),
+    make_pair(make_pair(make_symbol("apply"), make_pair(make_symbol("f"),
+    make_pair(make_pair(make_symbol("rev"), make_pair(make_symbol("args"),
+    SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL)))));
+
 $globals{"nth"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_pair(make_pair(SYMBOL_T,

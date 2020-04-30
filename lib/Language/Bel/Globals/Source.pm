@@ -679,6 +679,9 @@ __DATA__
 (mac each (var expr . body)
   `(map (fn (,var) ,@body) ,expr))
 
+(def flip (f)
+  (fn args (apply f (rev args))))
+
 ; we are here currently, implementing things
 
 (def drop (n xs)    ; n|whole xs
