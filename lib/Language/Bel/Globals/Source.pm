@@ -714,6 +714,12 @@ __DATA__
   (* (- (/ x y) (floor (/ x y)))
      y))
 
+(mac whilet (var expr . body)
+  (letu (vf vp)
+    `((rfn ,vf (,vp)
+        (whenlet ,var ,vp ,@body (,vf ,expr)))
+      ,expr)))
+
 ; we are here currently, implementing things
 
 (def drop (n xs)    ; n|whole xs
