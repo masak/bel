@@ -89,8 +89,7 @@ sub bel_todo {
     bel_todo("(apply or '(t nil))", "t", "'unapplyable");
     # TODO: `best` not implemented
     bel_todo("(best (of > len) '((a b) (a b c d) (a) (a b c)))", "(a b c d)", "('unboundb best)");
-    # TODO: `!3` syntax not implemented
-    bel_todo("(!3 (part + 2))", "5", "('unboundb part)");
+    is_bel_output("(!3 (part + 2))", "5");
     # TODO: `to` not implemented
     bel_todo(q[(to "testfile" (print 'hello))], "nil", "('unboundb to)");
     # TODO: `from` not implemented

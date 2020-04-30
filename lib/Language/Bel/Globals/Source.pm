@@ -682,6 +682,10 @@ __DATA__
 (def flip (f)
   (fn args (apply f (rev args))))
 
+(def part (f . args)
+  (fn rest
+    (apply f (append args rest))))
+
 ; we are here currently, implementing things
 
 (def drop (n xs)    ; n|whole xs
