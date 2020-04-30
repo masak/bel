@@ -720,6 +720,12 @@ __DATA__
         (whenlet ,var ,vp ,@body (,vf ,expr)))
       ,expr)))
 
+(mac loop (var init update test . body)
+  (letu v
+    `((rfn ,v (,var)
+        (when ,test ,@body (,v ,update)))
+      ,init)))
+
 ; we are here currently, implementing things
 
 (def drop (n xs)    ; n|whole xs

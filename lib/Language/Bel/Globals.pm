@@ -3700,6 +3700,37 @@ $globals{"whilet"} =
     make_pair(SYMBOL_NIL, SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))),
     SYMBOL_NIL))))), SYMBOL_NIL)));
 
+$globals{"loop"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("mac"),
+    make_pair(make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("var"),
+    make_pair(make_symbol("init"), make_pair(make_symbol("update"),
+    make_pair(make_symbol("test"), make_symbol("body"))))),
+    make_pair(make_pair(make_symbol("letu"), make_pair(make_symbol("v"),
+    make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("rfn"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_symbol("v"), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(make_symbol("cons"), make_pair(make_symbol("var"),
+    make_pair(SYMBOL_NIL, SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("when"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_symbol("test"),
+    make_pair(make_pair(make_symbol("append"),
+    make_pair(make_symbol("body"), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(make_symbol("cons"), make_pair(make_symbol("v"),
+    make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_symbol("update"), make_pair(SYMBOL_NIL, SYMBOL_NIL))),
+    SYMBOL_NIL))), make_pair(SYMBOL_NIL, SYMBOL_NIL))), SYMBOL_NIL))),
+    SYMBOL_NIL))), SYMBOL_NIL))), make_pair(SYMBOL_NIL, SYMBOL_NIL))),
+    SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("cons"), make_pair(make_symbol("init"),
+    make_pair(SYMBOL_NIL, SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))),
+    SYMBOL_NIL))))), SYMBOL_NIL)));
+
 $globals{"nth"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_pair(make_pair(SYMBOL_T,
