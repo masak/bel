@@ -699,6 +699,15 @@ __DATA__
 (def <= args
   (apply >= (rev args)))
 
+(def floor (x)              ; (x|real)
+  (let (s n d) (numr x)
+    (let (f m) (i/ n d)
+      (litnum (list s
+                    (i+ f (if (or (= s '+) (= m i0))
+                              i0
+                              i1))
+                    i1)))))
+
 ; we are here currently, implementing things
 
 (def drop (n xs)    ; n|whole xs
