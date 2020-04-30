@@ -3731,6 +3731,22 @@ $globals{"loop"} =
     make_pair(SYMBOL_NIL, SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))),
     SYMBOL_NIL))))), SYMBOL_NIL)));
 
+$globals{"while"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("mac"),
+    make_pair(make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("expr"),
+    make_symbol("body")), make_pair(make_pair(make_symbol("letu"),
+    make_pair(make_symbol("v"), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("loop"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_symbol("v"), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_symbol("expr"), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_symbol("expr"), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_symbol("v"), make_pair(make_pair(make_symbol("append"),
+    make_pair(make_symbol("body"), make_pair(SYMBOL_NIL, SYMBOL_NIL))),
+    SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))),
+    SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))))), SYMBOL_NIL)));
+
 $globals{"nth"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_pair(make_pair(SYMBOL_T,

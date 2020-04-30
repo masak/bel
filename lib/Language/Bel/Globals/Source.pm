@@ -726,6 +726,10 @@ __DATA__
         (when ,test ,@body (,v ,update)))
       ,init)))
 
+(mac while (expr . body)
+  (letu v
+    `(loop ,v ,expr ,expr ,v ,@body)))
+
 ; we are here currently, implementing things
 
 (def drop (n xs)    ; n|whole xs
