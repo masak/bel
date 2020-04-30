@@ -689,6 +689,10 @@ __DATA__
 (def trap (f . args)
   (flip (apply part (flip f) (rev args))))
 
+(def only (f)
+  (fn args
+    (if (car args) (apply f args))))
+
 ; we are here currently, implementing things
 
 (def drop (n xs)    ; n|whole xs
