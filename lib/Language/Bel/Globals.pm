@@ -3656,6 +3656,19 @@ $globals{"ceil"} =
     make_pair(make_symbol("args"), SYMBOL_NIL))), SYMBOL_NIL)),
     SYMBOL_NIL)))));
 
+$globals{"mod"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"),
+    make_pair(make_symbol("y"), SYMBOL_NIL)),
+    make_pair(make_pair(make_symbol("*"),
+    make_pair(make_pair(make_symbol("-"),
+    make_pair(make_pair(make_symbol("/"), make_pair(make_symbol("x"),
+    make_pair(make_symbol("y"), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("floor"),
+    make_pair(make_pair(make_symbol("/"), make_pair(make_symbol("x"),
+    make_pair(make_symbol("y"), SYMBOL_NIL))), SYMBOL_NIL)), SYMBOL_NIL))),
+    make_pair(make_symbol("y"), SYMBOL_NIL))), SYMBOL_NIL)))));
+
 $globals{"nth"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_pair(make_pair(SYMBOL_T,

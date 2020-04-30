@@ -710,6 +710,10 @@ __DATA__
 
 (set ceil -:floor:-)
 
+(def mod (x y)
+  (* (- (/ x y) (floor (/ x y)))
+     y))
+
 ; we are here currently, implementing things
 
 (def drop (n xs)    ; n|whole xs
