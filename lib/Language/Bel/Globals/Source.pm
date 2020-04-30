@@ -730,6 +730,10 @@ __DATA__
   (letu v
     `(loop ,v ,expr ,expr ,v ,@body)))
 
+(mac til (var expr test . body)
+  `(loop ,var ,expr ,expr (no ,test)
+     ,@body))
+
 ; we are here currently, implementing things
 
 (def drop (n xs)    ; n|whole xs
