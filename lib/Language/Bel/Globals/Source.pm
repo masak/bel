@@ -686,6 +686,9 @@ __DATA__
   (fn rest
     (apply f (append args rest))))
 
+(def trap (f . args)
+  (flip (apply part (flip f) (rev args))))
+
 ; we are here currently, implementing things
 
 (def drop (n xs)    ; n|whole xs
