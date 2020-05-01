@@ -744,6 +744,13 @@ __DATA__
 (mac repeat (n . body)
   `(for ,(uvar) 1 ,n ,@body))
 
+(mac poll (expr f)
+  (letu (vr ve vf)
+    `((rfn ,vr (,ve ,vf)
+        (if (,vf ,ve) ,ve (,vr ,expr ,vf)))
+      ,expr
+      ,f)))
+
 ; we are here currently, implementing things
 
 (def drop (n xs)    ; n|whole xs
