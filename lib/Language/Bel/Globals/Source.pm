@@ -751,6 +751,13 @@ __DATA__
       ,expr
       ,f)))
 
+(mac accum (var . body)
+  (letu v
+    `(withs (,v   nil
+             ,var [push _ ,v])
+       ,@body
+       (rev ,v))))
+
 ; we are here currently, implementing things
 
 (def drop (n xs)    ; n|whole xs
