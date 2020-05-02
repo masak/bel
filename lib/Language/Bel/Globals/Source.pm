@@ -762,6 +762,11 @@ __DATA__
   (letu v
     `(accum ,v (repeat ,n (,v ,expr)))))
 
+(mac drain (expr (o f 'no))
+  (letu v
+    `(accum ,v
+       (poll ,expr (cor ,f (compose no ,v))))))
+
 ; we are here currently, implementing things
 
 (def drop (n xs)    ; n|whole xs
