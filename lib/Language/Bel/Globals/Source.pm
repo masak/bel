@@ -512,16 +512,16 @@ __DATA__
 
 (set comfns nil)
 
-;(def com (f g)
-;  (set comfns (put f g comfns)))
+(def com (f g)
+  (set comfns (put f g comfns)))
 
-;(com real (of sr< numr))
+(com real (of sr< numr))
 
-;(com char (of < charn))
+(com char (of < charn))
 
-;(com string list<)
+(com string list<)
 
-;(com symbol (of list< nom))
+(com symbol (of list< nom))
 
 (def int (n)
   (and (real n) (= (srden:numr n) i1)))
