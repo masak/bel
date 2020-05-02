@@ -489,9 +489,39 @@ __DATA__
 (def len (xs)
   (if (no xs) 0 (inc:len:cdr xs)))
 
-; skipping charn
+(def charn (c)
+  (dec:pos c chars caris))
 
-; skipping comparison functions
+(def < args
+  (pairwise bin< args))
+
+(def > args
+  (apply < (rev args)))
+
+(def list< (x y)
+  (if (no x) y
+      (no y) nil
+             (or (< (car x) (car y))
+                 (and (= (car x) (car y))
+                      (< (cdr x) (cdr y))))))
+
+(def bin< args
+  (aif (all no args)                    nil
+       (find [all (car _) args] comfns) (apply (cdr it) args)
+                                        (err 'incomparable)))
+
+(set comfns nil)
+
+;(def com (f g)
+;  (set comfns (put f g comfns)))
+
+;(com real (of sr< numr))
+
+;(com char (of < charn))
+
+;(com string list<)
+
+;(com symbol (of list< nom))
 
 (def int (n)
   (and (real n) (= (srden:numr n) i1)))
