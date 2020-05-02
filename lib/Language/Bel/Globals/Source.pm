@@ -758,6 +758,10 @@ __DATA__
        ,@body
        (rev ,v))))
 
+(mac nof (n expr)
+  (letu v
+    `(accum ,v (repeat ,n (,v ,expr)))))
+
 ; we are here currently, implementing things
 
 (def drop (n xs)    ; n|whole xs
