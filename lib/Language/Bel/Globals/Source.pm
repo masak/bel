@@ -655,6 +655,16 @@ __DATA__
     `(let ,v ,x
        (zap [rem ,v _ ,@rest] ,place))))
 
+; skipping reader and printer
+
+(def first (n xs)   ; n|whole xs
+  (if (or (= n 0) (no xs))
+      nil
+      (cons (car xs)
+            (first (- n 1) (cdr xs)))))
+
+; skipping catch
+
 ; we are here currently, implementing things
 
 (def drop (n xs)    ; n|whole xs
