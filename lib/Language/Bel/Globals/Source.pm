@@ -693,6 +693,9 @@ __DATA__
   (fn args
     (if (car args) (apply f args))))
 
+(def >= args
+  (pairwise ~bin< args))
+
 ; we are here currently, implementing things
 
 (def drop (n xs)    ; n|whole xs
