@@ -696,6 +696,9 @@ __DATA__
 (def >= args
   (pairwise ~bin< args))
 
+(def <= args
+  (apply >= (rev args)))
+
 ; we are here currently, implementing things
 
 (def drop (n xs)    ; n|whole xs

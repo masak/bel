@@ -3421,6 +3421,13 @@ $globals{">="} =
     make_pair(make_symbol("bin<"), SYMBOL_NIL))),
     make_pair(make_symbol("args"), SYMBOL_NIL))), SYMBOL_NIL)))));
 
+$globals{"<="} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_symbol("args"),
+    make_pair(make_pair(make_symbol("apply"), make_pair(make_symbol(">="),
+    make_pair(make_pair(make_symbol("rev"), make_pair(make_symbol("args"),
+    SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL)))));
+
 $globals{"nth"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_pair(make_pair(SYMBOL_T,
