@@ -657,6 +657,11 @@ __DATA__
 
 ; we are here currently, implementing things
 
+(def drop (n xs)    ; n|whole xs
+  (if (= n 0)
+      xs
+      (drop (- n 1) (cdr xs))))
+
 (def nth (n|pint xs|pair)
   (if (= n 1)
       (car xs)
