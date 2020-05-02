@@ -665,6 +665,11 @@ __DATA__
 
 ; skipping catch
 
+(def cut (xs (o start 1) (o end (len xs)))
+  (first (- (+ end 1 (if (< end 0) (len xs) 0))
+            start)
+         (drop (- start 1) xs)))
+
 ; we are here currently, implementing things
 
 (def drop (n xs)    ; n|whole xs
