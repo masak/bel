@@ -10,6 +10,7 @@ use Language::Bel::Types qw(
     is_nil
     is_pair
     is_symbol
+    make_char
     make_pair
     make_symbol
     pair_car
@@ -121,6 +122,23 @@ sub prim_xdr {
     return $d_value;
 }
 
+sub prim_nom {
+    my ($value) = @_;
+
+    if (!is_symbol($value)) {
+        die "not-a-symbol\n";
+    }
+
+    my $result = SYMBOL_NIL;
+    for my $char (reverse(split //, symbol_name($value))) {
+        $result = make_pair(
+            make_char(ord($char)),
+            $result,
+        );
+    }
+    return $result;
+}
+
 sub make_prim {
     my ($name) = @_;
 
@@ -141,6 +159,7 @@ my %prim_fn = (
     "cdr" => { fn => \&prim_cdr, arity => 1 },
     "id" => { fn => \&prim_id, arity => 2 },
     "join" => { fn => \&prim_join, arity => 2 },
+    "nom" => { fn => \&prim_nom, arity => 1 },
     "type" => { fn => \&prim_type, arity => 1 },
     "xar" => { fn => \&prim_xar, arity => 2 },
     "xdr" => { fn => \&prim_xdr, arity => 2 },
@@ -150,15 +169,10 @@ sub PRIM_FN {
     return \%prim_fn;
 }
 
-my %primitives = (
-    "car" => make_prim("car"),
-    "cdr" => make_prim("cdr"),
-    "id" => make_prim("id"),
-    "join" => make_prim("join"),
-    "type" => make_prim("type"),
-    "xar" => make_prim("xar"),
-    "xdr" => make_prim("xdr"),
-);
+my %primitives;
+for my $name (keys %prim_fn) {
+    $primitives{$name} = make_prim($name);
+}
 
 sub PRIMITIVES {
     return \%primitives;
@@ -170,6 +184,7 @@ our @EXPORT_OK = qw(
     prim_cdr
     prim_id 
     prim_join
+    prim_nom
     prim_type
     prim_xar
     prim_xdr

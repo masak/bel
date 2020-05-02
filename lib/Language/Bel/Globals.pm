@@ -41,6 +41,8 @@ $globals{"id"} = PRIMITIVES->{"id"};
 
 $globals{"join"} = PRIMITIVES->{"join"};
 
+$globals{"nom"} = PRIMITIVES->{"nom"};
+
 $globals{"type"} = PRIMITIVES->{"type"};
 
 $globals{"xar"} = PRIMITIVES->{"xar"};
