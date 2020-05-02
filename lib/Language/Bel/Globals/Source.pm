@@ -529,6 +529,9 @@ __DATA__
 (def whole (n)
   (and (int n) (~< n 0)))
 
+(def pint (n)
+  (and (int n) (> n 0)))
+
 (def yc (f)
   ([_ _] [f (fn a (apply (_ _) a))]))
 

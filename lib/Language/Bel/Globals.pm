@@ -2444,6 +2444,20 @@ $globals{"whole"} =
     SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL))), SYMBOL_NIL))),
     SYMBOL_NIL)))));
 
+$globals{"pint"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("n"), SYMBOL_NIL),
+    make_pair(make_pair(make_symbol("and"),
+    make_pair(make_pair(make_symbol("int"), make_pair(make_symbol("n"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol(">"),
+    make_pair(make_symbol("n"), make_pair(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("num"), make_pair(make_pair(make_symbol("+"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(SYMBOL_T, SYMBOL_NIL),
+    SYMBOL_NIL))), make_pair(make_pair(make_symbol("+"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(SYMBOL_T, SYMBOL_NIL),
+    SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL))), SYMBOL_NIL))),
+    SYMBOL_NIL)))));
+
 $globals{"yc"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("f"), SYMBOL_NIL),
