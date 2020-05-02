@@ -741,6 +741,9 @@ __DATA__
        (loop ,var ,vi (+ ,var 1) (<= ,var ,vm)
          ,@body))))
 
+(mac repeat (n . body)
+  `(for ,(uvar) 1 ,n ,@body))
+
 ; we are here currently, implementing things
 
 (def drop (n xs)    ; n|whole xs
