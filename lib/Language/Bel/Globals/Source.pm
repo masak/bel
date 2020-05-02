@@ -734,6 +734,13 @@ __DATA__
   `(loop ,var ,expr ,expr (no ,test)
      ,@body))
 
+(mac for (var init max . body)
+  (letu (vi vm)
+    `(with (,vi ,init
+            ,vm ,max)
+       (loop ,var ,vi (+ ,var 1) (<= ,var ,vm)
+         ,@body))))
+
 ; we are here currently, implementing things
 
 (def drop (n xs)    ; n|whole xs

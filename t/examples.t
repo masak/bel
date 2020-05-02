@@ -107,7 +107,7 @@ sub bel_todo {
     # TODO: goes with the previous one
     bel_todo("(z 1 1)", "0", "('unboundb z)");
     # TODO: goes with the previous one
-    bel_todo("(for x 1 2 (for y 1 2 (set (z x y) (+ (* x 10) y))))", "nil", "('unboundb for)");
+    bel_todo("(for x 1 2 (for y 1 2 (set (z x y) (+ (* x 10) y))))", "nil", "('unboundb z)");
     # TODO: goes with the previous one
     bel_todo("(z 1 1)", "11", "('unboundb z)");
     # TODO: goes with the previous one
