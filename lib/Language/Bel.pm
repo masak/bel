@@ -34,7 +34,7 @@ use Language::Bel::Primitives qw(
     PRIM_FN
 );
 use Language::Bel::Reader qw(
-    _read
+    read_whole
 );
 use Language::Bel::Expander::Bquote qw(
     _bqexpand
@@ -141,7 +141,7 @@ Evaluates an expression, passed in as a string of Bel code.
 sub eval {
     my ($self, $expr) = @_;
 
-    my $ast = _bqexpand(_read($expr));
+    my $ast = _bqexpand(read_whole($expr));
     my $result = $self->eval_ast($ast);
     my $result_string = _print($result);
 

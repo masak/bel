@@ -19,10 +19,10 @@ use Language::Bel::Symbols::Common qw(
 );
 use Exporter 'import';
 
-sub _read {
+sub read_whole {
     my ($expr) = @_;
 
-    return _read_helper($expr, 0)->{ast};
+    return read_partial($expr, 0)->{ast};
 }
 
 my %char_codepoints = (
@@ -33,7 +33,7 @@ my %char_codepoints = (
     sp => 32,
 );
 
-sub _read_helper {
+sub read_partial {
     my ($expr, $pos) = @_;
 
     my $skip_whitespace = sub {
@@ -56,13 +56,13 @@ sub _read_helper {
     }
     elsif ($c eq "'") {
         ++$pos;
-        my $r = _read_helper($expr, $pos);
+        my $r = read_partial($expr, $pos);
         my $ast = make_pair(SYMBOL_QUOTE, make_pair($r->{ast}, SYMBOL_NIL));
         return { ast => $ast, pos => $r->{pos} };
     }
     elsif ($c eq "`") {
         ++$pos;
-        my $r = _read_helper($expr, $pos);
+        my $r = read_partial($expr, $pos);
         my $ast = make_pair(SYMBOL_BQUOTE, make_pair($r->{ast}, SYMBOL_NIL));
         return { ast => $ast, pos => $r->{pos} };
     }
@@ -74,7 +74,7 @@ sub _read_helper {
             ++$pos;
             $symbol = SYMBOL_COMMA_AT;
         }
-        my $r = _read_helper($expr, $pos);
+        my $r = read_partial($expr, $pos);
         my $ast = make_pair($symbol, make_pair($r->{ast}, SYMBOL_NIL));
         return { ast => $ast, pos => $r->{pos} };
     }
@@ -128,7 +128,7 @@ sub _read_helper {
         while ($pos < length($expr) && substr($expr, $pos, 1) ne "\n") {
             ++$pos;
         }
-        return _read_helper($expr, $pos);
+        return read_partial($expr, $pos);
     }
     else {  # symbol
         my $start = $pos;
@@ -183,7 +183,7 @@ sub _rdlist {
         if ($seen_element_after_dot) {
             die "only one element after dot allowed";
         }
-        my $r = _read_helper($expr, $pos);
+        my $r = read_partial($expr, $pos);
         if ($seen_dot) {
             $seen_element_after_dot = 1;
         }
@@ -478,7 +478,8 @@ sub make_t_list {
 }
 
 our @EXPORT_OK = qw(
-    _read
+    read_whole
+    read_partial
 );
 
 1;
