@@ -57,11 +57,11 @@ Language::Bel - An interpreter for Paul Graham's language Bel
 
 =head1 VERSION
 
-Version 0.30
+Version 0.31
 
 =cut
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 =head1 SYNOPSIS
 
@@ -709,8 +709,7 @@ sub applyf {
         $self->applyf($apply_op, $apply_args, $a);
     }
     else {
-        my $car_f = pair_car($f);
-        if (!is_symbol_of_name($car_f, "lit")) {
+        if (!is_pair($f) || !is_symbol_of_name(pair_car($f), "lit")) {
             die "'cannot-apply\n";
         }
         # XXX: skipping `proper` check for now
