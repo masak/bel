@@ -128,6 +128,8 @@ HEADER
         print_primitive($prim_name);
     }
 
+    my @globals;
+
     DECLARATION:
     for my $declaration (@DECLARATIONS) {
         my $ast = _read($declaration);
@@ -225,7 +227,10 @@ HEADER
         elsif (symbol_name($car_ast) eq "set") {
             while (!is_nil(prim_cdr($ast))) {
                 $new_ast = prim_car($cddr_ast);
-                print_global($name, $interpreter->eval_ast(_bqexpand($new_ast)));
+                push @globals, {
+                    name => $name,
+                    expr => $interpreter->eval_ast(_bqexpand($new_ast)),
+                };
 
                 $ast = prim_cdr(prim_cdr($ast));
                 $name = symbol_name(prim_car(prim_cdr($ast)));
@@ -233,11 +238,44 @@ HEADER
             }
             next DECLARATION;
         }
+        elsif (symbol_name($car_ast) eq "vir") {
+            my $tag = prim_car(prim_cdr($ast));
+            my $rest = prim_cdr(prim_cdr($ast));
+            for my $global (@globals) {
+                if ($global->{name} eq "virfns") {
+                    $global->{expr} = make_pair(
+                        make_pair(
+                            $tag,
+                            make_pair(
+                                make_symbol("lit"),
+                                make_pair(
+                                    make_symbol("clo"),
+                                    make_pair(
+                                        SYMBOL_NIL,
+                                        _bqexpand($rest),
+                                    ),
+                                ),
+                            ),
+                        ),
+                        $global->{expr},
+                    );
+                    last;
+                }
+            }
+            next;
+        }
         else {
             die "Unrecognized: $declaration";
         }
 
-        print_global($name, $interpreter->eval_ast(_bqexpand($new_ast)));
+        push @globals, {
+            name => $name,
+            expr => $interpreter->eval_ast(_bqexpand($new_ast)),
+        };
+    }
+
+    for my $global (@globals) {
+        print_global($global->{name}, $global->{expr});
     }
 
     print <<'FOOTER';

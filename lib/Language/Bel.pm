@@ -57,11 +57,11 @@ Language::Bel - An interpreter for Paul Graham's language Bel
 
 =head1 VERSION
 
-Version 0.28
+Version 0.29
 
 =cut
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 =head1 SYNOPSIS
 
@@ -768,6 +768,48 @@ sub applylit {
         }
         # XXX: skipping `mac` case for now
         # XXX: skipping `cont` case for now
+        else {
+            my $virfns = pair_cdr(get(make_symbol("virfns"), $self->{g}));
+            my $it;
+            if ($it = get($tag, $virfns)) {
+                my $cdr_it = prim_cdr($it);
+                my @stack;
+                while (!is_nil($args)) {
+                    push @stack, prim_car($args);
+                    $args = prim_cdr($args);
+                }
+                my $quoted_args = SYMBOL_NIL;
+                while (@stack) {
+                    my $arg = pop(@stack);
+                    $quoted_args = make_pair(
+                        make_pair(
+                            make_symbol("quote"),
+                            make_pair(
+                                $arg,
+                                SYMBOL_NIL,
+                            ),
+                        ),
+                        $quoted_args,
+                    );
+                }
+                my $f_and_quoted_args = make_pair(
+                    $f,
+                    make_pair(
+                        $quoted_args,
+                        SYMBOL_NIL,
+                    ),
+                );
+                my $fu = fut(sub {
+                    my $virfn_result = pop @{$self->{r}};
+                    push @{$self->{s}}, [$virfn_result, $a];
+                });
+                push @{$self->{s}}, $fu;
+                $self->applyf($cdr_it, $f_and_quoted_args, $a);
+            }
+            else {
+                die "'unapplyable\n";
+            }
+        }
     }
 }
 
