@@ -34,7 +34,7 @@ use Language::Bel::Primitives qw(
     PRIM_FN
 );
 use Language::Bel::Reader qw(
-    _read
+    read_whole
 );
 use Language::Bel::Expander::Bquote qw(
     _bqexpand
@@ -132,7 +132,7 @@ HEADER
 
     DECLARATION:
     for my $declaration (@DECLARATIONS) {
-        my $ast = _read($declaration);
+        my $ast = read_whole($declaration);
         next
             if is_nil($ast);   # `;` comment
         die "Malformed global declaration\n"
