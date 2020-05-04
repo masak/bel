@@ -4,6 +4,12 @@ use strict;
 use warnings;
 
 use Language::Bel;
+use Language::Bel::Reader qw(
+    read_partial
+);
+use Language::Bel::Expander::Bquote qw(
+    _bqexpand
+);
 
 binmode STDOUT, ':encoding(utf-8)';
 
@@ -15,19 +21,54 @@ sub prompt {
     return $input;
 }
 
-my $b = Language::Bel->new({ output => sub {
-    my ($string) = @_;
-    print($string, "\n");
-} });
+if (@ARGV == 1) {
+    my ($source_file) = $ARGV[0];
+    eval_file($source_file);
+}
+else {
+    repl();
+}
 
-print("Language::Bel ", $Language::Bel::VERSION, " -- $^O.\n");
-while (defined (my $expr = prompt("> "))) {
-    next if $expr =~ /^\s*$/;
+sub eval_file {
+    my ($source_file) = @_;
 
-    eval {
-        $b->eval($expr);
-    };
-    if ($@) {
-        print($@);
+    my $b = Language::Bel->new();
+
+    my $source;
+    {
+        local $/;
+        open my $fh, '<', $source_file
+            or die "can't open $source_file for reading: $!";
+        $source = <$fh>;
+    }
+
+    while ($source) {
+        my $p = read_partial($source);
+        my $ast = _bqexpand($p->{ast});
+        my $next_pos = $p->{pos};
+
+        $b->eval_ast($ast);
+
+        $source = substr($source, $next_pos);
+        $source =~ s/^\s+//;
+    }
+}
+
+sub repl {
+    my $b = Language::Bel->new({ output => sub {
+        my ($string) = @_;
+        print($string, "\n");
+    } });
+
+    print("Language::Bel ", $Language::Bel::VERSION, " -- $^O.\n");
+    while (defined (my $expr = prompt("> "))) {
+        next if $expr =~ /^\s*$/;
+
+        eval {
+            $b->eval($expr);
+        };
+        if ($@) {
+            print($@);
+        }
     }
 }

@@ -36,6 +36,7 @@ my %char_codepoints = (
 sub read_partial {
     my ($expr, $pos) = @_;
 
+    $pos ||= 0;
     my $skip_whitespace = sub {
         while ($pos < length($expr) && substr($expr, $pos, 1) =~ /\s/) {
             ++$pos;
