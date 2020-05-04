@@ -401,7 +401,19 @@ sub parsesr {
 sub buildnum {
     my ($r, $i) = @_;
 
-    return make_number($r, $i);
+    return make_pair(
+        make_symbol("lit"),
+        make_pair(
+            make_symbol("num"),
+            make_pair(
+                $r,
+                make_pair(
+                    $i,
+                    SYMBOL_NIL,
+                ),
+            ),
+        ),
+    );
 }
 
 # (def parsed (cs base)
@@ -438,24 +450,6 @@ sub parseint {
         $result += ord($d) - ord("0");
     }
     return $result;
-}
-
-sub make_number {
-    my ($r, $i) = @_;
-
-    return make_pair(
-        make_symbol("lit"),
-        make_pair(
-            make_symbol("num"),
-            make_pair(
-                $r,
-                make_pair(
-                    $i,
-                    SYMBOL_NIL,
-                ),
-            ),
-        ),
-    );
 }
 
 sub make_sr {
