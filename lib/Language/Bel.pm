@@ -57,11 +57,11 @@ Language::Bel - An interpreter for Paul Graham's language Bel
 
 =head1 VERSION
 
-Version 0.29
+Version 0.30
 
 =cut
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 =head1 SYNOPSIS
 
@@ -1020,7 +1020,9 @@ sub destructure {
             die "'underargs\n";
         }
     }
-    # XXX: skipping the `(atom arg)` case for now
+    elsif (!is_pair($arg)) {
+        die "'atom-arg\n";
+    }
     else {
         my $fu1 = fut(sub {
             $self->pass($p, pair_car($arg), $env);
