@@ -37,6 +37,8 @@ $globals{"car"} = PRIMITIVES->{"car"};
 
 $globals{"cdr"} = PRIMITIVES->{"cdr"};
 
+$globals{"coin"} = PRIMITIVES->{"coin"};
+
 $globals{"id"} = PRIMITIVES->{"id"};
 
 $globals{"join"} = PRIMITIVES->{"join"};

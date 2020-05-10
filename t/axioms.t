@@ -6,7 +6,7 @@ use Test::More;
 
 use Language::Bel;
 
-plan tests => 36;
+plan tests => 39;
 
 my $actual_output = "";
 my $b = Language::Bel->new({ output => sub {
@@ -87,4 +87,10 @@ sub is_bel_error {
     is_bel_output("(nom nil)", q["nil"]);
     is_bel_error("(nom '(a))", "not-a-symbol");
     is_bel_error(q[(nom "a")], "not-a-symbol");
+}
+
+{
+    is_bel_output("(~~mem (coin) '(t nil))", "t");
+    is_bel_output("(~~mem t (nof 8 (coin)))", "t");
+    is_bel_output("(~~mem nil (nof 8 (coin)))", "t");
 }

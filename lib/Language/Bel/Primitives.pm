@@ -56,6 +56,12 @@ sub prim_cdr {
     }
 }
 
+sub prim_coin {
+    return rand() < 0.5
+        ? SYMBOL_NIL
+        : SYMBOL_T;
+}
+
 sub _id {
     my ($first, $second) = @_;
 
@@ -157,6 +163,7 @@ sub make_prim {
 my %prim_fn = (
     "car" => { fn => \&prim_car, arity => 1 },
     "cdr" => { fn => \&prim_cdr, arity => 1 },
+    "coin" => { fn => \&prim_coin, arity => 0 },
     "id" => { fn => \&prim_id, arity => 2 },
     "join" => { fn => \&prim_join, arity => 2 },
     "nom" => { fn => \&prim_nom, arity => 1 },
@@ -182,6 +189,7 @@ our @EXPORT_OK = qw(
     _id
     prim_car
     prim_cdr
+    prim_coin
     prim_id 
     prim_join
     prim_nom

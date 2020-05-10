@@ -870,7 +870,10 @@ sub applyprim {
     # XXX: skipping the 'unknown-prim case for now
     my $fn = $prim->{fn};
     my $v;
-    if ($prim->{arity} == 1) {
+    if ($prim->{arity} == 0) {
+        $v = $fn->();
+    }
+    elsif ($prim->{arity} == 1) {
         $v = $fn->($_a);
     }
     elsif ($prim->{arity} == 2) {
