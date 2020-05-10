@@ -21,16 +21,16 @@ After downloading Bel, you can run it like this:
 
 ```sh
 $ perl -Ilib bin/bel
-Language::Bel 0.26 -- msys.
+Language::Bel 0.34 -- msys.
 > (+ 2 2)
 4
-> (let sp " " (append "Hello" sp "world!"))
+> (append "Hello" '(\sp) "world!")
 "Hello world!"
 ```
 
 ## State of completion
 
-`Language::Bel` intends to be a full implementation of the Bel spec.
+`Language::Bel` intends to be a complete implementation of the Bel spec.
 It's not fully there yet, though it's under active development.
 
 [The spec](https://github.com/masak/bel/blob/master/pg/bel.bel) contains 353 items.
