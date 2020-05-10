@@ -4010,6 +4010,19 @@ $globals{"randlen"} =
     SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL)))), SYMBOL_NIL))),
     SYMBOL_NIL)))), SYMBOL_NIL)))));
 
+$globals{"rand"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_pair(SYMBOL_T,
+    make_pair(make_symbol("n"), make_pair(make_symbol("pint"),
+    SYMBOL_NIL))), SYMBOL_NIL), make_pair(make_pair(make_symbol("poll"),
+    make_pair(make_pair(make_symbol("randlen"),
+    make_pair(make_pair(make_symbol("clog2"), make_pair(make_symbol("n"),
+    SYMBOL_NIL)), SYMBOL_NIL)), make_pair(make_pair(make_symbol("fn"),
+    make_pair(make_pair(make_symbol("_"), SYMBOL_NIL),
+    make_pair(make_pair(make_symbol("<"), make_pair(make_symbol("_"),
+    make_pair(make_symbol("n"), SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))),
+    SYMBOL_NIL)))));
+
 $globals{"drop"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("n"),

@@ -778,6 +778,9 @@ __DATA__
          0
          (nof n (if (coin) 0 1))))
 
+(def rand (n|pint)
+  (poll (randlen (clog2 n)) [< _ n]))
+
 ; we are here currently, implementing things
 
 (def drop (n xs)    ; n|whole xs
