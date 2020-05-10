@@ -767,6 +767,9 @@ __DATA__
     `(accum ,v
        (poll ,expr (cor ,f (compose no ,v))))))
 
+(def ^w (x y|whole)
+  (apply * (nof y x)))
+
 ; we are here currently, implementing things
 
 (def drop (n xs)    ; n|whole xs
