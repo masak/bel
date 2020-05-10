@@ -773,6 +773,11 @@ __DATA__
 (def clog2 (n)
   (if (<= n 2) 1 (inc:clog2 (/ n 2))))
 
+(def randlen (n)        ; temporary implementation -- missing `read`
+  (foldl (fn (c s) (+ (* 2 s) c))
+         0
+         (nof n (if (coin) 0 1))))
+
 ; we are here currently, implementing things
 
 (def drop (n xs)    ; n|whole xs
