@@ -805,6 +805,11 @@ __DATA__
        ((case loc a xar d xdr) cell (cdr xs))
        (car xs))))
 
+(mac clean (f place)
+  (letu v
+    `(let ,v (compose no ,f)
+       (zap [keep ,v _] ,place))))
+
 ; we are here currently, implementing things
 
 (def err args)
