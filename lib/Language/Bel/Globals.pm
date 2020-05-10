@@ -3944,6 +3944,34 @@ $globals{"^w"} =
     make_pair(make_symbol("x"), SYMBOL_NIL))), SYMBOL_NIL))),
     SYMBOL_NIL)))));
 
+$globals{"clog2"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("n"), SYMBOL_NIL),
+    make_pair(make_pair(make_symbol("if"),
+    make_pair(make_pair(make_symbol("<="), make_pair(make_symbol("n"),
+    make_pair(make_pair(make_symbol("lit"), make_pair(make_symbol("num"),
+    make_pair(make_pair(make_symbol("+"), make_pair(make_pair(SYMBOL_T,
+    make_pair(SYMBOL_T, SYMBOL_NIL)), make_pair(make_pair(SYMBOL_T,
+    SYMBOL_NIL), SYMBOL_NIL))), make_pair(make_pair(make_symbol("+"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(SYMBOL_T, SYMBOL_NIL),
+    SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("lit"), make_pair(make_symbol("num"),
+    make_pair(make_pair(make_symbol("+"), make_pair(make_pair(SYMBOL_T,
+    SYMBOL_NIL), make_pair(make_pair(SYMBOL_T, SYMBOL_NIL), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("+"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(SYMBOL_T, SYMBOL_NIL), SYMBOL_NIL))),
+    SYMBOL_NIL)))), make_pair(make_pair(make_pair(make_symbol("compose"),
+    make_pair(make_symbol("inc"), make_pair(make_symbol("clog2"),
+    SYMBOL_NIL))), make_pair(make_pair(make_symbol("/"),
+    make_pair(make_symbol("n"), make_pair(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("num"), make_pair(make_pair(make_symbol("+"),
+    make_pair(make_pair(SYMBOL_T, make_pair(SYMBOL_T, SYMBOL_NIL)),
+    make_pair(make_pair(SYMBOL_T, SYMBOL_NIL), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("+"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(SYMBOL_T, SYMBOL_NIL), SYMBOL_NIL))),
+    SYMBOL_NIL)))), SYMBOL_NIL))), SYMBOL_NIL)), SYMBOL_NIL)))),
+    SYMBOL_NIL)))));
+
 $globals{"drop"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("n"),
