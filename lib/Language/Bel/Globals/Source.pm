@@ -810,6 +810,8 @@ __DATA__
     `(let ,v (compose no ,f)
        (zap [keep ,v _] ,place))))
 
+; skipping swap -- it has nested bquotes
+
 ; we are here currently, implementing things
 
 (def err args)
