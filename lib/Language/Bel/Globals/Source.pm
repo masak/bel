@@ -781,6 +781,15 @@ __DATA__
 (def rand (n|pint)
   (poll (randlen (clog2 n)) [< _ n]))
 
+(mac wipe args
+  `(set ,@(fuse [list _ nil] args)))
+
+(mac pop (place)
+  `(let (cell loc) (where ,place)
+     (let xs ((case loc a car d cdr) cell)
+       ((case loc a xar d xdr) cell (cdr xs))
+       (car xs))))
+
 ; we are here currently, implementing things
 
 (def drop (n xs)    ; n|whole xs
@@ -795,14 +804,6 @@ __DATA__
 
 (vir num (f args)
   `(nth ,f ,@args))
-
-; skip
-
-(mac pop (place)
-  `(let (cell loc) (where ,place)
-     (let xs ((case loc a car d cdr) cell)
-       ((case loc a xar d xdr) cell (cdr xs))
-       (car xs))))
 
 ; skip
 
