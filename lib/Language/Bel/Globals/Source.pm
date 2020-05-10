@@ -657,6 +657,21 @@ __DATA__
 
 ; skipping reader and printer
 
+(def drop (n|whole xs)
+  (if (= n 0)
+      xs
+      (drop (- n 1) (cdr xs))))
+
+(def nth (n|pint xs|pair)
+  (if (= n 1)
+      (car xs)
+      (nth (- n 1) (cdr xs))))
+
+(vir num (f args)
+  `(nth ,f ,@args))
+
+; skipping nchar
+
 (def first (n xs)   ; n|whole xs
   (if (or (= n 0) (no xs))
       nil
@@ -791,21 +806,6 @@ __DATA__
        (car xs))))
 
 ; we are here currently, implementing things
-
-(def drop (n xs)    ; n|whole xs
-  (if (= n 0)
-      xs
-      (drop (- n 1) (cdr xs))))
-
-(def nth (n|pint xs|pair)
-  (if (= n 1)
-      (car xs)
-      (nth (- n 1) (cdr xs))))
-
-(vir num (f args)
-  `(nth ,f ,@args))
-
-; skip
 
 (def err args)
 
