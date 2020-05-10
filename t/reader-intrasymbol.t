@@ -6,7 +6,7 @@ use Test::More;
 
 use Language::Bel;
 
-plan tests => 8;
+plan tests => 17;
 
 my $actual_output = "";
 my $b = Language::Bel->new({ output => sub {
@@ -32,4 +32,13 @@ sub is_bel_output {
     is_bel_output("'~<", "(compose no <)");
     is_bel_output("'~", "no");
     is_bel_output("'~~", "(compose no no)");
+    is_bel_output("'for|2", "(t for 2)");
+    is_bel_output("'a.b", "(a b)");
+    is_bel_output("'a!b", "(a (quote b))");
+    is_bel_output("'c|isa!cont", "(t c (isa (quote cont)))");
+    is_bel_output("'(id 2.x 3.x)", "(id (2 x) (3 x))");
+    is_bel_output("'a!b.c", "(a (quote b) c)");
+    is_bel_output("'!a", "(upon (quote a))");
+    is_bel_output("(let x '(a . b) (map .x (list car cdr)))", "(a b)");
+    is_bel_output("'x|~f:g!a", "(t x ((compose (compose no f) g) (quote a)))");
 }
