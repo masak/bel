@@ -264,6 +264,23 @@ HEADER
             }
             next;
         }
+        elsif (symbol_name($car_ast) eq "com") {
+            my $f = prim_car(prim_cdr($ast));
+            my $g = prim_car(prim_cdr(prim_cdr($ast)));
+            for my $global (@globals) {
+                if ($global->{name} eq "comfns") {
+                    $global->{expr} = make_pair(
+                        make_pair(
+                            $interpreter->eval_ast($f),
+                            $interpreter->eval_ast($g),
+                        ),
+                        $global->{expr},
+                    );
+                    last;
+                }
+            }
+            next;
+        }
         else {
             die "Unrecognized: $declaration";
         }

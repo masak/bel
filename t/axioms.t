@@ -6,7 +6,7 @@ use Test::More;
 
 use Language::Bel;
 
-plan tests => 31;
+plan tests => 36;
 
 my $actual_output = "";
 my $b = Language::Bel->new({ output => sub {
@@ -79,4 +79,12 @@ sub is_bel_error {
     is_bel_output("(type \\bel)", "char");
     is_bel_output("(type nil)", "symbol");
     is_bel_output("(type '(a))", "pair");
+}
+
+{
+    is_bel_output("(nom 'a)", q["a"]);
+    is_bel_error("(nom \\a)", "not-a-symbol");
+    is_bel_output("(nom nil)", q["nil"]);
+    is_bel_error("(nom '(a))", "not-a-symbol");
+    is_bel_error(q[(nom "a")], "not-a-symbol");
 }
