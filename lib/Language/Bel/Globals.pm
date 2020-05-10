@@ -3234,9 +3234,11 @@ $globals{"pull"} =
 
 $globals{"nth"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("n"),
-    make_pair(make_symbol("xs"), SYMBOL_NIL)),
-    make_pair(make_pair(make_symbol("if"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_pair(SYMBOL_T,
+    make_pair(make_symbol("n"), make_pair(make_symbol("pint"),
+    SYMBOL_NIL))), make_pair(make_pair(SYMBOL_T,
+    make_pair(make_symbol("xs"), make_pair(SYMBOL_PAIR, SYMBOL_NIL))),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("if"),
     make_pair(make_pair(make_symbol("="), make_pair(make_symbol("n"),
     make_pair(make_pair(make_symbol("lit"), make_pair(make_symbol("num"),
     make_pair(make_pair(make_symbol("+"), make_pair(make_pair(SYMBOL_T,
