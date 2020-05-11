@@ -812,6 +812,9 @@ __DATA__
 
 ; skipping swap -- it has nested bquotes
 
+(def adjoin (x ys (o f =))
+  (if (mem x ys f) ys (cons x ys)))
+
 ; we are here currently, implementing things
 
 (def err args)

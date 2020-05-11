@@ -4157,6 +4157,18 @@ $globals{"clean"} =
     SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))),
     SYMBOL_NIL))))), SYMBOL_NIL)));
 
+$globals{"adjoin"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"),
+    make_pair(make_symbol("ys"), make_pair(make_pair(make_symbol("o"),
+    make_pair(make_symbol("f"), make_pair(make_symbol("="), SYMBOL_NIL))),
+    SYMBOL_NIL))), make_pair(make_pair(make_symbol("if"),
+    make_pair(make_pair(make_symbol("mem"), make_pair(make_symbol("x"),
+    make_pair(make_symbol("ys"), make_pair(make_symbol("f"), SYMBOL_NIL)))),
+    make_pair(make_symbol("ys"), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_symbol("x"), make_pair(make_symbol("ys"), SYMBOL_NIL))),
+    SYMBOL_NIL)))), SYMBOL_NIL)))));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"),
