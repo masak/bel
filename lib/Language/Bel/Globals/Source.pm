@@ -657,7 +657,7 @@ __DATA__
 
 ; we are here currently, implementing things
 
-(def nth (n xs)     ; n|pint xs|pair
+(def nth (n|pint xs|pair)
   (if (= n 1)
       (car xs)
       (nth (- n 1) (cdr xs))))
