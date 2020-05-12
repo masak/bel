@@ -4204,6 +4204,18 @@ $globals{"pushnew"} =
     make_pair(SYMBOL_NIL, SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))),
     SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))))), SYMBOL_NIL)));
 
+$globals{"dedup"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("xs"),
+    make_pair(make_pair(make_symbol("o"), make_pair(make_symbol("f"),
+    make_pair(make_symbol("="), SYMBOL_NIL))), SYMBOL_NIL)),
+    make_pair(make_pair(make_symbol("rev"),
+    make_pair(make_pair(make_symbol("foldl"),
+    make_pair(make_pair(make_symbol("trap"),
+    make_pair(make_symbol("adjoin"), make_pair(make_symbol("f"),
+    SYMBOL_NIL))), make_pair(SYMBOL_NIL, make_pair(make_symbol("xs"),
+    SYMBOL_NIL)))), SYMBOL_NIL)), SYMBOL_NIL)))));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"),

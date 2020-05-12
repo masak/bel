@@ -820,6 +820,9 @@ __DATA__
     `(let ,v ,x
        (zap [adjoin ,v _ ,f] ,place))))
 
+(def dedup (xs (o f =))
+  (rev (foldl (trap adjoin f) nil xs)))
+
 ; we are here currently, implementing things
 
 (def err args)
