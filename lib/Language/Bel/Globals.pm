@@ -4285,6 +4285,12 @@ $globals{"max"} =
     make_pair(make_pair(make_symbol("best"), make_pair(make_symbol(">"),
     make_pair(make_symbol("args"), SYMBOL_NIL))), SYMBOL_NIL)))));
 
+$globals{"min"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_symbol("args"),
+    make_pair(make_pair(make_symbol("best"), make_pair(make_symbol("<"),
+    make_pair(make_symbol("args"), SYMBOL_NIL))), SYMBOL_NIL)))));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"),

@@ -836,6 +836,9 @@ __DATA__
 (def max args
   (best > args))
 
+(def min args
+  (best < args))
+
 ; we are here currently, implementing things
 
 (def err args)
