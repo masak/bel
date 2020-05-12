@@ -815,6 +815,11 @@ __DATA__
 (def adjoin (x ys (o f =))
   (if (mem x ys f) ys (cons x ys)))
 
+(mac pushnew (x place (o f '=))
+  (letu v
+    `(let ,v ,x
+       (zap [adjoin ,v _ ,f] ,place))))
+
 ; we are here currently, implementing things
 
 (def err args)
