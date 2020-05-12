@@ -4236,6 +4236,17 @@ $globals{"insert"} =
     SYMBOL_NIL)), SYMBOL_NIL)))), SYMBOL_NIL))), SYMBOL_NIL)))))),
     SYMBOL_NIL)))));
 
+$globals{"sort"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("f"),
+    make_pair(make_symbol("xs"), SYMBOL_NIL)),
+    make_pair(make_pair(make_symbol("foldr"),
+    make_pair(make_pair(make_symbol("part"),
+    make_pair(make_symbol("insert"), make_pair(make_symbol("f"),
+    SYMBOL_NIL))), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("rev"), make_pair(make_symbol("xs"),
+    SYMBOL_NIL)), SYMBOL_NIL)))), SYMBOL_NIL)))));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"),

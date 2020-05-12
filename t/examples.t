@@ -69,7 +69,7 @@ sub bel_todo {
     is_bel_output("(find pair w)", "(b c)");
     is_bel_output("(pop (find pair w))", "b");
     is_bel_output("w", "(a (c) d (e f))");
-    bel_todo(q[(dedup:sort < "abracadabra")], q["abcdr"], "('unboundb sort)");
+    bel_todo(q[(dedup:sort < "abracadabra")], q["abcdr"], "('unboundb chars)");
     is_bel_output("(+ .05 19/20)", "1");
     is_bel_output("(map (upon 2 3) (list + - * /))", "(5 -1 6 2/3)");
     is_bel_output("(let x 'a (cons x 'b))", "(a . b)");

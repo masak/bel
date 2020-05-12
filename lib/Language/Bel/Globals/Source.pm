@@ -828,6 +828,9 @@ __DATA__
       (f x (car ys)) (cons x ys)
                      (cons (car ys) (insert f x (cdr ys)))))
 
+(def sort (f xs)
+  (foldr (part insert f) nil (rev xs)))
+
 ; we are here currently, implementing things
 
 (def err args)
