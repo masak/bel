@@ -4216,6 +4216,26 @@ $globals{"dedup"} =
     SYMBOL_NIL))), make_pair(SYMBOL_NIL, make_pair(make_symbol("xs"),
     SYMBOL_NIL)))), SYMBOL_NIL)), SYMBOL_NIL)))));
 
+$globals{"insert"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("f"),
+    make_pair(make_symbol("x"), make_pair(make_symbol("ys"), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("if"),
+    make_pair(make_pair(make_symbol("no"), make_pair(make_symbol("ys"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("list"),
+    make_pair(make_symbol("x"), SYMBOL_NIL)),
+    make_pair(make_pair(make_symbol("f"), make_pair(make_symbol("x"),
+    make_pair(make_pair(make_symbol("car"), make_pair(make_symbol("ys"),
+    SYMBOL_NIL)), SYMBOL_NIL))), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_symbol("x"), make_pair(make_symbol("ys"), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(make_symbol("car"), make_pair(make_symbol("ys"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("insert"),
+    make_pair(make_symbol("f"), make_pair(make_symbol("x"),
+    make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("ys"),
+    SYMBOL_NIL)), SYMBOL_NIL)))), SYMBOL_NIL))), SYMBOL_NIL)))))),
+    SYMBOL_NIL)))));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"),

@@ -823,6 +823,11 @@ __DATA__
 (def dedup (xs (o f =))
   (rev (foldl (trap adjoin f) nil xs)))
 
+(def insert (f x ys)
+  (if (no ys)        (list x)
+      (f x (car ys)) (cons x ys)
+                     (cons (car ys) (insert f x (cdr ys)))))
+
 ; we are here currently, implementing things
 
 (def err args)
