@@ -833,6 +833,9 @@ __DATA__
 
 (set best car:sort)
 
+(def max args
+  (best > args))
+
 ; we are here currently, implementing things
 
 (def err args)
