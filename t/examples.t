@@ -87,8 +87,7 @@ sub bel_todo {
     bel_todo("goodness", "10", "('unboundb goodness)");
     # TODO: can't apply macros yet
     bel_todo("(apply or '(t nil))", "t", "'unapplyable");
-    # TODO: `best` not implemented
-    bel_todo("(best (of > len) '((a b) (a b c d) (a) (a b c)))", "(a b c d)", "('unboundb best)");
+    is_bel_output("(best (of > len) '((a b) (a b c d) (a) (a b c)))", "(a b c d)");
     is_bel_output("(!3 (part + 2))", "5");
     # TODO: `to` not implemented
     bel_todo(q[(to "testfile" (print 'hello))], "nil", "('unboundb to)");

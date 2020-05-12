@@ -831,6 +831,8 @@ __DATA__
 (def sort (f xs)
   (foldr (part insert f) nil (rev xs)))
 
+(set best car:sort)
+
 ; we are here currently, implementing things
 
 (def err args)

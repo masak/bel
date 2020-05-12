@@ -4247,6 +4247,38 @@ $globals{"sort"} =
     make_pair(make_pair(make_symbol("rev"), make_pair(make_symbol("xs"),
     SYMBOL_NIL)), SYMBOL_NIL)))), SYMBOL_NIL)))));
 
+$globals{"best"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(make_pair(make_pair(make_symbol("g"),
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("f"),
+    make_pair(make_symbol("xs"), SYMBOL_NIL)),
+    make_pair(make_pair(make_symbol("foldr"),
+    make_pair(make_pair(make_symbol("part"),
+    make_pair(make_symbol("insert"), make_pair(make_symbol("f"),
+    SYMBOL_NIL))), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("rev"), make_pair(make_symbol("xs"),
+    SYMBOL_NIL)), SYMBOL_NIL)))), SYMBOL_NIL)))))),
+    make_pair(make_pair(make_symbol("f"), make_pair(make_symbol("lit"),
+    make_pair(make_symbol("prim"), make_pair(make_symbol("car"),
+    SYMBOL_NIL)))), make_pair(make_pair(make_symbol("fs"),
+    make_pair(make_pair(make_symbol("lit"), make_pair(make_symbol("prim"),
+    make_pair(make_symbol("car"), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("f"),
+    make_pair(make_symbol("xs"), SYMBOL_NIL)),
+    make_pair(make_pair(make_symbol("foldr"),
+    make_pair(make_pair(make_symbol("part"),
+    make_pair(make_symbol("insert"), make_pair(make_symbol("f"),
+    SYMBOL_NIL))), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("rev"), make_pair(make_symbol("xs"),
+    SYMBOL_NIL)), SYMBOL_NIL)))), SYMBOL_NIL))))), SYMBOL_NIL))),
+    SYMBOL_NIL))), make_pair(make_symbol("args"),
+    make_pair(make_pair(make_symbol("f"),
+    make_pair(make_pair(make_symbol("apply"), make_pair(make_symbol("g"),
+    make_pair(make_symbol("args"), SYMBOL_NIL))), SYMBOL_NIL)),
+    SYMBOL_NIL)))));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"),
