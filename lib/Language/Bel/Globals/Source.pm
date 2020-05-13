@@ -842,6 +842,8 @@ __DATA__
 (def even (n)
   (int (/ n 2)))
 
+(set odd (cand int ~even))
+
 ; we are here currently, implementing things
 
 (def err args)
