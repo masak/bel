@@ -839,6 +839,9 @@ __DATA__
 (def min args
   (best < args))
 
+(def even (n)
+  (int (/ n 2)))
+
 ; we are here currently, implementing things
 
 (def err args)
