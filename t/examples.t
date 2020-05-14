@@ -101,17 +101,16 @@ sub bel_todo {
     # TODO: goes with the previous one
     bel_todo("(map ++:y '(a b))", "(2 3)", "('unboundb y)");
     bel_todo("y!b", "3", "('unboundb y)");
-    # TODO: `array` not implemented
-    bel_todo("(set z (array '(2 2) 0))", "(lit arr (lit arr 0 0) (lit arr 0 0))", "('unboundb array)");
+    is_bel_output("(set z (array '(2 2) 0))", "(lit arr (lit arr 0 0) (lit arr 0 0))");
     # TODO: goes with the previous one
-    bel_todo("(z 1 1)", "0", "('unboundb z)");
+    bel_todo("(z 1 1)", "0", "'unapplyable");
     # TODO: goes with the previous one
-    bel_todo("(for x 1 2 (for y 1 2 (set (z x y) (+ (* x 10) y))))", "nil", "('unboundb z)");
+    bel_todo("(for x 1 2 (for y 1 2 (set (z x y) (+ (* x 10) y))))", "nil", "'unapplyable");
     # TODO: goes with the previous one
-    bel_todo("(z 1 1)", "11", "('unboundb z)");
+    bel_todo("(z 1 1)", "11", "'unapplyable");
     # TODO: goes with the previous one
     bel_todo("(swap (z 1) (z 2))", "(lit arr 11 12)", "('unboundb swap)");
     # TODO: goes with the previous one
-    bel_todo("(z 1 1)", "21", "('unboundb z)");
+    bel_todo("(z 1 1)", "21", "'unapplyable");
 }
 

@@ -871,6 +871,12 @@ __DATA__
 
 ; skip prs -- needs pr
 
+(def array (dims (o default))
+  (if (no dims)
+      default
+      `(lit arr ,@(nof (car dims)
+                       (array (cdr dims) default)))))
+
 ; we are here currently, implementing things
 
 (def err args)
