@@ -94,9 +94,9 @@ sub bel_todo {
     # TODO: `from` not implemented
     bel_todo(q[(from "testfile" (read))], "hello", "('unboundb from)");
     is_bel_output("(set y (table))", "(lit tab)");
-    bel_todo("(set y!a 1 y!b 2)", "2", "'unapplyable");
-    bel_todo("(map y '(a b))", "(1 2)", "'unapplyable");
-    bel_todo("(map ++:y '(a b))", "(2 3)", "'unapplyable");
+    is_bel_output("(set y!a 1 y!b 2)", "2");
+    bel_todo("(map y '(a b))", "(1 2)");
+    bel_todo("(map ++:y '(a b))", "(2 3)", "'underargs");
     bel_todo("y!b", "3", "'unapplyable");
     is_bel_output("(set z (array '(2 2) 0))", "(lit arr (lit arr 0 0) (lit arr 0 0))");
     is_bel_output("(z 1 1)", "0");

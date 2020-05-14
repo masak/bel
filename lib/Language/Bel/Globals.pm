@@ -862,6 +862,15 @@ $globals{"isa"} =
     SYMBOL_NIL))), SYMBOL_NIL)))));
 
 $globals{"virfns"} =
+    make_pair(make_pair(make_symbol("tab"), make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("f"), make_pair(make_symbol("args"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("tabref"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_symbol("f"), make_pair(make_pair(make_symbol("append"),
+    make_pair(make_symbol("args"), make_pair(SYMBOL_NIL, SYMBOL_NIL))),
+    SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL)))))),
     make_pair(make_pair(make_symbol("arr"), make_pair(make_symbol("lit"),
     make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
     make_pair(make_pair(make_symbol("f"), make_pair(make_symbol("args"),
@@ -879,7 +888,7 @@ $globals{"virfns"} =
     SYMBOL_NIL)), make_pair(make_pair(make_symbol("cons"),
     make_pair(make_symbol("f"), make_pair(make_pair(make_symbol("append"),
     make_pair(make_symbol("args"), make_pair(SYMBOL_NIL, SYMBOL_NIL))),
-    SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL)))))), SYMBOL_NIL));
+    SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL)))))), SYMBOL_NIL)));
 
 $globals{"vir"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("mac"),
@@ -4553,6 +4562,18 @@ $globals{"table"} =
     SYMBOL_NIL)), make_pair(make_pair(make_symbol("append"),
     make_pair(make_symbol("kvs"), make_pair(SYMBOL_NIL, SYMBOL_NIL))),
     SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL)))));
+
+$globals{"tabref"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("tab"),
+    make_pair(make_symbol("key"), make_pair(make_pair(make_symbol("o"),
+    make_pair(make_symbol("default"), SYMBOL_NIL)), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("aif"),
+    make_pair(make_pair(make_symbol("get"), make_pair(make_symbol("key"),
+    make_pair(make_pair(make_symbol("cddr"), make_pair(make_symbol("tab"),
+    SYMBOL_NIL)), SYMBOL_NIL))), make_pair(make_pair(make_symbol("cdr"),
+    make_pair(make_symbol("it"), SYMBOL_NIL)),
+    make_pair(make_symbol("default"), SYMBOL_NIL)))), SYMBOL_NIL)))));
 
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),

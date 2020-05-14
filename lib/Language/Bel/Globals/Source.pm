@@ -888,6 +888,14 @@ __DATA__
 (def table ((o kvs))
   `(lit tab ,@kvs))
 
+(vir tab (f args)
+  `(tabref ,f ,@args))
+
+(def tabref (tab key (o default))
+  (aif (get key (cddr tab))
+       (cdr it)
+       default))
+
 ; we are here currently, implementing things
 
 (def err args)
