@@ -93,14 +93,11 @@ sub bel_todo {
     bel_todo(q[(to "testfile" (print 'hello))], "nil", "('unboundb to)");
     # TODO: `from` not implemented
     bel_todo(q[(from "testfile" (read))], "hello", "('unboundb from)");
-    # TODO: `table` not implemented
-    bel_todo("(set y (table))", "(lit tab)", "('unboundb table)");
-    bel_todo("(set y!a 1 y!b 2)", "2", "('unboundb y)");
-    # TODO: goes with the previous one
-    bel_todo("(map y '(a b))", "(1 2)", "('unboundb y)");
-    # TODO: goes with the previous one
-    bel_todo("(map ++:y '(a b))", "(2 3)", "('unboundb y)");
-    bel_todo("y!b", "3", "('unboundb y)");
+    is_bel_output("(set y (table))", "(lit tab)");
+    bel_todo("(set y!a 1 y!b 2)", "2", "'unapplyable");
+    bel_todo("(map y '(a b))", "(1 2)", "'unapplyable");
+    bel_todo("(map ++:y '(a b))", "(2 3)", "'unapplyable");
+    bel_todo("y!b", "3", "'unapplyable");
     is_bel_output("(set z (array '(2 2) 0))", "(lit arr (lit arr 0 0) (lit arr 0 0))");
     is_bel_output("(z 1 1)", "0");
     is_bel_output("(for x 1 2 (for y 1 2 (set (z x y) (+ (* x 10) y))))", "nil");

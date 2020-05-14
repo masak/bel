@@ -4542,6 +4542,18 @@ $globals{"aref"} =
     SYMBOL_NIL)), SYMBOL_NIL)), make_pair(make_symbol("ns"), SYMBOL_NIL)))),
     SYMBOL_NIL)))), SYMBOL_NIL)))));
 
+$globals{"table"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_pair(make_symbol("o"),
+    make_pair(make_symbol("kvs"), SYMBOL_NIL)), SYMBOL_NIL),
+    make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("lit"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("tab"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("append"),
+    make_pair(make_symbol("kvs"), make_pair(SYMBOL_NIL, SYMBOL_NIL))),
+    SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL)))));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"),

@@ -885,6 +885,9 @@ __DATA__
       (n (cddr a))
       (apply aref (n (cddr a)) ns)))
 
+(def table ((o kvs))
+  `(lit tab ,@kvs))
+
 ; we are here currently, implementing things
 
 (def err args)
