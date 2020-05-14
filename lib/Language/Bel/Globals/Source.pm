@@ -844,6 +844,15 @@ __DATA__
 
 (set odd (cand int ~even))
 
+(def round (n)
+  (let r (fn (n)
+           (withs (f (floor n)
+                   d (- n f))
+             (if (or (> d 1/2) (and (= d 1/2) (odd f)))
+                 (ceil n)
+                 f)))
+    (if (< n 0) (-:r:- n) (r n))))
+
 ; we are here currently, implementing things
 
 (def err args)
