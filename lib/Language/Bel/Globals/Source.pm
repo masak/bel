@@ -863,6 +863,12 @@ __DATA__
 
 ; skip load -- needs streams
 
+(mac record body
+  (letu v
+    `(let ,v (newq)
+       (bind outs ,v ,@body)
+       (car ,v))))
+
 ; we are here currently, implementing things
 
 (def err args)
