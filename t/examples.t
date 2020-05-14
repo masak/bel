@@ -56,7 +56,7 @@ sub bel_todo {
                 ? "Expected '$expected_todo_error', got '$error'"
                 : "Expected '$expected_output', got '$actual_output'";
         ok(
-            $error && $error eq $expected_todo_error || !$error && $actual_output eq $expected_output,
+            $error && $error eq $expected_todo_error || !$error && $actual_output ne $expected_output,
             "TODO $expr ($message)"
         );
     }
@@ -102,15 +102,11 @@ sub bel_todo {
     bel_todo("(map ++:y '(a b))", "(2 3)", "('unboundb y)");
     bel_todo("y!b", "3", "('unboundb y)");
     is_bel_output("(set z (array '(2 2) 0))", "(lit arr (lit arr 0 0) (lit arr 0 0))");
-    # TODO: goes with the previous one
-    bel_todo("(z 1 1)", "0", "'unapplyable");
-    # TODO: goes with the previous one
-    bel_todo("(for x 1 2 (for y 1 2 (set (z x y) (+ (* x 10) y))))", "nil", "'unapplyable");
-    # TODO: goes with the previous one
-    bel_todo("(z 1 1)", "11", "'unapplyable");
+    is_bel_output("(z 1 1)", "0");
+    is_bel_output("(for x 1 2 (for y 1 2 (set (z x y) (+ (* x 10) y))))", "nil");
+    is_bel_output("(z 1 1)", "11");
     # TODO: goes with the previous one
     bel_todo("(swap (z 1) (z 2))", "(lit arr 11 12)", "('unboundb swap)");
-    # TODO: goes with the previous one
-    bel_todo("(z 1 1)", "21", "'unapplyable");
+    bel_todo("(z 1 1)", "21");
 }
 
