@@ -853,6 +853,16 @@ __DATA__
                  f)))
     (if (< n 0) (-:r:- n) (r n))))
 
+; skip withfile -- needs streams
+
+; skip from -- needs streams
+
+; skip to -- needs streams
+
+; skip readall -- needs streams
+
+; skip load -- needs streams
+
 ; we are here currently, implementing things
 
 (def err args)
