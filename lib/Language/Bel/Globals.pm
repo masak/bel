@@ -4682,6 +4682,9 @@ $globals{"tabrem"} =
     make_pair(make_symbol("tab"), SYMBOL_NIL)), SYMBOL_NIL))),
     SYMBOL_NIL)))));
 
+$globals{"templates"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("tab"), SYMBOL_NIL));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"),

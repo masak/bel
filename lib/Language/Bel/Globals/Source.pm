@@ -914,6 +914,8 @@ __DATA__
 (def tabrem (tab key (o f =))
   (clean [caris _ key f] (cddr tab)))
 
+(set templates (table))
+
 ; we are here currently, implementing things
 
 (def err args)
