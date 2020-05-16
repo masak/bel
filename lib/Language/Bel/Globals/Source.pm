@@ -223,6 +223,17 @@ __DATA__
 (mac vir (tag . rest)
   `(set virfns (put ',tag (fn ,@rest) virfns)))
 
+(set locfns nil)
+
+(mac loc (test . rest)
+  `(set locfns (cons (list ,test (fn ,@rest)) locfns)))
+
+(loc (is car) (f args a s r m)
+  (mev (cdr s) (cons (list (car args) 'a) r) m))
+
+(loc (is cdr) (f args a s r m)
+  (mev (cdr s) (cons (list (car args) 'd) r) m))
+
 ; back to skipping the evaluator
 
 (def function (x)
@@ -895,6 +906,10 @@ __DATA__
   (aif (get key (cddr tab))
        (cdr it)
        default))
+
+(loc isa!tab (f args a s r m)
+  (let e `(list (tabloc ,f ,@(map [list 'quote _] args)) 'd)
+    (mev (cons (list e a) (cdr s)) r m)))
 
 ; we are here currently, implementing things
 
