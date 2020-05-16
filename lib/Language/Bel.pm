@@ -837,6 +837,52 @@ sub findlocfn {
             );
         }
     }
+    elsif (is_pair($f)
+        && is_symbol_of_name(prim_car($f), "lit")
+        && is_symbol_of_name(prim_car(prim_cdr($f)), "tab")) {
+        my $cell = tabloc($f, prim_car($args));
+        return make_pair(
+            $cell,
+            make_pair(
+                make_symbol("d"),
+                SYMBOL_NIL,
+            ),
+        );
+    }
+}
+
+sub tabloc {
+    my ($tab, $key) = @_;
+
+    my $kvs = prim_cdr(prim_cdr($tab));
+    ELEM:
+    while (!is_nil($kvs)) {
+        my $kv = prim_car($kvs);
+        my @stack = [prim_car($kv), $key];
+        while (@stack) {
+            my ($v0, $v1) = @{pop(@stack)};
+            if (!is_pair($v0) || !is_pair($v1)) {
+                if (!_id($v0, $v1)) {
+                    $kvs = prim_cdr($kvs);
+                    next ELEM;
+                }
+            }
+            else {
+                push @stack, [prim_cdr($v0), prim_cdr($v1)];
+                push @stack, [prim_car($v0), prim_car($v1)];
+            }
+        }
+        return $kv;
+    }
+    my $cell = make_pair(
+        $key,
+        SYMBOL_NIL,
+    );
+    prim_xdr(
+        prim_cdr($tab),
+        make_pair($cell, prim_cdr(prim_cdr($tab)))
+    );
+    return $cell;
 }
 
 # (def applyprim (f args s r m)
