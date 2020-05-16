@@ -911,6 +911,9 @@ __DATA__
   (let e `(list (tabloc ,f ,@(map [list 'quote _] args)) 'd)
     (mev (cons (list e a) (cdr s)) r m)))
 
+(def tabrem (tab key (o f =))
+  (clean [caris _ key f] (cddr tab)))
+
 ; we are here currently, implementing things
 
 (def err args)

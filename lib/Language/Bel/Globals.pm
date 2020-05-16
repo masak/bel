@@ -4668,6 +4668,20 @@ $globals{"tabref"} =
     make_pair(make_symbol("it"), SYMBOL_NIL)),
     make_pair(make_symbol("default"), SYMBOL_NIL)))), SYMBOL_NIL)))));
 
+$globals{"tabrem"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("tab"),
+    make_pair(make_symbol("key"), make_pair(make_pair(make_symbol("o"),
+    make_pair(make_symbol("f"), make_pair(make_symbol("="), SYMBOL_NIL))),
+    SYMBOL_NIL))), make_pair(make_pair(make_symbol("clean"),
+    make_pair(make_pair(make_symbol("fn"),
+    make_pair(make_pair(make_symbol("_"), SYMBOL_NIL),
+    make_pair(make_pair(make_symbol("caris"), make_pair(make_symbol("_"),
+    make_pair(make_symbol("key"), make_pair(make_symbol("f"),
+    SYMBOL_NIL)))), SYMBOL_NIL))), make_pair(make_pair(make_symbol("cddr"),
+    make_pair(make_symbol("tab"), SYMBOL_NIL)), SYMBOL_NIL))),
+    SYMBOL_NIL)))));
+
 $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"),
