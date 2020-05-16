@@ -740,15 +740,9 @@ sub applylit {
     my ($self, $f, $args, $a) = @_;
 
     my $it;
-    if (inwhere($self->{s}) && ($it = findlocfn($f))) {
+    if (inwhere($self->{s}) && ($it = findlocfn($f, $args))) {
         pop @{$self->{s}};  # get rid of the (smark 'loc)
-        push @{$self->{r}}, make_pair(
-            prim_car($args),
-            make_pair(
-                $it,
-                SYMBOL_NIL,
-            ),
-        );
+        push @{$self->{r}}, $it;
     }
     else {
         my $tag = pair_car(pair_cdr($f));
@@ -818,17 +812,29 @@ sub applylit {
 # (loc (is cdr) (f args a s r m)
 #   (mev (cdr s) (cons (list (car args) 'd) r) m))
 sub findlocfn {
-    my ($f) = @_;
+    my ($f, $args) = @_;
 
     if (is_pair($f)
         && is_symbol_of_name(prim_car($f), "lit")
         && is_symbol_of_name(prim_car(prim_cdr($f)), "prim")) {
         my $caddr_f = prim_car(prim_cdr(prim_cdr($f)));
         if (is_symbol_of_name($caddr_f, "car")) {
-            return make_symbol("a");
+            return make_pair(
+                prim_car($args),
+                make_pair(
+                    make_symbol("a"),
+                    SYMBOL_NIL,
+                ),
+            );
         }
         elsif (is_symbol_of_name($caddr_f, "cdr")) {
-            return make_symbol("d");
+            return make_pair(
+                prim_car($args),
+                make_pair(
+                    make_symbol("d"),
+                    SYMBOL_NIL,
+                ),
+            );
         }
     }
 }
