@@ -916,7 +916,25 @@ __DATA__
 
 (set templates (table))
 
-; we are here currently, implementing things
+(mac tem (name . fields)
+  `(set (templates ',name)
+        (list ,@(map (fn ((k v)) `(cons ',k (fn () ,v)))
+                     (hug fields)))))
+
+(mac make (name . args)
+  `(inst ',name
+         (list ,@(map (fn ((k v)) `(cons ',k ,v))
+                      (hug args)))))
+
+(def inst (name kvs)
+  (aif templates.name
+       (table (map (fn ((k . f))
+                     (cons k
+                           (aif (get k kvs) (cdr it) (f))))
+                   it))
+       (err 'no-template)))
+
+; skip readas
 
 (def err args)
 
