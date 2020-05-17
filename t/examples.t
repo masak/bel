@@ -102,8 +102,7 @@ sub bel_todo {
     is_bel_output("(z 1 1)", "0");
     is_bel_output("(for x 1 2 (for y 1 2 (set (z x y) (+ (* x 10) y))))", "nil");
     is_bel_output("(z 1 1)", "11");
-    # TODO: goes with the previous one
-    bel_todo("(swap (z 1) (z 2))", "(lit arr 11 12)", "('unboundb swap)");
-    bel_todo("(z 1 1)", "21");
+    is_bel_output("(swap (z 1) (z 2))", "(lit arr 11 12)");
+    is_bel_output("(z 1 1)", "21");
 }
 

@@ -821,7 +821,19 @@ __DATA__
     `(let ,v (compose no ,f)
        (zap [keep ,v _] ,place))))
 
-; skipping swap -- it has nested bquotes
+(mac swap places
+  (let vs (map [nof 3 (uvar)] places)
+    `(atomic (withs ,(fuse (fn (place (cell loc val))
+                             (list (list cell loc)
+                                   `(where ,place)
+                                   val
+                                   `((case ,loc a car d cdr) ,cell)))
+                           places
+                           vs)
+               ,@(map (fn ((cellx locx valx) (celly locy valy))
+                        `((case ,locx a xar d xdr) ,cellx ,valy))
+                      vs
+                      (snoc (cdr vs) (car vs)))))))
 
 (def adjoin (x ys (o f =))
   (if (mem x ys f) ys (cons x ys)))
