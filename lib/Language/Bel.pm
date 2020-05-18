@@ -57,11 +57,11 @@ Language::Bel - An interpreter for Paul Graham's language Bel
 
 =head1 VERSION
 
-Version 0.34
+Version 0.35
 
 =cut
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 =head1 SYNOPSIS
 
@@ -740,15 +740,9 @@ sub applylit {
     my ($self, $f, $args, $a) = @_;
 
     my $it;
-    if (inwhere($self->{s}) && ($it = findlocfn($f))) {
+    if (inwhere($self->{s}) && ($it = findlocfn($f, $args))) {
         pop @{$self->{s}};  # get rid of the (smark 'loc)
-        push @{$self->{r}}, make_pair(
-            prim_car($args),
-            make_pair(
-                $it,
-                SYMBOL_NIL,
-            ),
-        );
+        push @{$self->{r}}, $it;
     }
     else {
         my $tag = pair_car(pair_cdr($f));
@@ -818,19 +812,77 @@ sub applylit {
 # (loc (is cdr) (f args a s r m)
 #   (mev (cdr s) (cons (list (car args) 'd) r) m))
 sub findlocfn {
-    my ($f) = @_;
+    my ($f, $args) = @_;
 
     if (is_pair($f)
         && is_symbol_of_name(prim_car($f), "lit")
         && is_symbol_of_name(prim_car(prim_cdr($f)), "prim")) {
         my $caddr_f = prim_car(prim_cdr(prim_cdr($f)));
         if (is_symbol_of_name($caddr_f, "car")) {
-            return make_symbol("a");
+            return make_pair(
+                prim_car($args),
+                make_pair(
+                    make_symbol("a"),
+                    SYMBOL_NIL,
+                ),
+            );
         }
         elsif (is_symbol_of_name($caddr_f, "cdr")) {
-            return make_symbol("d");
+            return make_pair(
+                prim_car($args),
+                make_pair(
+                    make_symbol("d"),
+                    SYMBOL_NIL,
+                ),
+            );
         }
     }
+    elsif (is_pair($f)
+        && is_symbol_of_name(prim_car($f), "lit")
+        && is_symbol_of_name(prim_car(prim_cdr($f)), "tab")) {
+        my $cell = tabloc($f, prim_car($args));
+        return make_pair(
+            $cell,
+            make_pair(
+                make_symbol("d"),
+                SYMBOL_NIL,
+            ),
+        );
+    }
+}
+
+sub tabloc {
+    my ($tab, $key) = @_;
+
+    my $kvs = prim_cdr(prim_cdr($tab));
+    ELEM:
+    while (!is_nil($kvs)) {
+        my $kv = prim_car($kvs);
+        my @stack = [prim_car($kv), $key];
+        while (@stack) {
+            my ($v0, $v1) = @{pop(@stack)};
+            if (!is_pair($v0) || !is_pair($v1)) {
+                if (!_id($v0, $v1)) {
+                    $kvs = prim_cdr($kvs);
+                    next ELEM;
+                }
+            }
+            else {
+                push @stack, [prim_cdr($v0), prim_cdr($v1)];
+                push @stack, [prim_car($v0), prim_car($v1)];
+            }
+        }
+        return $kv;
+    }
+    my $cell = make_pair(
+        $key,
+        SYMBOL_NIL,
+    );
+    prim_xdr(
+        prim_cdr($tab),
+        make_pair($cell, prim_cdr(prim_cdr($tab)))
+    );
+    return $cell;
 }
 
 # (def applyprim (f args s r m)
@@ -870,7 +922,10 @@ sub applyprim {
     # XXX: skipping the 'unknown-prim case for now
     my $fn = $prim->{fn};
     my $v;
-    if ($prim->{arity} == 1) {
+    if ($prim->{arity} == 0) {
+        $v = $fn->();
+    }
+    elsif ($prim->{arity} == 1) {
         $v = $fn->($_a);
     }
     elsif ($prim->{arity} == 2) {

@@ -223,6 +223,17 @@ __DATA__
 (mac vir (tag . rest)
   `(set virfns (put ',tag (fn ,@rest) virfns)))
 
+(set locfns nil)
+
+(mac loc (test . rest)
+  `(set locfns (cons (list ,test (fn ,@rest)) locfns)))
+
+(loc (is car) (f args a s r m)
+  (mev (cdr s) (cons (list (car args) 'a) r) m))
+
+(loc (is cdr) (f args a s r m)
+  (mev (cdr s) (cons (list (car args) 'd) r) m))
+
 ; back to skipping the evaluator
 
 (def function (x)
@@ -655,7 +666,12 @@ __DATA__
     `(let ,v ,x
        (zap [rem ,v _ ,@rest] ,place))))
 
-; we are here currently, implementing things
+; skipping reader and printer
+
+(def drop (n|whole xs)
+  (if (= n 0)
+      xs
+      (drop (- n 1) (cdr xs))))
 
 (def nth (n|pint xs|pair)
   (if (= n 1)
@@ -665,7 +681,134 @@ __DATA__
 (vir num (f args)
   `(nth ,f ,@args))
 
-; skip
+; skipping nchar
+
+(def first (n xs)   ; n|whole xs
+  (if (or (= n 0) (no xs))
+      nil
+      (cons (car xs)
+            (first (- n 1) (cdr xs)))))
+
+; skipping catch
+
+(def cut (xs (o start 1) (o end (len xs)))
+  (first (- (+ end 1 (if (< end 0) (len xs) 0))
+            start)
+         (drop (- start 1) xs)))
+
+(mac whenlet (var expr . body)
+  `(iflet ,var ,expr (do ,@body)))
+
+(mac awhen args
+  `(whenlet it ,@args))
+
+(mac each (var expr . body)
+  `(map (fn (,var) ,@body) ,expr))
+
+(def flip (f)
+  (fn args (apply f (rev args))))
+
+(def part (f . args)
+  (fn rest
+    (apply f (append args rest))))
+
+(def trap (f . args)
+  (flip (apply part (flip f) (rev args))))
+
+(def only (f)
+  (fn args
+    (if (car args) (apply f args))))
+
+(def >= args
+  (pairwise ~bin< args))
+
+(def <= args
+  (apply >= (rev args)))
+
+(def floor (x)              ; (x|real)
+  (let (s n d) (numr x)
+    (let (f m) (i/ n d)
+      (litnum (list s
+                    (i+ f (if (or (= s '+) (= m i0))
+                              i0
+                              i1))
+                    i1)))))
+
+(set ceil -:floor:-)
+
+(def mod (x y)
+  (* (- (/ x y) (floor (/ x y)))
+     y))
+
+(mac whilet (var expr . body)
+  (letu (vf vp)
+    `((rfn ,vf (,vp)
+        (whenlet ,var ,vp ,@body (,vf ,expr)))
+      ,expr)))
+
+(mac loop (var init update test . body)
+  (letu v
+    `((rfn ,v (,var)
+        (when ,test ,@body (,v ,update)))
+      ,init)))
+
+(mac while (expr . body)
+  (letu v
+    `(loop ,v ,expr ,expr ,v ,@body)))
+
+(mac til (var expr test . body)
+  `(loop ,var ,expr ,expr (no ,test)
+     ,@body))
+
+(mac for (var init max . body)
+  (letu (vi vm)
+    `(with (,vi ,init
+            ,vm ,max)
+       (loop ,var ,vi (+ ,var 1) (<= ,var ,vm)
+         ,@body))))
+
+(mac repeat (n . body)
+  `(for ,(uvar) 1 ,n ,@body))
+
+(mac poll (expr f)
+  (letu (vr ve vf)
+    `((rfn ,vr (,ve ,vf)
+        (if (,vf ,ve) ,ve (,vr ,expr ,vf)))
+      ,expr
+      ,f)))
+
+(mac accum (var . body)
+  (letu v
+    `(withs (,v   nil
+             ,var [push _ ,v])
+       ,@body
+       (rev ,v))))
+
+(mac nof (n expr)
+  (letu v
+    `(accum ,v (repeat ,n (,v ,expr)))))
+
+(mac drain (expr (o f 'no))
+  (letu v
+    `(accum ,v
+       (poll ,expr (cor ,f (compose no ,v))))))
+
+(def ^w (x y|whole)
+  (apply * (nof y x)))
+
+(def clog2 (n)
+  (if (<= n 2) 1 (inc:clog2 (/ n 2))))
+
+(def randlen (n)        ; temporary implementation -- missing `read`
+  (foldl (fn (c s) (+ (* 2 s) c))
+         0
+         (nof n (if (coin) 0 1))))
+
+(def rand (n|pint)
+  (poll (randlen (clog2 n)) [< _ n]))
+
+(mac wipe args
+  `(set ,@(fuse [list _ nil] args)))
 
 (mac pop (place)
   `(let (cell loc) (where ,place)
@@ -673,7 +816,137 @@ __DATA__
        ((case loc a xar d xdr) cell (cdr xs))
        (car xs))))
 
-; skip
+(mac clean (f place)
+  (letu v
+    `(let ,v (compose no ,f)
+       (zap [keep ,v _] ,place))))
+
+(mac swap places
+  (let vs (map [nof 3 (uvar)] places)
+    `(atomic (withs ,(fuse (fn (place (cell loc val))
+                             (list (list cell loc)
+                                   `(where ,place)
+                                   val
+                                   `((case ,loc a car d cdr) ,cell)))
+                           places
+                           vs)
+               ,@(map (fn ((cellx locx valx) (celly locy valy))
+                        `((case ,locx a xar d xdr) ,cellx ,valy))
+                      vs
+                      (snoc (cdr vs) (car vs)))))))
+
+(def adjoin (x ys (o f =))
+  (if (mem x ys f) ys (cons x ys)))
+
+(mac pushnew (x place (o f '=))
+  (letu v
+    `(let ,v ,x
+       (zap [adjoin ,v _ ,f] ,place))))
+
+(def dedup (xs (o f =))
+  (rev (foldl (trap adjoin f) nil xs)))
+
+(def insert (f x ys)
+  (if (no ys)        (list x)
+      (f x (car ys)) (cons x ys)
+                     (cons (car ys) (insert f x (cdr ys)))))
+
+(def sort (f xs)
+  (foldr (part insert f) nil (rev xs)))
+
+(set best car:sort)
+
+(def max args
+  (best > args))
+
+(def min args
+  (best < args))
+
+(def even (n)
+  (int (/ n 2)))
+
+(set odd (cand int ~even))
+
+(def round (n)
+  (let r (fn (n)
+           (withs (f (floor n)
+                   d (- n f))
+             (if (or (> d 1/2) (and (= d 1/2) (odd f)))
+                 (ceil n)
+                 f)))
+    (if (< n 0) (-:r:- n) (r n))))
+
+; skip withfile -- needs streams
+
+; skip from -- needs streams
+
+; skip to -- needs streams
+
+; skip readall -- needs streams
+
+; skip load -- needs streams
+
+(mac record body
+  (letu v
+    `(let ,v (newq)
+       (bind outs ,v ,@body)
+       (car ,v))))
+
+; skip prs -- needs pr
+
+(def array (dims (o default))
+  (if (no dims)
+      default
+      `(lit arr ,@(nof (car dims)
+                       (array (cdr dims) default)))))
+
+(vir arr (f args)
+  `(aref ,f ,@args))
+
+(def aref (a|isa!arr n . ns)
+  (if (no ns)
+      (n (cddr a))
+      (apply aref (n (cddr a)) ns)))
+
+(def table ((o kvs))
+  `(lit tab ,@kvs))
+
+(vir tab (f args)
+  `(tabref ,f ,@args))
+
+(def tabref (tab key (o default))
+  (aif (get key (cddr tab))
+       (cdr it)
+       default))
+
+(loc isa!tab (f args a s r m)
+  (let e `(list (tabloc ,f ,@(map [list 'quote _] args)) 'd)
+    (mev (cons (list e a) (cdr s)) r m)))
+
+(def tabrem (tab key (o f =))
+  (clean [caris _ key f] (cddr tab)))
+
+(set templates (table))
+
+(mac tem (name . fields)
+  `(set (templates ',name)
+        (list ,@(map (fn ((k v)) `(cons ',k (fn () ,v)))
+                     (hug fields)))))
+
+(mac make (name . args)
+  `(inst ',name
+         (list ,@(map (fn ((k v)) `(cons ',k ,v))
+                      (hug args)))))
+
+(def inst (name kvs)
+  (aif templates.name
+       (table (map (fn ((k . f))
+                     (cons k
+                           (aif (get k kvs) (cdr it) (f))))
+                   it))
+       (err 'no-template)))
+
+; skip readas
 
 (def err args)
 

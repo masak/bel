@@ -6,7 +6,7 @@ use Test::More;
 
 use Language::Bel;
 
-plan tests => 2;
+plan tests => 6;
 
 my $actual_output = "";
 my $b = Language::Bel->new({ output => sub {
@@ -24,6 +24,10 @@ sub is_bel_output {
 }
 
 {
-    is_bel_output("(2 '(a b c))", "b");
-    is_bel_output("(do (push (cons 'num (fn (f args) ''haha)) virfns) (2 '(a b c)))", "haha");
+    is_bel_output("(<= 1 1 1)", "t");
+    is_bel_output("(<= 3 2 0)", "nil");
+    is_bel_output("(<= 1 2 3)", "t");
+    is_bel_output("(<= 1 2 1)", "nil");
+    is_bel_output("(<= 1)", "t");
+    is_bel_output("(<=)", "t");
 }

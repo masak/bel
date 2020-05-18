@@ -69,7 +69,7 @@ sub bel_todo {
     is_bel_output("(find pair w)", "(b c)");
     is_bel_output("(pop (find pair w))", "b");
     is_bel_output("w", "(a (c) d (e f))");
-    bel_todo(q[(dedup:sort < "abracadabra")], q["abcdr"], "('unboundb dedup)");
+    bel_todo(q[(dedup:sort < "abracadabra")], q["abcdr"], "('unboundb chars)");
     is_bel_output("(+ .05 19/20)", "1");
     is_bel_output("(map (upon 2 3) (list + - * /))", "(5 -1 6 2/3)");
     is_bel_output("(let x 'a (cons x 'b))", "(a . b)");
@@ -87,33 +87,22 @@ sub bel_todo {
     bel_todo("goodness", "10", "('unboundb goodness)");
     # TODO: can't apply macros yet
     bel_todo("(apply or '(t nil))", "t", "'unapplyable");
-    # TODO: `best` not implemented
-    bel_todo("(best (of > len) '((a b) (a b c d) (a) (a b c)))", "(a b c d)", "('unboundb best)");
-    # TODO: `!3` syntax not implemented
-    bel_todo("(!3 (part + 2))", "5", "('unboundb part)");
+    is_bel_output("(best (of > len) '((a b) (a b c d) (a) (a b c)))", "(a b c d)");
+    is_bel_output("(!3 (part + 2))", "5");
     # TODO: `to` not implemented
     bel_todo(q[(to "testfile" (print 'hello))], "nil", "('unboundb to)");
     # TODO: `from` not implemented
     bel_todo(q[(from "testfile" (read))], "hello", "('unboundb from)");
-    # TODO: `table` not implemented
-    bel_todo("(set y (table))", "(lit tab)", "('unboundb table)");
-    bel_todo("(set y!a 1 y!b 2)", "2", "('unboundb y)");
-    # TODO: goes with the previous one
-    bel_todo("(map y '(a b))", "(1 2)", "('unboundb y)");
-    # TODO: goes with the previous one
-    bel_todo("(map ++:y '(a b))", "(2 3)", "('unboundb y)");
-    bel_todo("y!b", "3", "('unboundb y)");
-    # TODO: `array` not implemented
-    bel_todo("(set z (array '(2 2) 0))", "(lit arr (lit arr 0 0) (lit arr 0 0))", "('unboundb array)");
-    # TODO: goes with the previous one
-    bel_todo("(z 1 1)", "0", "('unboundb z)");
-    # TODO: goes with the previous one
-    bel_todo("(for x 1 2 (for y 1 2 (set (z x y) (+ (* x 10) y))))", "nil", "('unboundb for)");
-    # TODO: goes with the previous one
-    bel_todo("(z 1 1)", "11", "('unboundb z)");
-    # TODO: goes with the previous one
-    bel_todo("(swap (z 1) (z 2))", "(lit arr 11 12)", "('unboundb swap)");
-    # TODO: goes with the previous one
-    bel_todo("(z 1 1)", "21", "('unboundb z)");
+    is_bel_output("(set y (table))", "(lit tab)");
+    is_bel_output("(set y!a 1 y!b 2)", "2");
+    is_bel_output("(map y '(a b))", "(1 2)");
+    is_bel_output("(map ++:y '(a b))", "(2 3)");
+    is_bel_output("y!b", "3");
+    is_bel_output("(set z (array '(2 2) 0))", "(lit arr (lit arr 0 0) (lit arr 0 0))");
+    is_bel_output("(z 1 1)", "0");
+    is_bel_output("(for x 1 2 (for y 1 2 (set (z x y) (+ (* x 10) y))))", "nil");
+    is_bel_output("(z 1 1)", "11");
+    is_bel_output("(swap (z 1) (z 2))", "(lit arr 11 12)");
+    is_bel_output("(z 1 1)", "21");
 }
 

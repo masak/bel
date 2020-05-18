@@ -77,13 +77,13 @@ sub bqex {
         ), $NO_CHANGE;
     }
     elsif (caris($e, "comma")) {
-        return pair_car(pair_cdr($e)), $CHANGED;
+        return pair_car(pair_cdr(_bqexpand($e))), $CHANGED;
     }
     elsif (caris($e, "comma-at")) {
         return make_pair(
             make_symbol("splice"),
             make_pair(
-                pair_car(pair_cdr($e)),
+                pair_car(pair_cdr(_bqexpand($e))),
                 SYMBOL_NIL,
             ),
         ), $CHANGED;
