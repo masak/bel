@@ -85,8 +85,7 @@ sub bel_todo {
     bel_todo(q[(let m (macro (x) (sym (append (nom x) "ness"))) (set (m good) 10))], "10", "('unboundb sym)");
     # TODO: goes with the previous one
     bel_todo("goodness", "10", "('unboundb goodness)");
-    # TODO: can't apply macros yet
-    bel_todo("(apply or '(t nil))", "t", "'unapplyable");
+    is_bel_output("(apply or '(t nil))", "t");
     is_bel_output("(best (of > len) '((a b) (a b c d) (a) (a b c)))", "(a b c d)");
     is_bel_output("(!3 (part + 2))", "5");
     # TODO: `to` not implemented

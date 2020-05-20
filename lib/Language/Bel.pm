@@ -759,7 +759,22 @@ sub applylit {
             # XXX: skipping `okenv` and `okparms` checks for now
             $self->applyclo($parms, $args, $env, $body);
         }
-        # XXX: skipping `mac` case for now
+        elsif ($tag_name eq "mac") {
+            my @stack;
+            while (!is_nil($args)) {
+                push @stack, prim_car($args);
+                $args = prim_cdr($args);
+            }
+            my $quoted_args = SYMBOL_NIL;
+            while (@stack) {
+                $quoted_args = make_pair(
+                    pop(@stack),
+                    $quoted_args,
+                );
+            }
+
+            $self->applym($f, $quoted_args, $a);
+        }
         # XXX: skipping `cont` case for now
         else {
             my $virfns = pair_cdr(get(make_symbol("virfns"), $self->{g}));
