@@ -91,6 +91,41 @@ sub prim_join {
     return make_pair($first, $second);
 }
 
+sub prim_nom {
+    my ($value) = @_;
+
+    if (!is_symbol($value)) {
+        die "not-a-symbol\n";
+    }
+
+    my $result = SYMBOL_NIL;
+    for my $char (reverse(split //, symbol_name($value))) {
+        $result = make_pair(
+            make_char(ord($char)),
+            $result,
+        );
+    }
+    return $result;
+}
+
+sub prim_sym {
+    my ($value) = @_;
+
+    my @stack;
+    while (is_pair($value)) {
+        my $elem = prim_car($value);
+        die "not-a-string"
+            unless is_char($elem);
+        push @stack, chr(char_codepoint($elem));
+        $value = prim_cdr($value);
+    }
+    die "not-a-string"
+        unless is_nil($value);
+
+    my $name = join("", @stack);
+    return make_symbol($name);
+}
+
 sub prim_type {
     my ($value) = @_;
 
@@ -128,23 +163,6 @@ sub prim_xdr {
     return $d_value;
 }
 
-sub prim_nom {
-    my ($value) = @_;
-
-    if (!is_symbol($value)) {
-        die "not-a-symbol\n";
-    }
-
-    my $result = SYMBOL_NIL;
-    for my $char (reverse(split //, symbol_name($value))) {
-        $result = make_pair(
-            make_char(ord($char)),
-            $result,
-        );
-    }
-    return $result;
-}
-
 sub make_prim {
     my ($name) = @_;
 
@@ -167,6 +185,7 @@ my %prim_fn = (
     "id" => { fn => \&prim_id, arity => 2 },
     "join" => { fn => \&prim_join, arity => 2 },
     "nom" => { fn => \&prim_nom, arity => 1 },
+    "sym" => { fn => \&prim_sym, arity => 1 },
     "type" => { fn => \&prim_type, arity => 1 },
     "xar" => { fn => \&prim_xar, arity => 2 },
     "xdr" => { fn => \&prim_xdr, arity => 2 },
@@ -193,6 +212,7 @@ our @EXPORT_OK = qw(
     prim_id 
     prim_join
     prim_nom
+    prim_sym
     prim_type
     prim_xar
     prim_xdr
