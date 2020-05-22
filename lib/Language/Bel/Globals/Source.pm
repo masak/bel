@@ -53,8 +53,8 @@ __DATA__
 
 (mac fn (parms . body)
   (if (no (cdr body))
-    `(list 'lit 'clo scope ',parms ',(car body))
-    `(list 'lit 'clo scope ',parms '(do ,@body))))
+      `(list 'lit 'clo scope ',parms ',(car body))
+      `(list 'lit 'clo scope ',parms '(do ,@body))))
 
 (set vmark (join))
 
@@ -101,7 +101,7 @@ __DATA__
 
 (def char   (x) (= (type x) 'char))
 
-; not doing `stream` right now; waiting until we have streams
+; skip stream
 
 (def proper (x)
   (or (no x)
@@ -200,7 +200,11 @@ __DATA__
 (def is (x)
   [= _ x])
 
-; skipping `eif`, `onerr`, `safe`; these require overriding `err` dynamically, and `ccc`
+; skip eif
+
+; skip onerr
+
+; skip safe
 
 (def literal (e)
   (or (in e t nil o apply)
@@ -216,7 +220,65 @@ __DATA__
 (def isa (name)
   [begins _ `(lit ,name) id])
 
-; skipping the evaluator for now
+; skip bel
+
+; skip mev
+
+; skip sched
+
+; skip ev
+
+; skip vref
+
+; skip smark
+
+; skip inwhere
+
+; skip lookup
+
+; skip binding
+
+; skip sigerr
+
+; skip fu
+
+; skip evmark
+
+; skip forms
+
+; skip form
+
+; skip formfn
+
+; skip parameters
+
+; skip quote
+
+; skip if
+
+; skip if2
+
+; skip where
+
+; skip dyn
+
+; skip dyn2
+
+; skip after
+
+; skip ccc
+
+; skip thread
+
+; skip evcall
+
+; skip evcall2
+
+; skip applym
+
+; skip applyf
+
+; skip applylit
 
 (set virfns nil)
 
@@ -234,7 +296,29 @@ __DATA__
 (loc (is cdr) (f args a s r m)
   (mev (cdr s) (cons (list (car args) 'd) r) m))
 
-; back to skipping the evaluator
+; skip okenv
+
+; skip okstack
+
+; skip okparms
+
+; skip oktoparm
+
+; skip prims
+
+; skip applyprim
+
+; skip applyclo
+
+; skip pass
+
+; skip typecheck
+
+; skip destructure
+
+; skip applycont
+
+; skip protected
 
 (def function (x)
   (find [(isa _) x] '(prim clo)))
@@ -666,7 +750,166 @@ __DATA__
     `(let ,v ,x
        (zap [rem ,v _ ,@rest] ,place))))
 
-; skipping reader and printer
+; skip cbuf
+
+; skip open
+
+; skip close
+
+; skip peek
+
+; skip rdc
+
+; skip bbuf
+
+; skip bitc
+
+; skip digit
+
+; skip breakc
+
+; skip signc
+
+; skip intrac
+
+; skip source
+
+; skip read
+
+; skip saferead
+
+; skip rdex
+
+; skip eatwhite
+
+; skip charstil
+
+; skip syntax
+
+; skip syn
+
+; skip \(
+
+; skip \)
+
+; skip \[
+
+; skip \]
+
+; skip rdlist
+
+; skip rddot
+
+; skip hard-rdex
+
+; skip namecs
+
+; skip \\
+
+; skip \'
+
+; skip \`
+
+; skip \,
+
+; skip rdwrap
+
+; skip \"
+
+; skip \¦
+
+; skip rddelim
+
+; skip \#
+
+; skip rdtarget
+
+; skip rdword
+
+; skip parseword
+
+; skip parsenum
+
+; skip validi
+
+; skip validr
+
+; skip validd
+
+; skip parsei
+
+; skip parsesr
+
+; skip parsed
+
+; skip parseint
+
+; skip charint
+
+; skip parset
+
+; skip parseslist
+
+; skip parsecom
+
+; skip parseno
+
+; skip bquote
+
+; skip bqex
+
+; skip bqthru
+
+; skip bqexpair
+
+; skip spa
+
+; skip spd
+
+(mac comma args
+  '(err 'comma-outside-backquote))
+
+(mac comma-at args
+  '(err 'comma-at-outside-backquote))
+
+(mac splice args
+  '(err 'comma-at-outside-list))
+
+; skip print
+
+; skip namedups
+
+; skip cells
+
+; skip prc
+
+; skip ustring
+
+; skip prstring
+
+; skip presc
+
+; skip prsimple
+
+; skip prsymbol
+
+; skip prnum
+
+; skip rrep
+
+; skip irep
+
+; skip intchar
+
+; skip prpair
+
+; skip prelts
+
+; skip prn
+
+; skip pr
+
+; skip prnice
 
 (def drop (n|whole xs)
   (if (= n 0)
@@ -681,15 +924,15 @@ __DATA__
 (vir num (f args)
   `(nth ,f ,@args))
 
-; skipping nchar
+; skip nchar
 
-(def first (n xs)   ; n|whole xs
+(def first (n|whole xs)
   (if (or (= n 0) (no xs))
       nil
       (cons (car xs)
             (first (- n 1) (cdr xs)))))
 
-; skipping catch
+; skip catch
 
 (def cut (xs (o start 1) (o end (len xs)))
   (first (- (+ end 1 (if (< end 0) (len xs) 0))
@@ -725,7 +968,7 @@ __DATA__
 (def <= args
   (apply >= (rev args)))
 
-(def floor (x)              ; (x|real)
+(def floor (x|real)
   (let (s n d) (numr x)
     (let (f m) (i/ n d)
       (litnum (list s
@@ -876,15 +1119,15 @@ __DATA__
                  f)))
     (if (< n 0) (-:r:- n) (r n))))
 
-; skip withfile -- needs streams
+; skip withfile
 
-; skip from -- needs streams
+; skip from
 
-; skip to -- needs streams
+; skip to
 
-; skip readall -- needs streams
+; skip readall
 
-; skip load -- needs streams
+; skip load
 
 (mac record body
   (letu v
@@ -892,7 +1135,7 @@ __DATA__
        (bind outs ,v ,@body)
        (car ,v))))
 
-; skip prs -- needs pr
+; skip prs
 
 (def array (dims (o default))
   (if (no dims)
@@ -923,6 +1166,12 @@ __DATA__
   (let e `(list (tabloc ,f ,@(map [list 'quote _] args)) 'd)
     (mev (cons (list e a) (cdr s)) r m)))
 
+(def tabloc (tab key)
+  (or (get key (cddr tab))
+      (let kv (cons key nil)
+        (push kv (cddr tab))
+        kv)))
+
 (def tabrem (tab key (o f =))
   (clean [caris _ key f] (cddr tab)))
 
@@ -949,12 +1198,3 @@ __DATA__
 ; skip readas
 
 (def err args)
-
-(mac comma args
-  '(err 'comma-outside-backquote))
-
-(mac comma-at args
-  '(err 'comma-at-outside-backquote))
-
-(mac splice args
-  '(err 'comma-at-outside-list))
