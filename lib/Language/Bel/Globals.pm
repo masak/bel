@@ -3347,6 +3347,36 @@ $globals{"pull"} =
     make_pair(SYMBOL_NIL, SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))),
     SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))))), SYMBOL_NIL)));
 
+$globals{"comma"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("mac"),
+    make_pair(make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_symbol("args"),
+    make_pair(make_pair(SYMBOL_QUOTE,
+    make_pair(make_pair(make_symbol("err"),
+    make_pair(make_pair(SYMBOL_QUOTE,
+    make_pair(make_symbol("comma-outside-backquote"), SYMBOL_NIL)),
+    SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL))))), SYMBOL_NIL)));
+
+$globals{"comma-at"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("mac"),
+    make_pair(make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_symbol("args"),
+    make_pair(make_pair(SYMBOL_QUOTE,
+    make_pair(make_pair(make_symbol("err"),
+    make_pair(make_pair(SYMBOL_QUOTE,
+    make_pair(make_symbol("comma-at-outside-backquote"), SYMBOL_NIL)),
+    SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL))))), SYMBOL_NIL)));
+
+$globals{"splice"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("mac"),
+    make_pair(make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_symbol("args"),
+    make_pair(make_pair(SYMBOL_QUOTE,
+    make_pair(make_pair(make_symbol("err"),
+    make_pair(make_pair(SYMBOL_QUOTE,
+    make_pair(make_symbol("comma-at-outside-list"), SYMBOL_NIL)),
+    SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL))))), SYMBOL_NIL)));
+
 $globals{"drop"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_pair(make_pair(SYMBOL_T,
@@ -3399,8 +3429,9 @@ $globals{"nth"} =
 
 $globals{"first"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("n"),
-    make_pair(make_symbol("xs"), SYMBOL_NIL)),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_pair(SYMBOL_T,
+    make_pair(make_symbol("n"), make_pair(make_symbol("whole"),
+    SYMBOL_NIL))), make_pair(make_symbol("xs"), SYMBOL_NIL)),
     make_pair(make_pair(make_symbol("if"),
     make_pair(make_pair(make_symbol("or"),
     make_pair(make_pair(make_symbol("="), make_pair(make_symbol("n"),
@@ -3572,8 +3603,9 @@ $globals{"<="} =
 
 $globals{"floor"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
-    make_pair(make_pair(make_symbol("let"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_pair(SYMBOL_T,
+    make_pair(make_symbol("x"), make_pair(make_symbol("real"),
+    SYMBOL_NIL))), SYMBOL_NIL), make_pair(make_pair(make_symbol("let"),
     make_pair(make_pair(make_symbol("s"), make_pair(make_symbol("n"),
     make_pair(make_symbol("d"), SYMBOL_NIL))),
     make_pair(make_pair(make_symbol("numr"), make_pair(make_symbol("x"),
@@ -4745,6 +4777,21 @@ $globals{"tabref"} =
     make_pair(make_symbol("it"), SYMBOL_NIL)),
     make_pair(make_symbol("default"), SYMBOL_NIL)))), SYMBOL_NIL)))));
 
+$globals{"tabloc"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("tab"),
+    make_pair(make_symbol("key"), SYMBOL_NIL)),
+    make_pair(make_pair(make_symbol("or"),
+    make_pair(make_pair(make_symbol("get"), make_pair(make_symbol("key"),
+    make_pair(make_pair(make_symbol("cddr"), make_pair(make_symbol("tab"),
+    SYMBOL_NIL)), SYMBOL_NIL))), make_pair(make_pair(make_symbol("let"),
+    make_pair(make_symbol("kv"), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_symbol("key"), make_pair(SYMBOL_NIL, SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("push"), make_pair(make_symbol("kv"),
+    make_pair(make_pair(make_symbol("cddr"), make_pair(make_symbol("tab"),
+    SYMBOL_NIL)), SYMBOL_NIL))), make_pair(make_symbol("kv"),
+    SYMBOL_NIL))))), SYMBOL_NIL))), SYMBOL_NIL)))));
+
 $globals{"tabrem"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("tab"),
@@ -4866,36 +4913,6 @@ $globals{"err"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_symbol("args"),
     make_pair(SYMBOL_NIL, SYMBOL_NIL)))));
-
-$globals{"comma"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("mac"),
-    make_pair(make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_symbol("args"),
-    make_pair(make_pair(SYMBOL_QUOTE,
-    make_pair(make_pair(make_symbol("err"),
-    make_pair(make_pair(SYMBOL_QUOTE,
-    make_pair(make_symbol("comma-outside-backquote"), SYMBOL_NIL)),
-    SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL))))), SYMBOL_NIL)));
-
-$globals{"comma-at"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("mac"),
-    make_pair(make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_symbol("args"),
-    make_pair(make_pair(SYMBOL_QUOTE,
-    make_pair(make_pair(make_symbol("err"),
-    make_pair(make_pair(SYMBOL_QUOTE,
-    make_pair(make_symbol("comma-at-outside-backquote"), SYMBOL_NIL)),
-    SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL))))), SYMBOL_NIL)));
-
-$globals{"splice"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("mac"),
-    make_pair(make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_symbol("args"),
-    make_pair(make_pair(SYMBOL_QUOTE,
-    make_pair(make_pair(make_symbol("err"),
-    make_pair(make_pair(SYMBOL_QUOTE,
-    make_pair(make_symbol("comma-at-outside-list"), SYMBOL_NIL)),
-    SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL))))), SYMBOL_NIL)));
 
 our @EXPORT_OK = qw(
     GLOBALS
