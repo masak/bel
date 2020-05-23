@@ -1747,10 +1747,11 @@ $globals{"srone"} =
     make_pair(make_pair(SYMBOL_T, SYMBOL_NIL), SYMBOL_NIL)));
 
 $globals{"sr+"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_pair(make_symbol("xs"),
-    make_symbol("xr")), make_pair(make_pair(make_symbol("ys"),
-    make_symbol("yr")), SYMBOL_NIL)), make_pair(make_pair(make_symbol("if"),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_pair(make_symbol("xs"), make_symbol("xr")),
+    make_pair(make_pair(make_symbol("ys"), make_symbol("yr")), SYMBOL_NIL)),
+    make_pair(make_pair(make_symbol("if"),
     make_pair(make_pair(make_symbol("="), make_pair(make_symbol("xs"),
     make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("-"),
     SYMBOL_NIL)), SYMBOL_NIL))), make_pair(make_pair(make_symbol("if"),
@@ -1771,7 +1772,8 @@ $globals{"sr+"} =
     make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("+"),
     SYMBOL_NIL)), make_pair(make_pair(make_symbol("r+"),
     make_pair(make_symbol("xr"), make_pair(make_symbol("yr"), SYMBOL_NIL))),
-    SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL)))), SYMBOL_NIL)))));
+    SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL)))), SYMBOL_NIL))))),
+    FASTFUNCS->{'sr+'});
 
 $globals{"sr-"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
