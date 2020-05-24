@@ -3377,6 +3377,12 @@ $globals{"splice"} =
     make_pair(make_symbol("comma-at-outside-list"), SYMBOL_NIL)),
     SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL))))), SYMBOL_NIL)));
 
+$globals{"pr"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_symbol("args"),
+    make_pair(make_pair(make_symbol("map"), make_pair(make_symbol("prnice"),
+    make_pair(make_symbol("args"), SYMBOL_NIL))), SYMBOL_NIL)))));
+
 $globals{"drop"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_pair(make_pair(SYMBOL_T,
@@ -3654,7 +3660,8 @@ $globals{"ceil"} =
     SYMBOL_NIL)))))), SYMBOL_NIL)))))),
     make_pair(make_pair(make_symbol("f"), make_pair(make_symbol("lit"),
     make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
-    make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
+    make_pair(make_pair(make_pair(SYMBOL_T, make_pair(make_symbol("x"),
+    make_pair(make_symbol("real"), SYMBOL_NIL))), SYMBOL_NIL),
     make_pair(make_pair(make_symbol("let"),
     make_pair(make_pair(make_symbol("s"), make_pair(make_symbol("n"),
     make_pair(make_symbol("d"), SYMBOL_NIL))),
@@ -3697,8 +3704,9 @@ $globals{"ceil"} =
     SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL)), SYMBOL_NIL))),
     SYMBOL_NIL)))))), SYMBOL_NIL))))),
     make_pair(make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
-    make_pair(make_pair(make_symbol("let"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_pair(SYMBOL_T,
+    make_pair(make_symbol("x"), make_pair(make_symbol("real"),
+    SYMBOL_NIL))), SYMBOL_NIL), make_pair(make_pair(make_symbol("let"),
     make_pair(make_pair(make_symbol("s"), make_pair(make_symbol("n"),
     make_pair(make_symbol("d"), SYMBOL_NIL))),
     make_pair(make_pair(make_symbol("numr"), make_pair(make_symbol("x"),
@@ -3784,8 +3792,9 @@ $globals{"ceil"} =
     SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL)), SYMBOL_NIL))),
     SYMBOL_NIL)))))), SYMBOL_NIL))))),
     make_pair(make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
-    make_pair(make_pair(make_symbol("let"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_pair(SYMBOL_T,
+    make_pair(make_symbol("x"), make_pair(make_symbol("real"),
+    SYMBOL_NIL))), SYMBOL_NIL), make_pair(make_pair(make_symbol("let"),
     make_pair(make_pair(make_symbol("s"), make_pair(make_symbol("n"),
     make_pair(make_symbol("d"), SYMBOL_NIL))),
     make_pair(make_pair(make_symbol("numr"), make_pair(make_symbol("x"),

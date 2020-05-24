@@ -907,7 +907,8 @@ __DATA__
 
 ; skip prn
 
-; skip pr
+(def pr args
+  (map prnice args))
 
 ; skip prnice
 
