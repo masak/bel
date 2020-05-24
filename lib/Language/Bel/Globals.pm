@@ -1850,8 +1850,9 @@ $globals{"srrecip"} =
     FASTFUNCS->{'srrecip'});
 
 $globals{"sr<"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_pair(make_symbol("xs"),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_pair(make_symbol("xs"),
     make_pair(make_symbol("xn"), make_pair(make_symbol("xd"), SYMBOL_NIL))),
     make_pair(make_pair(make_symbol("ys"), make_pair(make_symbol("yn"),
     make_pair(make_symbol("yd"), SYMBOL_NIL))), SYMBOL_NIL)),
@@ -1880,7 +1881,7 @@ $globals{"sr<"} =
     make_pair(make_symbol("xd"), SYMBOL_NIL))),
     make_pair(make_pair(make_symbol("i*"), make_pair(make_symbol("xn"),
     make_pair(make_symbol("yd"), SYMBOL_NIL))), SYMBOL_NIL))),
-    SYMBOL_NIL)))), SYMBOL_NIL)))), SYMBOL_NIL)))));
+    SYMBOL_NIL)))), SYMBOL_NIL)))), SYMBOL_NIL))))), FASTFUNCS->{'sr<'});
 
 $globals{"srnum"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),

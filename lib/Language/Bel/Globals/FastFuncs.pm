@@ -2242,6 +2242,100 @@ my %FASTFUNCS = (
         );
     },
 
+    "sr<" => sub {
+        my ($call, $x, $y) = @_;
+
+        my $xs = prim_car($x);
+        my $xn = prim_car(prim_cdr($x));
+        my $xd = prim_car(prim_cdr(prim_cdr($x)));
+
+        my $ys = prim_car($y);
+        my $yn = prim_car(prim_cdr($y));
+        my $yd = prim_car(prim_cdr(prim_cdr($y)));
+
+        if (is_symbol_of_name($xs, "+")) {
+            if (is_symbol_of_name($ys, "+")) {
+                my $xn_n = 0;
+                while (!is_nil($xn)) {
+                    ++$xn_n;
+                    $xn = prim_cdr($xn);
+                }
+
+                my $xd_n = 0;
+                while (!is_nil($xd)) {
+                    ++$xd_n;
+                    $xd = prim_cdr($xd);
+                }
+
+                my $yn_n = 0;
+                while (!is_nil($yn)) {
+                    ++$yn_n;
+                    $yn = prim_cdr($yn);
+                }
+
+                my $yd_n = 0;
+                while (!is_nil($yd)) {
+                    ++$yd_n;
+                    $yd = prim_cdr($yd);
+                }
+
+                my $p1_n = $xn_n * $yd_n;
+                my $p2_n = $yn_n * $xd_n;
+
+                my $n = $p2_n - $p1_n;
+                my $result = SYMBOL_NIL;
+                for (1..$n) {
+                    $result = make_pair(SYMBOL_T, $result);
+                }
+                return $result;
+            }
+            else {
+                return SYMBOL_NIL;
+            }
+        }
+        else {
+            if (is_symbol_of_name($ys, "+")) {
+                return !is_nil($xn) || !is_nil($yn)
+                    ? SYMBOL_T
+                    : SYMBOL_NIL;
+            }
+            else {
+                my $xn_n = 0;
+                while (!is_nil($xn)) {
+                    ++$xn_n;
+                    $xn = prim_cdr($xn);
+                }
+
+                my $xd_n = 0;
+                while (!is_nil($xd)) {
+                    ++$xd_n;
+                    $xd = prim_cdr($xd);
+                }
+
+                my $yn_n = 0;
+                while (!is_nil($yn)) {
+                    ++$yn_n;
+                    $yn = prim_cdr($yn);
+                }
+
+                my $yd_n = 0;
+                while (!is_nil($yd)) {
+                    ++$yd_n;
+                    $yd = prim_cdr($yd);
+                }
+
+                my $p1_n = $yn_n * $xd_n;
+                my $p2_n = $xn_n * $yd_n;
+
+                my $n = $p2_n - $p1_n;
+                my $result = SYMBOL_NIL;
+                for (1..$n) {
+                    $result = make_pair(SYMBOL_T, $result);
+                }
+                return $result;
+            }
+        }
+    },
 );
 
 sub FASTFUNCS {
