@@ -25,6 +25,7 @@ use Language::Bel::Symbols::Common qw(
     SYMBOL_NIL
     SYMBOL_T
 );
+use Language::Bel::Printer;
 
 use Exporter 'import';
 
@@ -1333,6 +1334,20 @@ my %FASTFUNCS = (
                 SYMBOL_NIL,
             ),
         );
+    },
+
+    "pr" => sub {
+        my ($call, @args) = @_;
+
+        print for
+            map { Language::Bel::Printer::prnice($_) }
+            @args;
+
+        my $result = SYMBOL_NIL;
+        while (@args) {
+            $result = make_pair(pop(@args), $result);
+        }
+        return $result;
     },
 );
 
