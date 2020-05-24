@@ -1806,10 +1806,10 @@ $globals{"srinv"} =
     FASTFUNCS->{'srinv'});
 
 $globals{"sr*"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_pair(make_symbol("xs"),
-    make_symbol("xr")), make_pair(make_pair(make_symbol("ys"),
-    make_symbol("yr")), SYMBOL_NIL)),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_pair(make_symbol("xs"), make_symbol("xr")),
+    make_pair(make_pair(make_symbol("ys"), make_symbol("yr")), SYMBOL_NIL)),
     make_pair(make_pair(make_symbol("cons"),
     make_pair(make_pair(make_symbol("if"),
     make_pair(make_pair(make_symbol("="), make_pair(make_symbol("xs"),
@@ -1822,7 +1822,7 @@ $globals{"sr*"} =
     make_pair(make_symbol("ys"), SYMBOL_NIL)))),
     make_pair(make_pair(make_symbol("r*"), make_pair(make_symbol("xr"),
     make_pair(make_symbol("yr"), SYMBOL_NIL))), SYMBOL_NIL))),
-    SYMBOL_NIL)))));
+    SYMBOL_NIL))))), FASTFUNCS->{'sr*'});
 
 $globals{"sr/"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
