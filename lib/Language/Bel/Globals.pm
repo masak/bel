@@ -3377,6 +3377,23 @@ $globals{"splice"} =
     make_pair(make_symbol("comma-at-outside-list"), SYMBOL_NIL)),
     SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL))))), SYMBOL_NIL)));
 
+$globals{"prn"} =
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_symbol("args"), make_pair(make_pair(make_symbol("do"),
+    make_pair(make_pair(make_symbol("map"),
+    make_pair(make_pair(make_symbol("fn"),
+    make_pair(make_pair(make_symbol("_"), SYMBOL_NIL),
+    make_pair(make_pair(make_symbol("do"),
+    make_pair(make_pair(make_symbol("print"), make_pair(make_symbol("_"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("prc"),
+    make_pair(make_char(32), SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL))),
+    make_pair(make_symbol("args"), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("prc"), make_pair(make_char(10),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("last"),
+    make_pair(make_symbol("args"), SYMBOL_NIL)), SYMBOL_NIL)))),
+    SYMBOL_NIL))))), FASTFUNCS->{'prn'});
+
 $globals{"pr"} =
     make_fastfunc(make_pair(make_symbol("lit"),
     make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,

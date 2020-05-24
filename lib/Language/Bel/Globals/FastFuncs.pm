@@ -1336,6 +1336,19 @@ my %FASTFUNCS = (
         );
     },
 
+    "prn" => sub {
+        my ($call, @args) = @_;
+
+        my $last = SYMBOL_NIL;
+        for (@args) {
+            print(Language::Bel::Printer::_print($_));
+            print(" ");
+            $last = $_;
+        }
+        print("\n");
+        return $last;
+    },
+
     "pr" => sub {
         my ($call, @args) = @_;
 
