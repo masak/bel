@@ -2148,6 +2148,79 @@ my %FASTFUNCS = (
         );
     },
 
+    "sr/" => sub {
+        my ($call, $x, $y) = @_;
+
+        my $xs = prim_car($x);
+        my $xn = prim_car(prim_cdr($x));
+        my $xd = prim_car(prim_cdr(prim_cdr($x)));
+
+        my $ys = prim_car($y);
+        my $yn = prim_car(prim_cdr($y));
+        my $yd = prim_car(prim_cdr(prim_cdr($y)));
+
+        die "'mistype\n"
+            if is_nil($yn);
+
+        my $sign = is_symbol_of_name($xs, "-")
+            ? make_symbol(is_symbol_of_name($ys, "-") ? "+" : "-")
+            : $ys;
+
+        my $xn_n = 0;
+        while (!is_nil($xn)) {
+            ++$xn_n;
+            $xn = prim_cdr($xn);
+        }
+
+        my $xd_n = 0;
+        while (!is_nil($xd)) {
+            ++$xd_n;
+            $xd = prim_cdr($xd);
+        }
+
+        my $yn_n = 0;
+        while (!is_nil($yn)) {
+            ++$yn_n;
+            $yn = prim_cdr($yn);
+        }
+
+        my $yd_n = 0;
+        while (!is_nil($yd)) {
+            ++$yd_n;
+            $yd = prim_cdr($yd);
+        }
+
+        my $n_n = $xn_n * $yd_n;
+        my $d_n = $xd_n * $yn_n;
+
+        my $n = SYMBOL_NIL;
+        for (1..$n_n) {
+            $n = make_pair(
+                SYMBOL_T,
+                $n,
+            );
+        }
+
+        my $d = SYMBOL_NIL;
+        for (1..$d_n) {
+            $d = make_pair(
+                SYMBOL_T,
+                $d,
+            );
+        }
+
+        return make_pair(
+            $sign,
+            make_pair(
+                $n,
+                make_pair(
+                    $d,
+                    SYMBOL_NIL,
+                ),
+            ),
+        );
+    },
+
     "srrecip" => sub {
         my ($call, $sr) = @_;
 
