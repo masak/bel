@@ -2336,6 +2336,42 @@ my %FASTFUNCS = (
             }
         }
     },
+
+    "srnum" => sub {
+        my ($call, $x) = @_;
+
+        return prim_car(prim_cdr($x));
+    },
+
+    "where__srnum" => sub {
+        my ($call, $x) = @_;
+
+        return make_pair(
+            prim_cdr($x),
+            make_pair(
+                SYMBOL_A,
+                SYMBOL_NIL,
+            ),
+        );
+    },
+
+    "srden" => sub {
+        my ($call, $x) = @_;
+
+        return prim_car(prim_cdr(prim_cdr($x)));
+    },
+
+    "where__srden" => sub {
+        my ($call, $x) = @_;
+
+        return make_pair(
+            prim_cdr(prim_cdr($x)),
+            make_pair(
+                SYMBOL_A,
+                SYMBOL_NIL,
+            ),
+        );
+    },
 );
 
 sub FASTFUNCS {
