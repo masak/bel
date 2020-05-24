@@ -1139,7 +1139,8 @@ __DATA__
        (bind outs ,v ,@body)
        (car ,v))))
 
-; skip prs
+(def prs args
+  (record (apply pr args)))
 
 (def array (dims (o default))
   (if (no dims)
