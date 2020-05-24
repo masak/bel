@@ -905,7 +905,10 @@ __DATA__
 
 ; skip prelts
 
-; skip prn
+(def prn args
+  (map [do (print _) (prc \sp)] args)
+  (prc \lf)
+  (last args))
 
 (def pr args
   (map prnice args))
