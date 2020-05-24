@@ -2054,6 +2054,29 @@ my %FASTFUNCS = (
             }
         }
     },
+
+    "srinv" => sub {
+        my ($call, $sr) = @_;
+
+        my $s = prim_car($sr);
+        my $n = prim_car(prim_cdr($sr));
+        my $d = prim_car(prim_cdr(prim_cdr($sr)));
+
+        my $sign = is_symbol_of_name($s, "+") && !is_nil($n)
+            ? "-"
+            : "+";
+
+        return make_pair(
+            make_symbol($sign),
+            make_pair(
+                $n,
+                make_pair(
+                    $d,
+                    SYMBOL_NIL,
+                ),
+            ),
+        );
+    },
 );
 
 sub FASTFUNCS {
