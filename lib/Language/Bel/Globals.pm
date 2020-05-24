@@ -1833,8 +1833,9 @@ $globals{"sr/"} =
     SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL)))));
 
 $globals{"srrecip"} =
-    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
-    make_pair(SYMBOL_NIL, make_pair(make_pair(make_pair(make_symbol("s"),
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_pair(make_symbol("s"),
     make_pair(make_pair(SYMBOL_T, make_pair(make_symbol("n"),
     make_pair(make_pair(make_symbol("fn"),
     make_pair(make_pair(make_symbol("_"), SYMBOL_NIL),
@@ -1844,7 +1845,8 @@ $globals{"srrecip"} =
     SYMBOL_NIL))), SYMBOL_NIL))), make_pair(make_symbol("d"), SYMBOL_NIL))),
     SYMBOL_NIL), make_pair(make_pair(make_symbol("list"),
     make_pair(make_symbol("s"), make_pair(make_symbol("d"),
-    make_pair(make_symbol("n"), SYMBOL_NIL)))), SYMBOL_NIL)))));
+    make_pair(make_symbol("n"), SYMBOL_NIL)))), SYMBOL_NIL))))),
+    FASTFUNCS->{'srrecip'});
 
 $globals{"sr<"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),

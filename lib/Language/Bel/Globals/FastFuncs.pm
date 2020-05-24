@@ -2147,6 +2147,28 @@ my %FASTFUNCS = (
             ),
         );
     },
+
+    "srrecip" => sub {
+        my ($call, $sr) = @_;
+
+        my $s = prim_car($sr);
+        my $n = prim_car(prim_cdr($sr));
+        die "'mistype\n"
+            if is_nil($n);
+        my $d = prim_car(prim_cdr(prim_cdr($sr)));
+
+        return make_pair(
+            $s,
+            make_pair(
+                $d,
+                make_pair(
+                    $n,
+                    SYMBOL_NIL,
+                ),
+            ),
+        );
+    },
+
 );
 
 sub FASTFUNCS {
