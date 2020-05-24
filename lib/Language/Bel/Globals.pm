@@ -4744,6 +4744,15 @@ $globals{"record"} =
     SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))),
     SYMBOL_NIL))))), SYMBOL_NIL)));
 
+$globals{"prs"} =
+    make_fastfunc(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_symbol("args"),
+    make_pair(make_pair(make_symbol("record"),
+    make_pair(make_pair(make_symbol("apply"), make_pair(make_symbol("pr"),
+    make_pair(make_symbol("args"), SYMBOL_NIL))), SYMBOL_NIL)),
+    SYMBOL_NIL))))), FASTFUNCS->{'prs'});
+
 $globals{"array"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("dims"),
