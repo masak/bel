@@ -10,6 +10,7 @@ use Language::Bel::Types qw(
     is_pair
     is_symbol
     is_symbol_of_name
+    make_char
     make_pair
     make_symbol
 );
@@ -25,6 +26,7 @@ use Language::Bel::Symbols::Common qw(
     SYMBOL_NIL
     SYMBOL_T
 );
+use Language::Bel::Printer;
 
 use Exporter 'import';
 
@@ -1333,6 +1335,52 @@ my %FASTFUNCS = (
                 SYMBOL_NIL,
             ),
         );
+    },
+
+    "prn" => sub {
+        my ($call, @args) = @_;
+
+        my $last = SYMBOL_NIL;
+        for (@args) {
+            print(Language::Bel::Printer::_print($_));
+            print(" ");
+            $last = $_;
+        }
+        print("\n");
+        return $last;
+    },
+
+    "pr" => sub {
+        my ($call, @args) = @_;
+
+        print for
+            map { Language::Bel::Printer::prnice($_) }
+            @args;
+
+        my $result = SYMBOL_NIL;
+        while (@args) {
+            $result = make_pair(pop(@args), $result);
+        }
+        return $result;
+    },
+
+    "prs" => sub {
+        my ($call, @args) = @_;
+
+        my @strings;
+        for (@args) {
+            push(@strings, Language::Bel::Printer::prnice($_));
+        }
+
+        my $result = SYMBOL_NIL;
+        while (@strings) {
+            my $string = pop(@strings);
+            for my $char (reverse(split //, $string)) {
+                my $c = make_char(ord($char));
+                $result = make_pair($c, $result);
+            }
+        }
+        return $result;
     },
 );
 

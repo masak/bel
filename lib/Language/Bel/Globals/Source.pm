@@ -905,9 +905,13 @@ __DATA__
 
 ; skip prelts
 
-; skip prn
+(def prn args
+  (map [do (print _) (prc \sp)] args)
+  (prc \lf)
+  (last args))
 
-; skip pr
+(def pr args
+  (map prnice args))
 
 ; skip prnice
 
@@ -1135,7 +1139,8 @@ __DATA__
        (bind outs ,v ,@body)
        (car ,v))))
 
-; skip prs
+(def prs args
+  (record (apply pr args)))
 
 (def array (dims (o default))
   (if (no dims)

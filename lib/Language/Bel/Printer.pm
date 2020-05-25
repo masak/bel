@@ -79,7 +79,50 @@ sub _print {
         return join("", @fragments);
     }
     else {
-        die "unhandled: not a symbol";
+        die "unhandled: unknown thing to print";
+    }
+}
+
+sub prnice {
+    my ($ast) = @_;
+
+    my $r_i;
+    if (is_symbol($ast)) {
+        my $name = symbol_name($ast);
+        return $name;
+    }
+    elsif (is_char($ast)) {
+        my $codepoint = char_codepoint($ast);
+        return chr($codepoint);
+    }
+    elsif (is_string($ast)) {
+        return string_value($ast);
+    }
+    elsif ($r_i = is_number($ast)) {
+        my $r = $r_i->[0];
+        my $i = $r_i->[1];
+        return prnum($r, $i);
+    }
+    elsif (is_pair($ast)) {
+        my @fragments = ("(");
+        my $first_elem = 1;
+        while (is_pair($ast) && !is_number($ast)) {
+            if (!$first_elem) {
+                push @fragments, " ";
+            }
+            push @fragments, _print(pair_car($ast));
+            $ast = pair_cdr($ast);
+            $first_elem = "";
+        }
+        if (!is_nil($ast)) {
+            push @fragments, " . ";
+            push @fragments, _print($ast);
+        }
+        push @fragments, ")";
+        return join("", @fragments);
+    }
+    else {
+        die "unhandled: unknown thing to print";
     }
 }
 
@@ -213,6 +256,7 @@ sub prnum {
 
 our @EXPORT_OK = qw(
     _print
+    prnice
 );
 
 1;
