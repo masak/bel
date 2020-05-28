@@ -1,0 +1,51 @@
+# PODNAME: Language::Bel::Reference
+# ABSTRACT: Bel language reference
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Language::Bel::Reference - Bel language reference
+
+=head1 VERSION
+
+version 0.35
+
+=head1 DESCRIPTION
+
+The reference goes through all the components of Bel, and describes them.
+
+We'll want to co-locate reference documentation with the things they describe.
+I'm fully willing to adapt the structure of the project to make this possible.
+
+Reference material should be B<austere and to the point>.
+
+Here are the things I know we'll want to document:
+
+=over
+
+=item Data types
+
+=item Axioms
+
+=item Special forms
+
+=item Built-in functions and macros
+
+=item Built-in constants
+
+=item Reader syntax
+
+=item Built-in virtual function types
+
+=back
+
+I'm fine with listing these first by some topic grouping (like "functions
+operating on lists"), and then all of them, alphabetically.
+
+=cut
+
