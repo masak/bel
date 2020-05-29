@@ -1,0 +1,29 @@
+# PODNAME: Language::Bel::Tutorial
+# ABSTRACT: Bel language tutorial
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Language::Bel::Tutorial - Bel language tutorial
+
+=head1 VERSION
+
+version 0.35
+
+=head1 DESCRIPTION
+
+This part is not written yet, but the plan is (as explained in #143) to base
+this off the Arc tutorial, which is written for people with no prior Lisp
+experience. It should be possible to adapt it to Bel and still have it feel
+natural and comprehensive.
+
+There doesn't have to be only one tutorial — we could have more of them, beyond
+the main one.
+
+=cut
+

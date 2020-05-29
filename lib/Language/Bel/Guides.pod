@@ -1,0 +1,51 @@
+# PODNAME: Language::Bel::Guides
+# ABSTRACT: Bel language how-to guides
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Language::Bel::Guides - Bel language how-to guides
+
+=head1 VERSION
+
+version 0.35
+
+=head1 DESCRIPTION
+
+Guides are supposed to be I<goal-oriented>; directions to achieve a specific
+end.
+
+They are written for relatively experienced users who know I<what> they want
+to do, but not I<how>. They don't much explain things; at most, they link to
+further explanations.
+
+Guides can show some different variants, allowing for slightly different ways
+to do things. However, it's more important to be practically usable than to
+be complete.
+
+Some possible 
+
+=over
+
+=item How to deal with parameters and binding
+
+=item How to create a new special form
+
+=item How to work with files
+
+=item How to make a new literal type
+
+=item How to register your literal type as a virtual function
+
+=back
+
+These are just suggestions; I expect them to be more high-level and abstracted
+from language mechanisms as we all gain more experience with Bel itself.
+
+=cut
+

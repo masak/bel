@@ -1,0 +1,39 @@
+# PODNAME: Language::Bel::Documentation
+# ABSTRACT: Bel language documentation
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Language::Bel::Documentation - Bel language documentation
+
+=head1 VERSION
+
+version 0.35
+
+=head1 DESCRIPTION
+
+In line with L<The Documentation System|https://documentation.divio.com/>,
+The Bel documentation targets four possible audiences:
+
+=over
+
+=item L<Language::Bel::Tutorial> for learners
+
+=item L<Language::Bel::Guides> for more experienced users
+
+=item L<Language::Bel::Explanation> for background and context
+
+=item L<Language::Bel::Reference> for technical description
+
+=back
+
+If you're unsure where to start, then probably
+L<the tutorial|Language::Bel::Tutorial> is a good place.
+
+=cut
+

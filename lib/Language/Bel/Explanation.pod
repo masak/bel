@@ -1,0 +1,84 @@
+# PODNAME: Language::Bel::Explanation
+# ABSTRACT: Bel language explanation
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Language::Bel::Explanation - Bel language explanation
+
+=head1 VERSION
+
+version 0.35
+
+=head1 DESCRIPTION
+
+I imagine I'll have the most to say in this section. These are the things I
+know we'll want to explain:
+
+=over
+
+=item Atoms, lists, and pairs
+
+=item Truth
+
+=item Functions
+
+=item Predicates
+
+=item Characters and strings
+
+=item Bindings and environments
+
+=item Dynamic variables
+
+=item Errors
+
+=item Primitive functions
+
+=item Macros
+
+=item Quasiquotation
+
+=item Special forms
+
+=item Numbers
+
+=item The Y combinator and recursion
+
+=item Threads and atomic
+
+=item Queues
+
+=item C<set> and other macros on "places"
+
+=item Streams
+
+=item Loops
+
+=item Sorting and comparison functions
+
+=item Files and I/O
+
+=item Arrays
+
+=item Tables
+
+=item Templates and instances
+
+=item The reader
+
+=item The evaluator
+
+=item The printer
+
+=item The places where Bel can be extended
+
+=back
+
+=cut
+
