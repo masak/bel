@@ -4,17 +4,11 @@ use strict;
 use warnings;
 use Test::More;
 
+use Language::Bel::NotYetImplemented;
+
 plan tests => 3;
 
-my %listed = (
-    chars => 1,
-    ccc => 1,
-    backquotes => 1,
-    printer => 1,
-    streams => 1,
-    reader => 1,
-    evaluator => 1,
-);
+my %listed = Language::Bel::NotYetImplemented::list();
 my %waiting_for;
 
 sub set_difference {
