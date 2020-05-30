@@ -4,7 +4,24 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 1;
+use Language::Bel::NotYetImplemented;
+
+plan tests => 3;
+
+my %listed = Language::Bel::NotYetImplemented::list();
+my %waiting_for;
+
+sub set_difference {
+    my ($h1_ref, $h2_ref) = @_;
+
+    my %difference;
+    for my $k (keys(%$h1_ref)) {
+        if (!exists $h2_ref->{$k}) {
+            $difference{$k}++;
+        }
+    }
+    return keys(%difference);
+}
 
 my $bel_bel_file = "pg/bel.bel";
 open my $BEL_BEL, "<", $bel_bel_file
@@ -77,8 +94,11 @@ while ($i < @bel_globals && !eof($SOURCE)) {
     if ($source_definition eq $bel_global) {
         $num_implemented++;
     }
-    elsif ($source_definition eq $skip_decl) {
-        # we are allowing this one to be skipped
+    elsif ($source_definition =~ /^; skip \Q$name\E \[waiting for (\w+(?:, \w+)*)\]$/) {
+        my $features = $1;
+        for my $feature (split /, /, $features) {
+            $waiting_for{$feature}++;
+        }
     }
     elsif ($name eq "randlen") {
         # make a special exception for `randlen`, which wants `read`
@@ -120,3 +140,18 @@ is $number_in_readme,
     $num_implemented,
     "the README.md file correctly reports the number of implemented globals";
 
+{
+    my $waiting_for_but_not_listed = join ", ", set_difference(\%waiting_for, \%listed);
+
+    is $waiting_for_but_not_listed,
+        "",
+        "all the features we're waiting for are listed";
+}
+
+{
+    my $listed_but_not_waiting_for = join ", ", set_difference(\%listed, \%waiting_for);
+
+    is $listed_but_not_waiting_for,
+        "",
+        "all the listed features are things we're waiting for";
+}

@@ -101,7 +101,7 @@ __DATA__
 
 (def char   (x) (= (type x) 'char))
 
-; skip stream
+; skip stream [waiting for streams]
 
 (def proper (x)
   (or (no x)
@@ -200,11 +200,11 @@ __DATA__
 (def is (x)
   [= _ x])
 
-; skip eif
+; skip eif [waiting for ccc]
 
-; skip onerr
+; skip onerr [waiting for ccc]
 
-; skip safe
+; skip safe [waiting for ccc]
 
 (def literal (e)
   (or (in e t nil o apply)
@@ -220,65 +220,65 @@ __DATA__
 (def isa (name)
   [begins _ `(lit ,name) id])
 
-; skip bel
+; skip bel [waiting for evaluator]
 
-; skip mev
+; skip mev [waiting for evaluator]
 
-; skip sched
+; skip sched [waiting for evaluator]
 
-; skip ev
+; skip ev [waiting for evaluator]
 
-; skip vref
+; skip vref [waiting for evaluator]
 
-; skip smark
+; skip smark [waiting for evaluator]
 
-; skip inwhere
+; skip inwhere [waiting for evaluator]
 
-; skip lookup
+; skip lookup [waiting for evaluator]
 
-; skip binding
+; skip binding [waiting for evaluator]
 
-; skip sigerr
+; skip sigerr [waiting for evaluator]
 
-; skip fu
+; skip fu [waiting for evaluator]
 
-; skip evmark
+; skip evmark [waiting for evaluator]
 
-; skip forms
+; skip forms [waiting for evaluator]
 
-; skip form
+; skip form [waiting for evaluator]
 
-; skip formfn
+; skip formfn [waiting for evaluator]
 
-; skip parameters
+; skip parameters [waiting for evaluator]
 
-; skip quote
+; skip quote [waiting for evaluator]
 
-; skip if
+; skip if [waiting for evaluator]
 
-; skip if2
+; skip if2 [waiting for evaluator]
 
-; skip where
+; skip where [waiting for evaluator]
 
-; skip dyn
+; skip dyn [waiting for evaluator]
 
-; skip dyn2
+; skip dyn2 [waiting for evaluator]
 
-; skip after
+; skip after [waiting for evaluator]
 
-; skip ccc
+; skip ccc [waiting for evaluator]
 
-; skip thread
+; skip thread [waiting for evaluator]
 
-; skip evcall
+; skip evcall [waiting for evaluator]
 
-; skip evcall2
+; skip evcall2 [waiting for evaluator]
 
-; skip applym
+; skip applym [waiting for evaluator]
 
-; skip applyf
+; skip applyf [waiting for evaluator]
 
-; skip applylit
+; skip applylit [waiting for evaluator]
 
 (set virfns nil)
 
@@ -296,29 +296,29 @@ __DATA__
 (loc (is cdr) (f args a s r m)
   (mev (cdr s) (cons (list (car args) 'd) r) m))
 
-; skip okenv
+; skip okenv [waiting for evaluator]
 
-; skip okstack
+; skip okstack [waiting for evaluator]
 
-; skip okparms
+; skip okparms [waiting for evaluator]
 
-; skip oktoparm
+; skip oktoparm [waiting for evaluator]
 
-; skip prims
+; skip prims [waiting for evaluator]
 
-; skip applyprim
+; skip applyprim [waiting for evaluator]
 
-; skip applyclo
+; skip applyclo [waiting for evaluator]
 
-; skip pass
+; skip pass [waiting for evaluator]
 
-; skip typecheck
+; skip typecheck [waiting for evaluator]
 
-; skip destructure
+; skip destructure [waiting for evaluator]
 
-; skip applycont
+; skip applycont [waiting for evaluator]
 
-; skip protected
+; skip protected [waiting for evaluator]
 
 (def function (x)
   (find [(isa _) x] '(prim clo)))
@@ -750,121 +750,121 @@ __DATA__
     `(let ,v ,x
        (zap [rem ,v _ ,@rest] ,place))))
 
-; skip cbuf
+; skip cbuf [waiting for streams]
 
-; skip open
+; skip open [waiting for streams]
 
-; skip close
+; skip close [waiting for streams]
 
-; skip peek
+; skip peek [waiting for streams]
 
-; skip rdc
+; skip rdc [waiting for streams]
 
-; skip bbuf
+; skip bbuf [waiting for streams]
 
-; skip bitc
+; skip bitc [waiting for streams]
 
-; skip digit
+; skip digit [waiting for streams]
 
-; skip breakc
+; skip breakc [waiting for streams]
 
-; skip signc
+; skip signc [waiting for streams]
 
-; skip intrac
+; skip intrac [waiting for streams]
 
-; skip source
+; skip source [waiting for streams]
 
-; skip read
+; skip read [waiting for reader]
 
-; skip saferead
+; skip saferead [waiting for reader]
 
-; skip rdex
+; skip rdex [waiting for reader]
 
-; skip eatwhite
+; skip eatwhite [waiting for reader]
 
-; skip charstil
+; skip charstil [waiting for reader]
 
-; skip syntax
+; skip syntax [waiting for reader]
 
-; skip syn
+; skip syn [waiting for reader]
 
-; skip \(
+; skip \( [waiting for reader]
 
-; skip \)
+; skip \) [waiting for reader]
 
-; skip \[
+; skip \[ [waiting for reader]
 
-; skip \]
+; skip \] [waiting for reader]
 
-; skip rdlist
+; skip rdlist [waiting for reader]
 
-; skip rddot
+; skip rddot [waiting for reader]
 
-; skip hard-rdex
+; skip hard-rdex [waiting for reader]
 
-; skip namecs
+; skip namecs [waiting for reader]
 
-; skip \\
+; skip \\ [waiting for reader]
 
-; skip \'
+; skip \' [waiting for reader]
 
-; skip \`
+; skip \` [waiting for reader]
 
-; skip \,
+; skip \, [waiting for reader]
 
-; skip rdwrap
+; skip rdwrap [waiting for reader]
 
-; skip \"
+; skip \" [waiting for reader]
 
-; skip \¦
+; skip \¦ [waiting for reader]
 
-; skip rddelim
+; skip rddelim [waiting for reader]
 
-; skip \#
+; skip \# [waiting for reader]
 
-; skip rdtarget
+; skip rdtarget [waiting for reader]
 
-; skip rdword
+; skip rdword [waiting for reader]
 
-; skip parseword
+; skip parseword [waiting for reader]
 
-; skip parsenum
+; skip parsenum [waiting for reader]
 
-; skip validi
+; skip validi [waiting for reader]
 
-; skip validr
+; skip validr [waiting for reader]
 
-; skip validd
+; skip validd [waiting for reader]
 
-; skip parsei
+; skip parsei [waiting for reader]
 
-; skip parsesr
+; skip parsesr [waiting for reader]
 
-; skip parsed
+; skip parsed [waiting for reader]
 
-; skip parseint
+; skip parseint [waiting for reader]
 
-; skip charint
+; skip charint [waiting for reader]
 
-; skip parset
+; skip parset [waiting for reader]
 
-; skip parseslist
+; skip parseslist [waiting for reader]
 
-; skip parsecom
+; skip parsecom [waiting for reader]
 
-; skip parseno
+; skip parseno [waiting for reader]
 
-; skip bquote
+; skip bquote [waiting for backquotes]
 
-; skip bqex
+; skip bqex [waiting for backquotes]
 
-; skip bqthru
+; skip bqthru [waiting for backquotes]
 
-; skip bqexpair
+; skip bqexpair [waiting for backquotes]
 
-; skip spa
+; skip spa [waiting for backquotes]
 
-; skip spd
+; skip spd [waiting for backquotes]
 
 (mac comma args
   '(err 'comma-outside-backquote))
@@ -875,35 +875,35 @@ __DATA__
 (mac splice args
   '(err 'comma-at-outside-list))
 
-; skip print
+; skip print [waiting for printer]
 
-; skip namedups
+; skip namedups [waiting for printer]
 
-; skip cells
+; skip cells [waiting for printer]
 
-; skip prc
+; skip prc [waiting for printer]
 
-; skip ustring
+; skip ustring [waiting for printer]
 
-; skip prstring
+; skip prstring [waiting for printer]
 
-; skip presc
+; skip presc [waiting for printer]
 
-; skip prsimple
+; skip prsimple [waiting for printer]
 
-; skip prsymbol
+; skip prsymbol [waiting for printer]
 
-; skip prnum
+; skip prnum [waiting for printer]
 
-; skip rrep
+; skip rrep [waiting for printer]
 
-; skip irep
+; skip irep [waiting for printer]
 
-; skip intchar
+; skip intchar [waiting for printer]
 
-; skip prpair
+; skip prpair [waiting for printer]
 
-; skip prelts
+; skip prelts [waiting for printer]
 
 (def prn args
   (map [do (print _) (prc \sp)] args)
@@ -913,7 +913,7 @@ __DATA__
 (def pr args
   (map prnice args))
 
-; skip prnice
+; skip prnice [waiting for printer]
 
 (def drop (n|whole xs)
   (if (= n 0)
@@ -928,7 +928,7 @@ __DATA__
 (vir num (f args)
   `(nth ,f ,@args))
 
-; skip nchar
+; skip nchar [waiting for chars]
 
 (def first (n|whole xs)
   (if (or (= n 0) (no xs))
@@ -936,7 +936,7 @@ __DATA__
       (cons (car xs)
             (first (- n 1) (cdr xs)))))
 
-; skip catch
+; skip catch [waiting for ccc]
 
 (def cut (xs (o start 1) (o end (len xs)))
   (first (- (+ end 1 (if (< end 0) (len xs) 0))
@@ -1123,15 +1123,15 @@ __DATA__
                  f)))
     (if (< n 0) (-:r:- n) (r n))))
 
-; skip withfile
+; skip withfile [waiting for streams]
 
-; skip from
+; skip from [waiting for streams]
 
-; skip to
+; skip to [waiting for streams]
 
-; skip readall
+; skip readall [waiting for streams]
 
-; skip load
+; skip load [waiting for streams, evaluator]
 
 (mac record body
   (letu v
@@ -1200,6 +1200,6 @@ __DATA__
                    it))
        (err 'no-template)))
 
-; skip readas
+; skip readas [waiting for evaluator]
 
 (def err args)
