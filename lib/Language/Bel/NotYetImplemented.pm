@@ -8,13 +8,41 @@ use Exporter 'import';
 
 sub list {
     return (
-        chars => 1,
-        ccc => 1,
-        backquotes => 1,
-        printer => 1,
-        streams => 1,
-        reader => 1,
-        evaluator => 1,
+        chars => [
+            "(nchar 65)",
+            "\\A",
+            "('unboundb nchar)",
+        ],
+        ccc => [
+            "(list 'a (ccc (fn (c) 'b)))",
+            "(a b)",
+            "('unboundb ccc)",
+        ],
+        backquotes => [
+            "(isa!mac bquote)",
+            "t",
+            "('unboundb bquote)",
+        ],
+        printer => [
+            "(function print)",
+            "clo",
+            "('unboundb print)",
+        ],
+        streams => [
+            "(function stream)",
+            "clo",
+            "('unboundb stream)",
+        ],
+        reader => [
+            q[(read '("[cons _ 'b]"))],
+            "(fn (_) (cons _ 'b))",
+            "('unboundb read)",
+        ],
+        evaluator => [
+            "(bel 'hi)",
+            "hi",
+            "('unboundb bel)",
+        ],
     );
 }
 

@@ -27,7 +27,7 @@ sub _bqexpand {
         my $cdr_ast = pair_cdr($ast);
 
         if (is_symbol_of_name($car_ast, "bquote")) {
-            die "bquote of nothing"
+            return $ast
                 unless is_pair($cdr_ast);
             return bquote(pair_car($cdr_ast));
         }
