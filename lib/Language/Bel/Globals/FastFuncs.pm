@@ -3342,6 +3342,358 @@ my %FASTFUNCS = (
             ),
         );
     },
+
+    "litnum" => sub {
+        my ($call, $r, $i) = @_;
+
+        if (!defined($i)) {
+            $i = make_pair(
+                make_symbol("+"),
+                make_pair(
+                    SYMBOL_NIL,
+                    make_pair(
+                        make_pair(
+                            SYMBOL_T,
+                            SYMBOL_NIL,
+                        ),
+                        SYMBOL_NIL,
+                    ),
+                ),
+            );
+        }
+
+        return make_pair(
+            make_symbol("lit"),
+            make_pair(
+                make_symbol("num"),
+                make_pair(
+                    $r,
+                    make_pair(
+                        $i,
+                        SYMBOL_NIL,
+                    ),
+                ),
+            ),
+        );
+    },
+
+    "number" => sub {
+        my ($call, $x) = @_;
+
+        if (!is_pair($x)) {
+            return SYMBOL_NIL;
+        }
+
+        if (!is_symbol_of_name(prim_car($x), "lit")) {
+            return SYMBOL_NIL;
+        }
+
+        $x = prim_cdr($x);
+        if (!is_pair($x)) {
+            return SYMBOL_NIL;
+        }
+
+        if (!is_symbol_of_name(prim_car($x), "num")) {
+            return SYMBOL_NIL;
+        }
+
+        $x = prim_cdr($x);
+        if (!is_pair($x)) {
+            return SYMBOL_NIL;
+        }
+
+        {
+            my $y = prim_car($x);
+            if (!is_pair($y)) {
+                return SYMBOL_NIL;
+            }
+
+
+            my $sign = prim_car($y);
+            if (!(is_symbol_of_name($sign, "+") || is_symbol_of_name($sign, "-"))) {
+                return SYMBOL_NIL;
+            }
+
+            $y = prim_cdr($y);
+            if (!is_pair($y)) {
+                return SYMBOL_NIL;
+            }
+
+            {
+                my $z = prim_car($y);
+                while (!is_nil($z)) {
+                    if (!is_pair($z)) {
+                        return SYMBOL_NIL;
+                    }
+                    $z = prim_cdr($z);
+                }
+            }
+
+            $y = prim_cdr($y);
+            if (!is_pair($y)) {
+                return SYMBOL_NIL;
+            }
+
+            {
+                my $z = prim_car($y);
+                while (!is_nil($z)) {
+                    if (!is_pair($z)) {
+                        return SYMBOL_NIL;
+                    }
+                    $z = prim_cdr($z);
+                }
+            }
+        }
+
+        $x = prim_cdr($x);
+        if (!is_pair($x)) {
+            return SYMBOL_NIL;
+        }
+
+        {
+            my $y = prim_car($x);
+            if (!is_pair($y)) {
+                return SYMBOL_NIL;
+            }
+
+
+            my $sign = prim_car($y);
+            if (!(is_symbol_of_name($sign, "+") || is_symbol_of_name($sign, "-"))) {
+                return SYMBOL_NIL;
+            }
+
+            $y = prim_cdr($y);
+            if (!is_pair($y)) {
+                return SYMBOL_NIL;
+            }
+
+            {
+                my $z = prim_car($y);
+                while (!is_nil($z)) {
+                    if (!is_pair($z)) {
+                        return SYMBOL_NIL;
+                    }
+                    $z = prim_cdr($z);
+                }
+            }
+
+            $y = prim_cdr($y);
+            if (!is_pair($y)) {
+                return SYMBOL_NIL;
+            }
+
+            {
+                my $z = prim_car($y);
+                while (!is_nil($z)) {
+                    if (!is_pair($z)) {
+                        return SYMBOL_NIL;
+                    }
+                    $z = prim_cdr($z);
+                }
+            }
+        }
+
+        return SYMBOL_T;
+    },
+
+    "numr" => sub {
+        my ($call, $x) = @_;
+
+        return prim_car(prim_cdr(prim_cdr($x)));
+    },
+
+    "numi" => sub {
+        my ($call, $x) = @_;
+
+        return prim_car(prim_cdr(prim_cdr(prim_cdr($x))));
+    },
+
+    "rpart" => sub {
+        my ($call, $n) = @_;
+
+        my $numr = prim_car(prim_cdr(prim_cdr($n)));
+
+        my $i = make_pair(
+            make_symbol("+"),
+            make_pair(
+                SYMBOL_NIL,
+                make_pair(
+                    make_pair(
+                        SYMBOL_T,
+                        SYMBOL_NIL,
+                    ),
+                    SYMBOL_NIL,
+                ),
+            ),
+        );
+
+        return make_pair(
+            make_symbol("lit"),
+            make_pair(
+                make_symbol("num"),
+                make_pair(
+                    $numr,
+                    make_pair(
+                        $i,
+                        SYMBOL_NIL,
+                    ),
+                ),
+            ),
+        );
+    },
+
+    "ipart" => sub {
+        my ($call, $n) = @_;
+
+        my $numi = prim_car(prim_cdr(prim_cdr(prim_cdr($n))));
+
+        my $i = make_pair(
+            make_symbol("+"),
+            make_pair(
+                SYMBOL_NIL,
+                make_pair(
+                    make_pair(
+                        SYMBOL_T,
+                        SYMBOL_NIL,
+                    ),
+                    SYMBOL_NIL,
+                ),
+            ),
+        );
+
+        return make_pair(
+            make_symbol("lit"),
+            make_pair(
+                make_symbol("num"),
+                make_pair(
+                    $numi,
+                    make_pair(
+                        $i,
+                        SYMBOL_NIL,
+                    ),
+                ),
+            ),
+        );
+    },
+
+    "real" => sub {
+        my ($call, $x) = @_;
+
+        if (!is_pair($x)) {
+            return SYMBOL_NIL;
+        }
+
+        if (!is_symbol_of_name(prim_car($x), "lit")) {
+            return SYMBOL_NIL;
+        }
+
+        $x = prim_cdr($x);
+        if (!is_pair($x)) {
+            return SYMBOL_NIL;
+        }
+
+        if (!is_symbol_of_name(prim_car($x), "num")) {
+            return SYMBOL_NIL;
+        }
+
+        $x = prim_cdr($x);
+        if (!is_pair($x)) {
+            return SYMBOL_NIL;
+        }
+
+        {
+            my $y = prim_car($x);
+            if (!is_pair($y)) {
+                return SYMBOL_NIL;
+            }
+
+
+            my $sign = prim_car($y);
+            if (!(is_symbol_of_name($sign, "+") || is_symbol_of_name($sign, "-"))) {
+                return SYMBOL_NIL;
+            }
+
+            $y = prim_cdr($y);
+            if (!is_pair($y)) {
+                return SYMBOL_NIL;
+            }
+
+            {
+                my $z = prim_car($y);
+                while (!is_nil($z)) {
+                    if (!is_pair($z)) {
+                        return SYMBOL_NIL;
+                    }
+                    $z = prim_cdr($z);
+                }
+            }
+
+            $y = prim_cdr($y);
+            if (!is_pair($y)) {
+                return SYMBOL_NIL;
+            }
+
+            {
+                my $z = prim_car($y);
+                while (!is_nil($z)) {
+                    if (!is_pair($z)) {
+                        return SYMBOL_NIL;
+                    }
+                    $z = prim_cdr($z);
+                }
+            }
+        }
+
+        $x = prim_cdr($x);
+        if (!is_pair($x)) {
+            return SYMBOL_NIL;
+        }
+
+        {
+            my $y = prim_car($x);
+            if (!is_pair($y)) {
+                return SYMBOL_NIL;
+            }
+
+
+            my $sign = prim_car($y);
+            if (!is_symbol_of_name($sign, "+")) {
+                return SYMBOL_NIL;
+            }
+
+            $y = prim_cdr($y);
+            if (!is_pair($y)) {
+                return SYMBOL_NIL;
+            }
+
+            if (!is_nil(prim_car($y))) {
+                return SYMBOL_NIL;
+            }
+
+            $y = prim_cdr($y);
+            if (!is_pair($y)) {
+                return SYMBOL_NIL;
+            }
+
+            {
+                my $z = prim_car($y);
+                my $t = 0;
+                while (!is_nil($z)) {
+                    if (!is_pair($z)) {
+                        return SYMBOL_NIL;
+                    }
+                    $z = prim_cdr($z);
+                    $t++;
+                }
+
+                if ($t != 1) {
+                    return SYMBOL_NIL;
+                }
+            }
+        }
+
+        return SYMBOL_T;
+    },
 );
 
 sub FASTFUNCS {
