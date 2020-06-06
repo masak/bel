@@ -18,6 +18,9 @@ sub preprocess {
 
     close $SOURCE;
 
+    check_no_fastfuncs_decl(@lines);
+    @lines = nanopass_turn_subs_into_fastfuncs_decl(@lines);
+
     check_no_exporter_stuff(@lines);
     @lines = nanopass_add_exporter_stuff(@lines);
 
@@ -25,6 +28,52 @@ sub preprocess {
     @lines = nanopass_demangle_function_names(@lines);
 
     return join("", map { "$_\n" } @lines);
+}
+
+sub check_no_fastfuncs_decl {
+    my (@input) = @_;
+
+    for my $line (@input) {
+        if ($line eq "my \%FASTFUNCS = (") {
+            die "This line should not be in source: `$line`";
+        }
+    }
+}
+
+sub nanopass_turn_subs_into_fastfuncs_decl {
+    my (@input) = @_;
+
+    my $indented_mode = 0;
+    my @output;
+    for my $line (@input) {
+        if (!$indented_mode && $line =~ /^sub /) {
+            $indented_mode = 1;
+            push @output, "my \%FASTFUNCS = (";
+        }
+
+        if ($line =~ /^sub (\w+) \{/) {
+            $line = qq["$1" => sub {];
+        }
+        elsif ($line eq "}") {
+            $line = "},";
+        }
+
+        if ($line eq "1;") {
+            $indented_mode = 0;
+
+            my $empty_line = pop @output;
+            push @output, ");";
+            push @output, $empty_line;
+        }
+
+        if ($indented_mode && $line) {
+            $line = (" " x 4) . $line;
+        }
+
+        push @output, $line;
+    }
+
+    return @output;
 }
 
 sub check_no_exporter_stuff {
