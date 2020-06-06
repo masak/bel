@@ -28,8 +28,6 @@ use Language::Bel::Symbols::Common qw(
 );
 use Language::Bel::Printer;
 
-use Exporter 'import';
-
 my %FASTFUNCS = (
     "no" => sub {
         my ($call, $x) = @_;
@@ -1382,14 +1380,6 @@ my %FASTFUNCS = (
         }
         return $result;
     },
-);
-
-sub FASTFUNCS {
-    return \%FASTFUNCS;
-}
-
-our @EXPORT_OK = qw(
-    FASTFUNCS
 );
 
 1;

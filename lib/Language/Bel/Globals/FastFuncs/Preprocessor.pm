@@ -18,10 +18,50 @@ sub preprocess {
 
     close $SOURCE;
 
+    check_no_exporter_stuff(@lines);
+    @lines = nanopass_add_exporter_stuff(@lines);
+
     check_function_names_mangled(@lines);
     @lines = nanopass_demangle_function_names(@lines);
 
     return join("", map { "$_\n" } @lines);
+}
+
+sub check_no_exporter_stuff {
+    my (@input) = @_;
+
+    for my $line (@input) {
+        if ($line =~ /^(?:use Exporter|sub FASTFUNCS|our \@EXPORT_OK)/) {
+            die "This line should not be in source: `$line`";
+        }
+    }
+}
+
+sub nanopass_add_exporter_stuff {
+    my (@input) = @_;
+
+    my @output;
+    for my $line (@input) {
+        if ($line =~ /^my \%FASTFUNCS = \($/) {
+            push @output,
+                "use Exporter 'import';",
+                "";
+        }
+        elsif ($line eq "1;") {
+            push @output,
+                "sub FASTFUNCS {",
+                "    return \\%FASTFUNCS;",
+                "}",
+                "",
+                "our \@EXPORT_OK = qw(",
+                "    FASTFUNCS",
+                ");",
+                "";
+        }
+        push @output, $line;
+    }
+
+    return @output;
 }
 
 sub check_function_names_mangled {
