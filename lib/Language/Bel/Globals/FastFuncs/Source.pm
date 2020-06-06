@@ -214,7 +214,7 @@ my %FASTFUNCS = (
         return $result;
     },
 
-    "=" => sub {
+    "__eq" => sub {
         my ($call, @args) = @_;
 
         my @stack = [@args];
@@ -1135,7 +1135,7 @@ my %FASTFUNCS = (
         );
     },
 
-    "i<" => sub {
+    "i__lt" => sub {
         my ($call, $xs, $ys) = @_;
 
         while (!is_nil($xs)) {
@@ -1146,7 +1146,7 @@ my %FASTFUNCS = (
         return $ys;
     },
 
-    "i+" => sub {
+    "i__plus" => sub {
         my ($call, @args) = @_;
 
         my $result = @args ? pop(@args) : SYMBOL_NIL;
@@ -1166,7 +1166,7 @@ my %FASTFUNCS = (
         return $result;
     },
 
-    "i-" => sub {
+    "i__minus" => sub {
         my ($call, $x, $y) = @_;
 
         while (!is_nil($x)) {
@@ -1193,7 +1193,7 @@ my %FASTFUNCS = (
         );
     },
 
-    "i*" => sub {
+    "i__star" => sub {
         my ($call, @args) = @_;
 
         my $product = 1;
@@ -1213,7 +1213,7 @@ my %FASTFUNCS = (
         return $result;
     },
 
-    "i/" => sub {
+    "i__slash" => sub {
         my ($call, $x, $y, $q) = @_;
 
         if (!defined($q)) {
@@ -1252,7 +1252,7 @@ my %FASTFUNCS = (
         );
     },
 
-    "i^" => sub {
+    "i__hat" => sub {
         my ($call, $x, $y) = @_;
 
         my $xn = 0;
@@ -1276,7 +1276,7 @@ my %FASTFUNCS = (
         return $result;
     },
 
-    "r+" => sub {
+    "r__plus" => sub {
         my ($call, $x, $y) = @_;
 
         my $xn = prim_car($x);
