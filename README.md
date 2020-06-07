@@ -38,6 +38,63 @@ It's not fully there yet, though it's under active development.
 
 ![225 of 353 definitions](definitions.svg)
 
+A summary of the remaining big features:
+
+* **Streams** are opaque objects created by the runtime when a file is opened
+  for reading or writing. They read and write individual bits. Primarily I would like
+  to mock everything to do with streams in the tests &mdash; but it might make sense
+  to have an integration test file that uses real streams and real files, too.
+
+* **ccc** (or `call-with-current-continuation`) is a control mechanism that tells the
+  evaluator to return to a point in the execution that was saved earlier. Saving the
+  execution state means saving the current evaluation stack, and being able to
+  reinstate it when a continuation is invoked. The current Perl implementation uses a
+  mutable Perl array for the evaluation stack, instead of a persistent Bel list; this
+  means that unlike the Bel implementation of the evaluator, the Perl implementation
+  has to defensively copy the whole stack both when taking the continuation and when
+  invoking it. (Either that, or we modify the Perl evaluator to use a persistent
+  Bel list too.)
+
+* **Threads** (so called "green threads") allow execution of different evaluation
+  stacks to be interleaved and executed in "round-robin" style. Therefore, threads
+  can be seen as "parallel execution contexts". Dynamic and lexical variables are
+  local to a thread; global variables are shared between all threads. It's possible
+  to prevent the scheduler from descheduling the current thread by binding the
+  dynamic `lock` variable. Failing to do this might result in unexpected interactions
+  between threads. The concurrency is "co-operative", which means that any thread
+  could block the others forever by never releasing the lock.
+
+* **Evaluator**; there's a Bel evaluator written in Perl already. It hard-codes a
+  number of behaviors that shouldn't be hard-coded, most of all _itself_. In Bel,
+  any part of the evaluator could be overridden by a new function, at which point it
+  takes effect immediately. In the long run, the Bel evaluator will replace the Perl
+  evaluator. We might be able to write tests for parts of the Bel evaluator by
+  intercepting the recursive call to `mev` inside of it.
+
+* **Reader**; there's a reader written in Perl already. It hard-codes the syntactic
+  forms it recognizes; these should in fact be extensible.
+
+* **Backquotes** (or "quasiquoting"); there's a backquote expander written in Perl
+  already. It runs earlier than it should. (It runs right after reading, before
+  evaluation. It should run as a normal macro, and then be evaluated. There must be
+  a conformance test that could expose this difference.) The main difficulty in
+  getting rid of the Perl version and running backquotes in Bel is that the
+  definition of the backquotes macro relies on working backquotes.
+
+* **Printer**; there's a printer written in Perl already. It's largely
+  feature-complete, but just like the evaluator and reader, it's not extensible
+  enough. It also doesn't handle cyclic structures and named pairs, although it
+  could do that.
+
+* **chars**; this global definition contains a very long Bel list of pairs where
+  the key is a `char` and the value is a list of bits representing how that
+  character is encoded in _some_ character encoding. (This implementation is
+  going to go with UTF-8.) Although it would be feasible to build the entire list
+  for millions of characters in memory (or to compromise and only build it for,
+  say the Latin-1 subset or characters), probably a saner approach would be to
+  generate this list on-demand. Preferably it would also conspire with the `nth`
+  function somehow, in order to make character lookup `O(1)` instead of `O(n)`.
+
 ## Contributing
 
 If you'd like to contribute, please fork the repository and make changes as you'd like.
