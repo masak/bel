@@ -74,11 +74,10 @@ sub generate {
         .feature-reader     { fill: #7e6; }
         .feature-backquotes { fill: #6af; }
         .feature-printer    { fill: #aaf; }
-        .feature-chars      { fill: #faf; }
       </style>\n\n");
 
-    my $y = 260;
-    for my $feature (qw<streams ccc evaluator reader backquotes printer chars>) {
+    my $y = 290;
+    for my $feature (qw<streams ccc evaluator reader backquotes printer>) {
         push(@output, "  <rect
         x='20'
         y='$y'
