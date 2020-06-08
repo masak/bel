@@ -18,6 +18,11 @@ sub list {
             "(a b)",
             "('unboundb ccc)",
         ],
+        thread => [
+            "(thread (+ 2 2))",
+            "4",
+            "('unboundb thread)",
+        ],
         backquotes => [
             "(isa!mac bquote)",
             "t",

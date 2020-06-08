@@ -6,7 +6,7 @@ use Test::More;
 
 use Language::Bel::NotYetImplemented;
 
-plan tests => 4;
+plan tests => 3;
 
 my %listed = Language::Bel::NotYetImplemented::list();
 my %waiting_for;
@@ -160,12 +160,4 @@ is $second_number_in_readme,
     is $waiting_for_but_not_listed,
         "",
         "all the features we're waiting for are listed";
-}
-
-{
-    my $listed_but_not_waiting_for = join ", ", set_difference(\%listed, \%waiting_for);
-
-    is $listed_but_not_waiting_for,
-        "",
-        "all the listed features are things we're waiting for";
 }
