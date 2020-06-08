@@ -53,6 +53,20 @@ $globals{"xar"} = PRIMITIVES->{"xar"};
 
 $globals{"xdr"} = PRIMITIVES->{"xdr"};
 
+$globals{"chars"} = SYMBOL_NIL;
+for my $n (reverse(0..127)) {
+    my $bitrep = SYMBOL_NIL;
+    for my $bit (reverse(split //, sprintf("%08b", $n))) {
+        $bitrep = make_pair(make_char(ord("0") + $bit), $bitrep);
+    }
+    $globals{"chars"} = make_pair(
+        make_pair(
+            make_char($n),
+            $bitrep,
+        ),
+        $globals{"chars"},
+    );
+}
 $globals{"no"} =
     make_fastfunc(make_pair(make_symbol("lit"),
     make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,

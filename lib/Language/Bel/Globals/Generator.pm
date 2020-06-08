@@ -128,6 +128,23 @@ HEADER
         print_primitive($prim_name);
     }
 
+    print(<<'EOD');
+$globals{"chars"} = SYMBOL_NIL;
+for my $n (reverse(0..127)) {
+    my $bitrep = SYMBOL_NIL;
+    for my $bit (reverse(split //, sprintf("%08b", $n))) {
+        $bitrep = make_pair(make_char(ord("0") + $bit), $bitrep);
+    }
+    $globals{"chars"} = make_pair(
+        make_pair(
+            make_char($n),
+            $bitrep,
+        ),
+        $globals{"chars"},
+    );
+}
+EOD
+
     my @globals;
 
     DECLARATION:
