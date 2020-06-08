@@ -6,7 +6,7 @@ use Test::More;
 
 use Language::Bel::NotYetImplemented;
 
-plan tests => 3;
+plan tests => 4;
 
 my %listed = Language::Bel::NotYetImplemented::list();
 my %waiting_for;
@@ -122,23 +122,37 @@ my $readme_file = "README.md";
 open my $README, "<", $readme_file
     or die "Cannot open $readme_file $!";
 
-my $found_line = 0;
-my $number_in_readme;
+my $found_first_line = 0;
+my $first_number_in_readme;
+
+my $found_second_line = 0;
+my $second_number_in_readme;
 
 while (my $line = <$README>) {
     $line =~ s/\r?\n$//;
     if ($line =~ /^`Language::Bel` currently defines (\d+) of them\.$/) {
-        $found_line = 1;
-        $number_in_readme = $1;
+        $found_first_line = 1;
+        $first_number_in_readme = $1;
+    }
+    elsif ($line =~ /^!\[(\d+) of \d+ definitions\]\([^\)]+\)$/) {
+        $found_second_line = 1;
+        $second_number_in_readme = $1;
     }
 }
 
-die "Didn't find the line with the number"
-    unless $found_line;
+die "Didn't find the first line with the number"
+    unless $found_first_line;
 
-is $number_in_readme,
+die "Didn't find the second line with the number"
+    unless $found_second_line;
+
+is $first_number_in_readme,
     $num_implemented,
-    "the README.md file correctly reports the number of implemented globals";
+    "the README.md file correctly reports the number of implemented globals (first number)";
+
+is $second_number_in_readme,
+    $num_implemented,
+    "the README.md file correctly reports the number of implemented globals (first number)";
 
 {
     my $waiting_for_but_not_listed = join ", ", set_difference(\%waiting_for, \%listed);
