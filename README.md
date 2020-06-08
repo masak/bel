@@ -86,15 +86,6 @@ A summary of the remaining big features:
   enough. It also doesn't handle cyclic structures and named pairs, although it
   could do that.
 
-* **chars**; this global definition contains a very long Bel list of pairs where
-  the key is a `char` and the value is a list of bits representing how that
-  character is encoded in _some_ character encoding. (This implementation is
-  going to go with UTF-8.) Although it would be feasible to build the entire list
-  for millions of characters in memory (or to compromise and only build it for,
-  say the Latin-1 subset or characters), probably a saner approach would be to
-  generate this list on-demand. Preferably it would also conspire with the `nth`
-  function somehow, in order to make character lookup `O(1)` instead of `O(n)`.
-
 ## Contributing
 
 If you'd like to contribute, please fork the repository and make changes as you'd like.

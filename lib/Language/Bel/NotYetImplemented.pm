@@ -8,11 +8,6 @@ use Exporter 'import';
 
 sub list {
     return (
-        chars => [
-            "(nchar 65)",
-            "\\A",
-            "('unboundb nchar)",
-        ],
         ccc => [
             "(list 'a (ccc (fn (c) 'b)))",
             "(a b)",
