@@ -27,6 +27,7 @@ plan tests => 1;
     }
 
     my $generated_svg = generate();
+    $actual_svg =~ s/\r//g;
 
     is $actual_svg, $generated_svg, "the definitions SVG is up to date";
 }
