@@ -3465,6 +3465,20 @@ $globals{"nth"} =
     make_pair(make_symbol("xs"), SYMBOL_NIL)), SYMBOL_NIL))),
     SYMBOL_NIL)))), SYMBOL_NIL)))));
 
+$globals{"nchar"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("n"), SYMBOL_NIL),
+    make_pair(make_pair(make_symbol("car"),
+    make_pair(make_pair(make_pair(make_symbol("+"),
+    make_pair(make_symbol("n"), make_pair(make_pair(make_symbol("lit"),
+    make_pair(make_symbol("num"), make_pair(make_pair(make_symbol("+"),
+    make_pair(make_pair(SYMBOL_T, SYMBOL_NIL), make_pair(make_pair(SYMBOL_T,
+    SYMBOL_NIL), SYMBOL_NIL))), make_pair(make_pair(make_symbol("+"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(SYMBOL_T, SYMBOL_NIL),
+    SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL))),
+    make_pair(make_symbol("chars"), SYMBOL_NIL)), SYMBOL_NIL)),
+    SYMBOL_NIL)))));
+
 $globals{"first"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_pair(make_pair(SYMBOL_T,
