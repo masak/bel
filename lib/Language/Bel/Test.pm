@@ -56,7 +56,8 @@ sub bel_todo {
                 ? "Expected '$expected_todo_error', got '$error'"
                 : "Expected '$expected_output', got '$actual_output'";
         ok(
-            $error && $error eq $expected_todo_error || !$error && $actual_output ne $expected_output,
+            $expected_todo_error && $error && $error eq $expected_todo_error
+            || !$expected_todo_error && !$error && $actual_output ne $expected_output,
             "TODO $expr ($message)"
         );
     }
