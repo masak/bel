@@ -64,6 +64,6 @@ plan tests => 39;
 
 {
     is_bel_output("(~~mem (coin) '(t nil))", "t");
-    is_bel_output("(~~mem t (nof 8 (coin)))", "t");
-    is_bel_output("(~~mem nil (nof 8 (coin)))", "t");
+    is_bel_output("(whilet _ (coin))", "nil");
+    is_bel_output("(til _ (coin) no)", "nil");
 }
