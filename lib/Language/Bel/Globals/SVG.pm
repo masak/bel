@@ -77,14 +77,17 @@ sub generate {
         .feature-chars      { fill: #faf; }
       </style>\n\n");
 
-    my $y = 260;
-    for my $feature (qw<streams ccc evaluator reader backquotes printer chars>) {
+    my $y = 230;
+    for my $feature (qw<done streams ccc evaluator reader backquotes printer chars>) {
+        my $class = $feature eq "done"
+            ? $feature
+            : "feature-$feature";
         push(@output, "  <rect
         x='20'
         y='$y'
         width='17'
         height='17'
-        class='feature-$feature box'
+        class='$class box'
         title='$feature'
       />\n");
       my $text_y = $y + 15;

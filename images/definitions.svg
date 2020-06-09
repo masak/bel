@@ -28,6 +28,18 @@
 
   <rect
         x='20'
+        y='230'
+        width='17'
+        height='17'
+        class='done box'
+        title='done'
+      />
+  <text
+        x='50'
+        y='245'
+      >done</text>
+  <rect
+        x='20'
         y='260'
         width='17'
         height='17'
