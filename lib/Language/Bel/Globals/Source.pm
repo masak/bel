@@ -316,7 +316,8 @@ __DATA__
 (loc (is cdr) (f args a s r m)
   (mev (cdr s) (cons (list (car args) 'd) r) m))
 
-; skip okenv [waiting for evaluator]
+(def okenv (a)
+  (and (proper a) (all pair a)))
 
 ; skip okstack [waiting for evaluator]
 

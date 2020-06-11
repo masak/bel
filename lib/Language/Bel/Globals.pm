@@ -1116,6 +1116,15 @@ $globals{"loc"} =
     SYMBOL_NIL))), SYMBOL_NIL))), make_pair(SYMBOL_NIL, SYMBOL_NIL))),
     SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))))), SYMBOL_NIL)));
 
+$globals{"okenv"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("a"), SYMBOL_NIL),
+    make_pair(make_pair(make_symbol("and"),
+    make_pair(make_pair(make_symbol("proper"), make_pair(make_symbol("a"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("all"),
+    make_pair(SYMBOL_PAIR, make_pair(make_symbol("a"), SYMBOL_NIL))),
+    SYMBOL_NIL))), SYMBOL_NIL)))));
+
 $globals{"function"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
