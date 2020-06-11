@@ -253,7 +253,8 @@ __DATA__
 
 ; skip sigerr [waiting for evaluator]
 
-; skip fu [waiting for evaluator]
+(mac fu args
+  `(list (list smark 'fut (fn ,@args)) nil))
 
 ; skip evmark [waiting for evaluator]
 
