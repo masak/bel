@@ -239,7 +239,11 @@ __DATA__
 
 ; skip lookup [waiting for evaluator]
 
-; skip binding [waiting for evaluator]
+(def binding (v s)
+  (get v
+       (map caddr (keep [begins _ (list smark 'bind) id]
+                        (map car s)))
+       id))
 
 ; skip sigerr [waiting for evaluator]
 
