@@ -863,6 +863,23 @@ $globals{"isa"} =
     SYMBOL_NIL))), make_pair(make_symbol("id"), SYMBOL_NIL)))),
     SYMBOL_NIL))), SYMBOL_NIL)))));
 
+$globals{"smark"} =
+    make_pair(SYMBOL_NIL, SYMBOL_NIL);
+
+$globals{"inwhere"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("s"), SYMBOL_NIL),
+    make_pair(make_pair(make_symbol("let"), make_pair(make_symbol("e"),
+    make_pair(make_pair(make_symbol("car"),
+    make_pair(make_pair(make_symbol("car"), make_pair(make_symbol("s"),
+    SYMBOL_NIL)), SYMBOL_NIL)), make_pair(make_pair(make_symbol("and"),
+    make_pair(make_pair(make_symbol("begins"), make_pair(make_symbol("e"),
+    make_pair(make_pair(make_symbol("list"), make_pair(make_symbol("smark"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("loc"),
+    SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("cddr"), make_pair(make_symbol("e"),
+    SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL)))));
+
 $globals{"virfns"} =
     make_pair(make_pair(make_symbol("tab"), make_pair(make_symbol("lit"),
     make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,

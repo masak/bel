@@ -230,9 +230,12 @@ __DATA__
 
 ; skip vref [waiting for evaluator]
 
-; skip smark [waiting for evaluator]
+(set smark (join))
 
-; skip inwhere [waiting for evaluator]
+(def inwhere (s)
+  (let e (car (car s))
+    (and (begins e (list smark 'loc))
+         (cddr e))))
 
 ; skip lookup [waiting for evaluator]
 
