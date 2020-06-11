@@ -880,6 +880,25 @@ $globals{"inwhere"} =
     make_pair(make_pair(make_symbol("cddr"), make_pair(make_symbol("e"),
     SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL)))));
 
+$globals{"lookup"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("e"),
+    make_pair(make_symbol("a"), make_pair(make_symbol("s"),
+    make_pair(make_symbol("g"), SYMBOL_NIL)))),
+    make_pair(make_pair(make_symbol("or"),
+    make_pair(make_pair(make_symbol("binding"), make_pair(make_symbol("e"),
+    make_pair(make_symbol("s"), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("get"), make_pair(make_symbol("e"),
+    make_pair(make_symbol("a"), make_pair(make_symbol("id"), SYMBOL_NIL)))),
+    make_pair(make_pair(make_symbol("get"), make_pair(make_symbol("e"),
+    make_pair(make_symbol("g"), make_pair(make_symbol("id"), SYMBOL_NIL)))),
+    make_pair(make_pair(make_symbol("case"), make_pair(make_symbol("e"),
+    make_pair(make_symbol("scope"), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_symbol("e"), make_pair(make_symbol("a"), SYMBOL_NIL))),
+    make_pair(make_symbol("globe"), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_symbol("e"), make_pair(make_symbol("g"), SYMBOL_NIL))),
+    SYMBOL_NIL)))))), SYMBOL_NIL))))), SYMBOL_NIL)))));
+
 $globals{"binding"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("v"),

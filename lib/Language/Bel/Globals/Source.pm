@@ -237,7 +237,13 @@ __DATA__
     (and (begins e (list smark 'loc))
          (cddr e))))
 
-; skip lookup [waiting for evaluator]
+(def lookup (e a s g)
+  (or (binding e s)
+      (get e a id)
+      (get e g id)
+      (case e
+        scope (cons e a)
+        globe (cons e g))))
 
 (def binding (v s)
   (get v
