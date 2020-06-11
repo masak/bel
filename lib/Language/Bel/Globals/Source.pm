@@ -264,7 +264,13 @@ __DATA__
 
 ; skip formfn [waiting for evaluator]
 
-; skip parameters [waiting for evaluator]
+(def parameters (p)
+  (if (no p)           nil
+      (variable p)     (list p)
+      (atom p)         (err 'bad-parm)
+      (in (car p) t o) (parameters (cadr p))
+                       (append (parameters (car p))
+                               (parameters (cdr p)))))
 
 ; skip quote [waiting for evaluator]
 
