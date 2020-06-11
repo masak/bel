@@ -319,7 +319,10 @@ __DATA__
 (def okenv (a)
   (and (proper a) (all pair a)))
 
-; skip okstack [waiting for evaluator]
+(def okstack (s)
+  (and (proper s)
+       (all [and (proper _) (cdr _) (okenv (cadr _))]
+            s)))
 
 ; skip okparms [waiting for evaluator]
 
