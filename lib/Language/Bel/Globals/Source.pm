@@ -353,7 +353,9 @@ __DATA__
 
 ; skip applycont [waiting for evaluator]
 
-; skip protected [waiting for evaluator]
+(def protected (x)
+  (some [begins (car x) (list smark _) id]
+        '(bind prot)))
 
 (def function (x)
   (find [(isa _) x] '(prim clo)))
