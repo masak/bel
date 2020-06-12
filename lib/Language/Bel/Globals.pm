@@ -1143,6 +1143,50 @@ $globals{"okstack"} =
     make_pair(make_symbol("s"), SYMBOL_NIL))), SYMBOL_NIL))),
     SYMBOL_NIL)))));
 
+$globals{"okparms"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("p"), SYMBOL_NIL),
+    make_pair(make_pair(make_symbol("if"),
+    make_pair(make_pair(make_symbol("no"), make_pair(make_symbol("p"),
+    SYMBOL_NIL)), make_pair(SYMBOL_T,
+    make_pair(make_pair(make_symbol("variable"), make_pair(make_symbol("p"),
+    SYMBOL_NIL)), make_pair(SYMBOL_T,
+    make_pair(make_pair(make_symbol("atom"), make_pair(make_symbol("p"),
+    SYMBOL_NIL)), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("caris"), make_pair(make_symbol("p"),
+    make_pair(SYMBOL_T, SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("oktoparm"), make_pair(make_symbol("p"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("and"),
+    make_pair(make_pair(make_symbol("if"),
+    make_pair(make_pair(make_symbol("caris"),
+    make_pair(make_pair(make_symbol("car"), make_pair(make_symbol("p"),
+    SYMBOL_NIL)), make_pair(make_symbol("o"), SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("oktoparm"),
+    make_pair(make_pair(make_symbol("car"), make_pair(make_symbol("p"),
+    SYMBOL_NIL)), SYMBOL_NIL)), make_pair(make_pair(make_symbol("okparms"),
+    make_pair(make_pair(make_symbol("car"), make_pair(make_symbol("p"),
+    SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL)))),
+    make_pair(make_pair(make_symbol("okparms"),
+    make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("p"),
+    SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL)))))))))),
+    SYMBOL_NIL)))));
+
+$globals{"oktoparm"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_pair(make_symbol("tag"),
+    make_pair(make_pair(make_symbol("o"), make_pair(make_symbol("var"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("o"),
+    make_pair(make_symbol("e"), SYMBOL_NIL)), make_symbol("extra")))),
+    SYMBOL_NIL), make_pair(make_pair(make_symbol("and"),
+    make_pair(make_pair(make_symbol("okparms"),
+    make_pair(make_symbol("var"), SYMBOL_NIL)),
+    make_pair(make_pair(make_symbol("or"),
+    make_pair(make_pair(make_symbol("="), make_pair(make_symbol("tag"),
+    make_pair(make_symbol("o"), SYMBOL_NIL))), make_pair(make_symbol("e"),
+    SYMBOL_NIL))), make_pair(make_pair(make_symbol("no"),
+    make_pair(make_symbol("extra"), SYMBOL_NIL)), SYMBOL_NIL)))),
+    SYMBOL_NIL)))));
+
 $globals{"function"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),

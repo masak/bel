@@ -324,9 +324,18 @@ __DATA__
        (all [and (proper _) (cdr _) (okenv (cadr _))]
             s)))
 
-; skip okparms [waiting for evaluator]
+(def okparms (p)
+  (if (no p)       t
+      (variable p) t
+      (atom p)     nil
+      (caris p t)  (oktoparm p)
+                   (and (if (caris (car p) o)
+                            (oktoparm (car p))
+                            (okparms (car p)))
+                        (okparms (cdr p)))))
 
-; skip oktoparm [waiting for evaluator]
+(def oktoparm ((tag (o var) (o e) . extra))
+  (and (okparms var) (or (= tag o) e) (no extra)))
 
 ; skip prims [waiting for evaluator]
 
