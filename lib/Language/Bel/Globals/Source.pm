@@ -337,7 +337,9 @@ __DATA__
 (def oktoparm ((tag (o var) (o e) . extra))
   (and (okparms var) (or (= tag o) e) (no extra)))
 
-; skip prims [waiting for evaluator]
+(set prims '((id join xar xdr wrb ops)
+             (car cdr type sym nom rdb cls stat sys)
+             (coin)))
 
 ; skip applyprim [waiting for evaluator]
 

@@ -1187,6 +1187,18 @@ $globals{"oktoparm"} =
     make_pair(make_symbol("extra"), SYMBOL_NIL)), SYMBOL_NIL)))),
     SYMBOL_NIL)))));
 
+$globals{"prims"} =
+    make_pair(make_pair(make_symbol("id"), make_pair(make_symbol("join"),
+    make_pair(make_symbol("xar"), make_pair(make_symbol("xdr"),
+    make_pair(make_symbol("wrb"), make_pair(make_symbol("ops"),
+    SYMBOL_NIL)))))), make_pair(make_pair(make_symbol("car"),
+    make_pair(make_symbol("cdr"), make_pair(make_symbol("type"),
+    make_pair(make_symbol("sym"), make_pair(make_symbol("nom"),
+    make_pair(make_symbol("rdb"), make_pair(make_symbol("cls"),
+    make_pair(make_symbol("stat"), make_pair(make_symbol("sys"),
+    SYMBOL_NIL))))))))), make_pair(make_pair(make_symbol("coin"),
+    SYMBOL_NIL), SYMBOL_NIL)));
+
 $globals{"function"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
