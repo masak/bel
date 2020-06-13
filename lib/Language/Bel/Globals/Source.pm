@@ -230,17 +230,31 @@ __DATA__
 
 ; skip vref [waiting for evaluator]
 
-; skip smark [waiting for evaluator]
+(set smark (join))
 
-; skip inwhere [waiting for evaluator]
+(def inwhere (s)
+  (let e (car (car s))
+    (and (begins e (list smark 'loc))
+         (cddr e))))
 
-; skip lookup [waiting for evaluator]
+(def lookup (e a s g)
+  (or (binding e s)
+      (get e a id)
+      (get e g id)
+      (case e
+        scope (cons e a)
+        globe (cons e g))))
 
-; skip binding [waiting for evaluator]
+(def binding (v s)
+  (get v
+       (map caddr (keep [begins _ (list smark 'bind) id]
+                        (map car s)))
+       id))
 
 ; skip sigerr [waiting for evaluator]
 
-; skip fu [waiting for evaluator]
+(mac fu args
+  `(list (list smark 'fut (fn ,@args)) nil))
 
 ; skip evmark [waiting for evaluator]
 
@@ -250,7 +264,13 @@ __DATA__
 
 ; skip formfn [waiting for evaluator]
 
-; skip parameters [waiting for evaluator]
+(def parameters (p)
+  (if (no p)           nil
+      (variable p)     (list p)
+      (atom p)         (err 'bad-parm)
+      (in (car p) t o) (parameters (cadr p))
+                       (append (parameters (car p))
+                               (parameters (cdr p)))))
 
 ; skip quote [waiting for evaluator]
 
@@ -296,15 +316,30 @@ __DATA__
 (loc (is cdr) (f args a s r m)
   (mev (cdr s) (cons (list (car args) 'd) r) m))
 
-; skip okenv [waiting for evaluator]
+(def okenv (a)
+  (and (proper a) (all pair a)))
 
-; skip okstack [waiting for evaluator]
+(def okstack (s)
+  (and (proper s)
+       (all [and (proper _) (cdr _) (okenv (cadr _))]
+            s)))
 
-; skip okparms [waiting for evaluator]
+(def okparms (p)
+  (if (no p)       t
+      (variable p) t
+      (atom p)     nil
+      (caris p t)  (oktoparm p)
+                   (and (if (caris (car p) o)
+                            (oktoparm (car p))
+                            (okparms (car p)))
+                        (okparms (cdr p)))))
 
-; skip oktoparm [waiting for evaluator]
+(def oktoparm ((tag (o var) (o e) . extra))
+  (and (okparms var) (or (= tag o) e) (no extra)))
 
-; skip prims [waiting for evaluator]
+(set prims '((id join xar xdr wrb ops)
+             (car cdr type sym nom rdb cls stat sys)
+             (coin)))
 
 ; skip applyprim [waiting for evaluator]
 
@@ -318,7 +353,9 @@ __DATA__
 
 ; skip applycont [waiting for evaluator]
 
-; skip protected [waiting for evaluator]
+(def protected (x)
+  (some [begins (car x) (list smark _) id]
+        '(bind prot)))
 
 (def function (x)
   (find [(isa _) x] '(prim clo)))
