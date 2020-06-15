@@ -24,9 +24,9 @@ sub list {
             "('unboundb thread)",
         ],
         backquotes => [
-            "(isa!mac bquote)",
+            "(isa!mac bqex)",
             "t",
-            "('unboundb bquote)",
+            "('unboundb bqex)",
         ],
         printer => [
             "(function print)",

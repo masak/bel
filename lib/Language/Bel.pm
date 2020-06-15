@@ -139,7 +139,7 @@ Evaluates an expression, passed in as a string of Bel code.
 sub eval {
     my ($self, $expr) = @_;
 
-    my $ast = _bqexpand(read_whole($expr));
+    my $ast = read_whole($expr);
     my $result = $self->eval_ast($ast);
     my $result_string = _print($result);
 
@@ -461,6 +461,18 @@ sub vref {
     elsif (is_pair($it = $self->lookup($v, $a))) {
         push @{$self->{r}}, pair_cdr($it);
     }
+    elsif (is_symbol_of_name($v, "bquote")) {
+        push @{$self->{r}}, make_pair(
+            make_symbol("lit"),
+            make_pair(
+                make_symbol("prim"),
+                make_pair(
+                    make_symbol("BQUOTE_HACK"),
+                    SYMBOL_NIL,
+                ),
+            )
+        );
+    }
     else {
         my $name = is_symbol($v)
             ? symbol_name($v)
@@ -601,8 +613,22 @@ sub evcall {
                 && is_symbol_of_name(prim_car(prim_cdr($v)), "mac");
         };
 
+        my $is_bquote_hack = sub {
+            my ($v) = @_;
+
+            return is_pair($v)
+                && is_symbol_of_name(prim_car($v), "lit")
+                && is_pair(prim_cdr($v))
+                && is_symbol_of_name(prim_car(prim_cdr($v)), "prim")
+                && is_pair(prim_cdr(prim_cdr($v)))
+                && is_symbol_of_name(prim_car(prim_cdr(prim_cdr($v))), "BQUOTE_HACK");
+        };
+
         if ($isa_mac->($op)) {
             $self->applym($op, $es1, $a);
+        }
+        elsif ($is_bquote_hack->($op)) {
+            push @{$self->{s}}, [_bqexpand($e), $a];
         }
         else {
             # We're consuming `es` twice, once in each fut.
