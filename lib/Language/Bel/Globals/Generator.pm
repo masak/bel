@@ -36,9 +36,6 @@ use Language::Bel::Primitives qw(
 use Language::Bel::Reader qw(
     read_whole
 );
-use Language::Bel::Expander::Bquote qw(
-    _bqexpand
-);
 use Language::Bel::Globals::Source;
 use Language::Bel::Globals::FastFuncs qw(
     FASTFUNCS
@@ -229,7 +226,7 @@ HEADER
                 $new_ast = prim_car($cddr_ast);
                 push @globals, {
                     name => $name,
-                    expr => $interpreter->eval_ast(_bqexpand($new_ast)),
+                    expr => $interpreter->eval_ast($new_ast),
                 };
 
                 $ast = prim_cdr(prim_cdr($ast));
@@ -252,7 +249,7 @@ HEADER
                                     make_symbol("clo"),
                                     make_pair(
                                         SYMBOL_NIL,
-                                        _bqexpand($rest),
+                                        $rest,
                                     ),
                                 ),
                             ),
@@ -278,7 +275,7 @@ HEADER
                                     make_symbol("clo"),
                                     make_pair(
                                         SYMBOL_NIL,
-                                        _bqexpand($rest),
+                                        $rest,
                                     ),
                                 ),
                             ),
@@ -313,7 +310,7 @@ HEADER
 
         push @globals, {
             name => $name,
-            expr => $interpreter->eval_ast(_bqexpand($new_ast)),
+            expr => $interpreter->eval_ast($new_ast),
         };
     }
 
