@@ -1337,6 +1337,2318 @@ my %FASTFUNCS = (
         );
     },
 
+    "r-" => sub {
+        my ($call, $x, $y) = @_;
+
+        my $xn = prim_car($x);
+        my $xd = prim_car(prim_cdr($x));
+
+        my $yn = prim_car($y);
+        my $yd = prim_car(prim_cdr($y));
+
+        my $xn_n = 0;
+        while (!is_nil($xn)) {
+            ++$xn_n;
+            $xn = prim_cdr($xn);
+        }
+
+        my $xd_n = 0;
+        while (!is_nil($xd)) {
+            ++$xd_n;
+            $xd = prim_cdr($xd);
+        }
+
+        my $yn_n = 0;
+        while (!is_nil($yn)) {
+            ++$yn_n;
+            $yn = prim_cdr($yn);
+        }
+
+        my $yd_n = 0;
+        while (!is_nil($yd)) {
+            ++$yd_n;
+            $yd = prim_cdr($yd);
+        }
+
+        my $n_n = $xn_n * $yd_n - $yn_n * $xd_n;
+        my $sign = $n_n < 1 ? "-" : "+";
+        $n_n = abs($n_n);
+        my $d_n = $xd_n * $yd_n;
+
+        my $n = SYMBOL_NIL;
+        for (1..$n_n) {
+            $n = make_pair(
+                SYMBOL_T,
+                $n,
+            );
+        }
+
+        my $d = SYMBOL_NIL;
+        for (1..$d_n) {
+            $d = make_pair(
+                SYMBOL_T,
+                $d,
+            );
+        }
+
+        return make_pair(
+            make_symbol($sign),
+            make_pair(
+                $n,
+                make_pair(
+                    $d,
+                    SYMBOL_NIL,
+                ),
+            ),
+        );
+    },
+
+    "r*" => sub {
+        my ($call, $x, $y) = @_;
+
+        my $xn = prim_car($x);
+        my $xd = prim_car(prim_cdr($x));
+
+        my $yn = prim_car($y);
+        my $yd = prim_car(prim_cdr($y));
+
+        my $xn_n = 0;
+        while (!is_nil($xn)) {
+            ++$xn_n;
+            $xn = prim_cdr($xn);
+        }
+
+        my $xd_n = 0;
+        while (!is_nil($xd)) {
+            ++$xd_n;
+            $xd = prim_cdr($xd);
+        }
+
+        my $yn_n = 0;
+        while (!is_nil($yn)) {
+            ++$yn_n;
+            $yn = prim_cdr($yn);
+        }
+
+        my $yd_n = 0;
+        while (!is_nil($yd)) {
+            ++$yd_n;
+            $yd = prim_cdr($yd);
+        }
+
+        my $n_n = $xn_n * $yn_n;
+        my $d_n = $xd_n * $yd_n;
+
+        my $n = SYMBOL_NIL;
+        for (1..$n_n) {
+            $n = make_pair(
+                SYMBOL_T,
+                $n,
+            );
+        }
+
+        my $d = SYMBOL_NIL;
+        for (1..$d_n) {
+            $d = make_pair(
+                SYMBOL_T,
+                $d,
+            );
+        }
+
+        return make_pair(
+            $n,
+            make_pair(
+                $d,
+                SYMBOL_NIL,
+            ),
+        );
+    },
+
+    "r/" => sub {
+        my ($call, $x, $y) = @_;
+
+        my $xn = prim_car($x);
+        my $xd = prim_car(prim_cdr($x));
+
+        my $yn = prim_car($y);
+        my $yd = prim_car(prim_cdr($y));
+
+        my $xn_n = 0;
+        while (!is_nil($xn)) {
+            ++$xn_n;
+            $xn = prim_cdr($xn);
+        }
+
+        my $xd_n = 0;
+        while (!is_nil($xd)) {
+            ++$xd_n;
+            $xd = prim_cdr($xd);
+        }
+
+        my $yn_n = 0;
+        while (!is_nil($yn)) {
+            ++$yn_n;
+            $yn = prim_cdr($yn);
+        }
+
+        my $yd_n = 0;
+        while (!is_nil($yd)) {
+            ++$yd_n;
+            $yd = prim_cdr($yd);
+        }
+
+        my $n_n = $xn_n * $yd_n;
+        my $d_n = $xd_n * $yn_n;
+
+        my $n = SYMBOL_NIL;
+        for (1..$n_n) {
+            $n = make_pair(
+                SYMBOL_T,
+                $n,
+            );
+        }
+
+        my $d = SYMBOL_NIL;
+        for (1..$d_n) {
+            $d = make_pair(
+                SYMBOL_T,
+                $d,
+            );
+        }
+
+        return make_pair(
+            $n,
+            make_pair(
+                $d,
+                SYMBOL_NIL,
+            ),
+        );
+    },
+
+    "sr+" => sub {
+        my ($call, $x, $y) = @_;
+
+        my $xs = prim_car($x);
+        my $xn = prim_car(prim_cdr($x));
+        my $xd = prim_car(prim_cdr(prim_cdr($x)));
+
+        my $ys = prim_car($y);
+        my $yn = prim_car(prim_cdr($y));
+        my $yd = prim_car(prim_cdr(prim_cdr($y)));
+
+        my $symbol;
+        if (is_symbol_of_name($xs, "-")) {
+            if (is_symbol_of_name($ys, "-")) {
+                my $xn_n = 0;
+                while (!is_nil($xn)) {
+                    ++$xn_n;
+                    $xn = prim_cdr($xn);
+                }
+
+                my $xd_n = 0;
+                while (!is_nil($xd)) {
+                    ++$xd_n;
+                    $xd = prim_cdr($xd);
+                }
+
+                my $yn_n = 0;
+                while (!is_nil($yn)) {
+                    ++$yn_n;
+                    $yn = prim_cdr($yn);
+                }
+
+                my $yd_n = 0;
+                while (!is_nil($yd)) {
+                    ++$yd_n;
+                    $yd = prim_cdr($yd);
+                }
+
+                my $n_n = $xn_n * $yd_n + $yn_n * $xd_n;
+                my $d_n = $xd_n * $yd_n;
+
+                my $n = SYMBOL_NIL;
+                for (1..$n_n) {
+                    $n = make_pair(
+                        SYMBOL_T,
+                        $n,
+                    );
+                }
+
+                my $d = SYMBOL_NIL;
+                for (1..$d_n) {
+                    $d = make_pair(
+                        SYMBOL_T,
+                        $d,
+                    );
+                }
+
+                return make_pair(
+                    make_symbol("-"),
+                    make_pair(
+                        $n,
+                        make_pair(
+                            $d,
+                            SYMBOL_NIL,
+                        ),
+                    ),
+                );
+            }
+            else {
+                my $xn_n = 0;
+                while (!is_nil($xn)) {
+                    ++$xn_n;
+                    $xn = prim_cdr($xn);
+                }
+
+                my $xd_n = 0;
+                while (!is_nil($xd)) {
+                    ++$xd_n;
+                    $xd = prim_cdr($xd);
+                }
+
+                my $yn_n = 0;
+                while (!is_nil($yn)) {
+                    ++$yn_n;
+                    $yn = prim_cdr($yn);
+                }
+
+                my $yd_n = 0;
+                while (!is_nil($yd)) {
+                    ++$yd_n;
+                    $yd = prim_cdr($yd);
+                }
+
+                my $n_n = $yn_n * $xd_n - $xn_n * $yd_n;
+                my $sign = $n_n < 1 ? "-" : "+";
+                $n_n = abs($n_n);
+                my $d_n = $yd_n * $xd_n;
+
+                my $n = SYMBOL_NIL;
+                for (1..$n_n) {
+                    $n = make_pair(
+                        SYMBOL_T,
+                        $n,
+                    );
+                }
+
+                my $d = SYMBOL_NIL;
+                for (1..$d_n) {
+                    $d = make_pair(
+                        SYMBOL_T,
+                        $d,
+                    );
+                }
+
+                return make_pair(
+                    make_symbol($sign),
+                    make_pair(
+                        $n,
+                        make_pair(
+                            $d,
+                            SYMBOL_NIL,
+                        ),
+                    ),
+                );
+            }
+        }
+        else {
+            if (is_symbol_of_name($ys, "-")) {
+                my $xn_n = 0;
+                while (!is_nil($xn)) {
+                    ++$xn_n;
+                    $xn = prim_cdr($xn);
+                }
+
+                my $xd_n = 0;
+                while (!is_nil($xd)) {
+                    ++$xd_n;
+                    $xd = prim_cdr($xd);
+                }
+
+                my $yn_n = 0;
+                while (!is_nil($yn)) {
+                    ++$yn_n;
+                    $yn = prim_cdr($yn);
+                }
+
+                my $yd_n = 0;
+                while (!is_nil($yd)) {
+                    ++$yd_n;
+                    $yd = prim_cdr($yd);
+                }
+
+                my $n_n = $xn_n * $yd_n - $yn_n * $xd_n;
+                my $sign = $n_n < 1 ? "-" : "+";
+                $n_n = abs($n_n);
+                my $d_n = $xd_n * $yd_n;
+
+                my $n = SYMBOL_NIL;
+                for (1..$n_n) {
+                    $n = make_pair(
+                        SYMBOL_T,
+                        $n,
+                    );
+                }
+
+                my $d = SYMBOL_NIL;
+                for (1..$d_n) {
+                    $d = make_pair(
+                        SYMBOL_T,
+                        $d,
+                    );
+                }
+
+                return make_pair(
+                    make_symbol($sign),
+                    make_pair(
+                        $n,
+                        make_pair(
+                            $d,
+                            SYMBOL_NIL,
+                        ),
+                    ),
+                );
+            }
+            else {
+                my $xn_n = 0;
+                while (!is_nil($xn)) {
+                    ++$xn_n;
+                    $xn = prim_cdr($xn);
+                }
+
+                my $xd_n = 0;
+                while (!is_nil($xd)) {
+                    ++$xd_n;
+                    $xd = prim_cdr($xd);
+                }
+
+                my $yn_n = 0;
+                while (!is_nil($yn)) {
+                    ++$yn_n;
+                    $yn = prim_cdr($yn);
+                }
+
+                my $yd_n = 0;
+                while (!is_nil($yd)) {
+                    ++$yd_n;
+                    $yd = prim_cdr($yd);
+                }
+
+                my $n_n = $xn_n * $yd_n + $yn_n * $xd_n;
+                my $d_n = $xd_n * $yd_n;
+
+                my $n = SYMBOL_NIL;
+                for (1..$n_n) {
+                    $n = make_pair(
+                        SYMBOL_T,
+                        $n,
+                    );
+                }
+
+                my $d = SYMBOL_NIL;
+                for (1..$d_n) {
+                    $d = make_pair(
+                        SYMBOL_T,
+                        $d,
+                    );
+                }
+
+                return make_pair(
+                    make_symbol("+"),
+                    make_pair(
+                        $n,
+                        make_pair(
+                            $d,
+                            SYMBOL_NIL,
+                        ),
+                    ),
+                );
+            }
+        }
+    },
+
+    "sr-" => sub {
+        my ($call, $x, $y) = @_;
+
+        my $xs = prim_car($x);
+        my $xn = prim_car(prim_cdr($x));
+        my $xd = prim_car(prim_cdr(prim_cdr($x)));
+
+        my $ys = prim_car($y);
+        my $yn = prim_car(prim_cdr($y));
+        my $yd = prim_car(prim_cdr(prim_cdr($y)));
+
+        my $symbol;
+        if (is_symbol_of_name($xs, "-")) {
+            if (is_symbol_of_name($ys, "-")) {
+                my $xn_n = 0;
+                while (!is_nil($xn)) {
+                    ++$xn_n;
+                    $xn = prim_cdr($xn);
+                }
+
+                my $xd_n = 0;
+                while (!is_nil($xd)) {
+                    ++$xd_n;
+                    $xd = prim_cdr($xd);
+                }
+
+                my $yn_n = 0;
+                while (!is_nil($yn)) {
+                    ++$yn_n;
+                    $yn = prim_cdr($yn);
+                }
+
+                my $yd_n = 0;
+                while (!is_nil($yd)) {
+                    ++$yd_n;
+                    $yd = prim_cdr($yd);
+                }
+
+                my $n_n = $yn_n * $xd_n - $xn_n * $yd_n;
+                my $sign = $n_n < 1 ? "-" : "+";
+                $n_n = abs($n_n);
+                my $d_n = $yd_n * $xd_n;
+
+                my $n = SYMBOL_NIL;
+                for (1..$n_n) {
+                    $n = make_pair(
+                        SYMBOL_T,
+                        $n,
+                    );
+                }
+
+                my $d = SYMBOL_NIL;
+                for (1..$d_n) {
+                    $d = make_pair(
+                        SYMBOL_T,
+                        $d,
+                    );
+                }
+
+                return make_pair(
+                    make_symbol($sign),
+                    make_pair(
+                        $n,
+                        make_pair(
+                            $d,
+                            SYMBOL_NIL,
+                        ),
+                    ),
+                );
+            }
+            else {
+                my $xn_n = 0;
+                while (!is_nil($xn)) {
+                    ++$xn_n;
+                    $xn = prim_cdr($xn);
+                }
+
+                my $xd_n = 0;
+                while (!is_nil($xd)) {
+                    ++$xd_n;
+                    $xd = prim_cdr($xd);
+                }
+
+                my $yn_n = 0;
+                while (!is_nil($yn)) {
+                    ++$yn_n;
+                    $yn = prim_cdr($yn);
+                }
+
+                my $yd_n = 0;
+                while (!is_nil($yd)) {
+                    ++$yd_n;
+                    $yd = prim_cdr($yd);
+                }
+
+                my $n_n = $xn_n * $yd_n + $yn_n * $xd_n;
+                my $d_n = $xd_n * $yd_n;
+
+                my $n = SYMBOL_NIL;
+                for (1..$n_n) {
+                    $n = make_pair(
+                        SYMBOL_T,
+                        $n,
+                    );
+                }
+
+                my $d = SYMBOL_NIL;
+                for (1..$d_n) {
+                    $d = make_pair(
+                        SYMBOL_T,
+                        $d,
+                    );
+                }
+
+                return make_pair(
+                    make_symbol("-"),
+                    make_pair(
+                        $n,
+                        make_pair(
+                            $d,
+                            SYMBOL_NIL,
+                        ),
+                    ),
+                );
+            }
+        }
+        else {
+            if (is_symbol_of_name($ys, "-")) {
+                my $xn_n = 0;
+                while (!is_nil($xn)) {
+                    ++$xn_n;
+                    $xn = prim_cdr($xn);
+                }
+
+                my $xd_n = 0;
+                while (!is_nil($xd)) {
+                    ++$xd_n;
+                    $xd = prim_cdr($xd);
+                }
+
+                my $yn_n = 0;
+                while (!is_nil($yn)) {
+                    ++$yn_n;
+                    $yn = prim_cdr($yn);
+                }
+
+                my $yd_n = 0;
+                while (!is_nil($yd)) {
+                    ++$yd_n;
+                    $yd = prim_cdr($yd);
+                }
+
+                my $n_n = $xn_n * $yd_n + $yn_n * $xd_n;
+                my $d_n = $xd_n * $yd_n;
+
+                my $n = SYMBOL_NIL;
+                for (1..$n_n) {
+                    $n = make_pair(
+                        SYMBOL_T,
+                        $n,
+                    );
+                }
+
+                my $d = SYMBOL_NIL;
+                for (1..$d_n) {
+                    $d = make_pair(
+                        SYMBOL_T,
+                        $d,
+                    );
+                }
+
+                return make_pair(
+                    make_symbol("+"),
+                    make_pair(
+                        $n,
+                        make_pair(
+                            $d,
+                            SYMBOL_NIL,
+                        ),
+                    ),
+                );
+            }
+            else {
+                my $xn_n = 0;
+                while (!is_nil($xn)) {
+                    ++$xn_n;
+                    $xn = prim_cdr($xn);
+                }
+
+                my $xd_n = 0;
+                while (!is_nil($xd)) {
+                    ++$xd_n;
+                    $xd = prim_cdr($xd);
+                }
+
+                my $yn_n = 0;
+                while (!is_nil($yn)) {
+                    ++$yn_n;
+                    $yn = prim_cdr($yn);
+                }
+
+                my $yd_n = 0;
+                while (!is_nil($yd)) {
+                    ++$yd_n;
+                    $yd = prim_cdr($yd);
+                }
+
+                my $n_n = $xn_n * $yd_n - $yn_n * $xd_n;
+                my $sign = $n_n < 1 && $yn_n > 0 ? "-" : "+";
+                $n_n = abs($n_n);
+                my $d_n = $xd_n * $yd_n;
+
+                my $n = SYMBOL_NIL;
+                for (1..$n_n) {
+                    $n = make_pair(
+                        SYMBOL_T,
+                        $n,
+                    );
+                }
+
+                my $d = SYMBOL_NIL;
+                for (1..$d_n) {
+                    $d = make_pair(
+                        SYMBOL_T,
+                        $d,
+                    );
+                }
+
+                return make_pair(
+                    make_symbol($sign),
+                    make_pair(
+                        $n,
+                        make_pair(
+                            $d,
+                            SYMBOL_NIL,
+                        ),
+                    ),
+                );
+            }
+        }
+    },
+
+    "srinv" => sub {
+        my ($call, $sr) = @_;
+
+        my $s = prim_car($sr);
+        my $n = prim_car(prim_cdr($sr));
+        my $d = prim_car(prim_cdr(prim_cdr($sr)));
+
+        my $sign = is_symbol_of_name($s, "+") && !is_nil($n)
+            ? "-"
+            : "+";
+
+        return make_pair(
+            make_symbol($sign),
+            make_pair(
+                $n,
+                make_pair(
+                    $d,
+                    SYMBOL_NIL,
+                ),
+            ),
+        );
+    },
+
+    "sr*" => sub {
+        my ($call, $x, $y) = @_;
+
+        my $xs = prim_car($x);
+        my $xn = prim_car(prim_cdr($x));
+        my $xd = prim_car(prim_cdr(prim_cdr($x)));
+
+        my $ys = prim_car($y);
+        my $yn = prim_car(prim_cdr($y));
+        my $yd = prim_car(prim_cdr(prim_cdr($y)));
+
+        my $sign = is_symbol_of_name($xs, "-")
+            ? make_symbol(is_symbol_of_name($ys, "-") ? "+" : "-")
+            : $ys;
+
+        my $xn_n = 0;
+        while (!is_nil($xn)) {
+            ++$xn_n;
+            $xn = prim_cdr($xn);
+        }
+
+        my $xd_n = 0;
+        while (!is_nil($xd)) {
+            ++$xd_n;
+            $xd = prim_cdr($xd);
+        }
+
+        my $yn_n = 0;
+        while (!is_nil($yn)) {
+            ++$yn_n;
+            $yn = prim_cdr($yn);
+        }
+
+        my $yd_n = 0;
+        while (!is_nil($yd)) {
+            ++$yd_n;
+            $yd = prim_cdr($yd);
+        }
+
+        my $n_n = $xn_n * $yn_n;
+        my $d_n = $xd_n * $yd_n;
+
+        my $n = SYMBOL_NIL;
+        for (1..$n_n) {
+            $n = make_pair(
+                SYMBOL_T,
+                $n,
+            );
+        }
+
+        my $d = SYMBOL_NIL;
+        for (1..$d_n) {
+            $d = make_pair(
+                SYMBOL_T,
+                $d,
+            );
+        }
+
+        return make_pair(
+            $sign,
+            make_pair(
+                $n,
+                make_pair(
+                    $d,
+                    SYMBOL_NIL,
+                ),
+            ),
+        );
+    },
+
+    "sr/" => sub {
+        my ($call, $x, $y) = @_;
+
+        my $xs = prim_car($x);
+        my $xn = prim_car(prim_cdr($x));
+        my $xd = prim_car(prim_cdr(prim_cdr($x)));
+
+        my $ys = prim_car($y);
+        my $yn = prim_car(prim_cdr($y));
+        my $yd = prim_car(prim_cdr(prim_cdr($y)));
+
+        die "'mistype\n"
+            if is_nil($yn);
+
+        my $sign = is_symbol_of_name($xs, "-")
+            ? make_symbol(is_symbol_of_name($ys, "-") ? "+" : "-")
+            : $ys;
+
+        my $xn_n = 0;
+        while (!is_nil($xn)) {
+            ++$xn_n;
+            $xn = prim_cdr($xn);
+        }
+
+        my $xd_n = 0;
+        while (!is_nil($xd)) {
+            ++$xd_n;
+            $xd = prim_cdr($xd);
+        }
+
+        my $yn_n = 0;
+        while (!is_nil($yn)) {
+            ++$yn_n;
+            $yn = prim_cdr($yn);
+        }
+
+        my $yd_n = 0;
+        while (!is_nil($yd)) {
+            ++$yd_n;
+            $yd = prim_cdr($yd);
+        }
+
+        my $n_n = $xn_n * $yd_n;
+        my $d_n = $xd_n * $yn_n;
+
+        my $n = SYMBOL_NIL;
+        for (1..$n_n) {
+            $n = make_pair(
+                SYMBOL_T,
+                $n,
+            );
+        }
+
+        my $d = SYMBOL_NIL;
+        for (1..$d_n) {
+            $d = make_pair(
+                SYMBOL_T,
+                $d,
+            );
+        }
+
+        return make_pair(
+            $sign,
+            make_pair(
+                $n,
+                make_pair(
+                    $d,
+                    SYMBOL_NIL,
+                ),
+            ),
+        );
+    },
+
+    "srrecip" => sub {
+        my ($call, $sr) = @_;
+
+        my $s = prim_car($sr);
+        my $n = prim_car(prim_cdr($sr));
+        die "'mistype\n"
+            if is_nil($n);
+        my $d = prim_car(prim_cdr(prim_cdr($sr)));
+
+        return make_pair(
+            $s,
+            make_pair(
+                $d,
+                make_pair(
+                    $n,
+                    SYMBOL_NIL,
+                ),
+            ),
+        );
+    },
+
+    "sr<" => sub {
+        my ($call, $x, $y) = @_;
+
+        my $xs = prim_car($x);
+        my $xn = prim_car(prim_cdr($x));
+        my $xd = prim_car(prim_cdr(prim_cdr($x)));
+
+        my $ys = prim_car($y);
+        my $yn = prim_car(prim_cdr($y));
+        my $yd = prim_car(prim_cdr(prim_cdr($y)));
+
+        if (is_symbol_of_name($xs, "+")) {
+            if (is_symbol_of_name($ys, "+")) {
+                my $xn_n = 0;
+                while (!is_nil($xn)) {
+                    ++$xn_n;
+                    $xn = prim_cdr($xn);
+                }
+
+                my $xd_n = 0;
+                while (!is_nil($xd)) {
+                    ++$xd_n;
+                    $xd = prim_cdr($xd);
+                }
+
+                my $yn_n = 0;
+                while (!is_nil($yn)) {
+                    ++$yn_n;
+                    $yn = prim_cdr($yn);
+                }
+
+                my $yd_n = 0;
+                while (!is_nil($yd)) {
+                    ++$yd_n;
+                    $yd = prim_cdr($yd);
+                }
+
+                my $p1_n = $xn_n * $yd_n;
+                my $p2_n = $yn_n * $xd_n;
+
+                my $n = $p2_n - $p1_n;
+                my $result = SYMBOL_NIL;
+                for (1..$n) {
+                    $result = make_pair(SYMBOL_T, $result);
+                }
+                return $result;
+            }
+            else {
+                return SYMBOL_NIL;
+            }
+        }
+        else {
+            if (is_symbol_of_name($ys, "+")) {
+                return !is_nil($xn) || !is_nil($yn)
+                    ? SYMBOL_T
+                    : SYMBOL_NIL;
+            }
+            else {
+                my $xn_n = 0;
+                while (!is_nil($xn)) {
+                    ++$xn_n;
+                    $xn = prim_cdr($xn);
+                }
+
+                my $xd_n = 0;
+                while (!is_nil($xd)) {
+                    ++$xd_n;
+                    $xd = prim_cdr($xd);
+                }
+
+                my $yn_n = 0;
+                while (!is_nil($yn)) {
+                    ++$yn_n;
+                    $yn = prim_cdr($yn);
+                }
+
+                my $yd_n = 0;
+                while (!is_nil($yd)) {
+                    ++$yd_n;
+                    $yd = prim_cdr($yd);
+                }
+
+                my $p1_n = $yn_n * $xd_n;
+                my $p2_n = $xn_n * $yd_n;
+
+                my $n = $p2_n - $p1_n;
+                my $result = SYMBOL_NIL;
+                for (1..$n) {
+                    $result = make_pair(SYMBOL_T, $result);
+                }
+                return $result;
+            }
+        }
+    },
+
+    "srnum" => sub {
+        my ($call, $x) = @_;
+
+        return prim_car(prim_cdr($x));
+    },
+
+    "where__srnum" => sub {
+        my ($call, $x) = @_;
+
+        return make_pair(
+            prim_cdr($x),
+            make_pair(
+                SYMBOL_A,
+                SYMBOL_NIL,
+            ),
+        );
+    },
+
+    "srden" => sub {
+        my ($call, $x) = @_;
+
+        return prim_car(prim_cdr(prim_cdr($x)));
+    },
+
+    "where__srden" => sub {
+        my ($call, $x) = @_;
+
+        return make_pair(
+            prim_cdr(prim_cdr($x)),
+            make_pair(
+                SYMBOL_A,
+                SYMBOL_NIL,
+            ),
+        );
+    },
+
+    "c+" => sub {
+        my ($call, $x, $y) = @_;
+
+        my $xr = prim_car($x);
+        my $xi = prim_car(prim_cdr($x));
+
+        my $yr = prim_car($y);
+        my $yi = prim_car(prim_cdr($y));
+
+        my $real_part;
+        {
+            my $xs = prim_car($xr);
+            my $xn = prim_car(prim_cdr($xr));
+            my $xd = prim_car(prim_cdr(prim_cdr($xr)));
+
+            my $ys = prim_car($yr);
+            my $yn = prim_car(prim_cdr($yr));
+            my $yd = prim_car(prim_cdr(prim_cdr($yr)));
+
+            my $symbol;
+            if (is_symbol_of_name($xs, "-")) {
+                if (is_symbol_of_name($ys, "-")) {
+                    my $xn_n = 0;
+                    while (!is_nil($xn)) {
+                        ++$xn_n;
+                        $xn = prim_cdr($xn);
+                    }
+
+                    my $xd_n = 0;
+                    while (!is_nil($xd)) {
+                        ++$xd_n;
+                        $xd = prim_cdr($xd);
+                    }
+
+                    my $yn_n = 0;
+                    while (!is_nil($yn)) {
+                        ++$yn_n;
+                        $yn = prim_cdr($yn);
+                    }
+
+                    my $yd_n = 0;
+                    while (!is_nil($yd)) {
+                        ++$yd_n;
+                        $yd = prim_cdr($yd);
+                    }
+
+                    my $n_n = $xn_n * $yd_n + $yn_n * $xd_n;
+                    my $d_n = $xd_n * $yd_n;
+
+                    my $n = SYMBOL_NIL;
+                    for (1..$n_n) {
+                        $n = make_pair(
+                            SYMBOL_T,
+                            $n,
+                        );
+                    }
+
+                    my $d = SYMBOL_NIL;
+                    for (1..$d_n) {
+                        $d = make_pair(
+                            SYMBOL_T,
+                            $d,
+                        );
+                    }
+
+                    $real_part = make_pair(
+                        make_symbol("-"),
+                        make_pair(
+                            $n,
+                            make_pair(
+                                $d,
+                                SYMBOL_NIL,
+                            ),
+                        ),
+                    );
+                }
+                else {
+                    my $xn_n = 0;
+                    while (!is_nil($xn)) {
+                        ++$xn_n;
+                        $xn = prim_cdr($xn);
+                    }
+
+                    my $xd_n = 0;
+                    while (!is_nil($xd)) {
+                        ++$xd_n;
+                        $xd = prim_cdr($xd);
+                    }
+
+                    my $yn_n = 0;
+                    while (!is_nil($yn)) {
+                        ++$yn_n;
+                        $yn = prim_cdr($yn);
+                    }
+
+                    my $yd_n = 0;
+                    while (!is_nil($yd)) {
+                        ++$yd_n;
+                        $yd = prim_cdr($yd);
+                    }
+
+                    my $n_n = $yn_n * $xd_n - $xn_n * $yd_n;
+                    my $sign = $n_n < 1 ? "-" : "+";
+                    $n_n = abs($n_n);
+                    my $d_n = $yd_n * $xd_n;
+
+                    my $n = SYMBOL_NIL;
+                    for (1..$n_n) {
+                        $n = make_pair(
+                            SYMBOL_T,
+                            $n,
+                        );
+                    }
+
+                    my $d = SYMBOL_NIL;
+                    for (1..$d_n) {
+                        $d = make_pair(
+                            SYMBOL_T,
+                            $d,
+                        );
+                    }
+
+                    $real_part = make_pair(
+                        make_symbol($sign),
+                        make_pair(
+                            $n,
+                            make_pair(
+                                $d,
+                                SYMBOL_NIL,
+                            ),
+                        ),
+                    );
+                }
+            }
+            else {
+                if (is_symbol_of_name($ys, "-")) {
+                    my $xn_n = 0;
+                    while (!is_nil($xn)) {
+                        ++$xn_n;
+                        $xn = prim_cdr($xn);
+                    }
+
+                    my $xd_n = 0;
+                    while (!is_nil($xd)) {
+                        ++$xd_n;
+                        $xd = prim_cdr($xd);
+                    }
+
+                    my $yn_n = 0;
+                    while (!is_nil($yn)) {
+                        ++$yn_n;
+                        $yn = prim_cdr($yn);
+                    }
+
+                    my $yd_n = 0;
+                    while (!is_nil($yd)) {
+                        ++$yd_n;
+                        $yd = prim_cdr($yd);
+                    }
+
+                    my $n_n = $xn_n * $yd_n - $yn_n * $xd_n;
+                    my $sign = $n_n < 1 ? "-" : "+";
+                    $n_n = abs($n_n);
+                    my $d_n = $xd_n * $yd_n;
+
+                    my $n = SYMBOL_NIL;
+                    for (1..$n_n) {
+                        $n = make_pair(
+                            SYMBOL_T,
+                            $n,
+                        );
+                    }
+
+                    my $d = SYMBOL_NIL;
+                    for (1..$d_n) {
+                        $d = make_pair(
+                            SYMBOL_T,
+                            $d,
+                        );
+                    }
+
+                    $real_part = make_pair(
+                        make_symbol($sign),
+                        make_pair(
+                            $n,
+                            make_pair(
+                                $d,
+                                SYMBOL_NIL,
+                            ),
+                        ),
+                    );
+                }
+                else {
+                    my $xn_n = 0;
+                    while (!is_nil($xn)) {
+                        ++$xn_n;
+                        $xn = prim_cdr($xn);
+                    }
+
+                    my $xd_n = 0;
+                    while (!is_nil($xd)) {
+                        ++$xd_n;
+                        $xd = prim_cdr($xd);
+                    }
+
+                    my $yn_n = 0;
+                    while (!is_nil($yn)) {
+                        ++$yn_n;
+                        $yn = prim_cdr($yn);
+                    }
+
+                    my $yd_n = 0;
+                    while (!is_nil($yd)) {
+                        ++$yd_n;
+                        $yd = prim_cdr($yd);
+                    }
+
+                    my $n_n = $xn_n * $yd_n + $yn_n * $xd_n;
+                    my $d_n = $xd_n * $yd_n;
+
+                    my $n = SYMBOL_NIL;
+                    for (1..$n_n) {
+                        $n = make_pair(
+                            SYMBOL_T,
+                            $n,
+                        );
+                    }
+
+                    my $d = SYMBOL_NIL;
+                    for (1..$d_n) {
+                        $d = make_pair(
+                            SYMBOL_T,
+                            $d,
+                        );
+                    }
+
+                    $real_part = make_pair(
+                        make_symbol("+"),
+                        make_pair(
+                            $n,
+                            make_pair(
+                                $d,
+                                SYMBOL_NIL,
+                            ),
+                        ),
+                    );
+                }
+            }
+        }
+
+        my $imaginary_part;
+        {
+            my $xs = prim_car($xi);
+            my $xn = prim_car(prim_cdr($xi));
+            my $xd = prim_car(prim_cdr(prim_cdr($xi)));
+
+            my $ys = prim_car($yi);
+            my $yn = prim_car(prim_cdr($yi));
+            my $yd = prim_car(prim_cdr(prim_cdr($yi)));
+
+            my $symbol;
+            if (is_symbol_of_name($xs, "-")) {
+                if (is_symbol_of_name($ys, "-")) {
+                    my $xn_n = 0;
+                    while (!is_nil($xn)) {
+                        ++$xn_n;
+                        $xn = prim_cdr($xn);
+                    }
+
+                    my $xd_n = 0;
+                    while (!is_nil($xd)) {
+                        ++$xd_n;
+                        $xd = prim_cdr($xd);
+                    }
+
+                    my $yn_n = 0;
+                    while (!is_nil($yn)) {
+                        ++$yn_n;
+                        $yn = prim_cdr($yn);
+                    }
+
+                    my $yd_n = 0;
+                    while (!is_nil($yd)) {
+                        ++$yd_n;
+                        $yd = prim_cdr($yd);
+                    }
+
+                    my $n_n = $xn_n * $yd_n + $yn_n * $xd_n;
+                    my $d_n = $xd_n * $yd_n;
+
+                    my $n = SYMBOL_NIL;
+                    for (1..$n_n) {
+                        $n = make_pair(
+                            SYMBOL_T,
+                            $n,
+                        );
+                    }
+
+                    my $d = SYMBOL_NIL;
+                    for (1..$d_n) {
+                        $d = make_pair(
+                            SYMBOL_T,
+                            $d,
+                        );
+                    }
+
+                    $imaginary_part = make_pair(
+                        make_symbol("-"),
+                        make_pair(
+                            $n,
+                            make_pair(
+                                $d,
+                                SYMBOL_NIL,
+                            ),
+                        ),
+                    );
+                }
+                else {
+                    my $xn_n = 0;
+                    while (!is_nil($xn)) {
+                        ++$xn_n;
+                        $xn = prim_cdr($xn);
+                    }
+
+                    my $xd_n = 0;
+                    while (!is_nil($xd)) {
+                        ++$xd_n;
+                        $xd = prim_cdr($xd);
+                    }
+
+                    my $yn_n = 0;
+                    while (!is_nil($yn)) {
+                        ++$yn_n;
+                        $yn = prim_cdr($yn);
+                    }
+
+                    my $yd_n = 0;
+                    while (!is_nil($yd)) {
+                        ++$yd_n;
+                        $yd = prim_cdr($yd);
+                    }
+
+                    my $n_n = $yn_n * $xd_n - $xn_n * $yd_n;
+                    my $sign = $n_n < 1 ? "-" : "+";
+                    $n_n = abs($n_n);
+                    my $d_n = $yd_n * $xd_n;
+
+                    my $n = SYMBOL_NIL;
+                    for (1..$n_n) {
+                        $n = make_pair(
+                            SYMBOL_T,
+                            $n,
+                        );
+                    }
+
+                    my $d = SYMBOL_NIL;
+                    for (1..$d_n) {
+                        $d = make_pair(
+                            SYMBOL_T,
+                            $d,
+                        );
+                    }
+
+                    $imaginary_part = make_pair(
+                        make_symbol($sign),
+                        make_pair(
+                            $n,
+                            make_pair(
+                                $d,
+                                SYMBOL_NIL,
+                            ),
+                        ),
+                    );
+                }
+            }
+            else {
+                if (is_symbol_of_name($ys, "-")) {
+                    my $xn_n = 0;
+                    while (!is_nil($xn)) {
+                        ++$xn_n;
+                        $xn = prim_cdr($xn);
+                    }
+
+                    my $xd_n = 0;
+                    while (!is_nil($xd)) {
+                        ++$xd_n;
+                        $xd = prim_cdr($xd);
+                    }
+
+                    my $yn_n = 0;
+                    while (!is_nil($yn)) {
+                        ++$yn_n;
+                        $yn = prim_cdr($yn);
+                    }
+
+                    my $yd_n = 0;
+                    while (!is_nil($yd)) {
+                        ++$yd_n;
+                        $yd = prim_cdr($yd);
+                    }
+
+                    my $n_n = $xn_n * $yd_n - $yn_n * $xd_n;
+                    my $sign = $n_n < 1 ? "-" : "+";
+                    $n_n = abs($n_n);
+                    my $d_n = $xd_n * $yd_n;
+
+                    my $n = SYMBOL_NIL;
+                    for (1..$n_n) {
+                        $n = make_pair(
+                            SYMBOL_T,
+                            $n,
+                        );
+                    }
+
+                    my $d = SYMBOL_NIL;
+                    for (1..$d_n) {
+                        $d = make_pair(
+                            SYMBOL_T,
+                            $d,
+                        );
+                    }
+
+                    $imaginary_part = make_pair(
+                        make_symbol($sign),
+                        make_pair(
+                            $n,
+                            make_pair(
+                                $d,
+                                SYMBOL_NIL,
+                            ),
+                        ),
+                    );
+                }
+                else {
+                    my $xn_n = 0;
+                    while (!is_nil($xn)) {
+                        ++$xn_n;
+                        $xn = prim_cdr($xn);
+                    }
+
+                    my $xd_n = 0;
+                    while (!is_nil($xd)) {
+                        ++$xd_n;
+                        $xd = prim_cdr($xd);
+                    }
+
+                    my $yn_n = 0;
+                    while (!is_nil($yn)) {
+                        ++$yn_n;
+                        $yn = prim_cdr($yn);
+                    }
+
+                    my $yd_n = 0;
+                    while (!is_nil($yd)) {
+                        ++$yd_n;
+                        $yd = prim_cdr($yd);
+                    }
+
+                    my $n_n = $xn_n * $yd_n + $yn_n * $xd_n;
+                    my $d_n = $xd_n * $yd_n;
+
+                    my $n = SYMBOL_NIL;
+                    for (1..$n_n) {
+                        $n = make_pair(
+                            SYMBOL_T,
+                            $n,
+                        );
+                    }
+
+                    my $d = SYMBOL_NIL;
+                    for (1..$d_n) {
+                        $d = make_pair(
+                            SYMBOL_T,
+                            $d,
+                        );
+                    }
+
+                    $imaginary_part = make_pair(
+                        make_symbol("+"),
+                        make_pair(
+                            $n,
+                            make_pair(
+                                $d,
+                                SYMBOL_NIL,
+                            ),
+                        ),
+                    );
+                }
+            }
+        }
+
+        return make_pair(
+            $real_part,
+            make_pair(
+                $imaginary_part,
+                SYMBOL_NIL,
+            ),
+        );
+    },
+
+    "c*" => sub {
+        my ($call, $x, $y) = @_;
+        
+        my $xr = prim_car($x);
+        my $xi = prim_car(prim_cdr($x));
+        
+        my $yr = prim_car($y);
+        my $yi = prim_car(prim_cdr($y));
+        
+        my $real_part;
+        {
+            my $term1s;
+            my $term1n_n;
+            my $term1d_n;
+            
+            {
+                my $xs = prim_car($xr);
+                my $xn = prim_car(prim_cdr($xr));
+                my $xd = prim_car(prim_cdr(prim_cdr($xr)));
+            
+                my $ys = prim_car($yr);
+                my $yn = prim_car(prim_cdr($yr));
+                my $yd = prim_car(prim_cdr(prim_cdr($yr)));
+            
+                $term1s = is_symbol_of_name($xs, "-")
+                    ? make_symbol(is_symbol_of_name($ys, "-") ? "+" : "-")
+                    : $ys;
+            
+                my $xn_n = 0;
+                while (!is_nil($xn)) {
+                    ++$xn_n;
+                    $xn = prim_cdr($xn);
+                }
+            
+                my $xd_n = 0;
+                while (!is_nil($xd)) {
+                    ++$xd_n;
+                    $xd = prim_cdr($xd);
+                }
+            
+                my $yn_n = 0;
+                while (!is_nil($yn)) {
+                    ++$yn_n;
+                    $yn = prim_cdr($yn);
+                }
+            
+                my $yd_n = 0;
+                while (!is_nil($yd)) {
+                    ++$yd_n;
+                    $yd = prim_cdr($yd);
+                }
+            
+                $term1n_n = $xn_n * $yn_n;
+                $term1d_n = $xd_n * $yd_n;
+            }
+        
+            my $term2s;
+            my $term2n_n;
+            my $term2d_n;
+            
+            {
+                my $xs = prim_car($xi);
+                my $xn = prim_car(prim_cdr($xi));
+                my $xd = prim_car(prim_cdr(prim_cdr($xi)));
+            
+                my $ys = prim_car($yi);
+                my $yn = prim_car(prim_cdr($yi));
+                my $yd = prim_car(prim_cdr(prim_cdr($yi)));
+            
+                $term2s = is_symbol_of_name($xs, "-")
+                    ? make_symbol(is_symbol_of_name($ys, "-") ? "+" : "-")
+                    : $ys;
+            
+                my $xn_n = 0;
+                while (!is_nil($xn)) {
+                    ++$xn_n;
+                    $xn = prim_cdr($xn);
+                }
+            
+                my $xd_n = 0;
+                while (!is_nil($xd)) {
+                    ++$xd_n;
+                    $xd = prim_cdr($xd);
+                }
+            
+                my $yn_n = 0;
+                while (!is_nil($yn)) {
+                    ++$yn_n;
+                    $yn = prim_cdr($yn);
+                }
+            
+                my $yd_n = 0;
+                while (!is_nil($yd)) {
+                    ++$yd_n;
+                    $yd = prim_cdr($yd);
+                }
+            
+                $term2n_n = $xn_n * $yn_n;
+                $term2d_n = $xd_n * $yd_n;
+            }
+        
+            if (is_symbol_of_name($term1s, "-")) {
+                if (is_symbol_of_name($term2s, "-")) {
+                    my $n_n = $term2n_n * $term1d_n - $term1n_n * $term2d_n;
+                    my $sign = $n_n < 1 ? "-" : "+";
+                    $n_n = abs($n_n);
+                    my $d_n = $term2d_n * $term1d_n;
+        
+                    my $n = SYMBOL_NIL;
+                    for (1..$n_n) {
+                        $n = make_pair(
+                            SYMBOL_T,
+                            $n,
+                        );
+                    }
+        
+                    my $d = SYMBOL_NIL;
+                    for (1..$d_n) {
+                        $d = make_pair(
+                            SYMBOL_T,
+                            $d,
+                        );
+                    }
+        
+                    $real_part = make_pair(
+                        make_symbol($sign),
+                        make_pair(
+                            $n,
+                            make_pair(
+                                $d,
+                                SYMBOL_NIL,
+                            ),
+                        ),
+                    );
+                }
+                else {
+                    my $n_n = $term1n_n * $term2d_n + $term2n_n * $term1d_n;
+                    my $d_n = $term1d_n * $term2d_n;
+        
+                    my $n = SYMBOL_NIL;
+                    for (1..$n_n) {
+                        $n = make_pair(
+                            SYMBOL_T,
+                            $n,
+                        );
+                    }
+        
+                    my $d = SYMBOL_NIL;
+                    for (1..$d_n) {
+                        $d = make_pair(
+                            SYMBOL_T,
+                            $d,
+                        );
+                    }
+        
+                    $real_part = make_pair(
+                        make_symbol("-"),
+                        make_pair(
+                            $n,
+                            make_pair(
+                                $d,
+                                SYMBOL_NIL,
+                            ),
+                        ),
+                    );
+                }
+            }
+            else {
+                if (is_symbol_of_name($term2s, "-")) {
+                    my $n_n = $term1n_n * $term2d_n + $term2n_n * $term1d_n;
+                    my $d_n = $term1d_n * $term2d_n;
+        
+                    my $n = SYMBOL_NIL;
+                    for (1..$n_n) {
+                        $n = make_pair(
+                            SYMBOL_T,
+                            $n,
+                        );
+                    }
+        
+                    my $d = SYMBOL_NIL;
+                    for (1..$d_n) {
+                        $d = make_pair(
+                            SYMBOL_T,
+                            $d,
+                        );
+                    }
+        
+                    $real_part = make_pair(
+                        make_symbol("+"),
+                        make_pair(
+                            $n,
+                            make_pair(
+                                $d,
+                                SYMBOL_NIL,
+                            ),
+                        ),
+                    );
+                }
+                else {
+                    my $n_n = $term1n_n * $term2d_n - $term2n_n * $term1d_n;
+                    my $sign = $n_n < 1 && $term2n_n > 0 ? "-" : "+";
+                    $n_n = abs($n_n);
+                    my $d_n = $term1d_n * $term2d_n;
+        
+                    my $n = SYMBOL_NIL;
+                    for (1..$n_n) {
+                        $n = make_pair(
+                            SYMBOL_T,
+                            $n,
+                        );
+                    }
+        
+                    my $d = SYMBOL_NIL;
+                    for (1..$d_n) {
+                        $d = make_pair(
+                            SYMBOL_T,
+                            $d,
+                        );
+                    }
+        
+                    $real_part = make_pair(
+                        make_symbol($sign),
+                        make_pair(
+                            $n,
+                            make_pair(
+                                $d,
+                                SYMBOL_NIL,
+                            ),
+                        ),
+                    );
+                }
+            }
+        }
+        
+        my $imaginary_part;
+        {
+            my $term1s;
+            my $term1n_n;
+            my $term1d_n;
+            
+            {
+                my $xs = prim_car($xi);
+                my $xn = prim_car(prim_cdr($xi));
+                my $xd = prim_car(prim_cdr(prim_cdr($xi)));
+            
+                my $ys = prim_car($yr);
+                my $yn = prim_car(prim_cdr($yr));
+                my $yd = prim_car(prim_cdr(prim_cdr($yr)));
+            
+                $term1s = is_symbol_of_name($xs, "-")
+                    ? make_symbol(is_symbol_of_name($ys, "-") ? "+" : "-")
+                    : $ys;
+            
+                my $xn_n = 0;
+                while (!is_nil($xn)) {
+                    ++$xn_n;
+                    $xn = prim_cdr($xn);
+                }
+            
+                my $xd_n = 0;
+                while (!is_nil($xd)) {
+                    ++$xd_n;
+                    $xd = prim_cdr($xd);
+                }
+            
+                my $yn_n = 0;
+                while (!is_nil($yn)) {
+                    ++$yn_n;
+                    $yn = prim_cdr($yn);
+                }
+            
+                my $yd_n = 0;
+                while (!is_nil($yd)) {
+                    ++$yd_n;
+                    $yd = prim_cdr($yd);
+                }
+            
+                $term1n_n = $xn_n * $yn_n;
+                $term1d_n = $xd_n * $yd_n;
+            }
+        
+            my $term2s;
+            my $term2n_n;
+            my $term2d_n;
+            
+            {
+                my $xs = prim_car($xr);
+                my $xn = prim_car(prim_cdr($xr));
+                my $xd = prim_car(prim_cdr(prim_cdr($xr)));
+            
+                my $ys = prim_car($yi);
+                my $yn = prim_car(prim_cdr($yi));
+                my $yd = prim_car(prim_cdr(prim_cdr($yi)));
+            
+                $term2s = is_symbol_of_name($xs, "-")
+                    ? make_symbol(is_symbol_of_name($ys, "-") ? "+" : "-")
+                    : $ys;
+            
+                my $xn_n = 0;
+                while (!is_nil($xn)) {
+                    ++$xn_n;
+                    $xn = prim_cdr($xn);
+                }
+            
+                my $xd_n = 0;
+                while (!is_nil($xd)) {
+                    ++$xd_n;
+                    $xd = prim_cdr($xd);
+                }
+            
+                my $yn_n = 0;
+                while (!is_nil($yn)) {
+                    ++$yn_n;
+                    $yn = prim_cdr($yn);
+                }
+            
+                my $yd_n = 0;
+                while (!is_nil($yd)) {
+                    ++$yd_n;
+                    $yd = prim_cdr($yd);
+                }
+            
+                $term2n_n = $xn_n * $yn_n;
+                $term2d_n = $xd_n * $yd_n;
+            }
+        
+            if (is_symbol_of_name($term1s, "-")) {
+                if (is_symbol_of_name($term2s, "-")) {
+                    my $n_n = $term1n_n * $term2d_n + $term2n_n * $term1d_n;
+                    my $d_n = $term1d_n * $term2d_n;
+        
+                    my $n = SYMBOL_NIL;
+                    for (1..$n_n) {
+                        $n = make_pair(
+                            SYMBOL_T,
+                            $n,
+                        );
+                    }
+        
+                    my $d = SYMBOL_NIL;
+                    for (1..$d_n) {
+                        $d = make_pair(
+                            SYMBOL_T,
+                            $d,
+                        );
+                    }
+        
+                    $imaginary_part = make_pair(
+                        make_symbol("-"),
+                        make_pair(
+                            $n,
+                            make_pair(
+                                $d,
+                                SYMBOL_NIL,
+                            ),
+                        ),
+                    );
+                }
+                else {
+                    my $n_n = $term2n_n * $term1d_n - $term1n_n * $term2d_n;
+                    my $sign = $n_n < 1 ? "-" : "+";
+                    $n_n = abs($n_n);
+                    my $d_n = $term2d_n * $term1d_n;
+        
+                    my $n = SYMBOL_NIL;
+                    for (1..$n_n) {
+                        $n = make_pair(
+                            SYMBOL_T,
+                            $n,
+                        );
+                    }
+        
+                    my $d = SYMBOL_NIL;
+                    for (1..$d_n) {
+                        $d = make_pair(
+                            SYMBOL_T,
+                            $d,
+                        );
+                    }
+        
+                    $imaginary_part = make_pair(
+                        make_symbol($sign),
+                        make_pair(
+                            $n,
+                            make_pair(
+                                $d,
+                                SYMBOL_NIL,
+                            ),
+                        ),
+                    );
+                }
+            }
+            else {
+                if (is_symbol_of_name($term2s, "-")) {
+                    my $n_n = $term1n_n * $term2d_n - $term2n_n * $term1d_n;
+                    my $sign = $n_n < 1 ? "-" : "+";
+                    $n_n = abs($n_n);
+                    my $d_n = $term1d_n * $term2d_n;
+        
+                    my $n = SYMBOL_NIL;
+                    for (1..$n_n) {
+                        $n = make_pair(
+                            SYMBOL_T,
+                            $n,
+                        );
+                    }
+        
+                    my $d = SYMBOL_NIL;
+                    for (1..$d_n) {
+                        $d = make_pair(
+                            SYMBOL_T,
+                            $d,
+                        );
+                    }
+        
+                    $imaginary_part = make_pair(
+                        make_symbol($sign),
+                        make_pair(
+                            $n,
+                            make_pair(
+                                $d,
+                                SYMBOL_NIL,
+                            ),
+                        ),
+                    );
+                }
+                else {
+                    my $n_n = $term1n_n * $term2d_n + $term2n_n * $term1d_n;
+                    my $d_n = $term1d_n * $term2d_n;
+        
+                    my $n = SYMBOL_NIL;
+                    for (1..$n_n) {
+                        $n = make_pair(
+                            SYMBOL_T,
+                            $n,
+                        );
+                    }
+        
+                    my $d = SYMBOL_NIL;
+                    for (1..$d_n) {
+                        $d = make_pair(
+                            SYMBOL_T,
+                            $d,
+                        );
+                    }
+        
+                    $imaginary_part = make_pair(
+                        make_symbol("+"),
+                        make_pair(
+                            $n,
+                            make_pair(
+                                $d,
+                                SYMBOL_NIL,
+                            ),
+                        ),
+                    );
+                }
+            }
+        }
+        
+        return make_pair(
+            $real_part,
+            make_pair(
+                $imaginary_part,
+                SYMBOL_NIL,
+            ),
+        );
+    },
+
+    "litnum" => sub {
+        my ($call, $r, $i) = @_;
+
+        if (!defined($i)) {
+            $i = make_pair(
+                make_symbol("+"),
+                make_pair(
+                    SYMBOL_NIL,
+                    make_pair(
+                        make_pair(
+                            SYMBOL_T,
+                            SYMBOL_NIL,
+                        ),
+                        SYMBOL_NIL,
+                    ),
+                ),
+            );
+        }
+
+        return make_pair(
+            make_symbol("lit"),
+            make_pair(
+                make_symbol("num"),
+                make_pair(
+                    $r,
+                    make_pair(
+                        $i,
+                        SYMBOL_NIL,
+                    ),
+                ),
+            ),
+        );
+    },
+
+    "number" => sub {
+        my ($call, $x) = @_;
+
+        if (!is_pair($x)) {
+            return SYMBOL_NIL;
+        }
+
+        if (!is_symbol_of_name(prim_car($x), "lit")) {
+            return SYMBOL_NIL;
+        }
+
+        $x = prim_cdr($x);
+        if (!is_pair($x)) {
+            return SYMBOL_NIL;
+        }
+
+        if (!is_symbol_of_name(prim_car($x), "num")) {
+            return SYMBOL_NIL;
+        }
+
+        $x = prim_cdr($x);
+        if (!is_pair($x)) {
+            return SYMBOL_NIL;
+        }
+
+        {
+            my $y = prim_car($x);
+            if (!is_pair($y)) {
+                return SYMBOL_NIL;
+            }
+
+
+            my $sign = prim_car($y);
+            if (!(is_symbol_of_name($sign, "+") || is_symbol_of_name($sign, "-"))) {
+                return SYMBOL_NIL;
+            }
+
+            $y = prim_cdr($y);
+            if (!is_pair($y)) {
+                return SYMBOL_NIL;
+            }
+
+            {
+                my $z = prim_car($y);
+                while (!is_nil($z)) {
+                    if (!is_pair($z)) {
+                        return SYMBOL_NIL;
+                    }
+                    $z = prim_cdr($z);
+                }
+            }
+
+            $y = prim_cdr($y);
+            if (!is_pair($y)) {
+                return SYMBOL_NIL;
+            }
+
+            {
+                my $z = prim_car($y);
+                while (!is_nil($z)) {
+                    if (!is_pair($z)) {
+                        return SYMBOL_NIL;
+                    }
+                    $z = prim_cdr($z);
+                }
+            }
+        }
+
+        $x = prim_cdr($x);
+        if (!is_pair($x)) {
+            return SYMBOL_NIL;
+        }
+
+        {
+            my $y = prim_car($x);
+            if (!is_pair($y)) {
+                return SYMBOL_NIL;
+            }
+
+
+            my $sign = prim_car($y);
+            if (!(is_symbol_of_name($sign, "+") || is_symbol_of_name($sign, "-"))) {
+                return SYMBOL_NIL;
+            }
+
+            $y = prim_cdr($y);
+            if (!is_pair($y)) {
+                return SYMBOL_NIL;
+            }
+
+            {
+                my $z = prim_car($y);
+                while (!is_nil($z)) {
+                    if (!is_pair($z)) {
+                        return SYMBOL_NIL;
+                    }
+                    $z = prim_cdr($z);
+                }
+            }
+
+            $y = prim_cdr($y);
+            if (!is_pair($y)) {
+                return SYMBOL_NIL;
+            }
+
+            {
+                my $z = prim_car($y);
+                while (!is_nil($z)) {
+                    if (!is_pair($z)) {
+                        return SYMBOL_NIL;
+                    }
+                    $z = prim_cdr($z);
+                }
+            }
+        }
+
+        return SYMBOL_T;
+    },
+
+    "numr" => sub {
+        my ($call, $x) = @_;
+
+        return prim_car(prim_cdr(prim_cdr($x)));
+    },
+
+    "numi" => sub {
+        my ($call, $x) = @_;
+
+        return prim_car(prim_cdr(prim_cdr(prim_cdr($x))));
+    },
+
+    "rpart" => sub {
+        my ($call, $n) = @_;
+
+        my $numr = prim_car(prim_cdr(prim_cdr($n)));
+
+        my $i = make_pair(
+            make_symbol("+"),
+            make_pair(
+                SYMBOL_NIL,
+                make_pair(
+                    make_pair(
+                        SYMBOL_T,
+                        SYMBOL_NIL,
+                    ),
+                    SYMBOL_NIL,
+                ),
+            ),
+        );
+
+        return make_pair(
+            make_symbol("lit"),
+            make_pair(
+                make_symbol("num"),
+                make_pair(
+                    $numr,
+                    make_pair(
+                        $i,
+                        SYMBOL_NIL,
+                    ),
+                ),
+            ),
+        );
+    },
+
+    "ipart" => sub {
+        my ($call, $n) = @_;
+
+        my $numi = prim_car(prim_cdr(prim_cdr(prim_cdr($n))));
+
+        my $i = make_pair(
+            make_symbol("+"),
+            make_pair(
+                SYMBOL_NIL,
+                make_pair(
+                    make_pair(
+                        SYMBOL_T,
+                        SYMBOL_NIL,
+                    ),
+                    SYMBOL_NIL,
+                ),
+            ),
+        );
+
+        return make_pair(
+            make_symbol("lit"),
+            make_pair(
+                make_symbol("num"),
+                make_pair(
+                    $numi,
+                    make_pair(
+                        $i,
+                        SYMBOL_NIL,
+                    ),
+                ),
+            ),
+        );
+    },
+
+    "real" => sub {
+        my ($call, $x) = @_;
+
+        if (!is_pair($x)) {
+            return SYMBOL_NIL;
+        }
+
+        if (!is_symbol_of_name(prim_car($x), "lit")) {
+            return SYMBOL_NIL;
+        }
+
+        $x = prim_cdr($x);
+        if (!is_pair($x)) {
+            return SYMBOL_NIL;
+        }
+
+        if (!is_symbol_of_name(prim_car($x), "num")) {
+            return SYMBOL_NIL;
+        }
+
+        $x = prim_cdr($x);
+        if (!is_pair($x)) {
+            return SYMBOL_NIL;
+        }
+
+        {
+            my $y = prim_car($x);
+            if (!is_pair($y)) {
+                return SYMBOL_NIL;
+            }
+
+
+            my $sign = prim_car($y);
+            if (!(is_symbol_of_name($sign, "+") || is_symbol_of_name($sign, "-"))) {
+                return SYMBOL_NIL;
+            }
+
+            $y = prim_cdr($y);
+            if (!is_pair($y)) {
+                return SYMBOL_NIL;
+            }
+
+            {
+                my $z = prim_car($y);
+                while (!is_nil($z)) {
+                    if (!is_pair($z)) {
+                        return SYMBOL_NIL;
+                    }
+                    $z = prim_cdr($z);
+                }
+            }
+
+            $y = prim_cdr($y);
+            if (!is_pair($y)) {
+                return SYMBOL_NIL;
+            }
+
+            {
+                my $z = prim_car($y);
+                while (!is_nil($z)) {
+                    if (!is_pair($z)) {
+                        return SYMBOL_NIL;
+                    }
+                    $z = prim_cdr($z);
+                }
+            }
+        }
+
+        $x = prim_cdr($x);
+        if (!is_pair($x)) {
+            return SYMBOL_NIL;
+        }
+
+        {
+            my $y = prim_car($x);
+            if (!is_pair($y)) {
+                return SYMBOL_NIL;
+            }
+
+
+            my $sign = prim_car($y);
+            if (!is_symbol_of_name($sign, "+")) {
+                return SYMBOL_NIL;
+            }
+
+            $y = prim_cdr($y);
+            if (!is_pair($y)) {
+                return SYMBOL_NIL;
+            }
+
+            if (!is_nil(prim_car($y))) {
+                return SYMBOL_NIL;
+            }
+
+            $y = prim_cdr($y);
+            if (!is_pair($y)) {
+                return SYMBOL_NIL;
+            }
+
+            {
+                my $z = prim_car($y);
+                my $t = 0;
+                while (!is_nil($z)) {
+                    if (!is_pair($z)) {
+                        return SYMBOL_NIL;
+                    }
+                    $z = prim_cdr($z);
+                    $t++;
+                }
+
+                if ($t != 1) {
+                    return SYMBOL_NIL;
+                }
+            }
+        }
+
+        return SYMBOL_T;
+    },
+
     "prn" => sub {
         my ($call, @args) = @_;
 
