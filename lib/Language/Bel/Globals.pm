@@ -3350,12 +3350,11 @@ $globals{"bq-let"} =
     make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("parms"),
     make_pair(make_symbol("val"), make_symbol("body"))),
     make_pair(make_pair(make_symbol("list"),
-    make_pair(make_pair(make_symbol("append"),
-    make_pair(make_pair(make_symbol("list"),
+    make_pair(make_pair(make_symbol("cons"),
     make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("fn"),
     SYMBOL_NIL)), make_pair(make_pair(make_symbol("list"),
-    make_pair(make_symbol("parms"), SYMBOL_NIL)), SYMBOL_NIL))),
-    make_pair(make_symbol("body"), SYMBOL_NIL))),
+    make_pair(make_symbol("parms"), SYMBOL_NIL)),
+    make_pair(make_symbol("body"), SYMBOL_NIL)))),
     make_pair(make_symbol("val"), SYMBOL_NIL))), SYMBOL_NIL))))),
     SYMBOL_NIL)));
 
@@ -3399,6 +3398,37 @@ $globals{"bq-fn"} =
     SYMBOL_NIL)), make_pair(make_symbol("body"), SYMBOL_NIL))),
     SYMBOL_NIL))), SYMBOL_NIL))))))), SYMBOL_NIL)))), SYMBOL_NIL))))),
     SYMBOL_NIL)));
+
+$globals{"bq-case"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("mac"),
+    make_pair(make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("expr"),
+    make_symbol("args")), make_pair(make_pair(make_symbol("if"),
+    make_pair(make_pair(make_symbol("no"),
+    make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("args"),
+    SYMBOL_NIL)), SYMBOL_NIL)), make_pair(make_pair(make_symbol("car"),
+    make_pair(make_symbol("args"), SYMBOL_NIL)),
+    make_pair(make_pair(make_symbol("let"), make_pair(make_symbol("v"),
+    make_pair(make_pair(make_symbol("uvar"), SYMBOL_NIL),
+    make_pair(make_pair(make_symbol("list"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("let"),
+    SYMBOL_NIL)), make_pair(make_symbol("v"), make_pair(make_symbol("expr"),
+    make_pair(make_pair(make_symbol("list"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("if"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("list"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("="),
+    SYMBOL_NIL)), make_pair(make_symbol("v"),
+    make_pair(make_pair(make_symbol("list"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(SYMBOL_QUOTE, SYMBOL_NIL)),
+    make_pair(make_pair(make_symbol("car"), make_pair(make_symbol("args"),
+    SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL)))),
+    make_pair(make_pair(make_symbol("cadr"), make_pair(make_symbol("args"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("bq-case"),
+    SYMBOL_NIL)), make_pair(make_symbol("v"),
+    make_pair(make_pair(make_symbol("cddr"), make_pair(make_symbol("args"),
+    SYMBOL_NIL)), SYMBOL_NIL)))), SYMBOL_NIL))))), SYMBOL_NIL))))),
+    SYMBOL_NIL)))), SYMBOL_NIL)))), SYMBOL_NIL))))), SYMBOL_NIL)));
 
 $globals{"comma"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("mac"),

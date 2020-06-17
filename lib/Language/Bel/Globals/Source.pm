@@ -892,12 +892,21 @@ __DATA__
 ; skip parseno [waiting for reader]
 
 (mac bq-let (parms val . body)
-  (list (append (list 'fn (list parms)) body) val))
+  (list (cons 'fn (list parms) body) val))
 
 (mac bq-fn (parms . body)
   (if (no (cdr body))
       (list 'list ''lit ''clo 'scope (list 'quote parms) (list 'quote (car body)))
       (list 'list ''lit ''clo 'scope (list 'quote parms) (list 'quote (cons 'do body)))))
+
+(mac bq-case (expr . args)
+  (if (no (cdr args))
+      (car args)
+      (let v (uvar)
+        (list 'let v expr
+          (list 'if (list '= v (list 'quote (car args)))
+                    (cadr args)
+                    (cons 'bq-case v (cddr args)))))))
 
 ; skip bquote [waiting for backquotes]
 
