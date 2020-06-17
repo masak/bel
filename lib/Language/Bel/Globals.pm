@@ -3430,6 +3430,23 @@ $globals{"bq-case"} =
     SYMBOL_NIL)), SYMBOL_NIL)))), SYMBOL_NIL))))), SYMBOL_NIL))))),
     SYMBOL_NIL)))), SYMBOL_NIL)))), SYMBOL_NIL))))), SYMBOL_NIL)));
 
+$globals{"bq-with"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("mac"),
+    make_pair(make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("parms"),
+    make_symbol("body")), make_pair(make_pair(make_symbol("let"),
+    make_pair(make_symbol("ps"), make_pair(make_pair(make_symbol("hug"),
+    make_pair(make_symbol("parms"), SYMBOL_NIL)),
+    make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(make_symbol("cons"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("fn"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("map"),
+    make_pair(make_symbol("car"), make_pair(make_symbol("ps"),
+    SYMBOL_NIL))), make_pair(make_symbol("body"), SYMBOL_NIL)))),
+    make_pair(make_pair(make_symbol("map"), make_pair(make_symbol("cadr"),
+    make_pair(make_symbol("ps"), SYMBOL_NIL))), SYMBOL_NIL))),
+    SYMBOL_NIL)))), SYMBOL_NIL))))), SYMBOL_NIL)));
+
 $globals{"comma"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("mac"),
     make_pair(make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),

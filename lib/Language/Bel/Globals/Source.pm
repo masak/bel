@@ -908,6 +908,11 @@ __DATA__
                     (cadr args)
                     (cons 'bq-case v (cddr args)))))))
 
+(mac bq-with (parms . body)
+  (let ps (hug parms)
+    (cons (cons 'fn (map car ps) body)
+          (map cadr ps))))
+
 ; skip bquote [waiting for backquotes]
 
 ; skip bqex [waiting for backquotes]
