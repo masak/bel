@@ -4,7 +4,15 @@ use 5.006;
 use strict;
 use warnings;
 
+use POSIX qw(ceil);
+
 use Exporter 'import';
+
+sub round_up_to_10 {
+    my ($value) = @_;
+
+    return ceil($value / 10) * 10;
+}
 
 sub generate {
     my $globals_source_file = "lib/Language/Bel/Globals/Source.pm";
@@ -46,14 +54,11 @@ sub generate {
 
     my @output;
 
-    my $width = 680;
-    my $height = 470;
-
     push(@output, "<svg
         xmlns='http://www.w3.org/2000/svg'
-        width='$width'
-        height='$height'
-        viewbox='0 0 $width $height'
+        width='{{WIDTH}}'
+        height='{{HEIGHT}}'
+        viewbox='0 0 {{WIDTH}} {{HEIGHT}}'
         onclick=''>\n");
     push(@output, "  <style>
         text {
@@ -78,6 +83,7 @@ sub generate {
       </style>\n\n");
 
     my $y = 230;
+    my $box_size = 17;
     for my $feature (qw<done streams ccc evaluator reader backquotes printer chars>) {
         my $class = $feature eq "done"
             ? $feature
@@ -85,8 +91,8 @@ sub generate {
         push(@output, "  <rect
         x='20'
         y='$y'
-        width='17'
-        height='17'
+        width='$box_size'
+        height='$box_size'
         class='$class box'
         title='$feature'
       />\n");
@@ -104,6 +110,9 @@ sub generate {
     my $y_offset = 1;
     my $last_features = "+1";
 
+    my $max_x = 0;
+    my $max_y = 0;
+
     while (my $def = shift(@definitions)) {
         my ($name, $features) = @$def;
         $name =~ s/</\&lt;/g;
@@ -120,11 +129,15 @@ sub generate {
 
         my $x20 = $x_offset + 20 * $x;
         my $y20 = $y_offset + 20 * $y;
+
+        $max_x = $max_x > $x20 + $box_size ? $max_x : $x20 + $box_size;
+        $max_y = $max_y > $y20 + $box_size ? $max_y : $y20 + $box_size;
+
         push(@output, "  <rect
         x='$x20'
         y='$y20'
-        width='17'
-        height='17'
+        width='$box_size'
+        height='$box_size'
         class='$colorclass box'
         title='$name'
       />\n");
@@ -138,7 +151,14 @@ sub generate {
 
     push(@output, "</svg>\n");
 
-    return join("", @output);
+    my $width = round_up_to_10($max_x + 5);
+    my $height = round_up_to_10($max_y + 5);
+
+    my $output = join("", @output);
+    $output =~ s/\{\{WIDTH\}\}/$width/g;
+    $output =~ s/\{\{HEIGHT\}\}/$height/g;
+
+    return $output;
 }
 
 our @EXPORT_OK = qw(
