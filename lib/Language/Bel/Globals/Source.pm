@@ -920,6 +920,15 @@ __DATA__
         (list 'let v (car args)
           (list 'if v v (cons 'or (cdr args)))))))
 
+(mac bq-pcase (expr . args)
+  (if (no (cdr args))
+      (car args)
+      (letu v
+        (list 'let v expr
+          (list 'if (list (car args) v)
+                    (cadr args)
+                    (cons 'pcase v (cddr args)))))))
+
 ; skip bquote [waiting for backquotes]
 
 ; skip bqex [waiting for backquotes]
