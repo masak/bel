@@ -85,6 +85,7 @@ my $i = 0;
 my $num_implemented = 0;
 while ($i < @bel_globals && !eof($SOURCE)) {
     my $source_definition = read_source_definition();
+    next if $source_definition =~ /^\S+ bq-/;     # exceptions for bquote bootstrapping
     my $bel_global = $bel_globals[$i];
     my $name = ($bel_global =~ /^\((?:def|mac|set|form|syn) (\S+)/)
         ? $1

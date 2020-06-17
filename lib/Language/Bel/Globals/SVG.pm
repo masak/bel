@@ -39,6 +39,8 @@ sub generate {
         while (my $line = trim_nl(<$SOURCE> || "")) {
             $source_definition .= "$line\n";
         }
+
+        next if $source_definition =~ /^\S+ bq-/;     # exceptions for bquote bootstrapping
         
         if ($source_definition =~ /^; skip (\S+) \[waiting for (\w+(?:, \w+)*)\]$/) {
             my $name = $1;
