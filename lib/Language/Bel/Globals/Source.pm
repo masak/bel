@@ -891,6 +891,9 @@ __DATA__
 
 ; skip parseno [waiting for reader]
 
+(mac bq-let (parms val . body)
+  (list (append (list 'fn (list parms)) body) val))
+
 ; skip bquote [waiting for backquotes]
 
 ; skip bqex [waiting for backquotes]
