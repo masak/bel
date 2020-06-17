@@ -913,6 +913,13 @@ __DATA__
     (cons (cons 'fn (map car ps) body)
           (map cadr ps))))
 
+(mac bq-or args
+  (if (no args)
+      nil
+      (let v (uvar)
+        (list 'let v (car args)
+          (list 'if v v (cons 'or (cdr args)))))))
+
 ; skip bquote [waiting for backquotes]
 
 ; skip bqex [waiting for backquotes]
