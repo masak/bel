@@ -894,6 +894,11 @@ __DATA__
 (mac bq-let (parms val . body)
   (list (append (list 'fn (list parms)) body) val))
 
+(mac bq-fn (parms . body)
+  (if (no (cdr body))
+      (list 'list ''lit ''clo 'scope (list 'quote parms) (list 'quote (car body)))
+      (list 'list ''lit ''clo 'scope (list 'quote parms) (list 'quote (cons 'do body)))))
+
 ; skip bquote [waiting for backquotes]
 
 ; skip bqex [waiting for backquotes]
