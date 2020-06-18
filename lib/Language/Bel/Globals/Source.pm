@@ -892,7 +892,7 @@ __DATA__
 ; skip parseno [waiting for reader]
 
 (mac bq-let (parms val . body)
-  (list (cons 'fn (list parms) body) val))
+  (list (cons 'bq-fn (list parms) body) val))
 
 (mac bq-fn (parms . body)
   (if (no (cdr body))
@@ -902,23 +902,28 @@ __DATA__
 (mac bq-case (expr . args)
   (if (no (cdr args))
       (car args)
-      (let v (uvar)
-        (list 'let v expr
+      (bq-let v (uvar)
+        (list 'bq-let v expr
           (list 'if (list '= v (list 'quote (car args)))
                     (cadr args)
                     (cons 'bq-case v (cddr args)))))))
 
 (mac bq-with (parms . body)
-  (let ps (hug parms)
-    (cons (cons 'fn (map car ps) body)
+  (bq-let ps (hug parms)
+    (cons (cons 'bq-fn (map car ps) body)
           (map cadr ps))))
 
 (mac bq-or args
   (if (no args)
       nil
-      (let v (uvar)
-        (list 'let v (car args)
-          (list 'if v v (cons 'or (cdr args)))))))
+      (bq-let v (uvar)
+        (list 'bq-let v (car args)
+          (list 'if v v (cons 'bq-or (cdr args)))))))
+
+(mac bq-letu (v . body)
+  (if (variable v)
+      (cons 'bq-let v (list 'uvar) body)
+      (cons 'bq-with (fuse [list _ '(uvar)] v) body)))
 
 (mac bq-pcase (expr . args)
   (if (no (cdr args))
@@ -927,7 +932,7 @@ __DATA__
         (list 'let v expr
           (list 'if (list (car args) v)
                     (cadr args)
-                    (cons 'pcase v (cddr args)))))))
+                    (cons 'bq-pcase v (cddr args)))))))
 
 ; skip bquote [waiting for backquotes]
 
