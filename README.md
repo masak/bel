@@ -45,16 +45,6 @@ A summary of the remaining big features:
   to mock everything to do with streams in the tests &mdash; but it might make sense
   to have an integration test file that uses real streams and real files, too.
 
-* **ccc** (or `call-with-current-continuation`) is a control mechanism that tells the
-  evaluator to return to a point in the execution that was saved earlier. Saving the
-  execution state means saving the current evaluation stack, and being able to
-  reinstate it when a continuation is invoked. The current Perl implementation uses a
-  mutable Perl array for the evaluation stack, instead of a persistent Bel list; this
-  means that unlike the Bel implementation of the evaluator, the Perl implementation
-  has to defensively copy the whole stack both when taking the continuation and when
-  invoking it. (Either that, or we modify the Perl evaluator to use a persistent
-  Bel list too.)
-
 * **Threads** (so called "green threads") allow execution of different evaluation
   stacks to be interleaved and executed in "round-robin" style. Therefore, threads
   can be seen as "parallel execution contexts". Dynamic and lexical variables are

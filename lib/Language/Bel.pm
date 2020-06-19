@@ -55,11 +55,11 @@ Language::Bel - An interpreter for Paul Graham's language Bel
 
 =head1 VERSION
 
-Version 0.36
+Version 0.37
 
 =cut
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 =head1 SYNOPSIS
 
@@ -253,6 +253,69 @@ my %forms = (
         else {
             die "'cannot-bind\n";
         }
+    },
+
+    # (form ccc ((f) a s r m)
+    #   (mev (cons (list (list f (list 'lit 'cont s r))
+    #                    a)
+    #              s)
+    #        r
+    #        m))
+    ccc => sub {
+        my ($interpreter, $es, $a) = @_;
+
+        # XXX: skipping $es sanity checks for now
+        my $f = prim_car($es);
+
+        my $s = SYMBOL_NIL;
+        for my $entry (reverse(@{$interpreter->{s}})) {
+            die "s stack invariant broken: ", ref($entry), "\n"
+                unless ref($entry) eq "ARRAY";
+
+            my $e = $entry->[0];
+            my $a = $entry->[1];
+
+            $s = make_pair(
+                make_pair(
+                    $e,
+                    make_pair(
+                        $a,
+                        SYMBOL_NIL,
+                    ),
+                ),
+                $s,
+            );
+        }
+
+        my $r = SYMBOL_NIL;
+        for my $value (reverse(@{$interpreter->{r}})) {
+            $r = make_pair(
+                $value,
+                $r,
+            );
+        }
+
+        my $continuation = make_pair(
+            make_symbol("lit"),
+            make_pair(
+                make_symbol("cont"),
+                make_pair(
+                    $s,
+                    make_pair(
+                        $r,
+                        SYMBOL_NIL,
+                    ),
+                ),
+            ),
+        );
+        my $call_f_with_cont = make_pair(
+            $f,
+            make_pair(
+                $continuation,
+                SYMBOL_NIL,
+            ),
+        );
+        push @{$interpreter->{s}}, [$call_f_with_cont, $a];
     },
 );
 
@@ -773,7 +836,12 @@ sub applylit {
 
             $self->applym($f, $quoted_args, $a);
         }
-        # XXX: skipping `cont` case for now
+        elsif ($tag_name eq "cont") {
+            # XXX: Skipping `okstack`/`proper` check for now
+            my $s2 = prim_car($rest);
+            my $r2 = prim_car(prim_cdr($rest));
+            $self->applycont($s2, $r2, $args);
+        }
         else {
             my $virfns = pair_cdr(get(make_symbol("virfns"), $self->{g}));
             my $it;
@@ -1100,6 +1168,37 @@ sub destructure {
         });
         push @{$self->{s}}, $fu2, $fu1;
     }
+}
+
+# (def applycont (s2 r2 args s r m)
+#   (if (or (no args) (cdr args))
+#       (sigerr 'wrong-no-args s r m)
+#       (mev (append (keep [and (protected _) (no (mem _ s2 id))]
+#                          s)
+#                    s2)
+#            (cons (car args) r2)
+#            m)))
+sub applycont {
+    my ($self, $s2, $r2, $args) = @_;
+
+    # XXX: skipping the `protected` details for now
+
+    @{$self->{s}} = ();
+    while (!is_nil($s2)) {
+        my $entry = prim_car($s2);
+        my $e = prim_car($entry);
+        my $a = prim_car(prim_cdr($entry));
+        push @{$self->{s}}, [$e, $a];
+        $s2 = prim_cdr($s2);
+    }
+
+    @{$self->{r}} = ();
+    while (!is_nil($r2)) {
+        my $value = prim_car($r2);
+        push @{$self->{r}}, $value;
+        $r2 = prim_cdr($r2);
+    }
+    push @{$self->{r}}, prim_car($args);
 }
 
 =head1 AUTHOR
