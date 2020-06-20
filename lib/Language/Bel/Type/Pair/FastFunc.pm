@@ -1,6 +1,10 @@
 package Language::Bel::Type::Pair::FastFunc;
 use base qw(Language::Bel::Type::Pair);
 
+use 5.006;
+use strict;
+use warnings;
+
 sub new {
     my ($class, $pair, $fn, $where_fn) = @_;
 

@@ -1,5 +1,9 @@
 package Language::Bel::Symbols::Common;
 
+use 5.006;
+use strict;
+use warnings;
+
 use Language::Bel::Types qw(make_symbol);
 use Exporter 'import';
 

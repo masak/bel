@@ -1,5 +1,9 @@
 package Language::Bel::Types;
 
+use 5.006;
+use strict;
+use warnings;
+
 use Language::Bel::Type::Char;
 use Language::Bel::Type::Pair;
 use Language::Bel::Type::Pair::FastFunc;
