@@ -10,7 +10,11 @@ sub visit {
     my ($dir, $fn_ref, $prefix) = @_;
     $prefix ||= "";
 
+    # un-taint $dir
+    $dir =~ /^(\w+)$/;
+    $dir = $1;
     chdir($dir);
+
     for my $file (<*>) {
         my $name = "$prefix$dir/$file";
         if ($name =~ /\.pm$/) {
