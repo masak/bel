@@ -20,16 +20,13 @@ use Language::Bel::Types qw(
 );
 use Language::Bel::Symbols::Common qw(
     SYMBOL_NIL
-    SYMBOL_T
 );
 use Language::Bel::Primitives qw(
     _id
     prim_car
     prim_cdr
-    prim_type
     prim_xdr
     PRIM_FN
-    PRIMITIVES
 );
 use Language::Bel::Reader qw(
     read_whole
