@@ -938,7 +938,9 @@ __DATA__
                     (cadr args)
                     (cons 'bq-pcase v (cddr args)))))))
 
-; let us not define bquote just yet
+(mac bquote (e)
+  (bq-let (sub change) (bqex e nil)
+    (if change sub (list 'quote e))))
 
 (def bqex (e n)
   (if (no e)   (list nil nil)

@@ -3534,6 +3534,20 @@ $globals{"bq-pcase"} =
     SYMBOL_NIL)), SYMBOL_NIL)))), SYMBOL_NIL))))), SYMBOL_NIL))))),
     SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL))))), SYMBOL_NIL)));
 
+$globals{"bquote"} =
+    make_pair(make_symbol("lit"), make_pair(make_symbol("mac"),
+    make_pair(make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+    make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("e"), SYMBOL_NIL),
+    make_pair(make_pair(make_symbol("bq-let"),
+    make_pair(make_pair(make_symbol("sub"), make_pair(make_symbol("change"),
+    SYMBOL_NIL)), make_pair(make_pair(make_symbol("bqex"),
+    make_pair(make_symbol("e"), make_pair(SYMBOL_NIL, SYMBOL_NIL))),
+    make_pair(make_pair(make_symbol("if"), make_pair(make_symbol("change"),
+    make_pair(make_symbol("sub"), make_pair(make_pair(make_symbol("list"),
+    make_pair(make_pair(SYMBOL_QUOTE, make_pair(SYMBOL_QUOTE, SYMBOL_NIL)),
+    make_pair(make_symbol("e"), SYMBOL_NIL))), SYMBOL_NIL)))),
+    SYMBOL_NIL)))), SYMBOL_NIL))))), SYMBOL_NIL)));
+
 $globals{"bqex"} =
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("e"),
