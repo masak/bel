@@ -23,11 +23,6 @@ sub list {
             "4",
             "('unboundb thread)",
         ],
-        backquotes => [
-            "(isa!mac bqex)",
-            "t",
-            "('unboundb bqex)",
-        ],
         printer => [
             "(function print)",
             "clo",
