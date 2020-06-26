@@ -1,5 +1,9 @@
 package Language::Bel::Type::Symbol;
 
+use 5.006;
+use strict;
+use warnings;
+
 sub new {
     my ($class, $name) = @_;
 
