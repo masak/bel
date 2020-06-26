@@ -10,7 +10,6 @@ use Language::Bel::Types qw(
     is_nil
     is_pair
     is_symbol
-    is_symbol_of_name
     make_fastfunc
     make_pair
     make_symbol
@@ -31,7 +30,6 @@ use Language::Bel::Primitives qw(
 use Language::Bel::Primitives qw(
     prim_car
     prim_cdr
-    PRIM_FN
 );
 use Language::Bel::Reader qw(
     read_whole
@@ -100,7 +98,6 @@ use Language::Bel::Types qw(
     make_fastfunc
 );
 use Language::Bel::Symbols::Common qw(
-    SYMBOL_CHAR
     SYMBOL_NIL
     SYMBOL_PAIR
     SYMBOL_QUOTE

@@ -18,7 +18,6 @@ use Language::Bel::Primitives qw(
     _id
     prim_car
     prim_cdr
-    prim_id
 );
 use Language::Bel::Symbols::Common qw(
     SYMBOL_A
