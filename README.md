@@ -45,11 +45,11 @@ A summary of the remaining big features:
   to mock everything to do with streams in the tests &mdash; but it might make sense
   to have an integration test file that uses real streams and real files, too.
 
-* **ccc** (or `call-with-current-continuation`) is a control mechanism that tells the
-  evaluator to return to a point in the execution that was saved earlier. Saving the
-  execution state means saving the current evaluation stack, and being able to
-  reinstate it when a continuation is invoked. The current Perl implementation uses a
-  mutable Perl array for the evaluation stack, instead of a persistent Bel list; this
+* **ccc** (or `call-with-current-continuation`) is a control mechanism that allows the
+  program to save a point in the execution, and to return to that point again later.
+  Saving the execution state means saving the current evaluation stack, and being able
+  to reinstate it when a continuation is invoked. The current Perl implementation uses
+  a mutable Perl array for the evaluation stack, instead of a persistent Bel list; this
   means that unlike the Bel implementation of the evaluator, the Perl implementation
   has to defensively copy the whole stack both when taking the continuation and when
   invoking it. (Either that, or we modify the Perl evaluator to use a persistent
@@ -59,7 +59,7 @@ A summary of the remaining big features:
   stacks to be interleaved and executed in "round-robin" style. Therefore, threads
   can be seen as "parallel execution contexts". Dynamic and lexical variables are
   local to a thread; global variables are shared between all threads. It's possible
-  to prevent the scheduler from descheduling the current thread by binding the
+  to prevent the scheduler from de-scheduling the current thread by binding the
   dynamic `lock` variable. Failing to do this might result in unexpected interactions
   between threads. The concurrency is "co-operative", which means that any thread
   could block the others forever by never releasing the lock.
