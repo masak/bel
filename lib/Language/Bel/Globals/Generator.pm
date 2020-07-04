@@ -19,10 +19,6 @@ use Language::Bel::Types qw(
 );
 use Language::Bel::Symbols::Common qw(
     SYMBOL_NIL
-    SYMBOL_PAIR
-    SYMBOL_QUOTE
-    SYMBOL_SYMBOL
-    SYMBOL_T
 );
 use Language::Bel::Primitives qw(
     PRIMITIVES
