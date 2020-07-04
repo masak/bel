@@ -11,7 +11,9 @@ Only possible to install `Language::Bel` through GitHub right now.
 
 ```sh
 $ git clone https://github.com/masak/bel.git
-$ cd bel
+Cloning into 'bel'...
+[...]
+done.
 ```
 
 At some point soon, I'll also upload this distribution to CPAN.
