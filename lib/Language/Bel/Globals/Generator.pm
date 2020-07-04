@@ -34,9 +34,7 @@ use Language::Bel::Expander::Bquote qw(
     _bqexpand
 );
 use Language::Bel::Globals::Source;
-use Language::Bel::Globals::FastFuncs qw(
-    FASTFUNCS
-);
+use Language::Bel::Globals::FastFuncs;
 use Language::Bel;
 
 use Exporter 'import';
@@ -49,6 +47,13 @@ my %KNOWN_SYMBOL = qw(
     symbol      1
     t           1
 );
+
+my %FASTFUNCS;
+for my $name (@Language::Bel::Globals::FastFuncs::EXPORT_OK) {
+    if ($name =~ /fastfunc__/) {
+        $FASTFUNCS{$name} = 1;
+    }
+}
 
 my @DECLARATIONS;
 {
@@ -351,10 +356,12 @@ sub print_global {
     $mangled_name =~ s!/!_slash!g;
     $mangled_name =~ s/\^/_hat/g;
     $mangled_name =~ s/</_lt/g;
-    my $maybe_ff_d = FASTFUNCS->{$name} && FASTFUNCS->{"where__$name"}
-        ? "make_fastfunc($serialized, \\\&fastfunc__$mangled_name, \\\&fastfunc__where__$mangled_name)"
-        : FASTFUNCS->{$name}
-        ? "make_fastfunc($serialized, \\\&fastfunc__$mangled_name)"
+    my $fastfunc_name = "fastfunc__$mangled_name";
+    my $fastfunc_where_name = "fastfunc__where__$mangled_name";
+    my $maybe_ff_d = $FASTFUNCS{$fastfunc_name} && $FASTFUNCS{$fastfunc_where_name}
+        ? "make_fastfunc($serialized, \\\&$fastfunc_name, \\\&$fastfunc_where_name)"
+        : $FASTFUNCS{$fastfunc_name}
+        ? "make_fastfunc($serialized, \\\&$fastfunc_name)"
         : $serialized;
     my $formatted = break_lines($maybe_ff_d);
     print('$globals{"', $name, '"} =', "\n");
