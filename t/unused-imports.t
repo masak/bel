@@ -41,6 +41,8 @@ sub scan_for_unused {
         $contents = <$fh>;
     }
     my @imported_functions;
+    # Imported things in heredocs are quoted, and don't count
+    $contents =~ s/^\s++print\s++<<'HEADER';(?:(?!HEADER).)++HEADER//gms;
     while ($contents =~ /^use \S+ qw([^;]+)/gm) {
         my $functions = $1;
         for my $function ($functions =~ /\w+/g) {
