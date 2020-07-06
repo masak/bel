@@ -19,10 +19,6 @@ use Language::Bel::Types qw(
 );
 use Language::Bel::Symbols::Common qw(
     SYMBOL_NIL
-    SYMBOL_PAIR
-    SYMBOL_QUOTE
-    SYMBOL_SYMBOL
-    SYMBOL_T
 );
 use Language::Bel::Primitives qw(
     PRIMITIVES
@@ -38,9 +34,7 @@ use Language::Bel::Expander::Bquote qw(
     _bqexpand
 );
 use Language::Bel::Globals::Source;
-use Language::Bel::Globals::FastFuncs qw(
-    FASTFUNCS
-);
+use Language::Bel::Globals::FastFuncs;
 use Language::Bel;
 
 use Exporter 'import';
@@ -53,6 +47,13 @@ my %KNOWN_SYMBOL = qw(
     symbol      1
     t           1
 );
+
+my %FASTFUNCS;
+for my $name (@Language::Bel::Globals::FastFuncs::EXPORT_OK) {
+    if ($name =~ /fastfunc__/) {
+        $FASTFUNCS{$name} = 1;
+    }
+}
 
 my @DECLARATIONS;
 {
@@ -98,6 +99,7 @@ use Language::Bel::Types qw(
     make_fastfunc
 );
 use Language::Bel::Symbols::Common qw(
+    SYMBOL_CHAR
     SYMBOL_NIL
     SYMBOL_PAIR
     SYMBOL_QUOTE
@@ -108,7 +110,15 @@ use Language::Bel::Primitives qw(
     PRIMITIVES
 );
 use Language::Bel::Globals::FastFuncs qw(
-    FASTFUNCS
+HEADER
+
+    for my $name (@Language::Bel::Globals::FastFuncs::EXPORT_OK) {
+        if ($name =~ /fastfunc__/) {
+            print " " x 4, $name, "\n";
+        }
+    }
+
+    print <<'HEADER';
 );
 
 use Exporter 'import';
@@ -338,10 +348,20 @@ sub print_global {
     my ($name, $value) = @_;
 
     my $serialized = serialize($value);
-    my $maybe_ff_d = FASTFUNCS->{$name} && FASTFUNCS->{"where__$name"}
-        ? "make_fastfunc($serialized, FASTFUNCS->{'$name'}, FASTFUNCS->{'where__$name'})"
-        : FASTFUNCS->{$name}
-        ? "make_fastfunc($serialized, FASTFUNCS->{'$name'})"
+    my $mangled_name = $name;
+    $mangled_name =~ s/^=/eq/;
+    $mangled_name =~ s/\+/_plus/g;
+    $mangled_name =~ s/-/_minus/g;
+    $mangled_name =~ s/\*/_star/g;
+    $mangled_name =~ s!/!_slash!g;
+    $mangled_name =~ s/\^/_hat/g;
+    $mangled_name =~ s/</_lt/g;
+    my $fastfunc_name = "fastfunc__$mangled_name";
+    my $fastfunc_where_name = "fastfunc__where__$mangled_name";
+    my $maybe_ff_d = $FASTFUNCS{$fastfunc_name} && $FASTFUNCS{$fastfunc_where_name}
+        ? "make_fastfunc($serialized, \\\&$fastfunc_name, \\\&$fastfunc_where_name)"
+        : $FASTFUNCS{$fastfunc_name}
+        ? "make_fastfunc($serialized, \\\&$fastfunc_name)"
         : $serialized;
     my $formatted = break_lines($maybe_ff_d);
     print('$globals{"', $name, '"} =', "\n");
