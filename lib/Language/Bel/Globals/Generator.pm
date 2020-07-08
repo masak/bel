@@ -329,8 +329,22 @@ HEADER
     }
 
     print <<'FOOTER';
+my $globals_list = SYMBOL_NIL;
+for my $name (keys(%globals)) {
+    my $value = GLOBALS->{$name};
+    $globals_list = make_pair(
+        make_pair(make_symbol($name), $value),
+        $globals_list,
+    );
+}
+
+sub GLOBALS_LIST {
+    return $globals_list;
+}
+
 our @EXPORT_OK = qw(
     GLOBALS
+    GLOBALS_LIST
 );
 
 1;

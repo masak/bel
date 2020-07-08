@@ -41,6 +41,7 @@ use Language::Bel::Smark qw(
 );
 use Language::Bel::Globals qw(
     GLOBALS
+    GLOBALS_LIST
 );
 use Language::Bel::Printer qw(
     _print
@@ -90,14 +91,7 @@ sub new {
     if (!defined($self->{g})) {
         $self->{globals_hash} = GLOBALS;
 
-        $self->{g} = SYMBOL_NIL;
-        for my $name (keys(%{$self->{globals_hash}})) {
-            my $value = GLOBALS->{$name};
-            $self->{g} = make_pair(
-                make_pair(make_symbol($name), $value),
-                $self->{g},
-            );
-        }
+        $self->{g} = GLOBALS_LIST;
     }
     if (!defined($self->{call})) {
         $self->{call} = sub {
