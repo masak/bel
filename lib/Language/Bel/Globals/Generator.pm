@@ -107,6 +107,7 @@ use Language::Bel::Symbols::Common qw(
     SYMBOL_T
 );
 use Language::Bel::Primitives qw(
+    _id
     PRIMITIVES
 );
 use Language::Bel::Globals::FastFuncs qw(
@@ -127,6 +128,13 @@ my %globals;
 
 sub GLOBALS {
     return \%globals;
+}
+
+sub is_global_value {
+    my ($e, $global_name) = @_;
+
+    my $global = $globals{$global_name};
+    return $global && _id($e, $global);
 }
 
 HEADER
@@ -345,6 +353,7 @@ sub GLOBALS_LIST {
 our @EXPORT_OK = qw(
     GLOBALS
     GLOBALS_LIST
+    is_global_value
 );
 
 1;

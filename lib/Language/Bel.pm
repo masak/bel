@@ -40,8 +40,8 @@ use Language::Bel::Smark qw(
     make_smark_of_type
 );
 use Language::Bel::Globals qw(
-    GLOBALS
     GLOBALS_LIST
+    is_global_value
 );
 use Language::Bel::Printer qw(
     _print
@@ -89,8 +89,6 @@ sub new {
 
     $self = bless($self, $class);
     if (!defined($self->{g})) {
-        $self->{globals_hash} = GLOBALS;
-
         $self->{g} = GLOBALS_LIST;
     }
     if (!defined($self->{call})) {
@@ -379,13 +377,6 @@ sub literal {
     );
 }
 
-sub is_global_value {
-    my ($self, $e, $global_name) = @_;
-
-    my $global = $self->{globals_hash}{$global_name};
-    return $global && _id($e, $global);
-}
-
 # (def variable (e)
 #   (if (atom e)
 #       (no (literal e))
@@ -397,7 +388,7 @@ sub variable {
     return if is_smark($e);
 
     return is_pair($e)
-        ? $self->is_global_value(pair_car($e), "vmark")
+        ? is_global_value(pair_car($e), "vmark")
         : !literal($e);
 }
 
@@ -610,7 +601,7 @@ sub evcall {
                     $es2 = pair_cdr($es2);
                 }
 
-                if ($self->is_global_value($op, "err")) {
+                if (is_global_value($op, "err")) {
                     # XXX: Need to do proper parameter handling here
                     die symbol_name(prim_car($args)), "\n";
                 }
