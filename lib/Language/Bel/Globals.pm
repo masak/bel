@@ -22,6 +22,8 @@ use Language::Bel::Symbols::Common qw(
 use Language::Bel::Primitives qw(
     _id
     PRIMITIVES
+    prim_cdr
+    prim_xdr
 );
 use Language::Bel::Globals::FastFuncs qw(
     fastfunc__no
@@ -122,6 +124,21 @@ sub is_global_value {
     my $kv = $globals{$global_name};
     my $global = pair_cdr($kv);
     return $global && _id($e, $global);
+}
+
+# (let cell (cons v nil)
+#   (xdr g (cons cell (cdr g)))
+#   cell)))
+sub install_global {
+    my ($v) = @_;
+
+    my $cell = make_pair($v, SYMBOL_NIL);
+    prim_xdr($globals_list, make_pair(
+        $cell,
+        prim_cdr($globals_list),
+    ));
+
+    return $cell;
 }
 
 sub add_global {
@@ -5153,6 +5170,7 @@ sub GLOBALS_LIST {
 our @EXPORT_OK = qw(
     GLOBALS
     GLOBALS_LIST
+    install_global
     is_global_value
 );
 

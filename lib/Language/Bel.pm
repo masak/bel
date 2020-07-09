@@ -41,6 +41,7 @@ use Language::Bel::Smark qw(
 );
 use Language::Bel::Globals qw(
     GLOBALS_LIST
+    install_global
     is_global_value
 );
 use Language::Bel::Printer qw(
@@ -426,7 +427,7 @@ sub vref {
     if ($it = inwhere($self->{s})) {
         my $car_inwhere = prim_car($it);
         if (is_pair($it = $self->lookup($v, $a))
-            || !is_nil($car_inwhere) && ($it = $self->install_global($v))) {
+            || !is_nil($car_inwhere) && ($it = install_global($v))) {
             pop @{$self->{s}};  # get rid of the (smark 'loc)
             push @{$self->{r}}, make_pair(
                 $it,
@@ -462,21 +463,6 @@ sub inwhere {
     return @$s_ref
         && is_smark_of_type($smark = $s_ref->[-1][0], "loc")
         && make_pair($smark->value(), SYMBOL_NIL);
-}
-
-#                       (let cell (cons v nil)
-#                         (xdr g (cons cell (cdr g)))
-#                         cell)))
-sub install_global {
-    my ($self, $v) = @_;
-
-    my $cell = make_pair($v, SYMBOL_NIL);
-    prim_xdr($self->{g}, make_pair(
-        $cell,
-        prim_cdr($self->{g}),
-    ));
-
-    return $cell;
 }
 
 # (def get (k kvs (o f =))
