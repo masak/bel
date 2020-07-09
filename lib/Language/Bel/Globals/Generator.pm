@@ -137,6 +137,13 @@ sub is_global_value {
     return $global && _id($e, $global);
 }
 
+sub add_global {
+    my ($name, $value) = @_;
+
+    $globals{$name} = $value;
+    return;
+}
+
 HEADER
 
     for my $prim_name (sort(keys(%{PRIMITIVES()}))) {
@@ -363,8 +370,7 @@ FOOTER
 sub print_primitive {
     my ($name) = @_;
 
-    print('$globals{"', $name, '"} = PRIMITIVES->{"', $name, '"};', "\n");
-    print("\n");
+    print(qq[add_global("$name", PRIMITIVES->{"$name"});\n\n]);
 }
 
 sub print_global {
@@ -386,10 +392,8 @@ sub print_global {
         : $FASTFUNCS{$fastfunc_name}
         ? "make_fastfunc($serialized, \\\&$fastfunc_name)"
         : $serialized;
-    my $formatted = break_lines($maybe_ff_d);
-    print('$globals{"', $name, '"} =', "\n");
-    print("$formatted;\n");
-    print("\n");
+    my $formatted = break_lines(qq[add_global("$name", $maybe_ff_d);]);
+    print("$formatted\n\n");
 }
 
 sub serialize {
@@ -433,7 +437,9 @@ sub break_lines {
     }
     push @lines, $text;
 
-    return join "\n", map { "    $_" } @lines;
+    my $indented = join "\n", map { "    $_" } @lines;
+    $indented =~ s/^    //;
+    return $indented;
 }
 
 our @EXPORT_OK = qw(
