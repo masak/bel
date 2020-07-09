@@ -64,10 +64,33 @@ sub bel_todo {
     }
 }
 
+sub visit {
+    my ($dir, $fn_ref, $prefix) = @_;
+    $prefix ||= "";
+
+    # un-taint $dir
+    $dir =~ /^(\w+)$/;
+    $dir = $1;
+    chdir($dir);
+
+    for my $file (<*>) {
+        my $name = "$prefix$dir/$file";
+        if ($name =~ /\.pm$/) {
+            $fn_ref->($name, $file);
+        }
+
+        if (-d $file) {
+            visit($file, $fn_ref, "$prefix$dir/");
+        }
+    }
+    chdir("..");
+}
+
 our @EXPORT = qw(
     is_bel_output
     is_bel_error
     bel_todo
+    visit
 );
 
 1;
