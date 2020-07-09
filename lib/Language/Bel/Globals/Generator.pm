@@ -125,6 +125,7 @@ HEADER
 use Exporter 'import';
 
 my %globals;
+my $globals_list = SYMBOL_NIL;
 
 sub GLOBALS {
     return \%globals;
@@ -141,6 +142,10 @@ sub add_global {
     my ($name, $value) = @_;
 
     $globals{$name} = $value;
+    $globals_list = make_pair(
+        make_pair(make_symbol($name), $value),
+        $globals_list,
+    );
     return;
 }
 
@@ -344,15 +349,6 @@ HEADER
     }
 
     print <<'FOOTER';
-my $globals_list = SYMBOL_NIL;
-for my $name (keys(%globals)) {
-    my $value = GLOBALS->{$name};
-    $globals_list = make_pair(
-        make_pair(make_symbol($name), $value),
-        $globals_list,
-    );
-}
-
 sub GLOBALS_LIST {
     return $globals_list;
 }
