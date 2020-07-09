@@ -41,6 +41,7 @@ use Language::Bel::Smark qw(
 );
 use Language::Bel::Globals qw(
     GLOBALS_LIST
+    get_global_kv
     install_global
     is_global_value
 );
@@ -508,7 +509,7 @@ sub lookup {
 
     return $self->binding($e)
         || get($e, $a)
-        || get($e, $self->{g})
+        || (is_symbol($e) && get_global_kv(symbol_name($e)))
         || (is_symbol_of_name($e, "scope") && make_pair($e, $a))
         || (is_symbol_of_name($e, "globe") && make_pair($e, $self->{g}))
         || SYMBOL_NIL;

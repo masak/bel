@@ -5,11 +5,13 @@ use strict;
 use warnings;
 
 use Language::Bel::Types qw(
+    is_symbol
     make_char
     make_pair
     make_symbol
     make_fastfunc
     pair_cdr
+    symbol_name
 );
 use Language::Bel::Symbols::Common qw(
     SYMBOL_CHAR
@@ -118,10 +120,16 @@ sub GLOBALS {
     return \%globals;
 }
 
+sub get_global_kv {
+    my ($name) = @_;
+
+    return $globals{$name};
+}
+
 sub is_global_value {
     my ($e, $global_name) = @_;
 
-    my $kv = $globals{$global_name};
+    my $kv = get_global_kv($global_name);
     my $global = pair_cdr($kv);
     return $global && _id($e, $global);
 }
@@ -133,6 +141,10 @@ sub install_global {
     my ($v) = @_;
 
     my $cell = make_pair($v, SYMBOL_NIL);
+    if (is_symbol($v)) { # XXX: might be a uvar
+        my $name = symbol_name($v);
+        $globals{$name} = $cell;
+    }
     prim_xdr($globals_list, make_pair(
         $cell,
         prim_cdr($globals_list),
@@ -5170,6 +5182,7 @@ sub GLOBALS_LIST {
 our @EXPORT_OK = qw(
     GLOBALS
     GLOBALS_LIST
+    get_global_kv
     install_global
     is_global_value
 );
