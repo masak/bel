@@ -97,6 +97,7 @@ use Language::Bel::Types qw(
     make_pair
     make_symbol
     make_fastfunc
+    pair_cdr
 );
 use Language::Bel::Symbols::Common qw(
     SYMBOL_CHAR
@@ -134,18 +135,18 @@ sub GLOBALS {
 sub is_global_value {
     my ($e, $global_name) = @_;
 
-    my $global = $globals{$global_name};
+    my $kv = $globals{$global_name};
+    my $global = pair_cdr($kv);
     return $global && _id($e, $global);
 }
 
 sub add_global {
     my ($name, $value) = @_;
 
-    $globals{$name} = $value;
-    $globals_list = make_pair(
-        make_pair(make_symbol($name), $value),
-        $globals_list,
-    );
+    my $kv = make_pair(make_symbol($name), $value);
+
+    $globals{$name} = $kv;
+    $globals_list = make_pair($kv, $globals_list);
     return;
 }
 
