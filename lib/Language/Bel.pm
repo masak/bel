@@ -90,9 +90,6 @@ sub new {
     };
 
     $self = bless($self, $class);
-    if (!defined($self->{g})) {
-        $self->{g} = GLOBALS_LIST;
-    }
     if (!defined($self->{call})) {
         $self->{call} = sub {
             my ($fn, @args) = @_;
@@ -511,7 +508,7 @@ sub lookup {
         || get($e, $a)
         || (is_symbol($e) && get_global_kv(symbol_name($e)))
         || (is_symbol_of_name($e, "scope") && make_pair($e, $a))
-        || (is_symbol_of_name($e, "globe") && make_pair($e, $self->{g}))
+        || (is_symbol_of_name($e, "globe") && make_pair($e, GLOBALS_LIST))
         || SYMBOL_NIL;
 }
 
