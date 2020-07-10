@@ -744,7 +744,7 @@ sub applylit {
         }
         # XXX: skipping `cont` case for now
         else {
-            my $virfns = pair_cdr(get(make_symbol("virfns"), $self->{g}));
+            my $virfns = prim_cdr(get_global_kv("virfns"));
             my $it;
             if ($it = get($tag, $virfns)) {
                 my $cdr_it = prim_cdr($it);
