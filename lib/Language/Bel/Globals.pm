@@ -116,10 +116,6 @@ use Exporter 'import';
 my %globals;
 my $globals_list = SYMBOL_NIL;
 
-sub GLOBALS {
-    return \%globals;
-}
-
 sub get_global_kv {
     my ($name) = @_;
 
@@ -5180,7 +5176,6 @@ sub GLOBALS_LIST {
 }
 
 our @EXPORT_OK = qw(
-    GLOBALS
     GLOBALS_LIST
     get_global_kv
     install_global
