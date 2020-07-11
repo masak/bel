@@ -40,7 +40,10 @@ use Language::Bel::Smark qw(
     make_smark_of_type
 );
 use Language::Bel::Globals qw(
-    GLOBALS
+    GLOBALS_LIST
+    get_global_kv
+    install_global
+    is_global_value
 );
 use Language::Bel::Printer qw(
     _print
@@ -52,11 +55,11 @@ Language::Bel - An interpreter for Paul Graham's language Bel
 
 =head1 VERSION
 
-Version 0.36
+Version 0.37
 
 =cut
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 =head1 SYNOPSIS
 
@@ -87,18 +90,6 @@ sub new {
     };
 
     $self = bless($self, $class);
-    if (!defined($self->{g})) {
-        $self->{globals_hash} = GLOBALS;
-
-        $self->{g} = SYMBOL_NIL;
-        for my $name (keys(%{$self->{globals_hash}})) {
-            my $value = GLOBALS->{$name};
-            $self->{g} = make_pair(
-                make_pair(make_symbol($name), $value),
-                $self->{g},
-            );
-        }
-    }
     if (!defined($self->{call})) {
         $self->{call} = sub {
             my ($fn, @args) = @_;
@@ -385,13 +376,6 @@ sub literal {
     );
 }
 
-sub is_global_value {
-    my ($self, $e, $global_name) = @_;
-
-    my $global = $self->{globals_hash}{$global_name};
-    return $global && _id($e, $global);
-}
-
 # (def variable (e)
 #   (if (atom e)
 #       (no (literal e))
@@ -403,7 +387,7 @@ sub variable {
     return if is_smark($e);
 
     return is_pair($e)
-        ? $self->is_global_value(pair_car($e), "vmark")
+        ? is_global_value(pair_car($e), "vmark")
         : !literal($e);
 }
 
@@ -441,7 +425,7 @@ sub vref {
     if ($it = inwhere($self->{s})) {
         my $car_inwhere = prim_car($it);
         if (is_pair($it = $self->lookup($v, $a))
-            || !is_nil($car_inwhere) && ($it = $self->install_global($v))) {
+            || !is_nil($car_inwhere) && ($it = install_global($v))) {
             pop @{$self->{s}};  # get rid of the (smark 'loc)
             push @{$self->{r}}, make_pair(
                 $it,
@@ -477,21 +461,6 @@ sub inwhere {
     return @$s_ref
         && is_smark_of_type($smark = $s_ref->[-1][0], "loc")
         && make_pair($smark->value(), SYMBOL_NIL);
-}
-
-#                       (let cell (cons v nil)
-#                         (xdr g (cons cell (cdr g)))
-#                         cell)))
-sub install_global {
-    my ($self, $v) = @_;
-
-    my $cell = make_pair($v, SYMBOL_NIL);
-    prim_xdr($self->{g}, make_pair(
-        $cell,
-        prim_cdr($self->{g}),
-    ));
-
-    return $cell;
 }
 
 # (def get (k kvs (o f =))
@@ -537,9 +506,9 @@ sub lookup {
 
     return $self->binding($e)
         || get($e, $a)
-        || get($e, $self->{g})
+        || (is_symbol($e) && get_global_kv(symbol_name($e)))
         || (is_symbol_of_name($e, "scope") && make_pair($e, $a))
-        || (is_symbol_of_name($e, "globe") && make_pair($e, $self->{g}))
+        || (is_symbol_of_name($e, "globe") && make_pair($e, GLOBALS_LIST))
         || SYMBOL_NIL;
 }
 
@@ -616,7 +585,7 @@ sub evcall {
                     $es2 = pair_cdr($es2);
                 }
 
-                if ($self->is_global_value($op, "err")) {
+                if (is_global_value($op, "err")) {
                     # XXX: Need to do proper parameter handling here
                     die symbol_name(prim_car($args)), "\n";
                 }
@@ -772,7 +741,7 @@ sub applylit {
         }
         # XXX: skipping `cont` case for now
         else {
-            my $virfns = pair_cdr(get(make_symbol("virfns"), $self->{g}));
+            my $virfns = prim_cdr(get_global_kv("virfns"));
             my $it;
             if ($it = get($tag, $virfns)) {
                 my $cdr_it = prim_cdr($it);

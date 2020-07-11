@@ -22,8 +22,6 @@ use Language::Bel::Symbols::Common qw(
 );
 use Language::Bel::Primitives qw(
     PRIMITIVES
-);
-use Language::Bel::Primitives qw(
     prim_car
     prim_cdr
 );
@@ -93,10 +91,13 @@ use strict;
 use warnings;
 
 use Language::Bel::Types qw(
+    is_symbol
     make_char
     make_pair
     make_symbol
     make_fastfunc
+    pair_cdr
+    symbol_name
 );
 use Language::Bel::Symbols::Common qw(
     SYMBOL_CHAR
@@ -107,7 +108,10 @@ use Language::Bel::Symbols::Common qw(
     SYMBOL_T
 );
 use Language::Bel::Primitives qw(
+    _id
     PRIMITIVES
+    prim_cdr
+    prim_xdr
 );
 use Language::Bel::Globals::FastFuncs qw(
 HEADER
@@ -124,9 +128,49 @@ HEADER
 use Exporter 'import';
 
 my %globals;
+my $globals_list = SYMBOL_NIL;
 
-sub GLOBALS {
-    return \%globals;
+sub get_global_kv {
+    my ($name) = @_;
+
+    return $globals{$name};
+}
+
+sub is_global_value {
+    my ($e, $global_name) = @_;
+
+    my $kv = get_global_kv($global_name);
+    my $global = pair_cdr($kv);
+    return $global && _id($e, $global);
+}
+
+# (let cell (cons v nil)
+#   (xdr g (cons cell (cdr g)))
+#   cell)))
+sub install_global {
+    my ($v) = @_;
+
+    my $cell = make_pair($v, SYMBOL_NIL);
+    if (is_symbol($v)) { # XXX: might be a uvar
+        my $name = symbol_name($v);
+        $globals{$name} = $cell;
+    }
+    prim_xdr($globals_list, make_pair(
+        $cell,
+        prim_cdr($globals_list),
+    ));
+
+    return $cell;
+}
+
+sub add_global {
+    my ($name, $value) = @_;
+
+    my $kv = make_pair(make_symbol($name), $value);
+
+    $globals{$name} = $kv;
+    $globals_list = make_pair($kv, $globals_list);
+    return;
 }
 
 HEADER
@@ -329,8 +373,15 @@ HEADER
     }
 
     print <<'FOOTER';
+sub GLOBALS_LIST {
+    return $globals_list;
+}
+
 our @EXPORT_OK = qw(
-    GLOBALS
+    GLOBALS_LIST
+    get_global_kv
+    install_global
+    is_global_value
 );
 
 1;
@@ -340,8 +391,7 @@ FOOTER
 sub print_primitive {
     my ($name) = @_;
 
-    print('$globals{"', $name, '"} = PRIMITIVES->{"', $name, '"};', "\n");
-    print("\n");
+    print(qq[add_global("$name", PRIMITIVES->{"$name"});\n\n]);
 }
 
 sub print_global {
@@ -363,10 +413,8 @@ sub print_global {
         : $FASTFUNCS{$fastfunc_name}
         ? "make_fastfunc($serialized, \\\&$fastfunc_name)"
         : $serialized;
-    my $formatted = break_lines($maybe_ff_d);
-    print('$globals{"', $name, '"} =', "\n");
-    print("$formatted;\n");
-    print("\n");
+    my $formatted = break_lines(qq[add_global("$name", $maybe_ff_d);]);
+    print("$formatted\n\n");
 }
 
 sub serialize {
@@ -410,7 +458,9 @@ sub break_lines {
     }
     push @lines, $text;
 
-    return join "\n", map { "    $_" } @lines;
+    my $indented = join "\n", map { "    $_" } @lines;
+    $indented =~ s/^    //;
+    return $indented;
 }
 
 our @EXPORT_OK = qw(

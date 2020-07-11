@@ -23,7 +23,7 @@ After downloading Bel, you can run it like this:
 
 ```sh
 $ perl -Ilib bin/bel
-Language::Bel 0.34 -- msys.
+Language::Bel 0.37 -- msys.
 > (+ 2 2)
 4
 > (append "Hello" '(\sp) "world!")
