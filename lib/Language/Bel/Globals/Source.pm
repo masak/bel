@@ -801,7 +801,8 @@ __DATA__
 
 ; skip bitc [waiting for streams]
 
-; skip digit [waiting for streams]
+(def digit (c (o base i10))
+  (mem c (udrop (udrop base i16) "fedcba9876543210")))
 
 ; skip breakc [waiting for streams]
 
