@@ -822,17 +822,23 @@ __DATA__
 
 ; skip charstil [waiting for reader]
 
-; skip syntax [waiting for reader]
+(set syntax nil)
 
-; skip syn [waiting for reader]
+(mac syn (c . rest)
+  `(set syntax (put ,c (fn ,@rest) syntax)))
 
-; skip \( [waiting for reader]
+(syn \( (s base share)
+  (rdlist s \) base share))
 
-; skip \) [waiting for reader]
+(syn \) args
+  (err 'unexpected-terminator))
 
-; skip \[ [waiting for reader]
+(syn \[ (s base share)
+  (let (e newshare) (rdlist s \] base share)
+    (list (list 'fn '(_) e) newshare)))
 
-; skip \] [waiting for reader]
+(syn \] args
+  (err 'unexpected-terminator))
 
 ; skip rdlist [waiting for reader]
 
