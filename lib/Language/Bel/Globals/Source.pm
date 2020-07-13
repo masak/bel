@@ -809,7 +809,8 @@ __DATA__
 (def signc (c)
   (in c \+ \-))
 
-; skip intrac [waiting for streams]
+(def intrac (c)
+  (in c \. \!))
 
 ; skip source [waiting for streams]
 
