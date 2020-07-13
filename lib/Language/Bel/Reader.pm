@@ -37,10 +37,22 @@ sub read_partial {
     my ($expr, $pos) = @_;
 
     $pos ||= 0;
+
     my $skip_whitespace = sub {
         while ($pos < length($expr) && substr($expr, $pos, 1) =~ /\s/) {
             ++$pos;
         }
+    };
+
+    my $breakc = sub {
+        my $c;
+        return $pos >= length($expr)
+            || ($c = substr($expr, $pos, 1)) eq "("
+            || $c eq ")"
+            || $c eq "["
+            || $c eq "]"
+            || $c eq " "
+            || $c eq "\n";
     };
 
     $skip_whitespace->();
@@ -82,14 +94,16 @@ sub read_partial {
     elsif ($c eq "\\") {
         ++$pos;
         my $start = $pos;
-        EAT_CHAR:
-        {
-            do {
-                my $cc = substr($expr, $pos, 1);
-                # XXX: cheat for now
-                last EAT_CHAR if $cc eq ")" or $cc eq "]" or $cc =~ /\s/;
-                ++$pos;
-            } while ($pos < length($expr));
+        if ($breakc->()) {
+            ++$pos;
+        }
+        else {
+            EAT_CHAR:
+            {
+                while (!$breakc->()) {
+                    ++$pos;
+                }
+            }
         }
         my $name = substr($expr, $start, $pos - $start);
         my $ord = length($name) == 1
