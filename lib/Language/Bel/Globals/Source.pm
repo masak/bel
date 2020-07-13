@@ -806,7 +806,8 @@ __DATA__
 
 (set breakc (cor no whitec (is \;) [get _ syntax]))
 
-; skip signc [waiting for streams]
+(def signc (c)
+  (in c \+ \-))
 
 ; skip intrac [waiting for streams]
 

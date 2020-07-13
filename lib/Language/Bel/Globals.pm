@@ -3804,6 +3804,13 @@ add_global("breakc", make_pair(make_symbol("lit"),
     make_pair(make_symbol("args"), SYMBOL_NIL))), SYMBOL_NIL))),
     SYMBOL_NIL))))));
 
+add_global("signc", make_pair(make_symbol("lit"),
+    make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+    make_pair(make_pair(make_symbol("c"), SYMBOL_NIL),
+    make_pair(make_pair(make_symbol("in"), make_pair(make_symbol("c"),
+    make_pair(make_char(43), make_pair(make_char(45), SYMBOL_NIL)))),
+    SYMBOL_NIL))))));
+
 add_global("syntax", make_pair(make_pair(make_char(93),
     make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
     make_pair(SYMBOL_NIL, make_symbol("args"))))),
