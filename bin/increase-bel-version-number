@@ -1,0 +1,70 @@
+#!/usr/bin/perl
+use 5.006;
+use strict;
+use warnings;
+
+my %versions;
+
+my $readme_file = "README.md";
+open my $README, "<", $readme_file
+    or die "Cannot open $readme_file: $!";
+
+my @readme_lines;
+while (my $line = <$README>) {
+    $line =~ s/\r?\n$//;
+    push @readme_lines, $line;
+    if ($line =~ /^Language::Bel (\S+) -- \w+\.$/) {
+        ++$versions{$1};
+    }
+}
+
+close $README;
+
+my $bel_pm_file = "lib/Language/Bel.pm";
+open my $BEL_PM_FILE, "<", $bel_pm_file
+    or die "Cannot open $bel_pm_file: $!";
+
+my @bel_pm_lines;
+while (my $line = <$BEL_PM_FILE>) {
+    $line =~ s/\r?\n$//;
+    push @bel_pm_lines, $line;
+    if ($line =~ /^Version (\S+)$/) {
+        ++$versions{$1};
+    }
+    elsif ($line =~ /^our \$VERSION = '([^']+)';$/) {
+        ++$versions{$1};
+    }
+}
+
+close $BEL_PM_FILE;
+
+my $max_version = "";
+for (keys(%versions)) {
+    if ($max_version lt $_) {
+        $max_version = $_;
+    }
+}
+
+my $next_bigger_version = $max_version;
+$next_bigger_version =~ s/0.(\d\d)/"0." . sprintf("%02d", $1 + 1)/e;
+
+open $README, ">", $readme_file
+    or die "Cannot open $readme_file: $!";
+
+for my $line (@readme_lines) {
+    $line =~ s/^Language::Bel (\S+) -- (\w+)\.$/Language::Bel $next_bigger_version -- $2./;
+    print {$README} "$line\n";
+}
+
+close $README;
+
+open $BEL_PM_FILE, ">", $bel_pm_file
+    or die "Cannot open $bel_pm_file: $!";
+
+for my $line (@bel_pm_lines) {
+    $line =~ s/^Version (\S+)$/Version $next_bigger_version/;
+    $line =~ s/^our \$VERSION = '([^']+)';$/our \$VERSION = '$next_bigger_version';/;
+    print {$BEL_PM_FILE} "$line\n";
+}
+
+close $BEL_PM_FILE;
