@@ -358,6 +358,32 @@ HEADER
             }
             next;
         }
+        elsif (symbol_name($car_ast) eq "syn") {
+            my $c = prim_car(prim_cdr($ast));
+            my $rest = prim_car(prim_cdr(prim_cdr($ast)));
+            for my $global (@globals) {
+                if ($global->{name} eq "syntax") {
+                    $global->{expr} = make_pair(
+                        make_pair(
+                            $c,
+                            make_pair(
+                                make_symbol("lit"),
+                                make_pair(
+                                    make_symbol("clo"),
+                                    make_pair(
+                                        SYMBOL_NIL,
+                                        _bqexpand($rest),
+                                    ),
+                                ),
+                            ),
+                        ),
+                        $global->{expr},
+                    );
+                    last;
+                }
+            }
+            next;
+        }
         else {
             die "Unrecognized: $declaration";
         }

@@ -801,13 +801,16 @@ __DATA__
 
 ; skip bitc [waiting for streams]
 
-; skip digit [waiting for streams]
+(def digit (c (o base i10))
+  (mem c (udrop (udrop base i16) "fedcba9876543210")))
 
-; skip breakc [waiting for streams]
+(set breakc (cor no whitec (is \;) [get _ syntax]))
 
-; skip signc [waiting for streams]
+(def signc (c)
+  (in c \+ \-))
 
-; skip intrac [waiting for streams]
+(def intrac (c)
+  (in c \. \!))
 
 ; skip source [waiting for streams]
 
@@ -821,17 +824,23 @@ __DATA__
 
 ; skip charstil [waiting for reader]
 
-; skip syntax [waiting for reader]
+(set syntax nil)
 
-; skip syn [waiting for reader]
+(mac syn (c . rest)
+  `(set syntax (put ,c (fn ,@rest) syntax)))
 
-; skip \( [waiting for reader]
+(syn \( (s base share)
+  (rdlist s \) base share))
 
-; skip \) [waiting for reader]
+(syn \) args
+  (err 'unexpected-terminator))
 
-; skip \[ [waiting for reader]
+(syn \[ (s base share)
+  (let (e newshare) (rdlist s \] base share)
+    (list (list 'fn '(_) e) newshare)))
 
-; skip \] [waiting for reader]
+(syn \] args
+  (err 'unexpected-terminator))
 
 ; skip rdlist [waiting for reader]
 
