@@ -39,12 +39,7 @@ use Language::Bel::Smark qw(
     is_smark_of_type
     make_smark_of_type
 );
-use Language::Bel::Globals qw(
-    GLOBALS_LIST
-    get_global_kv
-    install_global
-    is_global_value
-);
+use Language::Bel::Globals;
 use Language::Bel::Printer qw(
     _print
 );
@@ -90,6 +85,9 @@ sub new {
     };
 
     $self = bless($self, $class);
+    if (!defined($self->{globals})) {
+        $self->{globals} = Language::Bel::Globals->new();
+    }
     if (!defined($self->{call})) {
         $self->{call} = sub {
             my ($fn, @args) = @_;
@@ -387,7 +385,7 @@ sub variable {
     return if is_smark($e);
 
     return is_pair($e)
-        ? is_global_value(pair_car($e), "vmark")
+        ? $self->{globals}->is_global_of_name(pair_car($e), "vmark")
         : !literal($e);
 }
 
@@ -425,7 +423,7 @@ sub vref {
     if ($it = inwhere($self->{s})) {
         my $car_inwhere = prim_car($it);
         if (is_pair($it = $self->lookup($v, $a))
-            || !is_nil($car_inwhere) && ($it = install_global($v))) {
+            || !is_nil($car_inwhere) && ($it = $self->{globals}->install($v))) {
             pop @{$self->{s}};  # get rid of the (smark 'loc)
             push @{$self->{r}}, make_pair(
                 $it,
@@ -506,9 +504,9 @@ sub lookup {
 
     return $self->binding($e)
         || get($e, $a)
-        || (is_symbol($e) && get_global_kv(symbol_name($e)))
+        || (is_symbol($e) && $self->{globals}->get_kv(symbol_name($e)))
         || (is_symbol_of_name($e, "scope") && make_pair($e, $a))
-        || (is_symbol_of_name($e, "globe") && make_pair($e, GLOBALS_LIST))
+        || (is_symbol_of_name($e, "globe") && make_pair($e, $self->{globals}->list()))
         || SYMBOL_NIL;
 }
 
@@ -585,7 +583,7 @@ sub evcall {
                     $es2 = pair_cdr($es2);
                 }
 
-                if (is_global_value($op, "err")) {
+                if ($self->{globals}->is_global_of_name($op, "err")) {
                     # XXX: Need to do proper parameter handling here
                     die symbol_name(prim_car($args)), "\n";
                 }
@@ -741,7 +739,7 @@ sub applylit {
         }
         # XXX: skipping `cont` case for now
         else {
-            my $virfns = prim_cdr(get_global_kv("virfns"));
+            my $virfns = prim_cdr($self->{globals}->get_kv("virfns"));
             my $it;
             if ($it = get($tag, $virfns)) {
                 my $cdr_it = prim_cdr($it);
