@@ -61,6 +61,12 @@ sub SYMBOL_QUOTE {
     return $symbol_quote;
 }
 
+my $symbol_stream = make_symbol("stream");
+
+sub SYMBOL_STREAM {
+    return $symbol_stream;
+}
+
 my $symbol_symbol = make_symbol("symbol");
 
 sub SYMBOL_SYMBOL {
@@ -83,6 +89,7 @@ our @EXPORT_OK = qw(
     SYMBOL_NIL 
     SYMBOL_PAIR
     SYMBOL_QUOTE
+    SYMBOL_STREAM
     SYMBOL_SYMBOL
     SYMBOL_T
 );

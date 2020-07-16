@@ -7,6 +7,7 @@ use warnings;
 use Language::Bel::Type::Char;
 use Language::Bel::Type::Pair;
 use Language::Bel::Type::Pair::FastFunc;
+use Language::Bel::Type::Stream;
 use Language::Bel::Type::Symbol;
 
 use Exporter 'import';
@@ -39,6 +40,12 @@ sub is_pair {
     my ($object) = @_;
 
     return $object->isa("Language::Bel::Type::Pair");
+}
+
+sub is_stream {
+    my ($object) = @_;
+
+    return $object->isa("Language::Bel::Type::Stream");
 }
 
 sub is_string {
@@ -79,6 +86,12 @@ sub make_pair {
     my ($car, $cdr) = @_;
 
     return Language::Bel::Type::Pair->new($car, $cdr);
+}
+
+sub make_stream {
+    my ($path_str, $mode) = @_;
+
+    return Language::Bel::Type::Stream->new($path_str, $mode);
 }
 
 sub make_symbol {
@@ -136,12 +149,14 @@ our @EXPORT_OK = qw(
     is_fastfunc
     is_nil
     is_pair
+    is_stream
     is_string
     is_symbol
     is_symbol_of_name
     make_char
     make_fastfunc
     make_pair
+    make_stream
     make_symbol
     pair_car
     pair_cdr

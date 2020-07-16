@@ -9,6 +9,7 @@ use Language::Bel::Types qw(
     is_char
     is_nil
     is_pair
+    is_stream
     is_string
     is_symbol
     is_symbol_of_name
@@ -77,6 +78,9 @@ sub _print {
         }
         push @fragments, ")";
         return join("", @fragments);
+    }
+    elsif (is_stream($ast)) {
+        return "<stream>";
     }
     else {
         die "unhandled: unknown thing to print";

@@ -9,9 +9,11 @@ use Language::Bel::Types qw(
     is_char
     is_nil
     is_pair
+    is_stream
     is_symbol
     make_char
     make_pair
+    make_stream
     make_symbol
     pair_car
     pair_cdr
@@ -23,8 +25,9 @@ use Language::Bel::Symbols::Common qw(
     SYMBOL_CHAR
     SYMBOL_NIL
     SYMBOL_PAIR
-    SYMBOL_T
+    SYMBOL_STREAM
     SYMBOL_SYMBOL
+    SYMBOL_T
 );
 use Exporter 'import';
 
@@ -108,6 +111,26 @@ sub prim_nom {
     return $result;
 }
 
+sub prim_ops {
+    my ($path, $mode) = @_;
+
+    my @stack;
+    while (is_pair($path)) {
+        my $elem = prim_car($path);
+        die "not-a-string"
+            unless is_char($elem);
+        push @stack, chr(char_codepoint($elem));
+        $path = prim_cdr($path);
+    }
+    my $path_str = join("", @stack);
+
+    if (!is_symbol($mode)) {
+        die "not-a-symbol\n";
+    }
+
+    return make_stream($path_str, $mode);
+}
+
 sub prim_sym {
     my ($value) = @_;
 
@@ -137,6 +160,9 @@ sub prim_type {
     }
     elsif (is_char($value)) {
         return SYMBOL_CHAR;
+    }
+    elsif (is_stream($value)) {
+        return SYMBOL_STREAM;
     }
     else {
         die "unknown type";
@@ -185,6 +211,7 @@ my %prim_fn = (
     "id" => { fn => \&prim_id, arity => 2 },
     "join" => { fn => \&prim_join, arity => 2 },
     "nom" => { fn => \&prim_nom, arity => 1 },
+    "ops" => { fn => \&prim_ops, arity => 2 },
     "sym" => { fn => \&prim_sym, arity => 1 },
     "type" => { fn => \&prim_type, arity => 1 },
     "xar" => { fn => \&prim_xar, arity => 2 },
@@ -212,6 +239,7 @@ our @EXPORT_OK = qw(
     prim_id 
     prim_join
     prim_nom
+    prim_ops
     prim_sym
     prim_type
     prim_xar

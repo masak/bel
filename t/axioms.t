@@ -6,7 +6,7 @@ use Test::More;
 
 use Language::Bel::Test;
 
-plan tests => 39;
+plan tests => 41;
 
 {
     is_bel_output("(id 'a 'a)", "t");
@@ -66,4 +66,9 @@ plan tests => 39;
     is_bel_output("(~~mem (coin) '(t nil))", "t");
     is_bel_output("(whilet _ (coin))", "nil");
     is_bel_output("(til _ (coin) no)", "nil");
+}
+
+{
+    is_bel_output(q[(ops "testfile" 'out)], "<stream>");
+    is_bel_output(q[(type (ops "testfile" 'out))], "stream");
 }

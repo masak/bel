@@ -143,6 +143,8 @@ sub new {
 
         $self->add_global("nom", PRIMITIVES->{"nom"});
 
+        $self->add_global("ops", PRIMITIVES->{"ops"});
+
         $self->add_global("sym", PRIMITIVES->{"sym"});
 
         $self->add_global("type", PRIMITIVES->{"type"});
