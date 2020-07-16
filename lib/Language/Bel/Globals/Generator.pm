@@ -125,53 +125,25 @@ HEADER
     print <<'HEADER';
 );
 
-use Exporter 'import';
-
-my %globals;
-my $globals_list = SYMBOL_NIL;
-
-sub get_global_kv {
-    my ($name) = @_;
-
-    return $globals{$name};
-}
-
-sub is_global_value {
-    my ($e, $global_name) = @_;
-
-    my $kv = get_global_kv($global_name);
-    my $global = pair_cdr($kv);
-    return $global && _id($e, $global);
-}
-
-# (let cell (cons v nil)
-#   (xdr g (cons cell (cdr g)))
-#   cell)))
-sub install_global {
-    my ($v) = @_;
-
-    my $cell = make_pair($v, SYMBOL_NIL);
-    if (is_symbol($v)) { # XXX: might be a uvar
-        my $name = symbol_name($v);
-        $globals{$name} = $cell;
-    }
-    prim_xdr($globals_list, make_pair(
-        $cell,
-        prim_cdr($globals_list),
-    ));
-
-    return $cell;
-}
-
 sub add_global {
-    my ($name, $value) = @_;
+    my ($self, $name, $value) = @_;
 
     my $kv = make_pair(make_symbol($name), $value);
 
-    $globals{$name} = $kv;
-    $globals_list = make_pair($kv, $globals_list);
-    return;
+    $self->{hash_ref}->{$name} = $kv;
+    $self->{list} = make_pair($kv, $self->{list});
 }
+
+sub new {
+    my ($class, $options_ref) = @_;
+    my $self = {
+        ref($options_ref) eq "HASH" ? %$options_ref : (),
+    };
+
+    $self = bless($self, $class);
+    if (!defined($self->{hash_ref}) && !defined($self->{list})) {
+        $self->{hash_ref} = {};
+        $self->{list} = SYMBOL_NIL;
 
 HEADER
 
@@ -394,30 +366,73 @@ HEADER
         };
     }
 
+    my $first = 1;
     for my $global (@globals) {
+        if ($first) {
+            $first = 0;
+        }
+        else {
+            print("\n");
+        }
+
         print_global($global->{name}, $global->{expr});
     }
 
     print <<'FOOTER';
-sub GLOBALS_LIST {
-    return $globals_list;
+    }
+
+    return $self;
 }
 
-our @EXPORT_OK = qw(
-    GLOBALS_LIST
-    get_global_kv
-    install_global
-    is_global_value
-);
+sub get_kv {
+    my ($self, $name) = @_;
+
+    return $self->{hash_ref}->{$name};
+}
+
+sub is_global_of_name {
+    my ($self, $e, $global_name) = @_;
+
+    my $kv = $self->get_kv($global_name);
+    my $global = pair_cdr($kv);
+    return $global && _id($e, $global);
+}
+
+# (let cell (cons v nil)
+#   (xdr g (cons cell (cdr g)))
+#   cell)))
+sub install {
+    my ($self, $v) = @_;
+
+    my $cell = make_pair($v, SYMBOL_NIL);
+    if (is_symbol($v)) { # XXX: might be a uvar
+        my $name = symbol_name($v);
+        $self->{hash_ref}->{$name} = $cell;
+    }
+    prim_xdr($self->{list}, make_pair(
+        $cell,
+        prim_cdr($self->{list}),
+    ));
+
+    return $cell;
+}
+
+sub list {
+    my ($self) = @_;
+
+    return $self->{list};
+}
 
 1;
 FOOTER
 }
 
+my $ADD = q[$self->add_global];
+
 sub print_primitive {
     my ($name) = @_;
 
-    print(qq[add_global("$name", PRIMITIVES->{"$name"});\n\n]);
+    print(qq[        $ADD("$name", PRIMITIVES->{"$name"});\n\n]);
 }
 
 sub print_global {
@@ -439,8 +454,9 @@ sub print_global {
         : $FASTFUNCS{$fastfunc_name}
         ? "make_fastfunc($serialized, \\\&$fastfunc_name)"
         : $serialized;
-    my $formatted = break_lines(qq[add_global("$name", $maybe_ff_d);]);
-    print("$formatted\n\n");
+    my $formatted = break_lines(qq[$ADD("$name", $maybe_ff_d);]);
+    my $indented = join("\n", map { "        $_" } split("\n", $formatted));
+    print("$indented\n");
 }
 
 sub serialize {
