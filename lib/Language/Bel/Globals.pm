@@ -537,6 +537,15 @@ sub new {
             SYMBOL_NIL)), make_pair(make_pair(SYMBOL_QUOTE, make_pair(SYMBOL_CHAR,
             SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL))))), \&fastfunc__char));
 
+        $self->add_global("stream", make_pair(make_symbol("lit"),
+            make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+            make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
+            make_pair(make_pair(make_symbol("="),
+            make_pair(make_pair(make_symbol("type"), make_pair(make_symbol("x"),
+            SYMBOL_NIL)), make_pair(make_pair(SYMBOL_QUOTE,
+            make_pair(make_symbol("stream"), SYMBOL_NIL)), SYMBOL_NIL))),
+            SYMBOL_NIL))))));
+
         $self->add_global("proper", make_fastfunc(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),

@@ -101,7 +101,7 @@ __DATA__
 
 (def char   (x) (= (type x) 'char))
 
-; skip stream [waiting for streams]
+(def stream (x) (= (type x) 'stream))
 
 (def proper (x)
   (or (no x)
