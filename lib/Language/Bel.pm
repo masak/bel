@@ -5,6 +5,8 @@ use strict;
 use warnings;
 
 use Language::Bel::Types qw(
+    are_identical
+    atoms_are_identical
     is_char
     is_fastfunc
     is_nil
@@ -16,13 +18,14 @@ use Language::Bel::Types qw(
     make_symbol
     pair_car
     pair_cdr
+    pairs_are_identical
     symbol_name
+    symbols_are_identical
 );
 use Language::Bel::Symbols::Common qw(
     SYMBOL_NIL
 );
 use Language::Bel::Primitives qw(
-    _id
     prim_car
     prim_cdr
     prim_xdr
@@ -472,12 +475,12 @@ sub get {
         return 1
             if is_symbol($first)
             && is_symbol($second)
-            && _id($first, $second);
+            && symbols_are_identical($first, $second);
         return is_pair($first)
             && is_pair(pair_car($first))
             && is_nil(pair_cdr($first))
             && is_pair($second)
-            && _id($first, $second);
+            && pairs_are_identical($first, $second);
     };
 
     while (!is_nil($kvs)) {
@@ -524,7 +527,7 @@ sub binding {
 
         next unless is_smark_of_type($e, "bind");
         my $smark_value = $e->value();
-        next unless _id(pair_car($smark_value), $v);
+        next unless are_identical(pair_car($smark_value), $v);
         return $smark_value;
     }
 
@@ -839,7 +842,7 @@ sub tabloc {
         while (@stack) {
             my ($v0, $v1) = @{pop(@stack)};
             if (!is_pair($v0) || !is_pair($v1)) {
-                if (!_id($v0, $v1)) {
+                if (!atoms_are_identical($v0, $v1)) {
                     $kvs = prim_cdr($kvs);
                     next ELEM;
                 }

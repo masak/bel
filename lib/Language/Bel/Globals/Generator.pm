@@ -91,6 +91,7 @@ use strict;
 use warnings;
 
 use Language::Bel::Types qw(
+    are_identical
     is_symbol
     make_char
     make_pair
@@ -108,7 +109,6 @@ use Language::Bel::Symbols::Common qw(
     SYMBOL_T
 );
 use Language::Bel::Primitives qw(
-    _id
     PRIMITIVES
     prim_cdr
     prim_xdr
@@ -395,7 +395,7 @@ sub is_global_of_name {
 
     my $kv = $self->get_kv($global_name);
     my $global = pair_cdr($kv);
-    return $global && _id($e, $global);
+    return $global && are_identical($e, $global);
 }
 
 # (let cell (cons v nil)

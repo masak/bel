@@ -5,6 +5,7 @@ use strict;
 use warnings;
 
 use Language::Bel::Types qw(
+    atoms_are_identical
     is_char
     is_nil
     is_pair
@@ -15,7 +16,6 @@ use Language::Bel::Types qw(
     make_symbol
 );
 use Language::Bel::Primitives qw(
-    _id
     prim_car
     prim_cdr
 );
@@ -229,7 +229,7 @@ sub fastfunc__eq  {
         if ($some_atom) {
             my $car_values = $values[0];
             for my $value (@values) {
-                if (!_id($value, $car_values)) {
+                if (!atoms_are_identical($value, $car_values)) {
                     return SYMBOL_NIL;
                 }
             }
@@ -319,7 +319,7 @@ sub fastfunc__mem {
                 if ($some_atom) {
                     my $car_values = $values[0];
                     for my $value (@values) {
-                        if (!_id($value, $car_values)) {
+                        if (!atoms_are_identical($value, $car_values)) {
                             $ys = prim_cdr($ys);
                             next ELEMENT;
                         }
@@ -376,7 +376,7 @@ sub fastfunc__where__mem {
                 if ($some_atom) {
                     my $car_values = $values[0];
                     for my $value (@values) {
-                        if (!_id($value, $car_values)) {
+                        if (!atoms_are_identical($value, $car_values)) {
                             $ys = prim_cdr($ys);
                             next ELEMENT;
                         }
@@ -425,7 +425,7 @@ sub fastfunc__in {
             if ($some_atom) {
                 my $car_values = $values[0];
                 for my $value (@values) {
-                    if (!_id($value, $car_values)) {
+                    if (!atoms_are_identical($value, $car_values)) {
                         shift(@args);
                         next ARG;
                     }
@@ -467,7 +467,7 @@ sub fastfunc__where__in {
             if ($some_atom) {
                 my $car_values = $values[0];
                 for my $value (@values) {
-                    if (!_id($value, $car_values)) {
+                    if (!atoms_are_identical($value, $car_values)) {
                         shift(@args);
                         next ARG;
                     }
@@ -617,7 +617,7 @@ sub fastfunc__begins {
                 if ($some_atom) {
                     my $car_values = $values[0];
                     for my $value (@values) {
-                        if (!_id($value, $car_values)) {
+                        if (!atoms_are_identical($value, $car_values)) {
                             return SYMBOL_NIL;
                         }
                     }
@@ -661,7 +661,7 @@ sub fastfunc__caris {
             if ($some_atom) {
                 my $car_values = $values[0];
                 for my $value (@values) {
-                    if (!_id($value, $car_values)) {
+                    if (!atoms_are_identical($value, $car_values)) {
                         return SYMBOL_NIL;
                     }
                 }
@@ -750,7 +750,7 @@ sub fastfunc__rem {
             while (@stack) {
                 my ($v0, $v1) = @{pop(@stack)};
                 if (!is_pair($v0) || !is_pair($v1)) {
-                    if (!_id($v0, $v1)) {
+                    if (!atoms_are_identical($v0, $v1)) {
                         push @values, $value;
                         last;
                     }
@@ -791,7 +791,7 @@ sub fastfunc__get {
             while (@stack) {
                 my ($v0, $v1) = @{pop(@stack)};
                 if (!is_pair($v0) || !is_pair($v1)) {
-                    if (!_id($v0, $v1)) {
+                    if (!atoms_are_identical($v0, $v1)) {
                         $kvs = prim_cdr($kvs);
                         next ELEM;
                     }
@@ -834,7 +834,7 @@ sub fastfunc__where__get {
             while (@stack) {
                 my ($v0, $v1) = @{pop(@stack)};
                 if (!is_pair($v0) || !is_pair($v1)) {
-                    if (!_id($v0, $v1)) {
+                    if (!atoms_are_identical($v0, $v1)) {
                         $kvs = prim_cdr($kvs);
                         next ELEM;
                     }
@@ -877,7 +877,7 @@ sub fastfunc__put {
             while (@stack) {
                 my ($v0, $v1) = @{pop(@stack)};
                 if (!is_pair($v0) || !is_pair($v1)) {
-                    if (!_id($v0, $v1)) {
+                    if (!atoms_are_identical($v0, $v1)) {
                         push @values, $kv;
                         last;
                     }
@@ -1085,7 +1085,7 @@ sub fastfunc__match {
             }
         }
         elsif (!is_pair($v0) || !is_pair($v1)) {
-            if (!_id($v0, $v1)) {
+            if (!atoms_are_identical($v0, $v1)) {
                 return SYMBOL_NIL;
             }
         }

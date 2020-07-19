@@ -12,10 +12,37 @@ use Language::Bel::Type::Symbol;
 
 use Exporter 'import';
 
+sub are_identical {
+    my ($first, $second) = @_;
+
+    return
+        atoms_are_identical($first, $second)
+        ||
+        is_pair($first) && is_pair($second)
+            && pairs_are_identical($first, $second);
+}
+
+sub atoms_are_identical {
+    my ($first, $second) = @_;
+
+    return
+        is_symbol($first) && is_symbol($second)
+            && symbols_are_identical($first, $second)
+        ||
+        is_char($first) && is_char($second)
+            && char_codepoint($first) == char_codepoint($second);
+}
+
 sub char_codepoint {
     my ($char) = @_;
 
     return $char->{codepoint};
+}
+
+sub chars_are_identical {
+    my ($first, $second) = @_;
+
+    return char_codepoint($first) == char_codepoint($second);
 }
 
 sub is_char {
@@ -126,6 +153,12 @@ sub pair_set_cdr {
     return;
 }
 
+sub pairs_are_identical {
+    my ($first, $second) = @_;
+
+    return $first eq $second;
+}
+
 sub string_value {
     my ($object) = @_;
 
@@ -143,8 +176,17 @@ sub symbol_name {
     return $symbol->{name};
 }
 
+sub symbols_are_identical {
+    my ($first, $second) = @_;
+
+    return symbol_name($first) eq symbol_name($second);
+}
+
 our @EXPORT_OK = qw(
+    are_identical
+    atoms_are_identical
     char_codepoint
+    chars_are_identical
     is_char
     is_fastfunc
     is_nil
@@ -162,8 +204,10 @@ our @EXPORT_OK = qw(
     pair_cdr
     pair_set_car
     pair_set_cdr
+    pairs_are_identical
     string_value
     symbol_name
+    symbols_are_identical
 );
 
 1;

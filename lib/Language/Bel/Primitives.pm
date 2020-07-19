@@ -5,6 +5,7 @@ use strict;
 use warnings;
 
 use Language::Bel::Types qw(
+    are_identical
     char_codepoint
     is_char
     is_nil
@@ -65,27 +66,10 @@ sub prim_coin {
         : SYMBOL_T;
 }
 
-sub _id {
-    my ($first, $second) = @_;
-
-    if (is_symbol($first) && is_symbol($second)) {
-        return symbol_name($first) eq symbol_name($second);
-    }
-    elsif (is_char($first) && is_char($second)) {
-        return char_codepoint($first) == char_codepoint($second);
-    }
-    elsif (is_pair($first) && is_pair($second)) {
-        return $first eq $second;
-    }
-    else {
-        return "";
-    }
-}
-
 sub prim_id {
     my ($first, $second) = @_;
 
-    return _id($first, $second) ? SYMBOL_T : SYMBOL_NIL;
+    return are_identical($first, $second) ? SYMBOL_T : SYMBOL_NIL;
 }
 
 sub prim_join {
@@ -236,7 +220,6 @@ sub PRIMITIVES {
 }
 
 our @EXPORT_OK = qw(
-    _id
     prim_car
     prim_cdr
     prim_coin
