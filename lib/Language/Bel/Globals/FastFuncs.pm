@@ -15,10 +15,7 @@ use Language::Bel::Types qw(
     make_pair
     make_symbol
 );
-use Language::Bel::Primitives qw(
-    prim_car
-    prim_cdr
-);
+use Language::Bel::Primitives;
 use Language::Bel::Symbols::Common qw(
     SYMBOL_A
     SYMBOL_D
@@ -30,50 +27,50 @@ use Language::Bel::Printer;
 use Exporter 'import';
 
 sub fastfunc__no {
-    my ($call, $x) = @_;
+    my ($bel, $x) = @_;
 
     return is_nil($x) ? SYMBOL_T : SYMBOL_NIL;
 }
 
 sub fastfunc__atom {
-    my ($call, $x) = @_;
+    my ($bel, $x) = @_;
 
     return is_pair($x) ? SYMBOL_NIL : SYMBOL_T;
 }
 
 sub fastfunc__all {
-    my ($call, $f, $xs) = @_;
+    my ($bel, $f, $xs) = @_;
 
     while (!is_nil($xs)) {
-        my $p = $call->($f, prim_car($xs));
+        my $p = $bel->{call}->($f, $bel->car($xs));
         if (is_nil($p)) {
             return SYMBOL_NIL;
         }
-        $xs = prim_cdr($xs);
+        $xs = $bel->cdr($xs);
     }
 
     return SYMBOL_T;
 }
 
 sub fastfunc__some {
-    my ($call, $f, $xs) = @_;
+    my ($bel, $f, $xs) = @_;
 
     while (!is_nil($xs)) {
-        my $p = $call->($f, prim_car($xs));
+        my $p = $bel->{call}->($f, $bel->car($xs));
         if (!is_nil($p)) {
             return $xs;
         }
-        $xs = prim_cdr($xs);
+        $xs = $bel->cdr($xs);
     }
 
     return SYMBOL_NIL;
 }
 
 sub fastfunc__where__some {
-    my ($call, $f, $xs) = @_;
+    my ($bel, $f, $xs) = @_;
 
     while (!is_nil($xs)) {
-        my $p = $call->($f, prim_car($xs));
+        my $p = $bel->{call}->($f, $bel->car($xs));
         if (!is_nil($p)) {
             return make_pair(
                 make_pair(
@@ -86,32 +83,32 @@ sub fastfunc__where__some {
                 ),
             );
         }
-        $xs = prim_cdr($xs);
+        $xs = $bel->cdr($xs);
     }
 
     return SYMBOL_NIL;
 }
 
 sub fastfunc__reduce {
-    my ($call, $f, $xs) = @_;
+    my ($bel, $f, $xs) = @_;
 
     my @values;
     while (!is_nil($xs)) {
-        push @values, prim_car($xs);
-        $xs = prim_cdr($xs);
+        push @values, $bel->car($xs);
+        $xs = $bel->cdr($xs);
     }
 
     my $result = @values ? pop(@values) : SYMBOL_NIL;
     while (@values) {
         my $value = pop(@values);
-        $result = $call->($f, $value, $result);
+        $result = $bel->{call}->($f, $value, $result);
     }
 
     return $result;
 }
 
 sub fastfunc__cons {
-    my ($call, @args) = @_;
+    my ($bel, @args) = @_;
 
     my $result = @args ? pop(@args) : SYMBOL_NIL;
     while (@args) {
@@ -123,15 +120,15 @@ sub fastfunc__cons {
 }
 
 sub fastfunc__append {
-    my ($call, @args) = @_;
+    my ($bel, @args) = @_;
 
     my $result = @args ? pop(@args) : SYMBOL_NIL;
     while (@args) {
         my $list = pop(@args);
         my @values;
         while (!is_nil($list)) {
-            push @values, prim_car($list);
-            $list = prim_cdr($list);
+            push @values, $bel->car($list);
+            $list = $bel->cdr($list);
         }
         while (@values) {
             my $value = pop(@values);
@@ -143,7 +140,7 @@ sub fastfunc__append {
 }
 
 sub fastfunc__snoc {
-    my ($call, @args) = @_;
+    my ($bel, @args) = @_;
 
     my $result = SYMBOL_NIL;
     while (scalar(@args) > 1) {
@@ -154,8 +151,8 @@ sub fastfunc__snoc {
         my $list = pop(@args);
         my @values;
         while (!is_nil($list)) {
-            push @values, prim_car($list);
-            $list = prim_cdr($list);
+            push @values, $bel->car($list);
+            $list = $bel->cdr($list);
         }
         while (@values) {
             my $value = pop(@values);
@@ -167,7 +164,7 @@ sub fastfunc__snoc {
 }
 
 sub fastfunc__list {
-    my ($call, @args) = @_;
+    my ($bel, @args) = @_;
 
     my $result = SYMBOL_NIL;
     while (@args) {
@@ -179,7 +176,7 @@ sub fastfunc__list {
 }
 
 sub fastfunc__map {
-    my ($call, $f, @ls) = @_;
+    my ($bel, $f, @ls) = @_;
 
     return SYMBOL_NIL
         unless @ls;
@@ -188,8 +185,8 @@ sub fastfunc__map {
     for my $list (@ls) {
         my @sublist;
         while (!is_nil($list)) {
-            push @sublist, prim_car($list);
-            $list = prim_cdr($list);
+            push @sublist, $bel->car($list);
+            $list = $bel->cdr($list);
         }
         push @sublists, \@sublist;
         my $length = scalar(@sublist);
@@ -199,7 +196,7 @@ sub fastfunc__map {
     }
     my @result;
     for my $i (0..$min_length-1) {
-        push @result, $call->(
+        push @result, $bel->{call}->(
             $f,
             map { $sublists[$_]->[$i] } 0..$#sublists
         );
@@ -213,7 +210,7 @@ sub fastfunc__map {
 }
 
 sub fastfunc__eq  {
-    my ($call, @args) = @_;
+    my ($bel, @args) = @_;
 
     my @stack = [@args];
     while (@stack) {
@@ -235,8 +232,8 @@ sub fastfunc__eq  {
             }
         }
         else {
-            push @stack, [map { prim_cdr($_) } @values];
-            push @stack, [map { prim_car($_) } @values];
+            push @stack, [map { $bel->cdr($_) } @values];
+            push @stack, [map { $bel->car($_) } @values];
         }
     }
 
@@ -244,68 +241,68 @@ sub fastfunc__eq  {
 }
 
 sub fastfunc__symbol {
-    my ($call, $x) = @_;
+    my ($bel, $x) = @_;
 
     return is_symbol($x) ? SYMBOL_T : SYMBOL_NIL;
 }
 
 sub fastfunc__pair {
-    my ($call, $x) = @_;
+    my ($bel, $x) = @_;
 
     return is_pair($x) ? SYMBOL_T : SYMBOL_NIL;
 }
 
 sub fastfunc__char {
-    my ($call, $x) = @_;
+    my ($bel, $x) = @_;
 
     return is_char($x) ? SYMBOL_T : SYMBOL_NIL;
 }
 
 sub fastfunc__proper {
-    my ($call, $x) = @_;
+    my ($bel, $x) = @_;
 
     while (!is_nil($x)) {
         if (!is_pair($x)) {
             return SYMBOL_NIL;
         }
-        $x = prim_cdr($x);
+        $x = $bel->cdr($x);
     }
 
     return SYMBOL_T;
 }
 
 sub fastfunc__string {
-    my ($call, $x) = @_;
+    my ($bel, $x) = @_;
 
     while (!is_nil($x)) {
         if (!is_pair($x)) {
             return SYMBOL_NIL;
         }
-        if (!is_char(prim_car($x))) {
+        if (!is_char($bel->car($x))) {
             return SYMBOL_NIL;
         }
-        $x = prim_cdr($x);
+        $x = $bel->cdr($x);
     }
 
     return SYMBOL_T;
 }
 
 sub fastfunc__mem {
-    my ($call, $x, $ys, $f) = @_;
+    my ($bel, $x, $ys, $f) = @_;
 
     if (defined($f)) {
         while (!is_nil($ys)) {
-            my $p = $call->($f, prim_car($ys), $x);
+            my $p = $bel->{call}->($f, $bel->car($ys), $x);
             if (!is_nil($p)) {
                 return $ys;
             }
-            $ys = prim_cdr($ys);
+            $ys = $bel->cdr($ys);
         }
     }
     else {
         ELEMENT:
         while (!is_nil($ys)) {
-            my @stack = [prim_car($ys), $x];
+            my @stack = [$bel->car($ys), $x];
             while (@stack) {
                 my @values = @{pop(@stack)};
                 next unless @values;
@@ -320,14 +317,14 @@ sub fastfunc__mem {
                     my $car_values = $values[0];
                     for my $value (@values) {
                         if (!atoms_are_identical($value, $car_values)) {
-                            $ys = prim_cdr($ys);
+                            $ys = $bel->cdr($ys);
                             next ELEMENT;
                         }
                     }
                 }
                 else {
-                    push @stack, [map { prim_cdr($_) } @values];
-                    push @stack, [map { prim_car($_) } @values];
+                    push @stack, [map { $bel->cdr($_) } @values];
+                    push @stack, [map { $bel->car($_) } @values];
                 }
             }
 
@@ -339,11 +336,11 @@ sub fastfunc__mem {
 }
 
 sub fastfunc__where__mem {
-    my ($call, $x, $ys, $f) = @_;
+    my ($bel, $x, $ys, $f) = @_;
 
     if (defined($f)) {
         while (!is_nil($ys)) {
-            my $p = $call->($f, prim_car($ys), $x);
+            my $p = $bel->{call}->($f, $bel->car($ys), $x);
             if (!is_nil($p)) {
                 return make_pair(
                     make_pair(
@@ -356,13 +353,13 @@ sub fastfunc__where__mem {
                     ),
                 );
             }
-            $ys = prim_cdr($ys);
+            $ys = $bel->cdr($ys);
         }
     }
     else {
         ELEMENT:
         while (!is_nil($ys)) {
-            my @stack = [prim_car($ys), $x];
+            my @stack = [$bel->car($ys), $x];
             while (@stack) {
                 my @values = @{pop(@stack)};
                 next unless @values;
@@ -377,14 +374,14 @@ sub fastfunc__where__mem {
                     my $car_values = $values[0];
                     for my $value (@values) {
                         if (!atoms_are_identical($value, $car_values)) {
-                            $ys = prim_cdr($ys);
+                            $ys = $bel->cdr($ys);
                             next ELEMENT;
                         }
                     }
                 }
                 else {
-                    push @stack, [map { prim_cdr($_) } @values];
-                    push @stack, [map { prim_car($_) } @values];
+                    push @stack, [map { $bel->cdr($_) } @values];
+                    push @stack, [map { $bel->car($_) } @values];
                 }
             }
 
@@ -405,7 +402,7 @@ sub fastfunc__where__mem {
 }
 
 sub fastfunc__in {
-    my ($call, @args) = @_;
+    my ($bel, @args) = @_;
 
     my $x = @args ? shift(@args) : SYMBOL_NIL;
 
@@ -432,8 +429,8 @@ sub fastfunc__in {
                 }
             }
             else {
-                push @stack, [map { prim_cdr($_) } @values];
-                push @stack, [map { prim_car($_) } @values];
+                push @stack, [map { $bel->cdr($_) } @values];
+                push @stack, [map { $bel->car($_) } @values];
             }
         }
         last ARG;
@@ -447,7 +444,7 @@ sub fastfunc__in {
 }
 
 sub fastfunc__where__in {
-    my ($call, @args) = @_;
+    my ($bel, @args) = @_;
 
     my $x = @args ? shift(@args) : SYMBOL_NIL;
 
@@ -474,8 +471,8 @@ sub fastfunc__where__in {
                 }
             }
             else {
-                push @stack, [map { prim_cdr($_) } @values];
-                push @stack, [map { prim_car($_) } @values];
+                push @stack, [map { $bel->cdr($_) } @values];
+                push @stack, [map { $bel->car($_) } @values];
             }
         }
         last ARG;
@@ -494,16 +491,16 @@ sub fastfunc__where__in {
 }
 
 sub fastfunc__cadr {
-    my ($call, $x) = @_;
+    my ($bel, $x) = @_;
 
-    return prim_car(prim_cdr($x));
+    return $bel->car($bel->cdr($x));
 }
 
 sub fastfunc__where__cadr {
-    my ($call, $x) = @_;
+    my ($bel, $x) = @_;
 
     return make_pair(
-        prim_cdr($x),
+        $bel->cdr($x),
         make_pair(
             SYMBOL_A,
             SYMBOL_NIL,
@@ -512,16 +509,16 @@ sub fastfunc__where__cadr {
 }
 
 sub fastfunc__cddr {
-    my ($call, $x) = @_;
+    my ($bel, $x) = @_;
 
-    return prim_cdr(prim_cdr($x));
+    return $bel->cdr($bel->cdr($x));
 }
 
 sub fastfunc__where__cddr {
-    my ($call, $x) = @_;
+    my ($bel, $x) = @_;
 
     return make_pair(
-        prim_cdr($x),
+        $bel->cdr($x),
         make_pair(
             SYMBOL_D,
             SYMBOL_NIL,
@@ -530,16 +527,16 @@ sub fastfunc__where__cddr {
 }
 
 sub fastfunc__caddr {
-    my ($call, $x) = @_;
+    my ($bel, $x) = @_;
 
-    return prim_car(prim_cdr(prim_cdr($x)));
+    return $bel->car($bel->cdr($bel->cdr($x)));
 }
 
 sub fastfunc__where__caddr {
-    my ($call, $x) = @_;
+    my ($bel, $x) = @_;
 
     return make_pair(
-        prim_cdr(prim_cdr($x)),
+        $bel->cdr($bel->cdr($x)),
         make_pair(
             SYMBOL_A,
             SYMBOL_NIL,
@@ -548,24 +545,24 @@ sub fastfunc__where__caddr {
 }
 
 sub fastfunc__find {
-    my ($call, $f, $xs) = @_;
+    my ($bel, $f, $xs) = @_;
 
     while (!is_nil($xs)) {
-        my $value = prim_car($xs);
-        if (!is_nil($call->($f, $value))) {
+        my $value = $bel->car($xs);
+        if (!is_nil($bel->{call}->($f, $value))) {
             return $value;
         }
-        $xs = prim_cdr($xs);
+        $xs = $bel->cdr($xs);
     }
     return SYMBOL_NIL;
 }
 
 sub fastfunc__where__find {
-    my ($call, $f, $xs) = @_;
+    my ($bel, $f, $xs) = @_;
 
     while (!is_nil($xs)) {
-        my $value = prim_car($xs);
-        if (!is_nil($call->($f, $value))) {
+        my $value = $bel->car($xs);
+        if (!is_nil($bel->{call}->($f, $value))) {
             return make_pair(
                 $xs,
                 make_pair(
@@ -574,13 +571,13 @@ sub fastfunc__where__find {
                 ),
             );
         }
-        $xs = prim_cdr($xs);
+        $xs = $bel->cdr($xs);
     }
     return SYMBOL_NIL;
 }
 
 sub fastfunc__begins {
-    my ($call, $xs, $pat, $f) = @_;
+    my ($bel, $xs, $pat, $f) = @_;
 
     if (defined($f)) {
         while (!is_nil($pat)) {
@@ -588,13 +585,13 @@ sub fastfunc__begins {
                 return SYMBOL_NIL;
             }
             else {
-                my $p = $call->($f, prim_car($xs), prim_car($pat));
+                my $p = $bel->{call}->($f, $bel->car($xs), $bel->car($pat));
                 if (is_nil($p)) {
                     return SYMBOL_NIL;
                 }
             }
-            $xs = prim_cdr($xs);
-            $pat = prim_cdr($pat);
+            $xs = $bel->cdr($xs);
+            $pat = $bel->cdr($pat);
         }
     }
     else {
@@ -603,7 +600,7 @@ sub fastfunc__begins {
                 return SYMBOL_NIL;
             }
 
-            my @stack = [prim_car($xs), prim_car($pat)];
+            my @stack = [$bel->car($xs), $bel->car($pat)];
             while (@stack) {
                 my @values = @{pop(@stack)};
                 next unless @values;
@@ -623,13 +620,13 @@ sub fastfunc__begins {
                     }
                 }
                 else {
-                    push @stack, [map { prim_cdr($_) } @values];
-                    push @stack, [map { prim_car($_) } @values];
+                    push @stack, [map { $bel->cdr($_) } @values];
+                    push @stack, [map { $bel->car($_) } @values];
                 }
             }
 
-            $xs = prim_cdr($xs);
-            $pat = prim_cdr($pat);
+            $xs = $bel->cdr($xs);
+            $pat = $bel->cdr($pat);
         }
     }
 
@@ -637,17 +634,17 @@ sub fastfunc__begins {
 }
 
 sub fastfunc__caris {
-    my ($call, $x, $y, $f) = @_;
+    my ($bel, $x, $y, $f) = @_;
 
     if (!is_pair($x)) {
         return SYMBOL_NIL;
     }
 
     if (defined($f)) {
-        return $call->($f, prim_car($x), $y);
+        return $bel->{call}->($f, $bel->car($x), $y);
     }
     else {
-        my @stack = [prim_car($x), $y];
+        my @stack = [$bel->car($x), $y];
         while (@stack) {
             my @values = @{pop(@stack)};
             next unless @values;
@@ -667,8 +664,8 @@ sub fastfunc__caris {
                 }
             }
             else {
-                push @stack, [map { prim_cdr($_) } @values];
-                push @stack, [map { prim_car($_) } @values];
+                push @stack, [map { $bel->cdr($_) } @values];
+                push @stack, [map { $bel->car($_) } @values];
             }
         }
 
@@ -677,30 +674,30 @@ sub fastfunc__caris {
 }
 
 sub fastfunc__hug {
-    my ($call, $xs, $f) = @_;
+    my ($bel, $xs, $f) = @_;
 
     my @values;
     my $cdr_xs;
     if (defined($f)) {
-        while (!is_nil($cdr_xs = prim_cdr($xs))) {
-            push @values, $call->($f, prim_car($xs), prim_car($cdr_xs));
-            $xs = prim_cdr($cdr_xs);
+        while (!is_nil($cdr_xs = $bel->cdr($xs))) {
+            push @values, $bel->{call}->($f, $bel->car($xs), $bel->car($cdr_xs));
+            $xs = $bel->cdr($cdr_xs);
         }
         if (!is_nil($xs)) {
-            push @values, $call->($f, prim_car($xs));
+            push @values, $bel->{call}->($f, $bel->car($xs));
         }
     }
     else {
-        while (!is_nil($cdr_xs = prim_cdr($xs))) {
+        while (!is_nil($cdr_xs = $bel->cdr($xs))) {
             push @values, make_pair(
-                prim_car($xs),
+                $bel->car($xs),
                 make_pair(
-                    prim_car($cdr_xs),
+                    $bel->car($cdr_xs),
                     SYMBOL_NIL));
-            $xs = prim_cdr($cdr_xs);
+            $xs = $bel->cdr($cdr_xs);
         }
         if (!is_nil($xs)) {
-            push @values, make_pair(prim_car($xs), SYMBOL_NIL);
+            push @values, make_pair($bel->car($xs), SYMBOL_NIL);
         }
     }
 
@@ -712,15 +709,15 @@ sub fastfunc__hug {
 }
 
 sub fastfunc__keep {
-    my ($call, $f, $xs) = @_;
+    my ($bel, $f, $xs) = @_;
 
     my @values;
     while (!is_nil($xs)) {
-        my $value = prim_car($xs);
-        if (!is_nil($call->($f, $value))) {
+        my $value = $bel->car($xs);
+        if (!is_nil($bel->{call}->($f, $value))) {
             push @values, $value;
         }
-        $xs = prim_cdr($xs);
+        $xs = $bel->cdr($xs);
     }
 
     my $result = SYMBOL_NIL;
@@ -731,21 +728,21 @@ sub fastfunc__keep {
 }
 
 sub fastfunc__rem {
-    my ($call, $x, $ys, $f) = @_;
+    my ($bel, $x, $ys, $f) = @_;
 
     my @values;
     if (defined($f)) {
         while (!is_nil($ys)) {
-            my $value = prim_car($ys);
-            if (is_nil($call->($f, $x, $value))) {
+            my $value = $bel->car($ys);
+            if (is_nil($bel->{call}->($f, $x, $value))) {
                 push @values, $value;
             }
-            $ys = prim_cdr($ys);
+            $ys = $bel->cdr($ys);
         }
     }
     else {
         while (!is_nil($ys)) {
-            my $value = prim_car($ys);
+            my $value = $bel->car($ys);
             my @stack = [$x, $value];
             while (@stack) {
                 my ($v0, $v1) = @{pop(@stack)};
@@ -756,11 +753,11 @@ sub fastfunc__rem {
                     }
                 }
                 else {
-                    push @stack, [prim_cdr($v0), prim_cdr($v1)];
-                    push @stack, [prim_car($v0), prim_car($v1)];
+                    push @stack, [$bel->cdr($v0), $bel->cdr($v1)];
+                    push @stack, [$bel->car($v0), $bel->car($v1)];
                 }
             }
-            $ys = prim_cdr($ys);
+            $ys = $bel->cdr($ys);
         }
     }
 
@@ -772,33 +769,33 @@ sub fastfunc__rem {
 }
 
 sub fastfunc__get {
-    my ($call, $k, $kvs, $f) = @_;
+    my ($bel, $k, $kvs, $f) = @_;
 
     if (defined($f)) {
         while (!is_nil($kvs)) {
-            my $kv = prim_car($kvs);
-            if (!is_nil($call->($f, prim_car($kv), $k))) {
+            my $kv = $bel->car($kvs);
+            if (!is_nil($bel->{call}->($f, $bel->car($kv), $k))) {
                 return $kv;
             }
-            $kvs = prim_cdr($kvs);
+            $kvs = $bel->cdr($kvs);
         }
     }
     else {
         ELEM:
         while (!is_nil($kvs)) {
-            my $kv = prim_car($kvs);
-            my @stack = [prim_car($kv), $k];
+            my $kv = $bel->car($kvs);
+            my @stack = [$bel->car($kv), $k];
             while (@stack) {
                 my ($v0, $v1) = @{pop(@stack)};
                 if (!is_pair($v0) || !is_pair($v1)) {
                     if (!atoms_are_identical($v0, $v1)) {
-                        $kvs = prim_cdr($kvs);
+                        $kvs = $bel->cdr($kvs);
                         next ELEM;
                     }
                 }
                 else {
-                    push @stack, [prim_cdr($v0), prim_cdr($v1)];
-                    push @stack, [prim_car($v0), prim_car($v1)];
+                    push @stack, [$bel->cdr($v0), $bel->cdr($v1)];
+                    push @stack, [$bel->car($v0), $bel->car($v1)];
                 }
             }
             return $kv;
@@ -809,12 +806,12 @@ sub fastfunc__get {
 }
 
 sub fastfunc__where__get {
-    my ($call, $k, $kvs, $f) = @_;
+    my ($bel, $k, $kvs, $f) = @_;
 
     if (defined($f)) {
         while (!is_nil($kvs)) {
-            my $kv = prim_car($kvs);
-            if (!is_nil($call->($f, prim_car($kv), $k))) {
+            my $kv = $bel->car($kvs);
+            if (!is_nil($bel->{call}->($f, $bel->car($kv), $k))) {
                 return make_pair(
                     $kvs,
                     make_pair(
@@ -823,25 +820,25 @@ sub fastfunc__where__get {
                     ),
                 );
             }
-            $kvs = prim_cdr($kvs);
+            $kvs = $bel->cdr($kvs);
         }
     }
     else {
         ELEM:
         while (!is_nil($kvs)) {
-            my $kv = prim_car($kvs);
-            my @stack = [prim_car($kv), $k];
+            my $kv = $bel->car($kvs);
+            my @stack = [$bel->car($kv), $k];
             while (@stack) {
                 my ($v0, $v1) = @{pop(@stack)};
                 if (!is_pair($v0) || !is_pair($v1)) {
                     if (!atoms_are_identical($v0, $v1)) {
-                        $kvs = prim_cdr($kvs);
+                        $kvs = $bel->cdr($kvs);
                         next ELEM;
                     }
                 }
                 else {
-                    push @stack, [prim_cdr($v0), prim_cdr($v1)];
-                    push @stack, [prim_car($v0), prim_car($v1)];
+                    push @stack, [$bel->cdr($v0), $bel->cdr($v1)];
+                    push @stack, [$bel->car($v0), $bel->car($v1)];
                 }
             }
             return make_pair(
@@ -858,22 +855,22 @@ sub fastfunc__where__get {
 }
 
 sub fastfunc__put {
-    my ($call, $k, $v, $kvs, $f) = @_;
+    my ($bel, $k, $v, $kvs, $f) = @_;
 
     my @values = make_pair($k, $v);
     if (defined($f)) {
         while (!is_nil($kvs)) {
-            my $kv = prim_car($kvs);
-            if (is_nil($call->($f, $k, prim_car($kv)))) {
+            my $kv = $bel->car($kvs);
+            if (is_nil($bel->{call}->($f, $k, $bel->car($kv)))) {
                 push @values, $kv;
             }
-            $kvs = prim_cdr($kvs);
+            $kvs = $bel->cdr($kvs);
         }
     }
     else {
         while (!is_nil($kvs)) {
-            my $kv = prim_car($kvs);
-            my @stack = [$k, prim_car($kv)];
+            my $kv = $bel->car($kvs);
+            my @stack = [$k, $bel->car($kv)];
             while (@stack) {
                 my ($v0, $v1) = @{pop(@stack)};
                 if (!is_pair($v0) || !is_pair($v1)) {
@@ -883,11 +880,11 @@ sub fastfunc__put {
                     }
                 }
                 else {
-                    push @stack, [prim_cdr($v0), prim_cdr($v1)];
-                    push @stack, [prim_car($v0), prim_car($v1)];
+                    push @stack, [$bel->cdr($v0), $bel->cdr($v1)];
+                    push @stack, [$bel->car($v0), $bel->car($v1)];
                 }
             }
-            $kvs = prim_cdr($kvs);
+            $kvs = $bel->cdr($kvs);
         }
     }
 
@@ -899,19 +896,19 @@ sub fastfunc__put {
 }
 
 sub fastfunc__rev {
-    my ($call, $xs) = @_;
+    my ($bel, $xs) = @_;
 
     my $result = SYMBOL_NIL;
     while (!is_nil($xs)) {
-        $result = make_pair(prim_car($xs), $result);
-        $xs = prim_cdr($xs);
+        $result = make_pair($bel->car($xs), $result);
+        $xs = $bel->cdr($xs);
     }
 
     return $result;
 }
 
 sub fastfunc__snap {
-    my ($call, $xs, $ys, $acc) = @_;
+    my ($bel, $xs, $ys, $acc) = @_;
 
     if (!defined($acc)) {
         $acc = SYMBOL_NIL;
@@ -919,14 +916,14 @@ sub fastfunc__snap {
 
     my @values;
     while (!is_nil($acc)) {
-        push @values, prim_car($acc);
-        $acc = prim_cdr($acc);
+        push @values, $bel->car($acc);
+        $acc = $bel->cdr($acc);
     }
 
     while (!is_nil($xs)) {
-        push @values, prim_car($ys);
-        $xs = prim_cdr($xs);
-        $ys = prim_cdr($ys);
+        push @values, $bel->car($ys);
+        $xs = $bel->cdr($xs);
+        $ys = $bel->cdr($ys);
     }
 
     my $result = SYMBOL_NIL;
@@ -944,24 +941,24 @@ sub fastfunc__snap {
 }
 
 sub fastfunc__udrop {
-    my ($call, $xs, $ys) = @_;
+    my ($bel, $xs, $ys) = @_;
 
     while (!is_nil($xs)) {
-        $xs = prim_cdr($xs);
-        $ys = prim_cdr($ys);
+        $xs = $bel->cdr($xs);
+        $ys = $bel->cdr($ys);
     }
 
     return $ys;
 }
 
 sub fastfunc__idfn {
-    my ($call, $x) = @_;
+    my ($bel, $x) = @_;
 
     return $x;
 }
 
 sub fastfunc__where__idfn {
-    my ($call, $x) = @_;
+    my ($bel, $x) = @_;
 
     return make_pair(
         make_pair(
@@ -976,11 +973,11 @@ sub fastfunc__where__idfn {
 }
 
 sub fastfunc__pairwise {
-    my ($call, $f, $xs) = @_;
+    my ($bel, $f, $xs) = @_;
 
     my $cdr_xs;
-    while (!is_nil($cdr_xs = prim_cdr($xs))) {
-        if (is_nil($call->($f, prim_car($xs), prim_car($cdr_xs)))) {
+    while (!is_nil($cdr_xs = $bel->cdr($xs))) {
+        if (is_nil($bel->{call}->($f, $bel->car($xs), $bel->car($cdr_xs)))) {
             return SYMBOL_NIL;
         }
         $xs = $cdr_xs;
@@ -990,41 +987,41 @@ sub fastfunc__pairwise {
 }
 
 sub fastfunc__foldl {
-    my ($call, $f, $base, @args) = @_;
+    my ($bel, $f, $base, @args) = @_;
 
     return $base
         unless @args;
 
     while (!grep { is_nil($_) } @args) {
-        my @car_args = map { prim_car($_) } @args;
-        $base = $call->($f, @car_args, $base);
-        @args = map { prim_cdr($_) } @args;
+        my @car_args = map { $bel->car($_) } @args;
+        $base = $bel->{call}->($f, @car_args, $base);
+        @args = map { $bel->cdr($_) } @args;
     }
 
     return $base;
 }
 
 sub fastfunc__foldr {
-    my ($call, $f, $base, @args) = @_;
+    my ($bel, $f, $base, @args) = @_;
 
     return $base
         unless @args;
 
     my @cars;
     while (!grep { is_nil($_) } @args) {
-        push @cars, [map { prim_car($_) } @args];
-        @args = map { prim_cdr($_) } @args;
+        push @cars, [map { $bel->car($_) } @args];
+        @args = map { $bel->cdr($_) } @args;
     }
 
     for my $cars (reverse(@cars)) {
-        $base = $call->($f, @{$cars}, $base);
+        $base = $bel->{call}->($f, @{$cars}, $base);
     }
 
     return $base;
 }
 
 sub fastfunc__fuse {
-    my ($call, $f, @args) = @_;
+    my ($bel, $f, @args) = @_;
 
     return SYMBOL_NIL
         unless @args;
@@ -1033,8 +1030,8 @@ sub fastfunc__fuse {
     for my $list (@args) {
         my @sublist;
         while (!is_nil($list)) {
-            push @sublist, prim_car($list);
-            $list = prim_cdr($list);
+            push @sublist, $bel->car($list);
+            $list = $bel->cdr($list);
         }
         push @sublists, \@sublist;
         my $length = scalar(@sublist);
@@ -1044,7 +1041,7 @@ sub fastfunc__fuse {
     }
     my @result;
     for my $i (0..$min_length-1) {
-        push @result, $call->(
+        push @result, $bel->{call}->(
             $f,
             map { $sublists[$_]->[$i] } 0..$#sublists
         );
@@ -1054,8 +1051,8 @@ sub fastfunc__fuse {
         my $list = pop(@result);
         my @values;
         while (!is_nil($list)) {
-            push @values, prim_car($list);
-            $list = prim_cdr($list);
+            push @values, $bel->car($list);
+            $list = $bel->cdr($list);
         }
         while (@values) {
             my $value = pop(@values);
@@ -1067,7 +1064,7 @@ sub fastfunc__fuse {
 }
 
 sub fastfunc__match {
-    my ($call, $x, $pat) = @_;
+    my ($bel, $x, $pat) = @_;
 
     my @stack = [$x, $pat];
     while (@stack) {
@@ -1076,11 +1073,11 @@ sub fastfunc__match {
             # succeed
         }
         elsif (is_pair($v1)
-            && is_symbol_of_name(prim_car($v1), "lit")
-            && is_pair(prim_cdr($v1))
-            && (is_symbol_of_name(prim_car(prim_cdr($v1)), "prim")
-                || is_symbol_of_name(prim_car(prim_cdr($v1)), "clo"))) {
-            if (is_nil($call->($v1, $v0))) {
+            && is_symbol_of_name($bel->car($v1), "lit")
+            && is_pair($bel->cdr($v1))
+            && (is_symbol_of_name($bel->car($bel->cdr($v1)), "prim")
+                || is_symbol_of_name($bel->car($bel->cdr($v1)), "clo"))) {
+            if (is_nil($bel->{call}->($v1, $v0))) {
                 return SYMBOL_NIL;
             }
         }
@@ -1090,8 +1087,8 @@ sub fastfunc__match {
             }
         }
         else {
-            push @stack, [prim_cdr($v0), prim_cdr($v1)];
-            push @stack, [prim_car($v0), prim_car($v1)];
+            push @stack, [$bel->cdr($v0), $bel->cdr($v1)];
+            push @stack, [$bel->car($v0), $bel->car($v1)];
         }
     }
 
@@ -1099,7 +1096,7 @@ sub fastfunc__match {
 }
 
 sub fastfunc__split {
-    my ($call, $f, $xs, $acc) = @_;
+    my ($bel, $f, $xs, $acc) = @_;
 
     if (!defined($acc)) {
         $acc = SYMBOL_NIL;
@@ -1107,15 +1104,15 @@ sub fastfunc__split {
     my @acc;
     while (!is_nil($xs)) {
         last
-            if !is_pair($xs) || !is_nil($call->($f, prim_car($xs)));
-        push(@acc, prim_car($xs));
-        $xs = prim_cdr($xs);
+            if !is_pair($xs) || !is_nil($bel->{call}->($f, $bel->car($xs)));
+        push(@acc, $bel->car($xs));
+        $xs = $bel->cdr($xs);
     }
 
     my @prefix;
     while (!is_nil($acc)) {
-        push(@prefix, prim_car($acc));
-        $acc = prim_cdr($acc);
+        push(@prefix, $bel->car($acc));
+        $acc = $bel->cdr($acc);
     }
     my $first = SYMBOL_NIL;
     while (@acc) {
@@ -1134,26 +1131,26 @@ sub fastfunc__split {
 }
 
 sub fastfunc__i_lt {
-    my ($call, $xs, $ys) = @_;
+    my ($bel, $xs, $ys) = @_;
 
     while (!is_nil($xs)) {
-        $xs = prim_cdr($xs);
-        $ys = prim_cdr($ys);
+        $xs = $bel->cdr($xs);
+        $ys = $bel->cdr($ys);
     }
 
     return $ys;
 }
 
 sub fastfunc__i_plus {
-    my ($call, @args) = @_;
+    my ($bel, @args) = @_;
 
     my $result = @args ? pop(@args) : SYMBOL_NIL;
     while (@args) {
         my $list = pop(@args);
         my @values;
         while (!is_nil($list)) {
-            push @values, prim_car($list);
-            $list = prim_cdr($list);
+            push @values, $bel->car($list);
+            $list = $bel->cdr($list);
         }
         while (@values) {
             my $value = pop(@values);
@@ -1165,7 +1162,7 @@ sub fastfunc__i_plus {
 }
 
 sub fastfunc__i_minus {
-    my ($call, $x, $y) = @_;
+    my ($bel, $x, $y) = @_;
 
     while (!is_nil($x)) {
         if (is_nil($y)) {
@@ -1178,8 +1175,8 @@ sub fastfunc__i_minus {
             );
         }
 
-        $x = prim_cdr($x);
-        $y = prim_cdr($y);
+        $x = $bel->cdr($x);
+        $y = $bel->cdr($y);
     }
 
     return make_pair(
@@ -1192,14 +1189,14 @@ sub fastfunc__i_minus {
 }
 
 sub fastfunc__i_star {
-    my ($call, @args) = @_;
+    my ($bel, @args) = @_;
 
     my $product = 1;
     for my $arg (@args) {
         my $factor = 0;
         while (!is_nil($arg)) {
             $factor += 1;
-            $arg = prim_cdr($arg);
+            $arg = $bel->cdr($arg);
         }
         $product *= $factor;
     }
@@ -1212,7 +1209,7 @@ sub fastfunc__i_star {
 }
 
 sub fastfunc__i_slash {
-    my ($call, $x, $y, $q) = @_;
+    my ($bel, $x, $y, $q) = @_;
 
     if (!defined($q)) {
         $q = SYMBOL_NIL;
@@ -1221,13 +1218,13 @@ sub fastfunc__i_slash {
     my $xn = 0;
     while (!is_nil($x)) {
         $xn += 1;
-        $x = prim_cdr($x);
+        $x = $bel->cdr($x);
     }
 
     my $yn = 0;
     while (!is_nil($y)) {
         $yn += 1;
-        $y = prim_cdr($y);
+        $y = $bel->cdr($y);
     }
 
     my $n = int($xn / $yn);
@@ -1251,18 +1248,18 @@ sub fastfunc__i_slash {
 }
 
 sub fastfunc__i_hat {
-    my ($call, $x, $y) = @_;
+    my ($bel, $x, $y) = @_;
 
     my $xn = 0;
     while (!is_nil($x)) {
         $xn += 1;
-        $x = prim_cdr($x);
+        $x = $bel->cdr($x);
     }
 
     my $yn = 0;
     while (!is_nil($y)) {
         $yn += 1;
-        $y = prim_cdr($y);
+        $y = $bel->cdr($y);
     }
 
     my $n = $xn ** $yn;
@@ -1275,36 +1272,36 @@ sub fastfunc__i_hat {
 }
 
 sub fastfunc__r_plus {
-    my ($call, $x, $y) = @_;
+    my ($bel, $x, $y) = @_;
 
-    my $xn = prim_car($x);
-    my $xd = prim_car(prim_cdr($x));
+    my $xn = $bel->car($x);
+    my $xd = $bel->car($bel->cdr($x));
 
-    my $yn = prim_car($y);
-    my $yd = prim_car(prim_cdr($y));
+    my $yn = $bel->car($y);
+    my $yd = $bel->car($bel->cdr($y));
 
     my $xn_n = 0;
     while (!is_nil($xn)) {
         ++$xn_n;
-        $xn = prim_cdr($xn);
+        $xn = $bel->cdr($xn);
     }
 
     my $xd_n = 0;
     while (!is_nil($xd)) {
         ++$xd_n;
-        $xd = prim_cdr($xd);
+        $xd = $bel->cdr($xd);
     }
 
     my $yn_n = 0;
     while (!is_nil($yn)) {
         ++$yn_n;
-        $yn = prim_cdr($yn);
+        $yn = $bel->cdr($yn);
     }
 
     my $yd_n = 0;
     while (!is_nil($yd)) {
         ++$yd_n;
-        $yd = prim_cdr($yd);
+        $yd = $bel->cdr($yd);
     }
 
     my $n_n = $xn_n * $yd_n + $yn_n * $xd_n;
@@ -1336,36 +1333,36 @@ sub fastfunc__r_plus {
 }
 
 sub fastfunc__r_minus {
-    my ($call, $x, $y) = @_;
+    my ($bel, $x, $y) = @_;
 
-    my $xn = prim_car($x);
-    my $xd = prim_car(prim_cdr($x));
+    my $xn = $bel->car($x);
+    my $xd = $bel->car($bel->cdr($x));
 
-    my $yn = prim_car($y);
-    my $yd = prim_car(prim_cdr($y));
+    my $yn = $bel->car($y);
+    my $yd = $bel->car($bel->cdr($y));
 
     my $xn_n = 0;
     while (!is_nil($xn)) {
         ++$xn_n;
-        $xn = prim_cdr($xn);
+        $xn = $bel->cdr($xn);
     }
 
     my $xd_n = 0;
     while (!is_nil($xd)) {
         ++$xd_n;
-        $xd = prim_cdr($xd);
+        $xd = $bel->cdr($xd);
     }
 
     my $yn_n = 0;
     while (!is_nil($yn)) {
         ++$yn_n;
-        $yn = prim_cdr($yn);
+        $yn = $bel->cdr($yn);
     }
 
     my $yd_n = 0;
     while (!is_nil($yd)) {
         ++$yd_n;
-        $yd = prim_cdr($yd);
+        $yd = $bel->cdr($yd);
     }
 
     my $n_n = $xn_n * $yd_n - $yn_n * $xd_n;
@@ -1402,36 +1399,36 @@ sub fastfunc__r_minus {
 }
 
 sub fastfunc__r_star {
-    my ($call, $x, $y) = @_;
+    my ($bel, $x, $y) = @_;
 
-    my $xn = prim_car($x);
-    my $xd = prim_car(prim_cdr($x));
+    my $xn = $bel->car($x);
+    my $xd = $bel->car($bel->cdr($x));
 
-    my $yn = prim_car($y);
-    my $yd = prim_car(prim_cdr($y));
+    my $yn = $bel->car($y);
+    my $yd = $bel->car($bel->cdr($y));
 
     my $xn_n = 0;
     while (!is_nil($xn)) {
         ++$xn_n;
-        $xn = prim_cdr($xn);
+        $xn = $bel->cdr($xn);
     }
 
     my $xd_n = 0;
     while (!is_nil($xd)) {
         ++$xd_n;
-        $xd = prim_cdr($xd);
+        $xd = $bel->cdr($xd);
     }
 
     my $yn_n = 0;
     while (!is_nil($yn)) {
         ++$yn_n;
-        $yn = prim_cdr($yn);
+        $yn = $bel->cdr($yn);
     }
 
     my $yd_n = 0;
     while (!is_nil($yd)) {
         ++$yd_n;
-        $yd = prim_cdr($yd);
+        $yd = $bel->cdr($yd);
     }
 
     my $n_n = $xn_n * $yn_n;
@@ -1463,36 +1460,36 @@ sub fastfunc__r_star {
 }
 
 sub fastfunc__r_slash {
-    my ($call, $x, $y) = @_;
+    my ($bel, $x, $y) = @_;
 
-    my $xn = prim_car($x);
-    my $xd = prim_car(prim_cdr($x));
+    my $xn = $bel->car($x);
+    my $xd = $bel->car($bel->cdr($x));
 
-    my $yn = prim_car($y);
-    my $yd = prim_car(prim_cdr($y));
+    my $yn = $bel->car($y);
+    my $yd = $bel->car($bel->cdr($y));
 
     my $xn_n = 0;
     while (!is_nil($xn)) {
         ++$xn_n;
-        $xn = prim_cdr($xn);
+        $xn = $bel->cdr($xn);
     }
 
     my $xd_n = 0;
     while (!is_nil($xd)) {
         ++$xd_n;
-        $xd = prim_cdr($xd);
+        $xd = $bel->cdr($xd);
     }
 
     my $yn_n = 0;
     while (!is_nil($yn)) {
         ++$yn_n;
-        $yn = prim_cdr($yn);
+        $yn = $bel->cdr($yn);
     }
 
     my $yd_n = 0;
     while (!is_nil($yd)) {
         ++$yd_n;
-        $yd = prim_cdr($yd);
+        $yd = $bel->cdr($yd);
     }
 
     my $n_n = $xn_n * $yd_n;
@@ -1524,15 +1521,15 @@ sub fastfunc__r_slash {
 }
 
 sub fastfunc__sr_plus {
-    my ($call, $x, $y) = @_;
+    my ($bel, $x, $y) = @_;
 
-    my $xs = prim_car($x);
-    my $xn = prim_car(prim_cdr($x));
-    my $xd = prim_car(prim_cdr(prim_cdr($x)));
+    my $xs = $bel->car($x);
+    my $xn = $bel->car($bel->cdr($x));
+    my $xd = $bel->car($bel->cdr($bel->cdr($x)));
 
-    my $ys = prim_car($y);
-    my $yn = prim_car(prim_cdr($y));
-    my $yd = prim_car(prim_cdr(prim_cdr($y)));
+    my $ys = $bel->car($y);
+    my $yn = $bel->car($bel->cdr($y));
+    my $yd = $bel->car($bel->cdr($bel->cdr($y)));
 
     my $symbol;
     if (is_symbol_of_name($xs, "-")) {
@@ -1540,25 +1537,25 @@ sub fastfunc__sr_plus {
             my $xn_n = 0;
             while (!is_nil($xn)) {
                 ++$xn_n;
-                $xn = prim_cdr($xn);
+                $xn = $bel->cdr($xn);
             }
 
             my $xd_n = 0;
             while (!is_nil($xd)) {
                 ++$xd_n;
-                $xd = prim_cdr($xd);
+                $xd = $bel->cdr($xd);
             }
 
             my $yn_n = 0;
             while (!is_nil($yn)) {
                 ++$yn_n;
-                $yn = prim_cdr($yn);
+                $yn = $bel->cdr($yn);
             }
 
             my $yd_n = 0;
             while (!is_nil($yd)) {
                 ++$yd_n;
-                $yd = prim_cdr($yd);
+                $yd = $bel->cdr($yd);
             }
 
             my $n_n = $xn_n * $yd_n + $yn_n * $xd_n;
@@ -1595,25 +1592,25 @@ sub fastfunc__sr_plus {
             my $xn_n = 0;
             while (!is_nil($xn)) {
                 ++$xn_n;
-                $xn = prim_cdr($xn);
+                $xn = $bel->cdr($xn);
             }
 
             my $xd_n = 0;
             while (!is_nil($xd)) {
                 ++$xd_n;
-                $xd = prim_cdr($xd);
+                $xd = $bel->cdr($xd);
             }
 
             my $yn_n = 0;
             while (!is_nil($yn)) {
                 ++$yn_n;
-                $yn = prim_cdr($yn);
+                $yn = $bel->cdr($yn);
             }
 
             my $yd_n = 0;
             while (!is_nil($yd)) {
                 ++$yd_n;
-                $yd = prim_cdr($yd);
+                $yd = $bel->cdr($yd);
             }
 
             my $n_n = $yn_n * $xd_n - $xn_n * $yd_n;
@@ -1654,25 +1651,25 @@ sub fastfunc__sr_plus {
             my $xn_n = 0;
             while (!is_nil($xn)) {
                 ++$xn_n;
-                $xn = prim_cdr($xn);
+                $xn = $bel->cdr($xn);
             }
 
             my $xd_n = 0;
             while (!is_nil($xd)) {
                 ++$xd_n;
-                $xd = prim_cdr($xd);
+                $xd = $bel->cdr($xd);
             }
 
             my $yn_n = 0;
             while (!is_nil($yn)) {
                 ++$yn_n;
-                $yn = prim_cdr($yn);
+                $yn = $bel->cdr($yn);
             }
 
             my $yd_n = 0;
             while (!is_nil($yd)) {
                 ++$yd_n;
-                $yd = prim_cdr($yd);
+                $yd = $bel->cdr($yd);
             }
 
             my $n_n = $xn_n * $yd_n - $yn_n * $xd_n;
@@ -1711,25 +1708,25 @@ sub fastfunc__sr_plus {
             my $xn_n = 0;
             while (!is_nil($xn)) {
                 ++$xn_n;
-                $xn = prim_cdr($xn);
+                $xn = $bel->cdr($xn);
             }
 
             my $xd_n = 0;
             while (!is_nil($xd)) {
                 ++$xd_n;
-                $xd = prim_cdr($xd);
+                $xd = $bel->cdr($xd);
             }
 
             my $yn_n = 0;
             while (!is_nil($yn)) {
                 ++$yn_n;
-                $yn = prim_cdr($yn);
+                $yn = $bel->cdr($yn);
             }
 
             my $yd_n = 0;
             while (!is_nil($yd)) {
                 ++$yd_n;
-                $yd = prim_cdr($yd);
+                $yd = $bel->cdr($yd);
             }
 
             my $n_n = $xn_n * $yd_n + $yn_n * $xd_n;
@@ -1766,15 +1763,15 @@ sub fastfunc__sr_plus {
 }
 
 sub fastfunc__sr_minus {
-    my ($call, $x, $y) = @_;
+    my ($bel, $x, $y) = @_;
 
-    my $xs = prim_car($x);
-    my $xn = prim_car(prim_cdr($x));
-    my $xd = prim_car(prim_cdr(prim_cdr($x)));
+    my $xs = $bel->car($x);
+    my $xn = $bel->car($bel->cdr($x));
+    my $xd = $bel->car($bel->cdr($bel->cdr($x)));
 
-    my $ys = prim_car($y);
-    my $yn = prim_car(prim_cdr($y));
-    my $yd = prim_car(prim_cdr(prim_cdr($y)));
+    my $ys = $bel->car($y);
+    my $yn = $bel->car($bel->cdr($y));
+    my $yd = $bel->car($bel->cdr($bel->cdr($y)));
 
     my $symbol;
     if (is_symbol_of_name($xs, "-")) {
@@ -1782,25 +1779,25 @@ sub fastfunc__sr_minus {
             my $xn_n = 0;
             while (!is_nil($xn)) {
                 ++$xn_n;
-                $xn = prim_cdr($xn);
+                $xn = $bel->cdr($xn);
             }
 
             my $xd_n = 0;
             while (!is_nil($xd)) {
                 ++$xd_n;
-                $xd = prim_cdr($xd);
+                $xd = $bel->cdr($xd);
             }
 
             my $yn_n = 0;
             while (!is_nil($yn)) {
                 ++$yn_n;
-                $yn = prim_cdr($yn);
+                $yn = $bel->cdr($yn);
             }
 
             my $yd_n = 0;
             while (!is_nil($yd)) {
                 ++$yd_n;
-                $yd = prim_cdr($yd);
+                $yd = $bel->cdr($yd);
             }
 
             my $n_n = $yn_n * $xd_n - $xn_n * $yd_n;
@@ -1839,25 +1836,25 @@ sub fastfunc__sr_minus {
             my $xn_n = 0;
             while (!is_nil($xn)) {
                 ++$xn_n;
-                $xn = prim_cdr($xn);
+                $xn = $bel->cdr($xn);
             }
 
             my $xd_n = 0;
             while (!is_nil($xd)) {
                 ++$xd_n;
-                $xd = prim_cdr($xd);
+                $xd = $bel->cdr($xd);
             }
 
             my $yn_n = 0;
             while (!is_nil($yn)) {
                 ++$yn_n;
-                $yn = prim_cdr($yn);
+                $yn = $bel->cdr($yn);
             }
 
             my $yd_n = 0;
             while (!is_nil($yd)) {
                 ++$yd_n;
-                $yd = prim_cdr($yd);
+                $yd = $bel->cdr($yd);
             }
 
             my $n_n = $xn_n * $yd_n + $yn_n * $xd_n;
@@ -1896,25 +1893,25 @@ sub fastfunc__sr_minus {
             my $xn_n = 0;
             while (!is_nil($xn)) {
                 ++$xn_n;
-                $xn = prim_cdr($xn);
+                $xn = $bel->cdr($xn);
             }
 
             my $xd_n = 0;
             while (!is_nil($xd)) {
                 ++$xd_n;
-                $xd = prim_cdr($xd);
+                $xd = $bel->cdr($xd);
             }
 
             my $yn_n = 0;
             while (!is_nil($yn)) {
                 ++$yn_n;
-                $yn = prim_cdr($yn);
+                $yn = $bel->cdr($yn);
             }
 
             my $yd_n = 0;
             while (!is_nil($yd)) {
                 ++$yd_n;
-                $yd = prim_cdr($yd);
+                $yd = $bel->cdr($yd);
             }
 
             my $n_n = $xn_n * $yd_n + $yn_n * $xd_n;
@@ -1951,25 +1948,25 @@ sub fastfunc__sr_minus {
             my $xn_n = 0;
             while (!is_nil($xn)) {
                 ++$xn_n;
-                $xn = prim_cdr($xn);
+                $xn = $bel->cdr($xn);
             }
 
             my $xd_n = 0;
             while (!is_nil($xd)) {
                 ++$xd_n;
-                $xd = prim_cdr($xd);
+                $xd = $bel->cdr($xd);
             }
 
             my $yn_n = 0;
             while (!is_nil($yn)) {
                 ++$yn_n;
-                $yn = prim_cdr($yn);
+                $yn = $bel->cdr($yn);
             }
 
             my $yd_n = 0;
             while (!is_nil($yd)) {
                 ++$yd_n;
-                $yd = prim_cdr($yd);
+                $yd = $bel->cdr($yd);
             }
 
             my $n_n = $xn_n * $yd_n - $yn_n * $xd_n;
@@ -2008,11 +2005,11 @@ sub fastfunc__sr_minus {
 }
 
 sub fastfunc__srinv {
-    my ($call, $sr) = @_;
+    my ($bel, $sr) = @_;
 
-    my $s = prim_car($sr);
-    my $n = prim_car(prim_cdr($sr));
-    my $d = prim_car(prim_cdr(prim_cdr($sr)));
+    my $s = $bel->car($sr);
+    my $n = $bel->car($bel->cdr($sr));
+    my $d = $bel->car($bel->cdr($bel->cdr($sr)));
 
     my $sign = is_symbol_of_name($s, "+") && !is_nil($n)
         ? "-"
@@ -2031,15 +2028,15 @@ sub fastfunc__srinv {
 }
 
 sub fastfunc__sr_star {
-    my ($call, $x, $y) = @_;
+    my ($bel, $x, $y) = @_;
 
-    my $xs = prim_car($x);
-    my $xn = prim_car(prim_cdr($x));
-    my $xd = prim_car(prim_cdr(prim_cdr($x)));
+    my $xs = $bel->car($x);
+    my $xn = $bel->car($bel->cdr($x));
+    my $xd = $bel->car($bel->cdr($bel->cdr($x)));
 
-    my $ys = prim_car($y);
-    my $yn = prim_car(prim_cdr($y));
-    my $yd = prim_car(prim_cdr(prim_cdr($y)));
+    my $ys = $bel->car($y);
+    my $yn = $bel->car($bel->cdr($y));
+    my $yd = $bel->car($bel->cdr($bel->cdr($y)));
 
     my $sign = is_symbol_of_name($xs, "-")
         ? make_symbol(is_symbol_of_name($ys, "-") ? "+" : "-")
@@ -2048,25 +2045,25 @@ sub fastfunc__sr_star {
     my $xn_n = 0;
     while (!is_nil($xn)) {
         ++$xn_n;
-        $xn = prim_cdr($xn);
+        $xn = $bel->cdr($xn);
     }
 
     my $xd_n = 0;
     while (!is_nil($xd)) {
         ++$xd_n;
-        $xd = prim_cdr($xd);
+        $xd = $bel->cdr($xd);
     }
 
     my $yn_n = 0;
     while (!is_nil($yn)) {
         ++$yn_n;
-        $yn = prim_cdr($yn);
+        $yn = $bel->cdr($yn);
     }
 
     my $yd_n = 0;
     while (!is_nil($yd)) {
         ++$yd_n;
-        $yd = prim_cdr($yd);
+        $yd = $bel->cdr($yd);
     }
 
     my $n_n = $xn_n * $yn_n;
@@ -2101,15 +2098,15 @@ sub fastfunc__sr_star {
 }
 
 sub fastfunc__sr_slash {
-    my ($call, $x, $y) = @_;
+    my ($bel, $x, $y) = @_;
 
-    my $xs = prim_car($x);
-    my $xn = prim_car(prim_cdr($x));
-    my $xd = prim_car(prim_cdr(prim_cdr($x)));
+    my $xs = $bel->car($x);
+    my $xn = $bel->car($bel->cdr($x));
+    my $xd = $bel->car($bel->cdr($bel->cdr($x)));
 
-    my $ys = prim_car($y);
-    my $yn = prim_car(prim_cdr($y));
-    my $yd = prim_car(prim_cdr(prim_cdr($y)));
+    my $ys = $bel->car($y);
+    my $yn = $bel->car($bel->cdr($y));
+    my $yd = $bel->car($bel->cdr($bel->cdr($y)));
 
     die "'mistype\n"
         if is_nil($yn);
@@ -2121,25 +2118,25 @@ sub fastfunc__sr_slash {
     my $xn_n = 0;
     while (!is_nil($xn)) {
         ++$xn_n;
-        $xn = prim_cdr($xn);
+        $xn = $bel->cdr($xn);
     }
 
     my $xd_n = 0;
     while (!is_nil($xd)) {
         ++$xd_n;
-        $xd = prim_cdr($xd);
+        $xd = $bel->cdr($xd);
     }
 
     my $yn_n = 0;
     while (!is_nil($yn)) {
         ++$yn_n;
-        $yn = prim_cdr($yn);
+        $yn = $bel->cdr($yn);
     }
 
     my $yd_n = 0;
     while (!is_nil($yd)) {
         ++$yd_n;
-        $yd = prim_cdr($yd);
+        $yd = $bel->cdr($yd);
     }
 
     my $n_n = $xn_n * $yd_n;
@@ -2174,13 +2171,13 @@ sub fastfunc__sr_slash {
 }
 
 sub fastfunc__srrecip {
-    my ($call, $sr) = @_;
+    my ($bel, $sr) = @_;
 
-    my $s = prim_car($sr);
-    my $n = prim_car(prim_cdr($sr));
+    my $s = $bel->car($sr);
+    my $n = $bel->car($bel->cdr($sr));
     die "'mistype\n"
         if is_nil($n);
-    my $d = prim_car(prim_cdr(prim_cdr($sr)));
+    my $d = $bel->car($bel->cdr($bel->cdr($sr)));
 
     return make_pair(
         $s,
@@ -2195,40 +2192,40 @@ sub fastfunc__srrecip {
 }
 
 sub fastfunc__sr_lt {
-    my ($call, $x, $y) = @_;
+    my ($bel, $x, $y) = @_;
 
-    my $xs = prim_car($x);
-    my $xn = prim_car(prim_cdr($x));
-    my $xd = prim_car(prim_cdr(prim_cdr($x)));
+    my $xs = $bel->car($x);
+    my $xn = $bel->car($bel->cdr($x));
+    my $xd = $bel->car($bel->cdr($bel->cdr($x)));
 
-    my $ys = prim_car($y);
-    my $yn = prim_car(prim_cdr($y));
-    my $yd = prim_car(prim_cdr(prim_cdr($y)));
+    my $ys = $bel->car($y);
+    my $yn = $bel->car($bel->cdr($y));
+    my $yd = $bel->car($bel->cdr($bel->cdr($y)));
 
     if (is_symbol_of_name($xs, "+")) {
         if (is_symbol_of_name($ys, "+")) {
             my $xn_n = 0;
             while (!is_nil($xn)) {
                 ++$xn_n;
-                $xn = prim_cdr($xn);
+                $xn = $bel->cdr($xn);
             }
 
             my $xd_n = 0;
             while (!is_nil($xd)) {
                 ++$xd_n;
-                $xd = prim_cdr($xd);
+                $xd = $bel->cdr($xd);
             }
 
             my $yn_n = 0;
             while (!is_nil($yn)) {
                 ++$yn_n;
-                $yn = prim_cdr($yn);
+                $yn = $bel->cdr($yn);
             }
 
             my $yd_n = 0;
             while (!is_nil($yd)) {
                 ++$yd_n;
-                $yd = prim_cdr($yd);
+                $yd = $bel->cdr($yd);
             }
 
             my $p1_n = $xn_n * $yd_n;
@@ -2255,25 +2252,25 @@ sub fastfunc__sr_lt {
             my $xn_n = 0;
             while (!is_nil($xn)) {
                 ++$xn_n;
-                $xn = prim_cdr($xn);
+                $xn = $bel->cdr($xn);
             }
 
             my $xd_n = 0;
             while (!is_nil($xd)) {
                 ++$xd_n;
-                $xd = prim_cdr($xd);
+                $xd = $bel->cdr($xd);
             }
 
             my $yn_n = 0;
             while (!is_nil($yn)) {
                 ++$yn_n;
-                $yn = prim_cdr($yn);
+                $yn = $bel->cdr($yn);
             }
 
             my $yd_n = 0;
             while (!is_nil($yd)) {
                 ++$yd_n;
-                $yd = prim_cdr($yd);
+                $yd = $bel->cdr($yd);
             }
 
             my $p1_n = $yn_n * $xd_n;
@@ -2290,16 +2287,16 @@ sub fastfunc__sr_lt {
 }
 
 sub fastfunc__srnum {
-    my ($call, $x) = @_;
+    my ($bel, $x) = @_;
 
-    return prim_car(prim_cdr($x));
+    return $bel->car($bel->cdr($x));
 }
 
 sub fastfunc__where__srnum {
-    my ($call, $x) = @_;
+    my ($bel, $x) = @_;
 
     return make_pair(
-        prim_cdr($x),
+        $bel->cdr($x),
         make_pair(
             SYMBOL_A,
             SYMBOL_NIL,
@@ -2308,16 +2305,16 @@ sub fastfunc__where__srnum {
 }
 
 sub fastfunc__srden {
-    my ($call, $x) = @_;
+    my ($bel, $x) = @_;
 
-    return prim_car(prim_cdr(prim_cdr($x)));
+    return $bel->car($bel->cdr($bel->cdr($x)));
 }
 
 sub fastfunc__where__srden {
-    my ($call, $x) = @_;
+    my ($bel, $x) = @_;
 
     return make_pair(
-        prim_cdr(prim_cdr($x)),
+        $bel->cdr($bel->cdr($x)),
         make_pair(
             SYMBOL_A,
             SYMBOL_NIL,
@@ -2326,23 +2323,23 @@ sub fastfunc__where__srden {
 }
 
 sub fastfunc__c_plus {
-    my ($call, $x, $y) = @_;
+    my ($bel, $x, $y) = @_;
 
-    my $xr = prim_car($x);
-    my $xi = prim_car(prim_cdr($x));
+    my $xr = $bel->car($x);
+    my $xi = $bel->car($bel->cdr($x));
 
-    my $yr = prim_car($y);
-    my $yi = prim_car(prim_cdr($y));
+    my $yr = $bel->car($y);
+    my $yi = $bel->car($bel->cdr($y));
 
     my $real_part;
     {
-        my $xs = prim_car($xr);
-        my $xn = prim_car(prim_cdr($xr));
-        my $xd = prim_car(prim_cdr(prim_cdr($xr)));
+        my $xs = $bel->car($xr);
+        my $xn = $bel->car($bel->cdr($xr));
+        my $xd = $bel->car($bel->cdr($bel->cdr($xr)));
 
-        my $ys = prim_car($yr);
-        my $yn = prim_car(prim_cdr($yr));
-        my $yd = prim_car(prim_cdr(prim_cdr($yr)));
+        my $ys = $bel->car($yr);
+        my $yn = $bel->car($bel->cdr($yr));
+        my $yd = $bel->car($bel->cdr($bel->cdr($yr)));
 
         my $symbol;
         if (is_symbol_of_name($xs, "-")) {
@@ -2350,25 +2347,25 @@ sub fastfunc__c_plus {
                 my $xn_n = 0;
                 while (!is_nil($xn)) {
                     ++$xn_n;
-                    $xn = prim_cdr($xn);
+                    $xn = $bel->cdr($xn);
                 }
 
                 my $xd_n = 0;
                 while (!is_nil($xd)) {
                     ++$xd_n;
-                    $xd = prim_cdr($xd);
+                    $xd = $bel->cdr($xd);
                 }
 
                 my $yn_n = 0;
                 while (!is_nil($yn)) {
                     ++$yn_n;
-                    $yn = prim_cdr($yn);
+                    $yn = $bel->cdr($yn);
                 }
 
                 my $yd_n = 0;
                 while (!is_nil($yd)) {
                     ++$yd_n;
-                    $yd = prim_cdr($yd);
+                    $yd = $bel->cdr($yd);
                 }
 
                 my $n_n = $xn_n * $yd_n + $yn_n * $xd_n;
@@ -2405,25 +2402,25 @@ sub fastfunc__c_plus {
                 my $xn_n = 0;
                 while (!is_nil($xn)) {
                     ++$xn_n;
-                    $xn = prim_cdr($xn);
+                    $xn = $bel->cdr($xn);
                 }
 
                 my $xd_n = 0;
                 while (!is_nil($xd)) {
                     ++$xd_n;
-                    $xd = prim_cdr($xd);
+                    $xd = $bel->cdr($xd);
                 }
 
                 my $yn_n = 0;
                 while (!is_nil($yn)) {
                     ++$yn_n;
-                    $yn = prim_cdr($yn);
+                    $yn = $bel->cdr($yn);
                 }
 
                 my $yd_n = 0;
                 while (!is_nil($yd)) {
                     ++$yd_n;
-                    $yd = prim_cdr($yd);
+                    $yd = $bel->cdr($yd);
                 }
 
                 my $n_n = $yn_n * $xd_n - $xn_n * $yd_n;
@@ -2464,25 +2461,25 @@ sub fastfunc__c_plus {
                 my $xn_n = 0;
                 while (!is_nil($xn)) {
                     ++$xn_n;
-                    $xn = prim_cdr($xn);
+                    $xn = $bel->cdr($xn);
                 }
 
                 my $xd_n = 0;
                 while (!is_nil($xd)) {
                     ++$xd_n;
-                    $xd = prim_cdr($xd);
+                    $xd = $bel->cdr($xd);
                 }
 
                 my $yn_n = 0;
                 while (!is_nil($yn)) {
                     ++$yn_n;
-                    $yn = prim_cdr($yn);
+                    $yn = $bel->cdr($yn);
                 }
 
                 my $yd_n = 0;
                 while (!is_nil($yd)) {
                     ++$yd_n;
-                    $yd = prim_cdr($yd);
+                    $yd = $bel->cdr($yd);
                 }
 
                 my $n_n = $xn_n * $yd_n - $yn_n * $xd_n;
@@ -2521,25 +2518,25 @@ sub fastfunc__c_plus {
                 my $xn_n = 0;
                 while (!is_nil($xn)) {
                     ++$xn_n;
-                    $xn = prim_cdr($xn);
+                    $xn = $bel->cdr($xn);
                 }
 
                 my $xd_n = 0;
                 while (!is_nil($xd)) {
                     ++$xd_n;
-                    $xd = prim_cdr($xd);
+                    $xd = $bel->cdr($xd);
                 }
 
                 my $yn_n = 0;
                 while (!is_nil($yn)) {
                     ++$yn_n;
-                    $yn = prim_cdr($yn);
+                    $yn = $bel->cdr($yn);
                 }
 
                 my $yd_n = 0;
                 while (!is_nil($yd)) {
                     ++$yd_n;
-                    $yd = prim_cdr($yd);
+                    $yd = $bel->cdr($yd);
                 }
 
                 my $n_n = $xn_n * $yd_n + $yn_n * $xd_n;
@@ -2577,13 +2574,13 @@ sub fastfunc__c_plus {
 
     my $imaginary_part;
     {
-        my $xs = prim_car($xi);
-        my $xn = prim_car(prim_cdr($xi));
-        my $xd = prim_car(prim_cdr(prim_cdr($xi)));
+        my $xs = $bel->car($xi);
+        my $xn = $bel->car($bel->cdr($xi));
+        my $xd = $bel->car($bel->cdr($bel->cdr($xi)));
 
-        my $ys = prim_car($yi);
-        my $yn = prim_car(prim_cdr($yi));
-        my $yd = prim_car(prim_cdr(prim_cdr($yi)));
+        my $ys = $bel->car($yi);
+        my $yn = $bel->car($bel->cdr($yi));
+        my $yd = $bel->car($bel->cdr($bel->cdr($yi)));
 
         my $symbol;
         if (is_symbol_of_name($xs, "-")) {
@@ -2591,25 +2588,25 @@ sub fastfunc__c_plus {
                 my $xn_n = 0;
                 while (!is_nil($xn)) {
                     ++$xn_n;
-                    $xn = prim_cdr($xn);
+                    $xn = $bel->cdr($xn);
                 }
 
                 my $xd_n = 0;
                 while (!is_nil($xd)) {
                     ++$xd_n;
-                    $xd = prim_cdr($xd);
+                    $xd = $bel->cdr($xd);
                 }
 
                 my $yn_n = 0;
                 while (!is_nil($yn)) {
                     ++$yn_n;
-                    $yn = prim_cdr($yn);
+                    $yn = $bel->cdr($yn);
                 }
 
                 my $yd_n = 0;
                 while (!is_nil($yd)) {
                     ++$yd_n;
-                    $yd = prim_cdr($yd);
+                    $yd = $bel->cdr($yd);
                 }
 
                 my $n_n = $xn_n * $yd_n + $yn_n * $xd_n;
@@ -2646,25 +2643,25 @@ sub fastfunc__c_plus {
                 my $xn_n = 0;
                 while (!is_nil($xn)) {
                     ++$xn_n;
-                    $xn = prim_cdr($xn);
+                    $xn = $bel->cdr($xn);
                 }
 
                 my $xd_n = 0;
                 while (!is_nil($xd)) {
                     ++$xd_n;
-                    $xd = prim_cdr($xd);
+                    $xd = $bel->cdr($xd);
                 }
 
                 my $yn_n = 0;
                 while (!is_nil($yn)) {
                     ++$yn_n;
-                    $yn = prim_cdr($yn);
+                    $yn = $bel->cdr($yn);
                 }
 
                 my $yd_n = 0;
                 while (!is_nil($yd)) {
                     ++$yd_n;
-                    $yd = prim_cdr($yd);
+                    $yd = $bel->cdr($yd);
                 }
 
                 my $n_n = $yn_n * $xd_n - $xn_n * $yd_n;
@@ -2705,25 +2702,25 @@ sub fastfunc__c_plus {
                 my $xn_n = 0;
                 while (!is_nil($xn)) {
                     ++$xn_n;
-                    $xn = prim_cdr($xn);
+                    $xn = $bel->cdr($xn);
                 }
 
                 my $xd_n = 0;
                 while (!is_nil($xd)) {
                     ++$xd_n;
-                    $xd = prim_cdr($xd);
+                    $xd = $bel->cdr($xd);
                 }
 
                 my $yn_n = 0;
                 while (!is_nil($yn)) {
                     ++$yn_n;
-                    $yn = prim_cdr($yn);
+                    $yn = $bel->cdr($yn);
                 }
 
                 my $yd_n = 0;
                 while (!is_nil($yd)) {
                     ++$yd_n;
-                    $yd = prim_cdr($yd);
+                    $yd = $bel->cdr($yd);
                 }
 
                 my $n_n = $xn_n * $yd_n - $yn_n * $xd_n;
@@ -2762,25 +2759,25 @@ sub fastfunc__c_plus {
                 my $xn_n = 0;
                 while (!is_nil($xn)) {
                     ++$xn_n;
-                    $xn = prim_cdr($xn);
+                    $xn = $bel->cdr($xn);
                 }
 
                 my $xd_n = 0;
                 while (!is_nil($xd)) {
                     ++$xd_n;
-                    $xd = prim_cdr($xd);
+                    $xd = $bel->cdr($xd);
                 }
 
                 my $yn_n = 0;
                 while (!is_nil($yn)) {
                     ++$yn_n;
-                    $yn = prim_cdr($yn);
+                    $yn = $bel->cdr($yn);
                 }
 
                 my $yd_n = 0;
                 while (!is_nil($yd)) {
                     ++$yd_n;
-                    $yd = prim_cdr($yd);
+                    $yd = $bel->cdr($yd);
                 }
 
                 my $n_n = $xn_n * $yd_n + $yn_n * $xd_n;
@@ -2826,13 +2823,13 @@ sub fastfunc__c_plus {
 }
 
 sub fastfunc__c_star {
-    my ($call, $x, $y) = @_;
+    my ($bel, $x, $y) = @_;
     
-    my $xr = prim_car($x);
-    my $xi = prim_car(prim_cdr($x));
+    my $xr = $bel->car($x);
+    my $xi = $bel->car($bel->cdr($x));
     
-    my $yr = prim_car($y);
-    my $yi = prim_car(prim_cdr($y));
+    my $yr = $bel->car($y);
+    my $yi = $bel->car($bel->cdr($y));
     
     my $real_part;
     {
@@ -2841,13 +2838,13 @@ sub fastfunc__c_star {
         my $term1d_n;
         
         {
-            my $xs = prim_car($xr);
-            my $xn = prim_car(prim_cdr($xr));
-            my $xd = prim_car(prim_cdr(prim_cdr($xr)));
+            my $xs = $bel->car($xr);
+            my $xn = $bel->car($bel->cdr($xr));
+            my $xd = $bel->car($bel->cdr($bel->cdr($xr)));
         
-            my $ys = prim_car($yr);
-            my $yn = prim_car(prim_cdr($yr));
-            my $yd = prim_car(prim_cdr(prim_cdr($yr)));
+            my $ys = $bel->car($yr);
+            my $yn = $bel->car($bel->cdr($yr));
+            my $yd = $bel->car($bel->cdr($bel->cdr($yr)));
         
             $term1s = is_symbol_of_name($xs, "-")
                 ? make_symbol(is_symbol_of_name($ys, "-") ? "+" : "-")
@@ -2856,25 +2853,25 @@ sub fastfunc__c_star {
             my $xn_n = 0;
             while (!is_nil($xn)) {
                 ++$xn_n;
-                $xn = prim_cdr($xn);
+                $xn = $bel->cdr($xn);
             }
         
             my $xd_n = 0;
             while (!is_nil($xd)) {
                 ++$xd_n;
-                $xd = prim_cdr($xd);
+                $xd = $bel->cdr($xd);
             }
         
             my $yn_n = 0;
             while (!is_nil($yn)) {
                 ++$yn_n;
-                $yn = prim_cdr($yn);
+                $yn = $bel->cdr($yn);
             }
         
             my $yd_n = 0;
             while (!is_nil($yd)) {
                 ++$yd_n;
-                $yd = prim_cdr($yd);
+                $yd = $bel->cdr($yd);
             }
         
             $term1n_n = $xn_n * $yn_n;
@@ -2886,13 +2883,13 @@ sub fastfunc__c_star {
         my $term2d_n;
         
         {
-            my $xs = prim_car($xi);
-            my $xn = prim_car(prim_cdr($xi));
-            my $xd = prim_car(prim_cdr(prim_cdr($xi)));
+            my $xs = $bel->car($xi);
+            my $xn = $bel->car($bel->cdr($xi));
+            my $xd = $bel->car($bel->cdr($bel->cdr($xi)));
         
-            my $ys = prim_car($yi);
-            my $yn = prim_car(prim_cdr($yi));
-            my $yd = prim_car(prim_cdr(prim_cdr($yi)));
+            my $ys = $bel->car($yi);
+            my $yn = $bel->car($bel->cdr($yi));
+            my $yd = $bel->car($bel->cdr($bel->cdr($yi)));
         
             $term2s = is_symbol_of_name($xs, "-")
                 ? make_symbol(is_symbol_of_name($ys, "-") ? "+" : "-")
@@ -2901,25 +2898,25 @@ sub fastfunc__c_star {
             my $xn_n = 0;
             while (!is_nil($xn)) {
                 ++$xn_n;
-                $xn = prim_cdr($xn);
+                $xn = $bel->cdr($xn);
             }
         
             my $xd_n = 0;
             while (!is_nil($xd)) {
                 ++$xd_n;
-                $xd = prim_cdr($xd);
+                $xd = $bel->cdr($xd);
             }
         
             my $yn_n = 0;
             while (!is_nil($yn)) {
                 ++$yn_n;
-                $yn = prim_cdr($yn);
+                $yn = $bel->cdr($yn);
             }
         
             my $yd_n = 0;
             while (!is_nil($yd)) {
                 ++$yd_n;
-                $yd = prim_cdr($yd);
+                $yd = $bel->cdr($yd);
             }
         
             $term2n_n = $xn_n * $yn_n;
@@ -3067,13 +3064,13 @@ sub fastfunc__c_star {
         my $term1d_n;
         
         {
-            my $xs = prim_car($xi);
-            my $xn = prim_car(prim_cdr($xi));
-            my $xd = prim_car(prim_cdr(prim_cdr($xi)));
+            my $xs = $bel->car($xi);
+            my $xn = $bel->car($bel->cdr($xi));
+            my $xd = $bel->car($bel->cdr($bel->cdr($xi)));
         
-            my $ys = prim_car($yr);
-            my $yn = prim_car(prim_cdr($yr));
-            my $yd = prim_car(prim_cdr(prim_cdr($yr)));
+            my $ys = $bel->car($yr);
+            my $yn = $bel->car($bel->cdr($yr));
+            my $yd = $bel->car($bel->cdr($bel->cdr($yr)));
         
             $term1s = is_symbol_of_name($xs, "-")
                 ? make_symbol(is_symbol_of_name($ys, "-") ? "+" : "-")
@@ -3082,25 +3079,25 @@ sub fastfunc__c_star {
             my $xn_n = 0;
             while (!is_nil($xn)) {
                 ++$xn_n;
-                $xn = prim_cdr($xn);
+                $xn = $bel->cdr($xn);
             }
         
             my $xd_n = 0;
             while (!is_nil($xd)) {
                 ++$xd_n;
-                $xd = prim_cdr($xd);
+                $xd = $bel->cdr($xd);
             }
         
             my $yn_n = 0;
             while (!is_nil($yn)) {
                 ++$yn_n;
-                $yn = prim_cdr($yn);
+                $yn = $bel->cdr($yn);
             }
         
             my $yd_n = 0;
             while (!is_nil($yd)) {
                 ++$yd_n;
-                $yd = prim_cdr($yd);
+                $yd = $bel->cdr($yd);
             }
         
             $term1n_n = $xn_n * $yn_n;
@@ -3112,13 +3109,13 @@ sub fastfunc__c_star {
         my $term2d_n;
         
         {
-            my $xs = prim_car($xr);
-            my $xn = prim_car(prim_cdr($xr));
-            my $xd = prim_car(prim_cdr(prim_cdr($xr)));
+            my $xs = $bel->car($xr);
+            my $xn = $bel->car($bel->cdr($xr));
+            my $xd = $bel->car($bel->cdr($bel->cdr($xr)));
         
-            my $ys = prim_car($yi);
-            my $yn = prim_car(prim_cdr($yi));
-            my $yd = prim_car(prim_cdr(prim_cdr($yi)));
+            my $ys = $bel->car($yi);
+            my $yn = $bel->car($bel->cdr($yi));
+            my $yd = $bel->car($bel->cdr($bel->cdr($yi)));
         
             $term2s = is_symbol_of_name($xs, "-")
                 ? make_symbol(is_symbol_of_name($ys, "-") ? "+" : "-")
@@ -3127,25 +3124,25 @@ sub fastfunc__c_star {
             my $xn_n = 0;
             while (!is_nil($xn)) {
                 ++$xn_n;
-                $xn = prim_cdr($xn);
+                $xn = $bel->cdr($xn);
             }
         
             my $xd_n = 0;
             while (!is_nil($xd)) {
                 ++$xd_n;
-                $xd = prim_cdr($xd);
+                $xd = $bel->cdr($xd);
             }
         
             my $yn_n = 0;
             while (!is_nil($yn)) {
                 ++$yn_n;
-                $yn = prim_cdr($yn);
+                $yn = $bel->cdr($yn);
             }
         
             my $yd_n = 0;
             while (!is_nil($yd)) {
                 ++$yd_n;
-                $yd = prim_cdr($yd);
+                $yd = $bel->cdr($yd);
             }
         
             $term2n_n = $xn_n * $yn_n;
@@ -3296,7 +3293,7 @@ sub fastfunc__c_star {
 }
 
 sub fastfunc__litnum {
-    my ($call, $r, $i) = @_;
+    my ($bel, $r, $i) = @_;
 
     if (!defined($i)) {
         $i = make_pair(
@@ -3330,117 +3327,117 @@ sub fastfunc__litnum {
 }
 
 sub fastfunc__number {
-    my ($call, $x) = @_;
+    my ($bel, $x) = @_;
 
     if (!is_pair($x)) {
         return SYMBOL_NIL;
     }
 
-    if (!is_symbol_of_name(prim_car($x), "lit")) {
+    if (!is_symbol_of_name($bel->car($x), "lit")) {
         return SYMBOL_NIL;
     }
 
-    $x = prim_cdr($x);
+    $x = $bel->cdr($x);
     if (!is_pair($x)) {
         return SYMBOL_NIL;
     }
 
-    if (!is_symbol_of_name(prim_car($x), "num")) {
+    if (!is_symbol_of_name($bel->car($x), "num")) {
         return SYMBOL_NIL;
     }
 
-    $x = prim_cdr($x);
-    if (!is_pair($x)) {
-        return SYMBOL_NIL;
-    }
-
-    {
-        my $y = prim_car($x);
-        if (!is_pair($y)) {
-            return SYMBOL_NIL;
-        }
-
-
-        my $sign = prim_car($y);
-        if (!(is_symbol_of_name($sign, "+") || is_symbol_of_name($sign, "-"))) {
-            return SYMBOL_NIL;
-        }
-
-        $y = prim_cdr($y);
-        if (!is_pair($y)) {
-            return SYMBOL_NIL;
-        }
-
-        {
-            my $z = prim_car($y);
-            while (!is_nil($z)) {
-                if (!is_pair($z)) {
-                    return SYMBOL_NIL;
-                }
-                $z = prim_cdr($z);
-            }
-        }
-
-        $y = prim_cdr($y);
-        if (!is_pair($y)) {
-            return SYMBOL_NIL;
-        }
-
-        {
-            my $z = prim_car($y);
-            while (!is_nil($z)) {
-                if (!is_pair($z)) {
-                    return SYMBOL_NIL;
-                }
-                $z = prim_cdr($z);
-            }
-        }
-    }
-
-    $x = prim_cdr($x);
+    $x = $bel->cdr($x);
     if (!is_pair($x)) {
         return SYMBOL_NIL;
     }
 
     {
-        my $y = prim_car($x);
+        my $y = $bel->car($x);
         if (!is_pair($y)) {
             return SYMBOL_NIL;
         }
 
 
-        my $sign = prim_car($y);
+        my $sign = $bel->car($y);
         if (!(is_symbol_of_name($sign, "+") || is_symbol_of_name($sign, "-"))) {
             return SYMBOL_NIL;
         }
 
-        $y = prim_cdr($y);
+        $y = $bel->cdr($y);
         if (!is_pair($y)) {
             return SYMBOL_NIL;
         }
 
         {
-            my $z = prim_car($y);
+            my $z = $bel->car($y);
             while (!is_nil($z)) {
                 if (!is_pair($z)) {
                     return SYMBOL_NIL;
                 }
-                $z = prim_cdr($z);
+                $z = $bel->cdr($z);
             }
         }
 
-        $y = prim_cdr($y);
+        $y = $bel->cdr($y);
         if (!is_pair($y)) {
             return SYMBOL_NIL;
         }
 
         {
-            my $z = prim_car($y);
+            my $z = $bel->car($y);
             while (!is_nil($z)) {
                 if (!is_pair($z)) {
                     return SYMBOL_NIL;
                 }
-                $z = prim_cdr($z);
+                $z = $bel->cdr($z);
+            }
+        }
+    }
+
+    $x = $bel->cdr($x);
+    if (!is_pair($x)) {
+        return SYMBOL_NIL;
+    }
+
+    {
+        my $y = $bel->car($x);
+        if (!is_pair($y)) {
+            return SYMBOL_NIL;
+        }
+
+
+        my $sign = $bel->car($y);
+        if (!(is_symbol_of_name($sign, "+") || is_symbol_of_name($sign, "-"))) {
+            return SYMBOL_NIL;
+        }
+
+        $y = $bel->cdr($y);
+        if (!is_pair($y)) {
+            return SYMBOL_NIL;
+        }
+
+        {
+            my $z = $bel->car($y);
+            while (!is_nil($z)) {
+                if (!is_pair($z)) {
+                    return SYMBOL_NIL;
+                }
+                $z = $bel->cdr($z);
+            }
+        }
+
+        $y = $bel->cdr($y);
+        if (!is_pair($y)) {
+            return SYMBOL_NIL;
+        }
+
+        {
+            my $z = $bel->car($y);
+            while (!is_nil($z)) {
+                if (!is_pair($z)) {
+                    return SYMBOL_NIL;
+                }
+                $z = $bel->cdr($z);
             }
         }
     }
@@ -3449,21 +3446,21 @@ sub fastfunc__number {
 }
 
 sub fastfunc__numr {
-    my ($call, $x) = @_;
+    my ($bel, $x) = @_;
 
-    return prim_car(prim_cdr(prim_cdr($x)));
+    return $bel->car($bel->cdr($bel->cdr($x)));
 }
 
 sub fastfunc__numi {
-    my ($call, $x) = @_;
+    my ($bel, $x) = @_;
 
-    return prim_car(prim_cdr(prim_cdr(prim_cdr($x))));
+    return $bel->car($bel->cdr($bel->cdr($bel->cdr($x))));
 }
 
 sub fastfunc__rpart {
-    my ($call, $n) = @_;
+    my ($bel, $n) = @_;
 
-    my $numr = prim_car(prim_cdr(prim_cdr($n)));
+    my $numr = $bel->car($bel->cdr($bel->cdr($n)));
 
     my $i = make_pair(
         make_symbol("+"),
@@ -3495,9 +3492,9 @@ sub fastfunc__rpart {
 }
 
 sub fastfunc__ipart {
-    my ($call, $n) = @_;
+    my ($bel, $n) = @_;
 
-    my $numi = prim_car(prim_cdr(prim_cdr(prim_cdr($n))));
+    my $numi = $bel->car($bel->cdr($bel->cdr($bel->cdr($n))));
 
     my $i = make_pair(
         make_symbol("+"),
@@ -3529,112 +3526,112 @@ sub fastfunc__ipart {
 }
 
 sub fastfunc__real {
-    my ($call, $x) = @_;
+    my ($bel, $x) = @_;
 
     if (!is_pair($x)) {
         return SYMBOL_NIL;
     }
 
-    if (!is_symbol_of_name(prim_car($x), "lit")) {
+    if (!is_symbol_of_name($bel->car($x), "lit")) {
         return SYMBOL_NIL;
     }
 
-    $x = prim_cdr($x);
+    $x = $bel->cdr($x);
     if (!is_pair($x)) {
         return SYMBOL_NIL;
     }
 
-    if (!is_symbol_of_name(prim_car($x), "num")) {
+    if (!is_symbol_of_name($bel->car($x), "num")) {
         return SYMBOL_NIL;
     }
 
-    $x = prim_cdr($x);
+    $x = $bel->cdr($x);
     if (!is_pair($x)) {
         return SYMBOL_NIL;
     }
 
     {
-        my $y = prim_car($x);
+        my $y = $bel->car($x);
         if (!is_pair($y)) {
             return SYMBOL_NIL;
         }
 
 
-        my $sign = prim_car($y);
+        my $sign = $bel->car($y);
         if (!(is_symbol_of_name($sign, "+") || is_symbol_of_name($sign, "-"))) {
             return SYMBOL_NIL;
         }
 
-        $y = prim_cdr($y);
+        $y = $bel->cdr($y);
         if (!is_pair($y)) {
             return SYMBOL_NIL;
         }
 
         {
-            my $z = prim_car($y);
+            my $z = $bel->car($y);
             while (!is_nil($z)) {
                 if (!is_pair($z)) {
                     return SYMBOL_NIL;
                 }
-                $z = prim_cdr($z);
+                $z = $bel->cdr($z);
             }
         }
 
-        $y = prim_cdr($y);
+        $y = $bel->cdr($y);
         if (!is_pair($y)) {
             return SYMBOL_NIL;
         }
 
         {
-            my $z = prim_car($y);
+            my $z = $bel->car($y);
             while (!is_nil($z)) {
                 if (!is_pair($z)) {
                     return SYMBOL_NIL;
                 }
-                $z = prim_cdr($z);
+                $z = $bel->cdr($z);
             }
         }
     }
 
-    $x = prim_cdr($x);
+    $x = $bel->cdr($x);
     if (!is_pair($x)) {
         return SYMBOL_NIL;
     }
 
     {
-        my $y = prim_car($x);
+        my $y = $bel->car($x);
         if (!is_pair($y)) {
             return SYMBOL_NIL;
         }
 
 
-        my $sign = prim_car($y);
+        my $sign = $bel->car($y);
         if (!is_symbol_of_name($sign, "+")) {
             return SYMBOL_NIL;
         }
 
-        $y = prim_cdr($y);
+        $y = $bel->cdr($y);
         if (!is_pair($y)) {
             return SYMBOL_NIL;
         }
 
-        if (!is_nil(prim_car($y))) {
+        if (!is_nil($bel->car($y))) {
             return SYMBOL_NIL;
         }
 
-        $y = prim_cdr($y);
+        $y = $bel->cdr($y);
         if (!is_pair($y)) {
             return SYMBOL_NIL;
         }
 
         {
-            my $z = prim_car($y);
+            my $z = $bel->car($y);
             my $t = 0;
             while (!is_nil($z)) {
                 if (!is_pair($z)) {
                     return SYMBOL_NIL;
                 }
-                $z = prim_cdr($z);
+                $z = $bel->cdr($z);
                 $t++;
             }
 
@@ -3648,7 +3645,7 @@ sub fastfunc__real {
 }
 
 sub fastfunc__prn {
-    my ($call, @args) = @_;
+    my ($bel, @args) = @_;
 
     my $last = SYMBOL_NIL;
     for (@args) {
@@ -3661,7 +3658,7 @@ sub fastfunc__prn {
 }
 
 sub fastfunc__pr {
-    my ($call, @args) = @_;
+    my ($bel, @args) = @_;
 
     print for
         map { Language::Bel::Printer::prnice($_) }
@@ -3675,7 +3672,7 @@ sub fastfunc__pr {
 }
 
 sub fastfunc__prs {
-    my ($call, @args) = @_;
+    my ($bel, @args) = @_;
 
     my @strings;
     for (@args) {

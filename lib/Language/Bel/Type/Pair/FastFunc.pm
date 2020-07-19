@@ -24,15 +24,15 @@ sub handles_where {
 }
 
 sub apply {
-    my ($self, $call, @args) = @_;
+    my ($self, $bel, @args) = @_;
 
-    return $self->{fn}->($call, @args);
+    return $self->{fn}->($bel, @args);
 }
 
 sub where_apply {
-    my ($self, $call, @args) = @_;
+    my ($self, $bel, @args) = @_;
 
-    return $self->{where_fn}->($call, @args);
+    return $self->{where_fn}->($bel, @args);
 }
 
 1;
