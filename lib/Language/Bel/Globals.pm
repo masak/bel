@@ -149,6 +149,8 @@ sub new {
 
         $self->add_global("type", PRIMITIVES->{"type"});
 
+        $self->add_global("wrb", PRIMITIVES->{"wrb"});
+
         $self->add_global("xar", PRIMITIVES->{"xar"});
 
         $self->add_global("xdr", PRIMITIVES->{"xdr"});

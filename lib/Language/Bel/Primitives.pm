@@ -169,6 +169,9 @@ sub prim_type {
     }
 }
 
+sub prim_wrb {
+}
+
 sub prim_xar {
     my ($object, $a_value) = @_;
 
@@ -214,6 +217,7 @@ my %prim_fn = (
     "ops" => { fn => \&prim_ops, arity => 2 },
     "sym" => { fn => \&prim_sym, arity => 1 },
     "type" => { fn => \&prim_type, arity => 1 },
+    "wrb" => { fn => \&prim_wrb, arity => 2 },
     "xar" => { fn => \&prim_xar, arity => 2 },
     "xdr" => { fn => \&prim_xdr, arity => 2 },
 );
@@ -242,6 +246,7 @@ our @EXPORT_OK = qw(
     prim_ops
     prim_sym
     prim_type
+    prim_wrb
     prim_xar
     prim_xdr
     PRIM_FN
