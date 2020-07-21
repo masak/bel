@@ -19,7 +19,7 @@ sub is_bel_output {
     my ($expr, $expected_output) = @_;
 
     $actual_output = "";
-    $b->eval($expr);
+    $b->read_eval_print($expr);
 
     is($actual_output, $expected_output, "$expr ==> $expected_output");
 }
@@ -28,7 +28,7 @@ sub is_bel_error {
     my ($expr, $expected_error) = @_;
 
     eval {
-        $b->eval($expr);
+        $b->read_eval_print($expr);
     };
 
     my $actual_error = $@;
@@ -42,7 +42,7 @@ sub bel_todo {
     $expected_todo_error ||= "";
     $actual_output = "";
     eval {
-        $b->eval($expr);
+        $b->read_eval_print($expr);
     };
 
     my $error = $@;

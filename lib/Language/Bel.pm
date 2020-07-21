@@ -83,6 +83,9 @@ sub new {
     };
 
     $self = bless($self, $class);
+    if (!defined($self->{output}) || ref($self->{output}) ne "CODE") {
+        die "Named parameter 'output' of type CODE required";
+    }
     if (!defined($self->{primitives})) {
         $self->{primitives} = Language::Bel::Primitives->new();
     }
@@ -143,12 +146,12 @@ Evaluates an expression, passed in as a string of Bel code.
 
 =cut
 
-sub eval {
+sub read_eval_print {
     my ($self, $expr) = @_;
 
     my $ast = _bqexpand(read_whole($expr));
-    my $result = $self->eval_ast($ast);
-    my $result_string = _print($result);
+    my $eval_result = $self->eval($ast);
+    my $result_string = _print($eval_result);
 
     my $output = $self->{output};
     if (ref($output) eq "CODE") {
@@ -162,7 +165,7 @@ sub eval {
 #   (ev (list (list e nil))
 #       nil
 #       (list nil g)))
-sub eval_ast {
+sub eval {
     my ($self, $ast) = @_;
 
     $self->{s} = [[$ast, SYMBOL_NIL]];
