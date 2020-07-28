@@ -38,6 +38,12 @@ sub new {
     };
 
     $self = bless($self, $class);
+    if (!defined($self->{output}) || ref($self->{output}) ne "CODE") {
+        die "Named parameter 'output' of type CODE required";
+    }
+    if (!defined($self->{bitbuffer})) {
+        $self->{bitbuffer} = [];
+    }
     return $self;
 }
 
@@ -163,6 +169,17 @@ sub prim_type {
 }
 
 sub prim_wrb {
+    my ($self, $bit, $stream) = @_;
+
+    # XXX: error handling
+    my $n = is_char($bit) && char_codepoint($bit) eq ord("1") ? 1 : 0;
+    push(@{$self->{bitbuffer}}, $n);
+    if (@{$self->{bitbuffer}} == 8) {
+        my $bits = "0b" . (join "", @{$self->{bitbuffer}});
+        my $ord = oct($bits);  # yes, you can use `oct` to convert binary to decimal
+        $self->{output}->(chr($ord));
+        @{$self->{bitbuffer}} = ();
+    }
     return SYMBOL_NIL;
 }
 

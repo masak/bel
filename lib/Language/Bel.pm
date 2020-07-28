@@ -87,7 +87,9 @@ sub new {
         die "Named parameter 'output' of type CODE required";
     }
     if (!defined($self->{primitives})) {
-        $self->{primitives} = Language::Bel::Primitives->new();
+        $self->{primitives} = Language::Bel::Primitives->new({
+            output => $self->{output}
+        });
     }
     if (!defined($self->{globals})) {
         $self->{globals} = Language::Bel::Globals->new(

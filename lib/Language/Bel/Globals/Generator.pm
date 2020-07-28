@@ -149,7 +149,7 @@ sub new {
 
     $self = bless($self, $class);
     if (!defined($self->{primitives})) {
-        $self->{primitives} = Language::Bel::Primitives->new();
+        $self->{primitives} = Language::Bel::Primitives->new({ output => sub {} });
     }
     if (!defined($self->{hash_ref}) && !defined($self->{list})) {
         $self->{hash_ref} = {};
