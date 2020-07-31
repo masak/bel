@@ -30,7 +30,7 @@ Language::Bel 0.38 -- msys.
 "Hello world!"
 ```
 
-## State of completion
+## ...but is it feature-complete?
 
 `Language::Bel` intends to be a complete implementation of the Bel spec.
 It's not fully there yet, though it's under active development.
@@ -96,6 +96,29 @@ A summary of the remaining big features:
   too slow to be practical. Recursing down this list totally kills performance,
   and also fills the memory with pairs. It's _necessary_ to intercept the `nchar`
   and `charn` functions, and do something more efficient than a linear scan.)
+
+## ...but is it fast?
+
+*Performance* refers to our expectations of a program executing a task efficiently;
+given a long list and a request to look up its millionth element, it will make a
+difference whether that lookup is indexed (like with arrays) or linear (like with
+linked lists).
+
+It's possible to make Bel run reasonably fast, using various optimizations under the
+hood. Here is a brief summary:
+
+* **Fast global lookup**. (Complete, #194) A lot of time was saved in the test suite by
+  turning the global lookup table into a hash under the hood.
+  
+* **Fast global functions**.
+
+* **Fast numbers**.
+
+* **Fast strings**.
+
+* **Fast lists**.
+
+* **A compiler**.
 
 ## Contributing
 
