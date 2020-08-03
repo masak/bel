@@ -107,20 +107,20 @@ linked lists).
 It's possible to make Bel run reasonably fast, using various optimizations under the
 hood. Here is a brief summary:
 
-* **Fast global lookup**. (Complete, #194) A lot of time was saved in the test suite by
+* **Fast global lookup** (Complete, #194). A lot of time was saved in the test suite by
   turning the global lookup table into a hash under the hood.
   
-* **Fast global functions**.
+* **Fast global functions** (Ongoing, #91).
 
-* **Fast numbers**.
+* **Fast numbers** (#140).
 
-* **Fast strings**.
+* **Fast strings** (#144).
 
-* **Fast lists**.
+* **Fast lists** (#144).
 
 * **Backpointer-based de-optimization**.
 
-* **A compiler**.
+* **A compiler**. (#106)
 
 ## Contributing
 
