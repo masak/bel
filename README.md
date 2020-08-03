@@ -118,6 +118,8 @@ hood. Here is a brief summary:
 
 * **Fast lists**.
 
+* **Backpointer-based de-optimization**.
+
 * **A compiler**.
 
 ## Contributing
