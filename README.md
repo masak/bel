@@ -110,7 +110,7 @@ hood. Here is a brief summary:
 * **Fast global lookup** (Complete, #194). A lot of time was saved in the test suite by
   turning the global lookup table into a hash under the hood.
   
-* **Fast global functions** (Ongoing, #91).
+* **Fast global functions** (Ongoing, #91 and #155).
 
 * **Fast numbers** (#140).
 
