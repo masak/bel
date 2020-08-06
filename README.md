@@ -110,9 +110,17 @@ hood. Here is a brief summary:
 * **Fast global lookup** (Complete, #194). A lot of time was saved in the test suite by
   turning the global lookup table into a hash under the hood.
   
-* **Fast global functions** (Ongoing, #91 and #155).
+* **Fast global functions** (Ongoing, #91 and #155). Instead of the interpreter
+  painstakingly following the laid-down rules of Bel interpretation (and making thousands
+  of function calls along the way), it can call into (manually) "pre-compiled" functions
+  written in Perl (working directly against the runtime/primitives). As pointed out in
+  #169, care needs to be taken when such a pre-compiled function has had a dependency
+  overridden. In the fullness of time, these Perl functions shouldn't have to be created
+  manually, but can be generated (ahead-of-time as well as at runtime) by a Bel compiler
+  (see #106).
 
-* **Fast numbers** (#140).
+* **Fast numbers** (#140). Using Perl's numbers instead of building up and traversing the
+  data structures in Bel.
 
 * **Fast strings** (#144).
 
