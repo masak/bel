@@ -118,7 +118,11 @@ sub make_pair {
 sub make_stream {
     my ($path_str, $mode) = @_;
 
-    return Language::Bel::Type::Stream->new($path_str, $mode);
+    # XXX: reading or writing according to $mode
+    open(my $handle, ">", $path_str)
+        or die "Couldn't open '$path_str' for writing: $!";
+
+    return Language::Bel::Type::Stream->new($handle, $mode);
 }
 
 sub make_symbol {

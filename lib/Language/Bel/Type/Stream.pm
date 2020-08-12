@@ -5,10 +5,16 @@ use strict;
 use warnings;
 
 sub new {
-    my ($class, $path_str, $mode) = @_;
+    my ($class, $handle, $mode) = @_;
 
-    my $obj = { path_str => $path_str, mode => $mode };
+    my $obj = { handle => $handle, mode => $mode };
     return bless($obj, $class);
+}
+
+sub write_char {
+    my ($self, $chr) = @_;
+
+    print {$self->{handle}} $chr;
 }
 
 1;

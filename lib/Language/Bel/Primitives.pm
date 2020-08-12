@@ -41,8 +41,10 @@ sub new {
     if (!defined($self->{output}) || ref($self->{output}) ne "CODE") {
         die "Named parameter 'output' of type CODE required";
     }
-    if (!defined($self->{bitbuffer})) {
-        $self->{bitbuffer} = [];
+    if (!defined($self->{wrb_buffer_of})) {
+        $self->{wrb_buffer_of} = {
+            nil => []
+        };
     }
     return $self;
 }
@@ -171,15 +173,31 @@ sub prim_type {
 sub prim_wrb {
     my ($self, $bit, $stream) = @_;
 
-    # XXX: error handling
-    my $n = is_char($bit) && char_codepoint($bit) eq ord("1") ? 1 : 0;
-    push(@{$self->{bitbuffer}}, $n);
+    my $codepoint;
+    die "'mistype\n"
+        unless is_char($bit)
+            && ($codepoint = char_codepoint($bit)) == ord("0")
+                || $codepoint == ord("1");
+    die "'mistype\n"
+        unless is_nil($stream) || is_stream($stream);
+
+    my $n = is_char($bit) && $codepoint eq ord("1") ? 1 : 0;
+    my $wrb_buffer = is_nil($stream)
+        ? $self->{wrb_buffer_of}{nil}
+        : ($self->{wrb_buffer_of}{$stream} ||= []);
+    push(@{$wrb_buffer}, $n);
     # XXX: Turn this into a real Unicode check, not just `8`
-    if (@{$self->{bitbuffer}} == 8) {
-        my $bits = "0b" . (join "", @{$self->{bitbuffer}});
+    if (@{$wrb_buffer} == 8) {
+        my $bits = "0b" . (join "", @{$wrb_buffer});
         my $ord = oct($bits);  # yes, you can use `oct` to convert binary to decimal
-        $self->{output}->(chr($ord));
-        @{$self->{bitbuffer}} = ();
+        my $chr = chr($ord);
+        if (is_nil($stream)) {
+            $self->{output}->($chr);
+        }
+        else {  # stream
+            $stream->write_char($chr);
+        }
+        @{$wrb_buffer} = ();
     }
     return $bit;
 }
