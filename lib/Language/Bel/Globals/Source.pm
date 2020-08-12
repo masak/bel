@@ -1169,15 +1169,15 @@ __DATA__
                  f)))
     (if (< n 0) (-:r:- n) (r n))))
 
-; skip withfile [waiting for streams]
+; skip withfile [waiting for after]
 
-; skip from [waiting for streams]
+; skip from [waiting for after]
 
-; skip to [waiting for streams]
+; skip to [waiting for after]
 
-; skip readall [waiting for streams]
+; skip readall [waiting for reader]
 
-; skip load [waiting for streams, evaluator]
+; skip load [waiting for evaluator]
 
 (mac record body
   (letu v

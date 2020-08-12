@@ -47,6 +47,10 @@ A summary of the remaining big features:
   to mock everything to do with streams in the tests &mdash; but it might make sense
   to have an integration test file that uses real streams and real files, too.
 
+* **after** is a primitive that gives "`finally` semantics" to an expression. That is,
+  `(after x y)` promises to run `y` no matter what happens to `x`: normal execution,
+  continuation-based jump, exception thrown...
+
 * **ccc** (or `call-with-current-continuation`) is a control mechanism that allows the
   program to save a point in the execution, and to return to that point again later.
   Saving the execution state means saving the current evaluation stack, and being able
