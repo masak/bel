@@ -47,4 +47,6 @@ SKIP: {
     close($HELLO);
 }
 
-unlink($filename);
+END {
+    unlink($filename);
+}

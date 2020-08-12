@@ -15,4 +15,6 @@ is_bel_output("(stream (join))", "nil");
 is_bel_output("(stream \\c)", "nil");
 is_bel_output(q[(stream (ops "testfile" 'out))], "t");
 
-unlink "testfile";
+END {
+    unlink("testfile");
+}

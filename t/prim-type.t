@@ -15,4 +15,6 @@ is_bel_output("(type nil)", "symbol");
 is_bel_output("(type '(a))", "pair");
 is_bel_output(q[(type (ops "testfile" 'out))], "stream");
 
-unlink "testfile";
+END {
+    unlink("testfile");
+}

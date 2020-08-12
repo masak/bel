@@ -11,4 +11,6 @@ plan tests => 2;
 is_bel_output(q[(stat (ops "testfile" 'out))], "out");
 is_bel_output(q[(stat (cls (ops "testfile" 'out)))], "closed");
 
-unlink "testfile";
+END {
+    unlink("testfile");
+}

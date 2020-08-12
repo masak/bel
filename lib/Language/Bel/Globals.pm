@@ -161,6 +161,8 @@ sub new {
 
         $self->add_global("ops", make_prim("ops"));
 
+        $self->add_global("rdb", make_prim("rdb"));
+
         $self->add_global("stat", make_prim("stat"));
 
         $self->add_global("sym", make_prim("sym"));

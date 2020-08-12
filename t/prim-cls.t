@@ -12,4 +12,6 @@ is_bel_output(q[(cls (ops "testfile" 'out))], "<stream>");
 is_bel_error(q[(cls (cls (ops "testfile" 'out)))], "'already-closed");
 is_bel_error(q[(cls 'not-a-stream)], "'mistype");
 
-unlink "testfile";
+END {
+    unlink("testfile");
+}

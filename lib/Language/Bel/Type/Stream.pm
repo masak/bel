@@ -11,6 +11,13 @@ sub new {
     return bless($obj, $class);
 }
 
+sub read_char {
+    my ($self) = @_;
+
+    read($self->{handle}, my $chr, 1);
+    return $chr;
+}
+
 sub write_char {
     my ($self, $chr) = @_;
 

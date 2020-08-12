@@ -142,6 +142,34 @@ sub prim_ops {
     return make_stream($path_str, $mode);
 }
 
+my $CHAR_0 = make_char(ord("0"));
+my $CHAR_1 = make_char(ord("1"));
+
+sub prim_rdb {
+    my ($self, $stream) = @_;
+
+    die "'mistype\n"
+        unless is_nil($stream) || is_stream($stream);
+    die "XXX: can't handle nil stream just yet"
+        if is_nil($stream);
+
+    my $rdb_buffer = is_nil($stream)
+        ? $self->{rdb_buffer_of}{nil}
+        : ($self->{rdb_buffer_of}{$stream} ||= []);
+    if (@{$rdb_buffer} == 0) {
+        my $chr = $stream->read_char();
+        if (length($chr) == 0) {
+            return SYMBOL_NIL;
+        }
+        for my $bit (split("", sprintf("%08b", ord($chr)))) {
+            push(@{$rdb_buffer}, $bit eq "1" ? $CHAR_1 : $CHAR_0);
+        }
+    }
+
+    my $bit = shift(@{$rdb_buffer});
+    return $bit;
+}
+
 sub prim_stat {
     my ($self, $stream) = @_;
 
@@ -244,7 +272,7 @@ sub prim_xdr {
 sub all_primitives {
     my ($class) = @_;
 
-    return qw(car cdr cls coin id join nom ops stat sym type wrb xar xdr);
+    return qw(car cdr cls coin id join nom ops rdb stat sym type wrb xar xdr);
 }
 
 # (def applyprim (f args s r m)
@@ -306,7 +334,9 @@ sub call {
     elsif ($name eq "wrb") {
         return $self->prim_wrb($_a, $_b);
     }
-    # XXX: skipping 'rdb'
+    elsif ($name eq "rdb") {
+        return $self->prim_rdb($_a);
+    }
     elsif ($name eq "ops") {
         return $self->prim_ops($_a, $_b);
     }

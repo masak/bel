@@ -118,9 +118,17 @@ sub make_pair {
 sub make_stream {
     my ($path_str, $mode) = @_;
 
-    # XXX: reading or writing according to $mode
-    open(my $handle, ">", $path_str)
-        or die "Couldn't open '$path_str' for writing: $!";
+    # XXX: error handle $mode values
+
+    my $handle;
+    if (is_symbol_of_name($mode, "out")) {
+        open($handle, ">", $path_str)
+            or die "Couldn't open '$path_str' for writing: $!";
+    }
+    else {
+        open($handle, "<", $path_str)
+            or die "Couldn't open '$path_str' for reading: $!";
+    }
 
     return Language::Bel::Type::Stream->new($handle, $mode);
 }
