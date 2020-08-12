@@ -17,4 +17,18 @@ sub write_char {
     print {$self->{handle}} $chr;
 }
 
+sub close {
+    my ($self) = @_;
+
+    die "'already-closed\n"
+        if $self->{mode}{name} eq "closed";
+
+    close($self->{handle})
+        or die $!;
+    $self->{mode} = bless(
+        { name => "closed" },
+        "Language::Bel::Type::Symbol",
+    );
+}
+
 1;

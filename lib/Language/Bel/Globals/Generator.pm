@@ -262,7 +262,7 @@ HEADER
                 $new_ast = $bel->car($cddr_ast);
                 push @globals, {
                     name => $name,
-                    expr => $bel->eval_ast(_bqexpand($new_ast)),
+                    expr => $bel->eval(_bqexpand($new_ast)),
                 };
 
                 $ast = $bel->cdr($bel->cdr($ast));
@@ -330,8 +330,8 @@ HEADER
                 if ($global->{name} eq "comfns") {
                     $global->{expr} = make_pair(
                         make_pair(
-                            $bel->eval_ast($f),
-                            $bel->eval_ast($g),
+                            $bel->eval($f),
+                            $bel->eval($g),
                         ),
                         $global->{expr},
                     );
@@ -372,7 +372,7 @@ HEADER
 
         push @globals, {
             name => $name,
-            expr => $bel->eval_ast(_bqexpand($new_ast)),
+            expr => $bel->eval(_bqexpand($new_ast)),
         };
     }
 

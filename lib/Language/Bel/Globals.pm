@@ -149,6 +149,8 @@ sub new {
 
         $self->add_global("cdr", make_prim("cdr"));
 
+        $self->add_global("cls", make_prim("cls"));
+
         $self->add_global("coin", make_prim("coin"));
 
         $self->add_global("id", make_prim("id"));

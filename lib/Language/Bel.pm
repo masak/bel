@@ -62,7 +62,7 @@ Perhaps a little code snippet.
 
     use Language::Bel;
 
-    my $foo = Language::Bel->new();
+    my $foo = Language::Bel->new({ output => sub {} });
     ...
 
 =head1 EXPORT
@@ -142,9 +142,10 @@ sub xdr {
     $self->{primitives}->prim_xdr($pair, $d);
 }
 
-=head2 eval
+=head2 read_eval_print
 
 Evaluates an expression, passed in as a string of Bel code.
+Prints the result.
 
 =cut
 

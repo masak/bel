@@ -77,6 +77,16 @@ sub prim_cdr {
     }
 }
 
+sub prim_cls {
+    my ($self, $stream) = @_;
+
+    die "'mistype\n"
+        unless is_stream($stream);
+
+    $stream->close();
+    return $stream;
+}
+
 sub prim_coin {
     return rand() < 0.5
         ? SYMBOL_NIL
@@ -225,7 +235,7 @@ sub prim_xdr {
 sub all_primitives {
     my ($class) = @_;
 
-    return qw(car cdr coin id join nom ops sym type wrb xar xdr);
+    return qw(car cdr cls coin id join nom ops sym type wrb xar xdr);
 }
 
 # (def applyprim (f args s r m)
@@ -291,7 +301,9 @@ sub call {
     elsif ($name eq "ops") {
         return $self->prim_ops($_a, $_b);
     }
-    # XXX: skipping 'cls'
+    elsif ($name eq "cls") {
+        return $self->prim_cls($_a);
+    }
     # XXX: skipping 'stat'
     elsif ($name eq "coin") {
         return $self->prim_coin();
