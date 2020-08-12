@@ -174,13 +174,14 @@ sub prim_wrb {
     # XXX: error handling
     my $n = is_char($bit) && char_codepoint($bit) eq ord("1") ? 1 : 0;
     push(@{$self->{bitbuffer}}, $n);
+    # XXX: Turn this into a real Unicode check, not just `8`
     if (@{$self->{bitbuffer}} == 8) {
         my $bits = "0b" . (join "", @{$self->{bitbuffer}});
         my $ord = oct($bits);  # yes, you can use `oct` to convert binary to decimal
         $self->{output}->(chr($ord));
         @{$self->{bitbuffer}} = ();
     }
-    return SYMBOL_NIL;
+    return $bit;
 }
 
 sub prim_xar {
