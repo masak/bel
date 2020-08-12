@@ -17,6 +17,12 @@ sub write_char {
     print {$self->{handle}} $chr;
 }
 
+sub stat {
+    my ($self) = @_;
+
+    return $self->{mode};
+}
+
 sub close {
     my ($self) = @_;
 
