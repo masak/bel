@@ -30,7 +30,10 @@ sub atoms_are_identical {
             && symbols_are_identical($first, $second)
         ||
         is_char($first) && is_char($second)
-            && char_codepoint($first) == char_codepoint($second);
+            && char_codepoint($first) == char_codepoint($second)
+        ||
+        is_stream($first) && is_stream($second)
+            && streams_are_identical($first, $second);
 }
 
 sub char_codepoint {
@@ -176,6 +179,12 @@ sub symbol_name {
     my ($symbol) = @_;
 
     return $symbol->{name};
+}
+
+sub streams_are_identical {
+    my ($first, $second) = @_;
+
+    return $first eq $second;
 }
 
 sub symbols_are_identical {
