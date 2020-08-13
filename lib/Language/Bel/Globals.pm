@@ -3615,6 +3615,16 @@ sub new {
             SYMBOL_NIL)), make_pair(make_symbol("cbuf"), SYMBOL_NIL))),
             make_pair(make_symbol("s"), SYMBOL_NIL))))), SYMBOL_NIL))))));
 
+        $self->add_global("close", make_pair(make_symbol("lit"),
+            make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+            make_pair(make_pair(make_symbol("s"), SYMBOL_NIL),
+            make_pair(make_pair(make_symbol("do"),
+            make_pair(make_pair(make_symbol("pull"), make_pair(make_symbol("s"),
+            make_pair(make_symbol("cbuf"), make_pair(make_symbol("caris"),
+            SYMBOL_NIL)))), make_pair(make_pair(make_symbol("cls"),
+            make_pair(make_symbol("s"), SYMBOL_NIL)), SYMBOL_NIL))),
+            SYMBOL_NIL))))));
+
         $self->add_global("digit", make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("c"),

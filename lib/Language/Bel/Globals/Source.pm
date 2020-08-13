@@ -794,7 +794,9 @@ __DATA__
     (push (list s) cbuf)
     s))
 
-; skip close [waiting for streams]
+(def close (s)
+  (pull s cbuf caris)
+  (cls s))
 
 ; skip peek [waiting for streams]
 
