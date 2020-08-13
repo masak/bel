@@ -817,7 +817,7 @@ __DATA__
 (def intrac (c)
   (in c \. \!))
 
-; skip source [waiting for streams]
+(set source (cor no stream (cand pair string:car)))
 
 ; skip read [waiting for reader]
 
