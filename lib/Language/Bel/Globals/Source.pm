@@ -798,13 +798,13 @@ __DATA__
   (pull s cbuf caris)
   (cls s))
 
-; skip peek [waiting for streams]
+; skip peek [waiting for chars]
 
-; skip rdc [waiting for streams]
+; skip rdc [waiting for chars]
 
-; skip bbuf [waiting for streams]
+(set bbuf nil)
 
-; skip bitc [waiting for streams]
+; skip bitc [waiting for chars]
 
 (def digit (c (o base i10))
   (mem c (udrop (udrop base i16) "fedcba9876543210")))

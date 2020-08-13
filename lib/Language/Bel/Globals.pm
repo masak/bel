@@ -3625,6 +3625,8 @@ sub new {
             make_pair(make_symbol("s"), SYMBOL_NIL)), SYMBOL_NIL))),
             SYMBOL_NIL))))));
 
+        $self->add_global("bbuf", SYMBOL_NIL);
+
         $self->add_global("digit", make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("c"),
