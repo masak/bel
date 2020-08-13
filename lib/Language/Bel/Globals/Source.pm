@@ -787,9 +787,12 @@ __DATA__
     `(let ,v ,x
        (zap [rem ,v _ ,@rest] ,place))))
 
-; skip cbuf [waiting for streams]
+(set cbuf '((nil)))
 
-; skip open [waiting for streams]
+(def open args
+  (let s (apply ops args)
+    (push (list s) cbuf)
+    s))
 
 ; skip close [waiting for streams]
 
