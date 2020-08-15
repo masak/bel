@@ -25,7 +25,7 @@ is_bel_output(qq[(set s (ops "$filename" 'in))], "<stream>");
 is_bel_output("(nof 8 (rdb s))", q["01111010"]);
 is_bel_output("(nof 8 (rdb s))", q["01101111"]);
 is_bel_output("(nof 8 (rdb s))", q["01101111"]);
-is_bel_output("(rdb s)", "nil");
+is_bel_output("(rdb s)", "eof");
 
 END {
     unlink($filename);

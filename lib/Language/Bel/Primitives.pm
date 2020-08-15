@@ -24,6 +24,7 @@ use Language::Bel::Types qw(
 );
 use Language::Bel::Symbols::Common qw(
     SYMBOL_CHAR
+    SYMBOL_EOF
     SYMBOL_NIL
     SYMBOL_PAIR
     SYMBOL_STREAM
@@ -159,7 +160,7 @@ sub prim_rdb {
     if (@{$rdb_buffer} == 0) {
         my $chr = $stream->read_char();
         if (length($chr) == 0) {
-            return SYMBOL_NIL;
+            return SYMBOL_EOF;
         }
         for my $bit (split("", sprintf("%08b", ord($chr)))) {
             push(@{$rdb_buffer}, $bit eq "1" ? $CHAR_1 : $CHAR_0);
