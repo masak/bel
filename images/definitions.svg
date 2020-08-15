@@ -17,7 +17,7 @@
         }
 
         .done               { fill: white; }
-        .feature-streams    { fill: #faa; }
+        .feature-after      { fill: #faa; }
         .feature-ccc        { fill: #fb6; }
         .feature-evaluator  { fill: #fe3; }
         .feature-reader     { fill: #7e6; }
@@ -43,13 +43,13 @@
         y='281'
         width='17'
         height='17'
-        class='feature-streams box'
-        title='streams'
+        class='feature-after box'
+        title='after'
       />
   <text
         x='50'
         y='296'
-      >streams</text>
+      >after</text>
   <rect
         x='20'
         y='311'
