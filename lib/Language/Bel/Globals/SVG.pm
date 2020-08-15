@@ -82,7 +82,7 @@ sub generate {
         .feature-chars      { fill: #faf; }
       </style>\n\n");
 
-    my $y = 251;
+    my $y = 280;
     my $box_size = 17;
     for my $feature (qw<done after ccc evaluator reader backquotes printer chars>) {
         my $class = $feature eq "done"

@@ -28,7 +28,7 @@
 
   <rect
         x='20'
-        y='251'
+        y='280'
         width='17'
         height='17'
         class='done box'
@@ -36,11 +36,11 @@
       />
   <text
         x='50'
-        y='266'
+        y='295'
       >done</text>
   <rect
         x='20'
-        y='281'
+        y='310'
         width='17'
         height='17'
         class='feature-after box'
@@ -48,11 +48,11 @@
       />
   <text
         x='50'
-        y='296'
+        y='325'
       >after</text>
   <rect
         x='20'
-        y='311'
+        y='340'
         width='17'
         height='17'
         class='feature-ccc box'
@@ -60,11 +60,11 @@
       />
   <text
         x='50'
-        y='326'
+        y='355'
       >ccc</text>
   <rect
         x='20'
-        y='341'
+        y='370'
         width='17'
         height='17'
         class='feature-evaluator box'
@@ -72,11 +72,11 @@
       />
   <text
         x='50'
-        y='356'
+        y='385'
       >evaluator</text>
   <rect
         x='20'
-        y='371'
+        y='400'
         width='17'
         height='17'
         class='feature-reader box'
@@ -84,11 +84,11 @@
       />
   <text
         x='50'
-        y='386'
+        y='415'
       >reader</text>
   <rect
         x='20'
-        y='401'
+        y='430'
         width='17'
         height='17'
         class='feature-backquotes box'
@@ -96,11 +96,11 @@
       />
   <text
         x='50'
-        y='416'
+        y='445'
       >backquotes</text>
   <rect
         x='20'
-        y='431'
+        y='460'
         width='17'
         height='17'
         class='feature-printer box'
@@ -108,11 +108,11 @@
       />
   <text
         x='50'
-        y='446'
+        y='475'
       >printer</text>
   <rect
         x='20'
-        y='461'
+        y='490'
         width='17'
         height='17'
         class='feature-chars box'
@@ -120,7 +120,7 @@
       />
   <text
         x='50'
-        y='476'
+        y='505'
       >chars</text>
   <rect
         x='151'
