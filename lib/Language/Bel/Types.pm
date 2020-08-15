@@ -123,12 +123,12 @@ sub make_stream {
     my $handle;
     if (is_symbol_of_name($mode, "out")) {
         open($handle, ">", $path_str)
-            or die "Couldn't open '$path_str' for writing: $!";
+            or die "'ioerror\n";
     }
     else {
         open($handle, "<", $path_str)
             or $! =~ /No such file/ and die "'notexist\n"
-            or die "Couldn't open '$path_str' for reading: $!";
+            or die "'ioerror\n";
     }
 
     return Language::Bel::Type::Stream->new($handle, $mode);
