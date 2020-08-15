@@ -127,6 +127,7 @@ sub make_stream {
     }
     else {
         open($handle, "<", $path_str)
+            or $! =~ /No such file/ and die "'notexist\n"
             or die "Couldn't open '$path_str' for reading: $!";
     }
 
