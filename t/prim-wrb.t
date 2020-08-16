@@ -6,7 +6,7 @@ use Test::More;
 
 use Language::Bel::Test;
 
-plan tests => 6;
+plan tests => 7;
 
 is_bel_output("(do (each c (list \\0 \\0 \\1 \\0 \\0 \\0 \\0 \\1) (wrb c nil)) nil)", "!nil");
 is_bel_output("(do (each c (list \\0 \\0 \\1 \\0 \\0 \\0 \\0 \\1) (wrb c nil)))", q[!"00100001"]);
@@ -46,6 +46,8 @@ SKIP: {
 
     close($HELLO);
 }
+
+is_bel_error(qq[(let s (ops "$filename" 'in) (wrb \\0 s))], "'badmode");
 
 END {
     unlink($filename);

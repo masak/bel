@@ -153,6 +153,8 @@ sub prim_rdb {
         unless is_nil($stream) || is_stream($stream);
     die "XXX: can't handle nil stream just yet"
         if is_nil($stream);
+    die "'badmode\n"
+        if is_stream($stream) && $stream->mode() ne "in";
 
     my $rdb_buffer = is_nil($stream)
         ? $self->{rdb_buffer_of}{nil}
@@ -228,6 +230,8 @@ sub prim_wrb {
                 || $codepoint == ord("1");
     die "'mistype\n"
         unless is_nil($stream) || is_stream($stream);
+    die "'badmode\n"
+        if is_stream($stream) && $stream->mode() ne "out";
 
     my $n = is_char($bit) && $codepoint eq ord("1") ? 1 : 0;
     my $wrb_buffer = is_nil($stream)

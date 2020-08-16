@@ -21,6 +21,9 @@ sub read_char {
 sub write_char {
     my ($self, $chr) = @_;
 
+    die "'badmode\n"
+        unless $self->{mode}{name} eq "out";
+
     print {$self->{handle}} $chr;
 }
 
@@ -42,6 +45,12 @@ sub close {
         { name => "closed" },
         "Language::Bel::Type::Symbol",
     );
+}
+
+sub mode {
+    my ($self) = @_;
+
+    return $self->{mode}{name};
 }
 
 1;
