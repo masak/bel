@@ -124,7 +124,7 @@ hood. Here is a brief summary:
 
 * **Fast strings** (#144).
 
-* **Fast lists** (#144).
+* **Fast lists** (#221).
 
 * **Backpointer-based de-optimization**.
 
