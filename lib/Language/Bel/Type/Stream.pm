@@ -5,7 +5,18 @@ use strict;
 use warnings;
 
 sub new {
-    my ($class, $handle, $mode) = @_;
+    my ($class, $path_str, $mode) = @_;
+
+    my $handle;
+    if ($mode->{name} eq "out") {
+        open($handle, ">", $path_str)
+            or die "'ioerror\n";
+    }
+    else {
+        open($handle, "<", $path_str)
+            or $! =~ /No such file/ and die "'notexist\n"
+            or die "'ioerror\n";
+    }
 
     my $obj = { handle => $handle, mode => $mode };
     return bless($obj, $class);
