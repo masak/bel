@@ -179,7 +179,7 @@ sub prim_stat {
     die "'mistype\n"
         unless is_stream($stream);
 
-    return $stream->stat();
+    return make_symbol($stream->stat());
 }
 
 sub prim_sym {

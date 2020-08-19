@@ -120,7 +120,7 @@ sub make_stream {
 
     # XXX: error handle $mode values
 
-    return Language::Bel::Type::Stream->new($path_str, $mode);
+    return Language::Bel::Type::Stream->new($path_str, symbol_name($mode));
 }
 
 sub make_symbol {

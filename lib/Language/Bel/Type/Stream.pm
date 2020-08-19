@@ -8,7 +8,7 @@ sub new {
     my ($class, $path_str, $mode) = @_;
 
     my $handle;
-    if ($mode->{name} eq "out") {
+    if ($mode eq "out") {
         open($handle, ">", $path_str)
             or die "'ioerror\n";
     }
@@ -33,7 +33,7 @@ sub write_char {
     my ($self, $chr) = @_;
 
     die "'badmode\n"
-        unless $self->{mode}{name} eq "out";
+        unless $self->{mode} eq "out";
 
     print {$self->{handle}} $chr;
 }
@@ -48,20 +48,17 @@ sub close {
     my ($self) = @_;
 
     die "'already-closed\n"
-        if $self->{mode}{name} eq "closed";
+        if $self->{mode} eq "closed";
 
     close($self->{handle})
         or die $!;
-    $self->{mode} = bless(
-        { name => "closed" },
-        "Language::Bel::Type::Symbol",
-    );
+    $self->{mode} = "closed";
 }
 
 sub mode {
     my ($self) = @_;
 
-    return $self->{mode}{name};
+    return $self->{mode};
 }
 
 1;
