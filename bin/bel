@@ -29,15 +29,10 @@ else {
     repl();
 }
 
-sub output {
-    my ($string) = @_;
-    print($string, "\n");
-}
-
 sub eval_file {
     my ($source_file) = @_;
 
-    my $b = Language::Bel->new({ output => \&output });
+    my $b = Language::Bel->new();
 
     my $source;
     {
@@ -60,7 +55,7 @@ sub eval_file {
 }
 
 sub repl {
-    my $b = Language::Bel->new({ output => \&output });
+    my $b = Language::Bel->new();
 
     print("Language::Bel ", $Language::Bel::VERSION, " -- $^O.\n");
     while (defined (my $expr = prompt("> "))) {

@@ -62,7 +62,7 @@ Perhaps a little code snippet.
 
     use Language::Bel;
 
-    my $foo = Language::Bel->new({ output => sub {} });
+    my $foo = Language::Bel->new();
     ...
 
 =head1 EXPORT
@@ -83,8 +83,11 @@ sub new {
     };
 
     $self = bless($self, $class);
-    if (!defined($self->{output}) || ref($self->{output}) ne "CODE") {
-        die "Named parameter 'output' of type CODE required";
+    if (!defined($self->{output})) {
+        $self->{output} = sub {
+            my ($string) = @_;
+            print($string, "\n");
+        };
     }
     if (!defined($self->{primitives})) {
         $self->{primitives} = Language::Bel::Primitives->new({
