@@ -20,11 +20,7 @@ use Language::Bel::Types qw(
 use Language::Bel::Symbols::Common qw(
     SYMBOL_NIL
 );
-use Language::Bel::Primitives qw(
-    PRIMITIVES
-    prim_car
-    prim_cdr
-);
+use Language::Bel::Primitives;
 use Language::Bel::Reader qw(
     read_whole
 );
@@ -81,7 +77,7 @@ my @DECLARATIONS;
 }
 
 sub generate_globals {
-    my ($interpreter) = @_;
+    my ($bel) = @_;
 
     print <<'HEADER';
 package Language::Bel::Globals;
@@ -91,6 +87,7 @@ use strict;
 use warnings;
 
 use Language::Bel::Types qw(
+    are_identical
     is_symbol
     make_char
     make_pair
@@ -107,12 +104,7 @@ use Language::Bel::Symbols::Common qw(
     SYMBOL_SYMBOL
     SYMBOL_T
 );
-use Language::Bel::Primitives qw(
-    _id
-    PRIMITIVES
-    prim_cdr
-    prim_xdr
-);
+use Language::Bel::Primitives;
 use Language::Bel::Globals::FastFuncs qw(
 HEADER
 
@@ -124,6 +116,21 @@ HEADER
 
     print <<'HEADER';
 );
+
+sub make_prim {
+    my ($name) = @_;
+
+    return make_pair(
+        make_symbol("lit"),
+        make_pair(
+            make_symbol("prim"),
+            make_pair(
+                make_symbol($name),
+                SYMBOL_NIL,
+            ),
+        ),
+    );
+}
 
 sub add_global {
     my ($self, $name, $value) = @_;
@@ -141,13 +148,16 @@ sub new {
     };
 
     $self = bless($self, $class);
+    if (!defined($self->{primitives})) {
+        $self->{primitives} = Language::Bel::Primitives->new({ output => sub {} });
+    }
     if (!defined($self->{hash_ref}) && !defined($self->{list})) {
         $self->{hash_ref} = {};
         $self->{list} = SYMBOL_NIL;
 
 HEADER
 
-    for my $prim_name (sort(keys(%{PRIMITIVES()}))) {
+    for my $prim_name (Language::Bel::Primitives->all_primitives()) {
         print_primitive($prim_name);
     }
 
@@ -161,12 +171,12 @@ HEADER
         die "Malformed global declaration\n"
             unless is_pair($ast);
 
-        my $car_ast = prim_car($ast);
+        my $car_ast = $bel->car($ast);
         die "First element of list is not a symbol"
             unless is_symbol($car_ast);
 
-        my $name = symbol_name(prim_car(prim_cdr($ast)));
-        my $cddr_ast = prim_cdr(prim_cdr($ast));
+        my $name = symbol_name($bel->car($bel->cdr($ast)));
+        my $cddr_ast = $bel->cdr($bel->cdr($ast));
         my $new_ast;
 
         if (symbol_name($car_ast) eq "def") {
@@ -248,22 +258,22 @@ HEADER
             );
         }
         elsif (symbol_name($car_ast) eq "set") {
-            while (!is_nil(prim_cdr($ast))) {
-                $new_ast = prim_car($cddr_ast);
+            while (!is_nil($bel->cdr($ast))) {
+                $new_ast = $bel->car($cddr_ast);
                 push @globals, {
                     name => $name,
-                    expr => $interpreter->eval_ast(_bqexpand($new_ast)),
+                    expr => $bel->eval(_bqexpand($new_ast)),
                 };
 
-                $ast = prim_cdr(prim_cdr($ast));
-                $name = symbol_name(prim_car(prim_cdr($ast)));
-                $cddr_ast = prim_cdr(prim_cdr($ast));
+                $ast = $bel->cdr($bel->cdr($ast));
+                $name = symbol_name($bel->car($bel->cdr($ast)));
+                $cddr_ast = $bel->cdr($bel->cdr($ast));
             }
             next DECLARATION;
         }
         elsif (symbol_name($car_ast) eq "vir") {
-            my $tag = prim_car(prim_cdr($ast));
-            my $rest = prim_cdr(prim_cdr($ast));
+            my $tag = $bel->car($bel->cdr($ast));
+            my $rest = $bel->cdr($bel->cdr($ast));
             for my $global (@globals) {
                 if ($global->{name} eq "virfns") {
                     $global->{expr} = make_pair(
@@ -288,8 +298,8 @@ HEADER
             next;
         }
         elsif (symbol_name($car_ast) eq "loc") {
-            my $tag = prim_car(prim_cdr($ast));
-            my $rest = prim_cdr(prim_cdr($ast));
+            my $tag = $bel->car($bel->cdr($ast));
+            my $rest = $bel->cdr($bel->cdr($ast));
             for my $global (@globals) {
                 if ($global->{name} eq "locfns") {
                     $global->{expr} = make_pair(
@@ -314,14 +324,14 @@ HEADER
             next;
         }
         elsif (symbol_name($car_ast) eq "com") {
-            my $f = prim_car(prim_cdr($ast));
-            my $g = prim_car(prim_cdr(prim_cdr($ast)));
+            my $f = $bel->car($bel->cdr($ast));
+            my $g = $bel->car($bel->cdr($bel->cdr($ast)));
             for my $global (@globals) {
                 if ($global->{name} eq "comfns") {
                     $global->{expr} = make_pair(
                         make_pair(
-                            $interpreter->eval_ast($f),
-                            $interpreter->eval_ast($g),
+                            $bel->eval($f),
+                            $bel->eval($g),
                         ),
                         $global->{expr},
                     );
@@ -331,8 +341,8 @@ HEADER
             next;
         }
         elsif (symbol_name($car_ast) eq "syn") {
-            my $c = prim_car(prim_cdr($ast));
-            my $rest = prim_car(prim_cdr(prim_cdr($ast)));
+            my $c = $bel->car($bel->cdr($ast));
+            my $rest = $bel->car($bel->cdr($bel->cdr($ast)));
             for my $global (@globals) {
                 if ($global->{name} eq "syntax") {
                     $global->{expr} = make_pair(
@@ -362,7 +372,7 @@ HEADER
 
         push @globals, {
             name => $name,
-            expr => $interpreter->eval_ast(_bqexpand($new_ast)),
+            expr => $bel->eval(_bqexpand($new_ast)),
         };
     }
 
@@ -395,7 +405,7 @@ sub is_global_of_name {
 
     my $kv = $self->get_kv($global_name);
     my $global = pair_cdr($kv);
-    return $global && _id($e, $global);
+    return $global && are_identical($e, $global);
 }
 
 # (let cell (cons v nil)
@@ -409,9 +419,10 @@ sub install {
         my $name = symbol_name($v);
         $self->{hash_ref}->{$name} = $cell;
     }
-    prim_xdr($self->{list}, make_pair(
+    my $prim = $self->{primitives};
+    $prim->prim_xdr($self->{list}, make_pair(
         $cell,
-        prim_cdr($self->{list}),
+        $prim->prim_cdr($self->{list}),
     ));
 
     return $cell;
@@ -432,7 +443,7 @@ my $ADD = q[$self->add_global];
 sub print_primitive {
     my ($name) = @_;
 
-    print(qq[        $ADD("$name", PRIMITIVES->{"$name"});\n\n]);
+    print(qq[        $ADD("$name", make_prim("$name"));\n\n]);
 }
 
 sub print_global {

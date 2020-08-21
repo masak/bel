@@ -5,13 +5,16 @@ use strict;
 use warnings;
 
 use Language::Bel::Types qw(
+    are_identical
     char_codepoint
     is_char
     is_nil
     is_pair
+    is_stream
     is_symbol
     make_char
     make_pair
+    make_stream
     make_symbol
     pair_car
     pair_cdr
@@ -21,15 +24,34 @@ use Language::Bel::Types qw(
 );
 use Language::Bel::Symbols::Common qw(
     SYMBOL_CHAR
+    SYMBOL_EOF
     SYMBOL_NIL
     SYMBOL_PAIR
-    SYMBOL_T
+    SYMBOL_STREAM
     SYMBOL_SYMBOL
+    SYMBOL_T
 );
-use Exporter 'import';
+
+sub new {
+    my ($class, $options_ref) = @_;
+    my $self = {
+        ref($options_ref) eq "HASH" ? %$options_ref : (),
+    };
+
+    $self = bless($self, $class);
+    if (!defined($self->{output}) || ref($self->{output}) ne "CODE") {
+        die "Named parameter 'output' of type CODE required";
+    }
+    if (!defined($self->{wrb_buffer_of})) {
+        $self->{wrb_buffer_of} = {
+            nil => []
+        };
+    }
+    return $self;
+}
 
 sub prim_car {
-    my ($object) = @_;
+    my ($self, $object) = @_;
 
     if (is_nil($object)) {
         return SYMBOL_NIL;
@@ -43,7 +65,7 @@ sub prim_car {
 }
 
 sub prim_cdr {
-    my ($object) = @_;
+    my ($self, $object) = @_;
 
     if (is_nil($object)) {
         return SYMBOL_NIL;
@@ -56,43 +78,36 @@ sub prim_cdr {
     }
 }
 
+sub prim_cls {
+    my ($self, $stream) = @_;
+
+    die "'mistype\n"
+        unless is_stream($stream);
+
+    $stream->close();
+    return $stream;
+}
+
 sub prim_coin {
     return rand() < 0.5
         ? SYMBOL_NIL
         : SYMBOL_T;
 }
 
-sub _id {
-    my ($first, $second) = @_;
-
-    if (is_symbol($first) && is_symbol($second)) {
-        return symbol_name($first) eq symbol_name($second);
-    }
-    elsif (is_char($first) && is_char($second)) {
-        return char_codepoint($first) == char_codepoint($second);
-    }
-    elsif (is_pair($first) && is_pair($second)) {
-        return $first eq $second;
-    }
-    else {
-        return "";
-    }
-}
-
 sub prim_id {
-    my ($first, $second) = @_;
+    my ($self, $first, $second) = @_;
 
-    return _id($first, $second) ? SYMBOL_T : SYMBOL_NIL;
+    return are_identical($first, $second) ? SYMBOL_T : SYMBOL_NIL;
 }
 
 sub prim_join {
-    my ($first, $second) = @_;
+    my ($self, $first, $second) = @_;
 
     return make_pair($first, $second);
 }
 
 sub prim_nom {
-    my ($value) = @_;
+    my ($self, $value) = @_;
 
     if (!is_symbol($value)) {
         die "not-a-symbol\n";
@@ -108,16 +123,75 @@ sub prim_nom {
     return $result;
 }
 
-sub prim_sym {
-    my ($value) = @_;
+sub prim_ops {
+    my ($self, $path, $mode) = @_;
 
     my @stack;
-    while (is_pair($value)) {
-        my $elem = prim_car($value);
+    while (is_pair($path)) {
+        my $elem = pair_car($path);
         die "not-a-string"
             unless is_char($elem);
         push @stack, chr(char_codepoint($elem));
-        $value = prim_cdr($value);
+        $path = pair_cdr($path);
+    }
+    my $path_str = join("", @stack);
+
+    if (!is_symbol($mode)) {
+        die "not-a-symbol\n";
+    }
+
+    return make_stream($path_str, $mode);
+}
+
+my $CHAR_0 = make_char(ord("0"));
+my $CHAR_1 = make_char(ord("1"));
+
+sub prim_rdb {
+    my ($self, $stream) = @_;
+
+    die "'mistype\n"
+        unless is_nil($stream) || is_stream($stream);
+    die "XXX: can't handle nil stream just yet"
+        if is_nil($stream);
+    die "'badmode\n"
+        if is_stream($stream) && $stream->mode() ne "in";
+
+    my $rdb_buffer = is_nil($stream)
+        ? $self->{rdb_buffer_of}{nil}
+        : ($self->{rdb_buffer_of}{$stream} ||= []);
+    if (@{$rdb_buffer} == 0) {
+        my $chr = $stream->read_char();
+        if (length($chr) == 0) {
+            return SYMBOL_EOF;
+        }
+        for my $bit (split("", sprintf("%08b", ord($chr)))) {
+            push(@{$rdb_buffer}, $bit eq "1" ? $CHAR_1 : $CHAR_0);
+        }
+    }
+
+    my $bit = shift(@{$rdb_buffer});
+    return $bit;
+}
+
+sub prim_stat {
+    my ($self, $stream) = @_;
+
+    die "'mistype\n"
+        unless is_stream($stream);
+
+    return make_symbol($stream->stat());
+}
+
+sub prim_sym {
+    my ($self, $value) = @_;
+
+    my @stack;
+    while (is_pair($value)) {
+        my $elem = pair_car($value);
+        die "not-a-string"
+            unless is_char($elem);
+        push @stack, chr(char_codepoint($elem));
+        $value = pair_cdr($value);
     }
     die "not-a-string"
         unless is_nil($value);
@@ -127,7 +201,7 @@ sub prim_sym {
 }
 
 sub prim_type {
-    my ($value) = @_;
+    my ($self, $value) = @_;
 
     if (is_symbol($value)) {
         return SYMBOL_SYMBOL;
@@ -138,13 +212,50 @@ sub prim_type {
     elsif (is_char($value)) {
         return SYMBOL_CHAR;
     }
+    elsif (is_stream($value)) {
+        return SYMBOL_STREAM;
+    }
     else {
         die "unknown type";
     }
 }
 
+sub prim_wrb {
+    my ($self, $bit, $stream) = @_;
+
+    my $codepoint;
+    die "'mistype\n"
+        unless is_char($bit)
+            && ($codepoint = char_codepoint($bit)) == ord("0")
+                || $codepoint == ord("1");
+    die "'mistype\n"
+        unless is_nil($stream) || is_stream($stream);
+    die "'badmode\n"
+        if is_stream($stream) && $stream->mode() ne "out";
+
+    my $n = is_char($bit) && $codepoint eq ord("1") ? 1 : 0;
+    my $wrb_buffer = is_nil($stream)
+        ? $self->{wrb_buffer_of}{nil}
+        : ($self->{wrb_buffer_of}{$stream} ||= []);
+    push(@{$wrb_buffer}, $n);
+    # XXX: Turn this into a real Unicode check, not just `8`
+    if (@{$wrb_buffer} == 8) {
+        my $bits = "0b" . (join "", @{$wrb_buffer});
+        my $ord = oct($bits);  # yes, you can use `oct` to convert binary to decimal
+        my $chr = chr($ord);
+        if (is_nil($stream)) {
+            $self->{output}->($chr);
+        }
+        else {  # stream
+            $stream->write_char($chr);
+        }
+        @{$wrb_buffer} = ();
+    }
+    return $bit;
+}
+
 sub prim_xar {
-    my ($object, $a_value) = @_;
+    my ($self, $object, $a_value) = @_;
 
     if (!is_pair($object)) {
         die "xar-on-atom\n";
@@ -154,7 +265,7 @@ sub prim_xar {
 }
 
 sub prim_xdr {
-    my ($object, $d_value) = @_;
+    my ($self, $object, $d_value) = @_;
 
     if (!is_pair($object)) {
         die "xdr-on-atom\n";
@@ -163,61 +274,92 @@ sub prim_xdr {
     return $d_value;
 }
 
-sub make_prim {
-    my ($name) = @_;
+sub all_primitives {
+    my ($class) = @_;
 
-    return make_pair(
-        make_symbol("lit"),
-        make_pair(
-            make_symbol("prim"),
-            make_pair(
-                make_symbol($name),
-                SYMBOL_NIL,
-            ),
-        ),
-    );
+    return qw(car cdr cls coin id join nom ops rdb stat sym type wrb xar xdr);
 }
 
-my %prim_fn = (
-    "car" => { fn => \&prim_car, arity => 1 },
-    "cdr" => { fn => \&prim_cdr, arity => 1 },
-    "coin" => { fn => \&prim_coin, arity => 0 },
-    "id" => { fn => \&prim_id, arity => 2 },
-    "join" => { fn => \&prim_join, arity => 2 },
-    "nom" => { fn => \&prim_nom, arity => 1 },
-    "sym" => { fn => \&prim_sym, arity => 1 },
-    "type" => { fn => \&prim_type, arity => 1 },
-    "xar" => { fn => \&prim_xar, arity => 2 },
-    "xdr" => { fn => \&prim_xdr, arity => 2 },
-);
+# (def applyprim (f args s r m)
+#   (aif (some [mem f _] prims)
+#        (if (udrop (cdr it) args)
+#            (sigerr 'overargs s r m)
+#            (with (a (car args)
+#                   b (cadr args))
+#              (eif v (case f
+#                       id   (id a b)
+#                       join (join a b)
+#                       car  (car a)
+#                       cdr  (cdr a)
+#                       type (type a)
+#                       xar  (xar a b)
+#                       xdr  (xdr a b)
+#                       sym  (sym a)
+#                       nom  (nom a)
+#                       wrb  (wrb a b)
+#                       rdb  (rdb a)
+#                       ops  (ops a b)
+#                       cls  (cls a)
+#                       stat (stat a)
+#                       coin (coin)
+#                       sys  (sys a))
+#                     (sigerr v s r m)
+#                     (mev s (cons v r) m))))
+#        (sigerr 'unknown-prim s r m)))
+sub call {
+    my ($self, $name, $_a, $_b) = @_;
 
-sub PRIM_FN {
-    return \%prim_fn;
+    if ($name eq "id") {
+        return $self->prim_id($_a, $_b);
+    }
+    elsif ($name eq "join") {
+        return $self->prim_join($_a, $_b);
+    }
+    elsif ($name eq "car") {
+        return $self->prim_car($_a);
+    }
+    elsif ($name eq "cdr") {
+        return $self->prim_cdr($_a);
+    }
+    elsif ($name eq "type") {
+        return $self->prim_type($_a);
+    }
+    elsif ($name eq "xar") {
+        return $self->prim_xar($_a, $_b);
+    }
+    elsif ($name eq "xdr") {
+        return $self->prim_xdr($_a, $_b);
+    }
+    elsif ($name eq "sym") {
+        return $self->prim_sym($_a);
+    }
+    elsif ($name eq "nom") {
+        return $self->prim_nom($_a);
+    }
+    elsif ($name eq "wrb") {
+        return $self->prim_wrb($_a, $_b);
+    }
+    elsif ($name eq "rdb") {
+        return $self->prim_rdb($_a);
+    }
+    elsif ($name eq "ops") {
+        return $self->prim_ops($_a, $_b);
+    }
+    elsif ($name eq "cls") {
+        return $self->prim_cls($_a);
+    }
+    elsif ($name eq "stat") {
+        return $self->prim_stat($_a);
+    }
+    elsif ($name eq "coin") {
+        return $self->prim_coin();
+    }
+    # XXX: skipping 'sys'
+    else {
+        # XXX: skipping the 'unknown-prim case for now
+        die "unknown-prim\n";
+    }
+    # XXX: skipping the `sigerr` case
 }
-
-my %primitives;
-for my $name (keys %prim_fn) {
-    $primitives{$name} = make_prim($name);
-}
-
-sub PRIMITIVES {
-    return \%primitives;
-}
-
-our @EXPORT_OK = qw(
-    _id
-    prim_car
-    prim_cdr
-    prim_coin
-    prim_id 
-    prim_join
-    prim_nom
-    prim_sym
-    prim_type
-    prim_xar
-    prim_xdr
-    PRIM_FN
-    PRIMITIVES
-);
 
 1;

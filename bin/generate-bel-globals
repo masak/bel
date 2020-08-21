@@ -7,6 +7,6 @@ use Language::Bel::Globals::Generator qw(generate_globals);
 
 binmode STDOUT, ':encoding(utf-8)';
 
-my $bel = Language::Bel->new();
+my $bel = Language::Bel->new({ output => sub {} });
 
 generate_globals($bel);

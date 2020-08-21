@@ -5,6 +5,7 @@ use strict;
 use warnings;
 
 use Language::Bel::Types qw(
+    are_identical
     is_symbol
     make_char
     make_pair
@@ -21,12 +22,7 @@ use Language::Bel::Symbols::Common qw(
     SYMBOL_SYMBOL
     SYMBOL_T
 );
-use Language::Bel::Primitives qw(
-    _id
-    PRIMITIVES
-    prim_cdr
-    prim_xdr
-);
+use Language::Bel::Primitives;
 use Language::Bel::Globals::FastFuncs qw(
     fastfunc__no
     fastfunc__atom
@@ -111,6 +107,21 @@ use Language::Bel::Globals::FastFuncs qw(
     fastfunc__prs
 );
 
+sub make_prim {
+    my ($name) = @_;
+
+    return make_pair(
+        make_symbol("lit"),
+        make_pair(
+            make_symbol("prim"),
+            make_pair(
+                make_symbol($name),
+                SYMBOL_NIL,
+            ),
+        ),
+    );
+}
+
 sub add_global {
     my ($self, $name, $value) = @_;
 
@@ -127,29 +138,42 @@ sub new {
     };
 
     $self = bless($self, $class);
+    if (!defined($self->{primitives})) {
+        $self->{primitives} = Language::Bel::Primitives->new({ output => sub {} });
+    }
     if (!defined($self->{hash_ref}) && !defined($self->{list})) {
         $self->{hash_ref} = {};
         $self->{list} = SYMBOL_NIL;
 
-        $self->add_global("car", PRIMITIVES->{"car"});
+        $self->add_global("car", make_prim("car"));
 
-        $self->add_global("cdr", PRIMITIVES->{"cdr"});
+        $self->add_global("cdr", make_prim("cdr"));
 
-        $self->add_global("coin", PRIMITIVES->{"coin"});
+        $self->add_global("cls", make_prim("cls"));
 
-        $self->add_global("id", PRIMITIVES->{"id"});
+        $self->add_global("coin", make_prim("coin"));
 
-        $self->add_global("join", PRIMITIVES->{"join"});
+        $self->add_global("id", make_prim("id"));
 
-        $self->add_global("nom", PRIMITIVES->{"nom"});
+        $self->add_global("join", make_prim("join"));
 
-        $self->add_global("sym", PRIMITIVES->{"sym"});
+        $self->add_global("nom", make_prim("nom"));
 
-        $self->add_global("type", PRIMITIVES->{"type"});
+        $self->add_global("ops", make_prim("ops"));
 
-        $self->add_global("xar", PRIMITIVES->{"xar"});
+        $self->add_global("rdb", make_prim("rdb"));
 
-        $self->add_global("xdr", PRIMITIVES->{"xdr"});
+        $self->add_global("stat", make_prim("stat"));
+
+        $self->add_global("sym", make_prim("sym"));
+
+        $self->add_global("type", make_prim("type"));
+
+        $self->add_global("wrb", make_prim("wrb"));
+
+        $self->add_global("xar", make_prim("xar"));
+
+        $self->add_global("xdr", make_prim("xdr"));
 
         $self->add_global("no", make_fastfunc(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
@@ -518,6 +542,15 @@ sub new {
             make_pair(make_pair(make_symbol("type"), make_pair(make_symbol("x"),
             SYMBOL_NIL)), make_pair(make_pair(SYMBOL_QUOTE, make_pair(SYMBOL_CHAR,
             SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL))))), \&fastfunc__char));
+
+        $self->add_global("stream", make_pair(make_symbol("lit"),
+            make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+            make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
+            make_pair(make_pair(make_symbol("="),
+            make_pair(make_pair(make_symbol("type"), make_pair(make_symbol("x"),
+            SYMBOL_NIL)), make_pair(make_pair(SYMBOL_QUOTE,
+            make_pair(make_symbol("stream"), SYMBOL_NIL)), SYMBOL_NIL))),
+            SYMBOL_NIL))))));
 
         $self->add_global("proper", make_fastfunc(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
@@ -5427,7 +5460,7 @@ sub is_global_of_name {
 
     my $kv = $self->get_kv($global_name);
     my $global = pair_cdr($kv);
-    return $global && _id($e, $global);
+    return $global && are_identical($e, $global);
 }
 
 # (let cell (cons v nil)
@@ -5441,9 +5474,10 @@ sub install {
         my $name = symbol_name($v);
         $self->{hash_ref}->{$name} = $cell;
     }
-    prim_xdr($self->{list}, make_pair(
+    my $prim = $self->{primitives};
+    $prim->prim_xdr($self->{list}, make_pair(
         $cell,
-        prim_cdr($self->{list}),
+        $prim->prim_cdr($self->{list}),
     ));
 
     return $cell;

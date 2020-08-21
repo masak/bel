@@ -43,6 +43,12 @@ sub SYMBOL_D {
     return $symbol_d;
 }
 
+my $symbol_eof = make_symbol("eof");
+
+sub SYMBOL_EOF {
+    return $symbol_eof;
+}
+
 my $symbol_nil = make_symbol("nil");
 
 sub SYMBOL_NIL {
@@ -59,6 +65,12 @@ my $symbol_quote = make_symbol("quote");
 
 sub SYMBOL_QUOTE {
     return $symbol_quote;
+}
+
+my $symbol_stream = make_symbol("stream");
+
+sub SYMBOL_STREAM {
+    return $symbol_stream;
 }
 
 my $symbol_symbol = make_symbol("symbol");
@@ -80,9 +92,11 @@ our @EXPORT_OK = qw(
     SYMBOL_COMMA
     SYMBOL_COMMA_AT
     SYMBOL_D
+    SYMBOL_EOF
     SYMBOL_NIL 
     SYMBOL_PAIR
     SYMBOL_QUOTE
+    SYMBOL_STREAM
     SYMBOL_SYMBOL
     SYMBOL_T
 );

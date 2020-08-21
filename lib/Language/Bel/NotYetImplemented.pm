@@ -34,9 +34,14 @@ sub list {
             "('unboundb print)",
         ],
         streams => [
-            "(function stream)",
+            "(function source)",
             "clo",
-            "('unboundb stream)",
+            "('unboundb source)",
+        ],
+        after => [
+            "(function after)",
+            "prim",
+            "('unboundb after)",
         ],
         reader => [
             q[(read '("[cons _ 'b]"))],

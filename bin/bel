@@ -47,7 +47,7 @@ sub eval_file {
         my $ast = _bqexpand($p->{ast});
         my $next_pos = $p->{pos};
 
-        $b->eval_ast($ast);
+        $b->eval($ast);
 
         $source = substr($source, $next_pos);
         $source =~ s/^\s+//;
@@ -55,17 +55,14 @@ sub eval_file {
 }
 
 sub repl {
-    my $b = Language::Bel->new({ output => sub {
-        my ($string) = @_;
-        print($string, "\n");
-    } });
+    my $b = Language::Bel->new();
 
     print("Language::Bel ", $Language::Bel::VERSION, " -- $^O.\n");
     while (defined (my $expr = prompt("> "))) {
         next if $expr =~ /^\s*$/;
 
         eval {
-            $b->eval($expr);
+            $b->read_eval_print($expr);
         };
         if ($@) {
             print($@);

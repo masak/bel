@@ -15,10 +15,10 @@ my $b1 = Language::Bel->new({ output => sub {
 } });
 my $b2 = Language::Bel->new({ output => sub {} });
 
-$b1->eval("(set xyzzy 'right)");
-$b2->eval("(set xyzzy 'wrong)");
+$b1->read_eval_print("(set xyzzy 'right)");
+$b2->read_eval_print("(set xyzzy 'wrong)");
 
 $actual_output = "";
-$b1->eval("xyzzy");
+$b1->read_eval_print("xyzzy");
 
 is($actual_output, "right", "two Bel instances have distinct globals and don't interfere");

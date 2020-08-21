@@ -5,6 +5,8 @@ use strict;
 use warnings;
 
 use Language::Bel::Types qw(
+    are_identical
+    atoms_are_identical
     is_char
     is_fastfunc
     is_nil
@@ -16,18 +18,14 @@ use Language::Bel::Types qw(
     make_symbol
     pair_car
     pair_cdr
+    pairs_are_identical
     symbol_name
+    symbols_are_identical
 );
 use Language::Bel::Symbols::Common qw(
     SYMBOL_NIL
 );
-use Language::Bel::Primitives qw(
-    _id
-    prim_car
-    prim_cdr
-    prim_xdr
-    PRIM_FN
-);
+use Language::Bel::Primitives;
 use Language::Bel::Reader qw(
     read_whole
 );
@@ -50,11 +48,11 @@ Language::Bel - An interpreter for Paul Graham's language Bel
 
 =head1 VERSION
 
-Version 0.38
+Version 0.39
 
 =cut
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 =head1 SYNOPSIS
 
@@ -85,15 +83,28 @@ sub new {
     };
 
     $self = bless($self, $class);
+    if (!defined($self->{output})) {
+        $self->{output} = sub {
+            my ($string) = @_;
+            print($string, "\n");
+        };
+    }
+    if (!defined($self->{primitives})) {
+        $self->{primitives} = Language::Bel::Primitives->new({
+            output => $self->{output}
+        });
+    }
     if (!defined($self->{globals})) {
-        $self->{globals} = Language::Bel::Globals->new();
+        $self->{globals} = Language::Bel::Globals->new(
+            primitives => $self->{primitives},
+        );
     }
     if (!defined($self->{call})) {
         $self->{call} = sub {
             my ($fn, @args) = @_;
 
             if (is_fastfunc($fn)) {
-                return $fn->apply($self->{call}, @args);
+                return $fn->apply($self, @args);
             }
             else {
                 my $args = SYMBOL_NIL;
@@ -116,18 +127,37 @@ sub new {
     return $self;
 }
 
-=head2 eval
+sub car {
+    my ($self, $pair) = @_;
+
+    $self->{primitives}->prim_car($pair);
+}
+
+sub cdr {
+    my ($self, $pair) = @_;
+
+    $self->{primitives}->prim_cdr($pair);
+}
+
+sub xdr {
+    my ($self, $pair, $d) = @_;
+
+    $self->{primitives}->prim_xdr($pair, $d);
+}
+
+=head2 read_eval_print
 
 Evaluates an expression, passed in as a string of Bel code.
+Prints the result.
 
 =cut
 
-sub eval {
+sub read_eval_print {
     my ($self, $expr) = @_;
 
     my $ast = _bqexpand(read_whole($expr));
-    my $result = $self->eval_ast($ast);
-    my $result_string = _print($result);
+    my $eval_result = $self->eval($ast);
+    my $result_string = _print($eval_result);
 
     my $output = $self->{output};
     if (ref($output) eq "CODE") {
@@ -141,7 +171,7 @@ sub eval {
 #   (ev (list (list e nil))
 #       nil
 #       (list nil g)))
-sub eval_ast {
+sub eval {
     my ($self, $ast) = @_;
 
     $self->{s} = [[$ast, SYMBOL_NIL]];
@@ -163,11 +193,11 @@ my %forms = (
     # (form quote ((e) a s r m)
     #   (mev s (cons e r) m))
     quote => sub {
-        my ($interpreter, $es, $a) = @_;
+        my ($bel, $es, $a) = @_;
 
         # XXX: skipping $es sanity check for now
         my $e = pair_car($es);
-        push @{$interpreter->{r}}, $e;
+        push @{$bel->{r}}, $e;
     },
 
     # (form if (es a s r m)
@@ -182,20 +212,20 @@ my %forms = (
     #            r
     #            m)))
     if => sub {
-        my ($interpreter, $es, $a) = @_;
+        my ($bel, $es, $a) = @_;
 
         if (is_nil($es)) {
-            push @{$interpreter->{r}}, SYMBOL_NIL;
+            push @{$bel->{r}}, SYMBOL_NIL;
         }
         else {
-            my $cdr_es = prim_cdr($es);
+            my $cdr_es = $bel->cdr($es);
             if (!is_nil($cdr_es)) {
                 my $fu = fut(sub {
-                    if2($interpreter, prim_cdr($es), $a);
+                    if2($bel, $bel->cdr($es), $a);
                 });
-                push @{$interpreter->{s}}, $fu;
+                push @{$bel->{s}}, $fu;
             }
-            push @{$interpreter->{s}}, [prim_car($es), $a];
+            push @{$bel->{s}}, [$bel->car($es), $a];
         }
     },
 
@@ -206,12 +236,12 @@ my %forms = (
     #        r
     #        m))
     where => sub {
-        my ($interpreter, $e_new, $a) = @_;
-        my $e = prim_car($e_new);
-        my $new = prim_car(prim_cdr($e_new));
+        my ($bel, $e_new, $a) = @_;
+        my $e = $bel->car($e_new);
+        my $new = $bel->car($bel->cdr($e_new));
 
-        push @{$interpreter->{s}}, [make_smark_of_type("loc", $new), SYMBOL_NIL];
-        push @{$interpreter->{s}}, [$e, $a];
+        push @{$bel->{s}}, [make_smark_of_type("loc", $new), SYMBOL_NIL];
+        push @{$bel->{s}}, [$e, $a];
     },
 
     # (form dyn ((v e1 e2) a s r m)
@@ -223,18 +253,18 @@ my %forms = (
     #            m)
     #       (sigerr 'cannot-bind s r m)))
     dyn => sub {
-        my ($interpreter, $es, $a) = @_;
+        my ($bel, $es, $a) = @_;
 
         # XXX: skipping $es sanity check for now
-        my $v = prim_car($es);
-        my $e1 = prim_car(prim_cdr($es));
-        my $e2 = prim_car(prim_cdr(prim_cdr($es)));
+        my $v = $bel->car($es);
+        my $e1 = $bel->car($bel->cdr($es));
+        my $e2 = $bel->car($bel->cdr($bel->cdr($es)));
 
-        if ($interpreter->variable($v)) {
+        if ($bel->variable($v)) {
             my $fu = fut(sub {
-                dyn2($interpreter, $v, $e2, $a);
+                dyn2($bel, $v, $e2, $a);
             });
-            push @{$interpreter->{s}}, $fu, [$e1, $a];
+            push @{$bel->{s}}, $fu, [$e1, $a];
         }
         else {
             die "'cannot-bind\n";
@@ -251,13 +281,13 @@ my %forms = (
 #        (cdr r)
 #        m))
 sub if2 {
-    my ($interpreter, $es, $a) = @_;
+    my ($bel, $es, $a) = @_;
 
-    my $car_r = pop(@{$interpreter->{r}});
+    my $car_r = pop(@{$bel->{r}});
     my $e = !is_nil($car_r)
-        ? prim_car($es)
-        : make_pair(make_symbol("if"), prim_cdr($es));
-    push @{$interpreter->{s}}, [$e, $a];
+        ? $bel->car($es)
+        : make_pair(make_symbol("if"), $bel->cdr($es));
+    push @{$bel->{s}}, [$e, $a];
 }
 
 # (def dyn2 (v e2 a s r m)
@@ -268,10 +298,10 @@ sub if2 {
 #        (cdr r)
 #        m))
 sub dyn2 {
-    my ($interpreter, $v, $e2, $a) = @_;
+    my ($bel, $v, $e2, $a) = @_;
 
-    my $car_r = pop(@{$interpreter->{r}});
-    push @{$interpreter->{s}},
+    my $car_r = pop(@{$bel->{r}});
+    push @{$bel->{s}},
         [make_smark_of_type("bind", make_pair($v, $car_r)), SYMBOL_NIL],
         [$e2, $a];
 }
@@ -421,7 +451,7 @@ sub vref {
 
     my $it;
     if ($it = inwhere($self->{s})) {
-        my $car_inwhere = prim_car($it);
+        my $car_inwhere = $self->car($it);
         if (is_pair($it = $self->lookup($v, $a))
             || !is_nil($car_inwhere) && ($it = $self->{globals}->install($v))) {
             pop @{$self->{s}};  # get rid of the (smark 'loc)
@@ -472,12 +502,12 @@ sub get {
         return 1
             if is_symbol($first)
             && is_symbol($second)
-            && _id($first, $second);
+            && symbols_are_identical($first, $second);
         return is_pair($first)
             && is_pair(pair_car($first))
             && is_nil(pair_cdr($first))
             && is_pair($second)
-            && _id($first, $second);
+            && pairs_are_identical($first, $second);
     };
 
     while (!is_nil($kvs)) {
@@ -524,7 +554,7 @@ sub binding {
 
         next unless is_smark_of_type($e, "bind");
         my $smark_value = $e->value();
-        next unless _id(pair_car($smark_value), $v);
+        next unless are_identical(pair_car($smark_value), $v);
         return $smark_value;
     }
 
@@ -560,9 +590,9 @@ sub evcall {
             my ($v) = @_;
 
             return is_pair($v)
-                && is_symbol_of_name(prim_car($v), "lit")
-                && is_pair(prim_cdr($v))
-                && is_symbol_of_name(prim_car(prim_cdr($v)), "mac");
+                && is_symbol_of_name($self->car($v), "lit")
+                && is_pair($self->cdr($v))
+                && is_symbol_of_name($self->car($self->cdr($v)), "mac");
         };
 
         if ($isa_mac->($op)) {
@@ -585,18 +615,18 @@ sub evcall {
 
                 if ($self->{globals}->is_global_of_name($op, "err")) {
                     # XXX: Need to do proper parameter handling here
-                    die symbol_name(prim_car($args)), "\n";
+                    die symbol_name($self->car($args)), "\n";
                 }
                 elsif (is_fastfunc($op)) {
                     my $e;
                     if (inwhere($self->{s}) && $op->handles_where()) {
-                        $e = $op->where_apply($self->{call}, @args);
+                        $e = $op->where_apply($self, @args);
                         if (!is_nil($e)) {
                             pop @{$self->{s}};  # get rid of the (smark 'loc)
                         }
                     }
                     else {
-                        $e = $op->apply($self->{call}, @args);
+                        $e = $op->apply($self, @args);
                     }
                     push @{$self->{r}}, $e;
                 }
@@ -634,7 +664,7 @@ sub evcall {
 sub applym {
     my ($self, $mac, $args, $a) = @_;
 
-    my $mac_clo = prim_car(prim_cdr(prim_cdr($mac)));
+    my $mac_clo = $self->car($self->cdr($self->cdr($mac)));
     my $fu = fut(sub {
         my $macro_expansion = pop @{$self->{r}};
         push @{$self->{s}}, [$macro_expansion, $a];
@@ -653,12 +683,12 @@ sub applyf {
     my ($self, $f, $args, $a) = @_;
 
     if (is_symbol_of_name($f, "apply")) {
-        my $apply_op = prim_car($args);
-        my $it_arg = prim_cdr($args);
+        my $apply_op = $self->car($args);
+        my $it_arg = $self->cdr($args);
         my @stack;
         while (!is_nil($it_arg)) {
-            push @stack, prim_car($it_arg);
-            $it_arg = prim_cdr($it_arg);
+            push @stack, $self->car($it_arg);
+            $it_arg = $self->cdr($it_arg);
         }
         my $apply_args = @stack ? pop(@stack) : SYMBOL_NIL;
         while (@stack) {
@@ -702,7 +732,7 @@ sub applylit {
     my ($self, $f, $args, $a) = @_;
 
     my $it;
-    if (inwhere($self->{s}) && ($it = findlocfn($f, $args))) {
+    if (inwhere($self->{s}) && ($it = $self->findlocfn($f, $args))) {
         pop @{$self->{s}};  # get rid of the (smark 'loc)
         push @{$self->{r}}, $it;
     }
@@ -724,8 +754,8 @@ sub applylit {
         elsif ($tag_name eq "mac") {
             my @stack;
             while (!is_nil($args)) {
-                push @stack, prim_car($args);
-                $args = prim_cdr($args);
+                push @stack, $self->car($args);
+                $args = $self->cdr($args);
             }
             my $quoted_args = SYMBOL_NIL;
             while (@stack) {
@@ -739,14 +769,14 @@ sub applylit {
         }
         # XXX: skipping `cont` case for now
         else {
-            my $virfns = prim_cdr($self->{globals}->get_kv("virfns"));
+            my $virfns = $self->cdr($self->{globals}->get_kv("virfns"));
             my $it;
             if ($it = get($tag, $virfns)) {
-                my $cdr_it = prim_cdr($it);
+                my $cdr_it = $self->cdr($it);
                 my @stack;
                 while (!is_nil($args)) {
-                    push @stack, prim_car($args);
-                    $args = prim_cdr($args);
+                    push @stack, $self->car($args);
+                    $args = $self->cdr($args);
                 }
                 my $quoted_args = SYMBOL_NIL;
                 while (@stack) {
@@ -789,15 +819,15 @@ sub applylit {
 # (loc (is cdr) (f args a s r m)
 #   (mev (cdr s) (cons (list (car args) 'd) r) m))
 sub findlocfn {
-    my ($f, $args) = @_;
+    my ($self, $f, $args) = @_;
 
     if (is_pair($f)
-        && is_symbol_of_name(prim_car($f), "lit")
-        && is_symbol_of_name(prim_car(prim_cdr($f)), "prim")) {
-        my $caddr_f = prim_car(prim_cdr(prim_cdr($f)));
+        && is_symbol_of_name($self->car($f), "lit")
+        && is_symbol_of_name($self->car($self->cdr($f)), "prim")) {
+        my $caddr_f = $self->car($self->cdr($self->cdr($f)));
         if (is_symbol_of_name($caddr_f, "car")) {
             return make_pair(
-                prim_car($args),
+                $self->car($args),
                 make_pair(
                     make_symbol("a"),
                     SYMBOL_NIL,
@@ -806,7 +836,7 @@ sub findlocfn {
         }
         elsif (is_symbol_of_name($caddr_f, "cdr")) {
             return make_pair(
-                prim_car($args),
+                $self->car($args),
                 make_pair(
                     make_symbol("d"),
                     SYMBOL_NIL,
@@ -815,9 +845,9 @@ sub findlocfn {
         }
     }
     elsif (is_pair($f)
-        && is_symbol_of_name(prim_car($f), "lit")
-        && is_symbol_of_name(prim_car(prim_cdr($f)), "tab")) {
-        my $cell = tabloc($f, prim_car($args));
+        && is_symbol_of_name($self->car($f), "lit")
+        && is_symbol_of_name($self->car($self->cdr($f)), "tab")) {
+        my $cell = $self->tabloc($f, $self->car($args));
         return make_pair(
             $cell,
             make_pair(
@@ -826,27 +856,28 @@ sub findlocfn {
             ),
         );
     }
+    return;
 }
 
 sub tabloc {
-    my ($tab, $key) = @_;
+    my ($self, $tab, $key) = @_;
 
-    my $kvs = prim_cdr(prim_cdr($tab));
+    my $kvs = $self->cdr($self->cdr($tab));
     ELEM:
     while (!is_nil($kvs)) {
-        my $kv = prim_car($kvs);
-        my @stack = [prim_car($kv), $key];
+        my $kv = $self->car($kvs);
+        my @stack = [$self->car($kv), $key];
         while (@stack) {
             my ($v0, $v1) = @{pop(@stack)};
             if (!is_pair($v0) || !is_pair($v1)) {
-                if (!_id($v0, $v1)) {
-                    $kvs = prim_cdr($kvs);
+                if (!atoms_are_identical($v0, $v1)) {
+                    $kvs = $self->cdr($kvs);
                     next ELEM;
                 }
             }
             else {
-                push @stack, [prim_cdr($v0), prim_cdr($v1)];
-                push @stack, [prim_car($v0), prim_car($v1)];
+                push @stack, [$self->cdr($v0), $self->cdr($v1)];
+                push @stack, [$self->car($v0), $self->car($v1)];
             }
         }
         return $kv;
@@ -855,9 +886,9 @@ sub tabloc {
         $key,
         SYMBOL_NIL,
     );
-    prim_xdr(
-        prim_cdr($tab),
-        make_pair($cell, prim_cdr(prim_cdr($tab)))
+    $self->xdr(
+        $self->cdr($tab),
+        make_pair($cell, $self->cdr($self->cdr($tab)))
     );
     return $cell;
 }
@@ -892,23 +923,10 @@ sub applyprim {
     my ($self, $f, $args) = @_;
 
     my $name = symbol_name($f);
-    my $_a = prim_car($args);
-    my $_b = prim_car(prim_cdr($args));
+    my $_a = $self->car($args);
+    my $_b = $self->car($self->cdr($args));
 
-    my $prim = PRIM_FN->{$name};
-    # XXX: skipping the 'unknown-prim case for now
-    my $fn = $prim->{fn};
-    my $v;
-    if ($prim->{arity} == 0) {
-        $v = $fn->();
-    }
-    elsif ($prim->{arity} == 1) {
-        $v = $fn->($_a);
-    }
-    elsif ($prim->{arity} == 2) {
-        $v = $fn->($_a, $_b);
-    }
-    # XXX: skipping the `sigerr` case
+    my $v = $self->{primitives}->call($name, $_a, $_b);
     push @{$self->{r}}, $v;
 }
 
@@ -963,7 +981,7 @@ sub pass {
         $self->typecheck(pair_cdr($pat), $arg, $env);
     }
     elsif (is_pair($pat) && is_symbol_of_name(pair_car($pat), "o")) {
-        $self->pass(prim_car(pair_cdr($pat)), $arg, $env);
+        $self->pass($self->car(pair_cdr($pat)), $arg, $env);
     }
     else {
         $self->destructure($pat, $arg, $env);
@@ -981,8 +999,8 @@ sub pass {
 #        m))
 sub typecheck {
     my ($self, $var_f, $arg, $env) = @_;
-    my $var = prim_car($var_f);
-    my $f = prim_car(prim_cdr($var_f));
+    my $var = $self->car($var_f);
+    my $f = $self->car($self->cdr($var_f));
 
     my $fu = fut(sub {
         if (!is_nil(pop(@{$self->{r}}))) {
@@ -1037,13 +1055,13 @@ sub destructure {
     if (is_nil($arg)) {
         if (is_pair($p) && is_symbol_of_name(pair_car($p), "o")) {
             my $fu1 = fut(sub {
-                $self->pass(prim_car(pair_cdr($p)), pop(@{$self->{r}}), $env);
+                $self->pass($self->car(pair_cdr($p)), pop(@{$self->{r}}), $env);
             });
             my $fu2 = fut(sub {
                 $self->pass($ps, SYMBOL_NIL, pop(@{$self->{r}}));
             });
             push @{$self->{s}}, $fu2, $fu1, [
-                prim_car(prim_cdr(pair_cdr($p))),
+                $self->car($self->cdr(pair_cdr($p))),
                 $env,
             ];
         }

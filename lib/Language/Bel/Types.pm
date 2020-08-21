@@ -7,14 +7,42 @@ use warnings;
 use Language::Bel::Type::Char;
 use Language::Bel::Type::Pair;
 use Language::Bel::Type::Pair::FastFunc;
+use Language::Bel::Type::Stream;
 use Language::Bel::Type::Symbol;
 
 use Exporter 'import';
+
+sub are_identical {
+    my ($first, $second) = @_;
+
+    return
+        atoms_are_identical($first, $second)
+        ||
+        is_pair($first) && is_pair($second)
+            && pairs_are_identical($first, $second);
+}
+
+sub atoms_are_identical {
+    my ($first, $second) = @_;
+
+    return
+        is_symbol($first) && is_symbol($second)
+            && symbols_are_identical($first, $second)
+        ||
+        is_char($first) && is_char($second)
+            && char_codepoint($first) == char_codepoint($second);
+}
 
 sub char_codepoint {
     my ($char) = @_;
 
     return $char->{codepoint};
+}
+
+sub chars_are_identical {
+    my ($first, $second) = @_;
+
+    return char_codepoint($first) == char_codepoint($second);
 }
 
 sub is_char {
@@ -39,6 +67,12 @@ sub is_pair {
     my ($object) = @_;
 
     return $object->isa("Language::Bel::Type::Pair");
+}
+
+sub is_stream {
+    my ($object) = @_;
+
+    return $object->isa("Language::Bel::Type::Stream");
 }
 
 sub is_string {
@@ -81,6 +115,14 @@ sub make_pair {
     return Language::Bel::Type::Pair->new($car, $cdr);
 }
 
+sub make_stream {
+    my ($path_str, $mode) = @_;
+
+    # XXX: error handle $mode values
+
+    return Language::Bel::Type::Stream->new($path_str, symbol_name($mode));
+}
+
 sub make_symbol {
     my ($name) = @_;
 
@@ -113,6 +155,12 @@ sub pair_set_cdr {
     return;
 }
 
+sub pairs_are_identical {
+    my ($first, $second) = @_;
+
+    return $first eq $second;
+}
+
 sub string_value {
     my ($object) = @_;
 
@@ -130,25 +178,38 @@ sub symbol_name {
     return $symbol->{name};
 }
 
+sub symbols_are_identical {
+    my ($first, $second) = @_;
+
+    return symbol_name($first) eq symbol_name($second);
+}
+
 our @EXPORT_OK = qw(
+    are_identical
+    atoms_are_identical
     char_codepoint
+    chars_are_identical
     is_char
     is_fastfunc
     is_nil
     is_pair
+    is_stream
     is_string
     is_symbol
     is_symbol_of_name
     make_char
     make_fastfunc
     make_pair
+    make_stream
     make_symbol
     pair_car
     pair_cdr
     pair_set_car
     pair_set_cdr
+    pairs_are_identical
     string_value
     symbol_name
+    symbols_are_identical
 );
 
 1;
