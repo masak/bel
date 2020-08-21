@@ -33,11 +33,6 @@ sub list {
             "clo",
             "('unboundb print)",
         ],
-        streams => [
-            "(function source)",
-            "clo",
-            "('unboundb source)",
-        ],
         after => [
             "(function after)",
             "prim",

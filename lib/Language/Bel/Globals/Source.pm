@@ -787,19 +787,24 @@ __DATA__
     `(let ,v ,x
        (zap [rem ,v _ ,@rest] ,place))))
 
-; skip cbuf [waiting for streams]
+(set cbuf '((nil)))
 
-; skip open [waiting for streams]
+(def open args
+  (let s (apply ops args)
+    (push (list s) cbuf)
+    s))
 
-; skip close [waiting for streams]
+(def close (s)
+  (pull s cbuf caris)
+  (cls s))
 
-; skip peek [waiting for streams]
+; skip peek [waiting for chars]
 
-; skip rdc [waiting for streams]
+; skip rdc [waiting for chars]
 
-; skip bbuf [waiting for streams]
+(set bbuf nil)
 
-; skip bitc [waiting for streams]
+; skip bitc [waiting for chars]
 
 (def digit (c (o base i10))
   (mem c (udrop (udrop base i16) "fedcba9876543210")))
@@ -812,7 +817,7 @@ __DATA__
 (def intrac (c)
   (in c \. \!))
 
-; skip source [waiting for streams]
+(set source (cor no stream (cand pair string:car)))
 
 ; skip read [waiting for reader]
 

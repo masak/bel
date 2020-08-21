@@ -23,7 +23,7 @@ After downloading Bel, you can run it like this:
 
 ```sh
 $ perl -Ilib bin/bel
-Language::Bel 0.39 -- msys.
+Language::Bel 0.40 -- msys.
 > (+ 2 2)
 4
 > (append "Hello" '(\sp) "world!")
@@ -36,16 +36,11 @@ Language::Bel 0.39 -- msys.
 It's not fully there yet, though it's under active development.
 
 [The spec](https://github.com/masak/bel/blob/master/pg/bel.bel) contains 353 items.
-`Language::Bel` currently defines 248 of them.
+`Language::Bel` currently defines 253 of them.
 
-![248 of 353 definitions](images/definitions.svg)
+![253 of 353 definitions](images/definitions.svg)
 
 A summary of the remaining big features:
-
-* **Streams** are opaque objects created by the runtime when a file is opened
-  for reading or writing. They read and write individual bits. Primarily I would like
-  to mock everything to do with streams in the tests &mdash; but it might make sense
-  to have an integration test file that uses real streams and real files, too.
 
 * **after** is a primitive that gives "`finally` semantics" to an expression. That is,
   `(after x y)` promises to run `y` no matter what happens to `x`: normal execution,

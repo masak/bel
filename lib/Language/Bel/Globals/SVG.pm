@@ -73,7 +73,7 @@ sub generate {
         }
 
         .done               { fill: white; }
-        .feature-streams    { fill: #faa; }
+        .feature-after      { fill: #faa; }
         .feature-ccc        { fill: #fb6; }
         .feature-evaluator  { fill: #fe3; }
         .feature-reader     { fill: #7e6; }
@@ -82,9 +82,9 @@ sub generate {
         .feature-chars      { fill: #faf; }
       </style>\n\n");
 
-    my $y = 251;
+    my $y = 280;
     my $box_size = 17;
-    for my $feature (qw<done streams ccc evaluator reader backquotes printer chars>) {
+    for my $feature (qw<done after ccc evaluator reader backquotes printer chars>) {
         my $class = $feature eq "done"
             ? $feature
             : "feature-$feature";

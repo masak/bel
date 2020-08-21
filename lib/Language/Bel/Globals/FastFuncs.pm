@@ -734,7 +734,7 @@ sub fastfunc__rem {
     if (defined($f)) {
         while (!is_nil($ys)) {
             my $value = $bel->car($ys);
-            if (is_nil($bel->{call}->($f, $x, $value))) {
+            if (is_nil($bel->{call}->($f, $value, $x))) {
                 push @values, $value;
             }
             $ys = $bel->cdr($ys);
