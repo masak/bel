@@ -6,7 +6,7 @@ use Test::More;
 
 use Language::Bel::Test;
 
-plan tests => 3;
+plan tests => 4;
 
 ## Testing all possible ways to re-invoke `mev
 
@@ -15,4 +15,13 @@ plan tests => 3;
     is_bel_output("(bel nil)", "nil");
     is_bel_output("(bel t)", "t");
     is_bel_output("(bel \\x)", "\\x");
+}
+
+# variable
+{
+    is_bel_output("(bel 'vmark)", "(nil)");
+    # TODO: lexical variable
+    # TODO: dynamic variable
+    # TODO: unbound variable
+    # TODO: inwhere case
 }

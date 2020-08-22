@@ -244,7 +244,19 @@ __DATA__
        (get (car e) forms id) ((cdr it) (cdr e) a s r m)
                               (evcall e a s r m)))
 
-; skip vref [waiting for evaluator]
+(def vref (v a s r m)
+  (let g (cadr m)
+    (if (inwhere s)
+        (aif (or (lookup v a s g)
+                 (and (car (inwhere s))
+                      (let cell (cons v nil)
+                        (xdr g (cons cell (cdr g)))
+                        cell)))
+             (mev (cdr s) (cons (list it 'd) r) m)
+             (sigerr 'unbound s r m))
+        (aif (lookup v a s g)
+             (mev s (cons (cdr it) r) m)
+             (sigerr (list 'unboundb v) s r m)))))
 
 (set smark (join))
 
