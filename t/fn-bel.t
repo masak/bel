@@ -25,3 +25,9 @@ plan tests => 4;
     # TODO: unbound variable
     # TODO: inwhere case
 }
+
+# TODO: froms (waiting for eif)
+# TODO: macro/applym
+# TODO: improper lit
+# TODO: applyf not a lit
+# TODO: locfn
