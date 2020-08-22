@@ -220,13 +220,29 @@ __DATA__
 (def isa (name)
   [begins _ `(lit ,name) id])
 
-; skip bel [waiting for evaluator]
+(def bel (e (o g globe))
+  (ev (list (list e nil))
+      nil
+      (list nil g)))
 
-; skip mev [waiting for evaluator]
+(def mev (s r (p g))
+  (if (no s)
+      (if p
+          (sched p g)
+          (car r))
+      (sched (if (cdr (binding 'lock s))
+                 (cons (list s r) p)
+                 (snoc p (list s r)))
+             g)))
 
 ; skip sched [waiting for evaluator]
 
-; skip ev [waiting for evaluator]
+(def ev (((e a) . s) r m)
+  (aif (literal e)            (mev s (cons e r) m)
+       (variable e)           (vref e a s r m)
+       (no (proper e))        (sigerr 'malformed s r m)
+       (get (car e) forms id) ((cdr it) (cdr e) a s r m)
+                              (evcall e a s r m)))
 
 ; skip vref [waiting for evaluator]
 

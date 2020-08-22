@@ -34,8 +34,8 @@ sub list {
             "('unboundb print)",
         ],
         after => [
-            "(function after)",
-            "prim",
+            "(after 1 2)",
+            "1",
             "('unboundb after)",
         ],
         reader => [
@@ -44,9 +44,9 @@ sub list {
             "('unboundb read)",
         ],
         evaluator => [
-            "(bel 'hi)",
-            "hi",
-            "('unboundb bel)",
+            "(function sched)",
+            "clo",
+            "('unboundb sched)",
         ],
     );
 }
