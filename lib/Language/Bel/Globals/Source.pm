@@ -296,7 +296,7 @@ __DATA__
               m)
          (sigerr 'unknown-mark s r m)))
 
-; skip forms [waiting for evaluator]
+(set forms (list (cons smark evmark)))
 
 ; skip form [waiting for evaluator]
 
