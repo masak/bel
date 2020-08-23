@@ -284,7 +284,17 @@ __DATA__
 (mac fu args
   `(list (list smark 'fut (fn ,@args)) nil))
 
-; skip evmark [waiting for evaluator]
+(def evmark (e a s r m)
+  (case (car e)
+    fut  ((cadr e) s r m)
+    bind (mev s r m)
+    loc  (sigerr 'unfindable s r m)
+    prot (mev (cons (list (cadr e) a)
+                    (fu (s r m) (mev s (cdr r) m))
+                    s)
+              r
+              m)
+         (sigerr 'unknown-mark s r m)))
 
 ; skip forms [waiting for evaluator]
 
