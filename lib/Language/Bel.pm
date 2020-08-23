@@ -744,9 +744,9 @@ sub applylit {
             $self->applyprim(pair_car($rest), $args);
         }
         elsif ($tag_name eq "clo") {
-            my $env = pair_car($rest);
-            my $parms = pair_car(pair_cdr($rest));
-            my $body = pair_car(pair_cdr(pair_cdr($rest)));
+            my $env = $self->car($rest);
+            my $parms = $self->car($self->cdr($rest));
+            my $body = $self->car($self->cdr($self->cdr($rest)));
 
             # XXX: skipping `okenv` and `okparms` checks for now
             $self->applyclo($parms, $args, $env, $body);
