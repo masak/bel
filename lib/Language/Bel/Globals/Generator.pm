@@ -15,6 +15,7 @@ use Language::Bel::Types qw(
     make_symbol
     pair_car
     pair_cdr
+    pairs_are_identical
     symbol_name
 );
 use Language::Bel::Symbols::Common qw(
@@ -376,6 +377,7 @@ HEADER
         };
     }
 
+    my $smark = $bel->eval(make_symbol("smark"));
     my $first = 1;
     for my $global (@globals) {
         if ($first) {
@@ -385,7 +387,7 @@ HEADER
             print("\n");
         }
 
-        print_global($global->{name}, $global->{expr});
+        print_global($global->{name}, $global->{expr}, $smark);
     }
 
     print <<'FOOTER';
@@ -447,9 +449,9 @@ sub print_primitive {
 }
 
 sub print_global {
-    my ($name, $value) = @_;
+    my ($name, $value, $smark) = @_;
 
-    my $serialized = serialize($value);
+    my $serialized = serialize($value, $smark);
     my $mangled_name = $name;
     $mangled_name =~ s/^=/eq/;
     $mangled_name =~ s/\+/_plus/g;
@@ -471,12 +473,17 @@ sub print_global {
 }
 
 sub serialize {
-    my ($value) = @_;
+    my ($value, $smark) = @_;
 
     if (is_pair($value)) {
-        my $car = serialize(pair_car($value));
-        my $cdr = serialize(pair_cdr($value));
-        return "make_pair($car, $cdr)";
+        if (defined($smark) && pairs_are_identical($value, $smark)) {
+            return q[pair_cdr($self->get_kv("smark"))];
+        }
+        else {
+            my $car = serialize(pair_car($value), $smark);
+            my $cdr = serialize(pair_cdr($value), $smark);
+            return "make_pair($car, $cdr)";
+        }
     }
     elsif (is_symbol($value)) {
         my $name = symbol_name($value);

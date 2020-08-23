@@ -1193,8 +1193,9 @@ sub new {
             make_pair(make_symbol("m"), SYMBOL_NIL))))), SYMBOL_NIL))))))))))),
             SYMBOL_NIL))))));
 
-        $self->add_global("forms", make_pair(make_pair(make_pair(SYMBOL_NIL,
-            SYMBOL_NIL), make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+        $self->add_global("forms",
+            make_pair(make_pair(pair_cdr($self->get_kv("smark")),
+            make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
             make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("e"),
             make_pair(make_symbol("a"), make_pair(make_symbol("s"),
             make_pair(make_symbol("r"), make_pair(make_symbol("m"), SYMBOL_NIL))))),
