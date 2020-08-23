@@ -6,7 +6,7 @@ use Test::More;
 
 use Language::Bel::Test;
 
-plan tests => 4;
+plan tests => 6;
 
 ## Testing all possible ways to re-invoke `mev
 
@@ -28,6 +28,13 @@ plan tests => 4;
 
 # TODO: froms (waiting for eif)
 # TODO: macro/applym
+# TODO: apply
 # TODO: improper lit
 # TODO: applyf not a lit
 # TODO: locfn
+
+# primitive
+{
+    is_bel_output("(bel '(id \\a \\b))", "nil");
+    is_bel_output("(bel '(id \\c \\c))", "t");
+}

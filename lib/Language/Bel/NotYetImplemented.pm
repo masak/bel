@@ -44,9 +44,9 @@ sub list {
             "('unboundb read)",
         ],
         evaluator => [
-            "(function sched)",
+            "(function load)",
             "clo",
-            "('unboundb sched)",
+            "('unboundb load)",
         ],
     );
 }

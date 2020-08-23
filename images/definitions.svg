@@ -579,55 +579,71 @@
         title='&lt;anon&gt;'
       />
   <rect
-        x='466'
-        y='56'
+        x='461'
+        y='51'
+        width='17'
+        height='17'
+        class='done box'
+        title='&lt;anon&gt;'
+      />
+  <rect
+        x='481'
+        y='51'
+        width='17'
+        height='17'
+        class='done box'
+        title='&lt;anon&gt;'
+      />
+  <rect
+        x='501'
+        y='51'
+        width='17'
+        height='17'
+        class='done box'
+        title='&lt;anon&gt;'
+      />
+  <rect
+        x='521'
+        y='51'
+        width='17'
+        height='17'
+        class='done box'
+        title='&lt;anon&gt;'
+      />
+  <rect
+        x='541'
+        y='51'
+        width='17'
+        height='17'
+        class='done box'
+        title='&lt;anon&gt;'
+      />
+  <rect
+        x='561'
+        y='51'
+        width='17'
+        height='17'
+        class='done box'
+        title='&lt;anon&gt;'
+      />
+  <rect
+        x='161'
+        y='71'
+        width='17'
+        height='17'
+        class='done box'
+        title='&lt;anon&gt;'
+      />
+  <rect
+        x='186'
+        y='76'
         width='17'
         height='17'
         class='feature-evaluator box'
-        title='sched'
+        title='sigerr'
       />
   <rect
-        x='491'
-        y='61'
-        width='17'
-        height='17'
-        class='done box'
-        title='&lt;anon&gt;'
-      />
-  <rect
-        x='511'
-        y='61'
-        width='17'
-        height='17'
-        class='done box'
-        title='&lt;anon&gt;'
-      />
-  <rect
-        x='531'
-        y='61'
-        width='17'
-        height='17'
-        class='done box'
-        title='&lt;anon&gt;'
-      />
-  <rect
-        x='551'
-        y='61'
-        width='17'
-        height='17'
-        class='done box'
-        title='&lt;anon&gt;'
-      />
-  <rect
-        x='571'
-        y='61'
-        width='17'
-        height='17'
-        class='done box'
-        title='&lt;anon&gt;'
-      />
-  <rect
-        x='171'
+        x='211'
         y='81'
         width='17'
         height='17'
@@ -635,55 +651,119 @@
         title='&lt;anon&gt;'
       />
   <rect
-        x='196'
+        x='231'
+        y='81'
+        width='17'
+        height='17'
+        class='done box'
+        title='&lt;anon&gt;'
+      />
+  <rect
+        x='251'
+        y='81'
+        width='17'
+        height='17'
+        class='done box'
+        title='&lt;anon&gt;'
+      />
+  <rect
+        x='276'
         y='86'
-        width='17'
-        height='17'
-        class='feature-evaluator box'
-        title='sigerr'
-      />
-  <rect
-        x='221'
-        y='91'
-        width='17'
-        height='17'
-        class='done box'
-        title='&lt;anon&gt;'
-      />
-  <rect
-        x='241'
-        y='91'
-        width='17'
-        height='17'
-        class='done box'
-        title='&lt;anon&gt;'
-      />
-  <rect
-        x='261'
-        y='91'
-        width='17'
-        height='17'
-        class='done box'
-        title='&lt;anon&gt;'
-      />
-  <rect
-        x='286'
-        y='96'
         width='17'
         height='17'
         class='feature-evaluator box'
         title='form'
       />
   <rect
-        x='306'
-        y='96'
+        x='296'
+        y='86'
         width='17'
         height='17'
         class='feature-evaluator box'
         title='formfn'
       />
   <rect
-        x='331'
+        x='321'
+        y='91'
+        width='17'
+        height='17'
+        class='done box'
+        title='&lt;anon&gt;'
+      />
+  <rect
+        x='346'
+        y='96'
+        width='17'
+        height='17'
+        class='feature-evaluator box'
+        title='quote'
+      />
+  <rect
+        x='366'
+        y='96'
+        width='17'
+        height='17'
+        class='feature-evaluator box'
+        title='if'
+      />
+  <rect
+        x='386'
+        y='96'
+        width='17'
+        height='17'
+        class='feature-evaluator box'
+        title='if2'
+      />
+  <rect
+        x='406'
+        y='96'
+        width='17'
+        height='17'
+        class='feature-evaluator box'
+        title='where'
+      />
+  <rect
+        x='426'
+        y='96'
+        width='17'
+        height='17'
+        class='feature-evaluator box'
+        title='dyn'
+      />
+  <rect
+        x='446'
+        y='96'
+        width='17'
+        height='17'
+        class='feature-evaluator box'
+        title='dyn2'
+      />
+  <rect
+        x='466'
+        y='96'
+        width='17'
+        height='17'
+        class='feature-evaluator box'
+        title='after'
+      />
+  <rect
+        x='486'
+        y='96'
+        width='17'
+        height='17'
+        class='feature-evaluator box'
+        title='ccc'
+      />
+  <rect
+        x='506'
+        y='96'
+        width='17'
+        height='17'
+        class='feature-evaluator box'
+        title='thread'
+      />
+  <rect
+        x='531'
         y='101'
         width='17'
         height='17'
@@ -691,92 +771,12 @@
         title='&lt;anon&gt;'
       />
   <rect
-        x='356'
-        y='106'
+        x='551'
+        y='101'
         width='17'
         height='17'
-        class='feature-evaluator box'
-        title='quote'
-      />
-  <rect
-        x='376'
-        y='106'
-        width='17'
-        height='17'
-        class='feature-evaluator box'
-        title='if'
-      />
-  <rect
-        x='396'
-        y='106'
-        width='17'
-        height='17'
-        class='feature-evaluator box'
-        title='if2'
-      />
-  <rect
-        x='416'
-        y='106'
-        width='17'
-        height='17'
-        class='feature-evaluator box'
-        title='where'
-      />
-  <rect
-        x='436'
-        y='106'
-        width='17'
-        height='17'
-        class='feature-evaluator box'
-        title='dyn'
-      />
-  <rect
-        x='456'
-        y='106'
-        width='17'
-        height='17'
-        class='feature-evaluator box'
-        title='dyn2'
-      />
-  <rect
-        x='476'
-        y='106'
-        width='17'
-        height='17'
-        class='feature-evaluator box'
-        title='after'
-      />
-  <rect
-        x='496'
-        y='106'
-        width='17'
-        height='17'
-        class='feature-evaluator box'
-        title='ccc'
-      />
-  <rect
-        x='516'
-        y='106'
-        width='17'
-        height='17'
-        class='feature-evaluator box'
-        title='thread'
-      />
-  <rect
-        x='536'
-        y='106'
-        width='17'
-        height='17'
-        class='feature-evaluator box'
-        title='evcall'
-      />
-  <rect
-        x='556'
-        y='106'
-        width='17'
-        height='17'
-        class='feature-evaluator box'
-        title='evcall2'
+        class='done box'
+        title='&lt;anon&gt;'
       />
   <rect
         x='576'
@@ -787,20 +787,20 @@
         title='applym'
       />
   <rect
-        x='596'
-        y='106'
+        x='601'
+        y='111'
         width='17'
         height='17'
-        class='feature-evaluator box'
-        title='applyf'
+        class='done box'
+        title='&lt;anon&gt;'
       />
   <rect
-        x='196'
-        y='126'
+        x='201'
+        y='131'
         width='17'
         height='17'
-        class='feature-evaluator box'
-        title='applylit'
+        class='done box'
+        title='&lt;anon&gt;'
       />
   <rect
         x='221'
@@ -891,12 +891,12 @@
         title='&lt;anon&gt;'
       />
   <rect
-        x='446'
-        y='136'
+        x='441'
+        y='131'
         width='17'
         height='17'
-        class='feature-evaluator box'
-        title='applyprim'
+        class='done box'
+        title='&lt;anon&gt;'
       />
   <rect
         x='466'

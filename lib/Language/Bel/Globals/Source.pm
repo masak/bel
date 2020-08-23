@@ -235,7 +235,8 @@ __DATA__
                  (snoc p (list s r)))
              g)))
 
-; skip sched [waiting for evaluator]
+(def sched (((s r) . p) g)
+  (ev s r (list p g)))
 
 (def ev (((e a) . s) r m)
   (aif (literal e)            (mev s (cons e r) m)
@@ -328,15 +329,53 @@ __DATA__
 
 ; skip thread [waiting for evaluator]
 
-; skip evcall [waiting for evaluator]
+(def evcall (e a s r m)
+  (mev (cons (list (car e) a)
+             (fu (s r m)
+               (evcall2 (cdr e) a s r m))
+             s)
+       r
+       m))
 
-; skip evcall2 [waiting for evaluator]
+(def evcall2 (es a s (op . r) m)
+  (if ((isa 'mac) op)
+      (applym op es a s r m)
+      (mev (append (map [list _ a] es)
+                   (cons (fu (s r m)
+                           (let (args r2) (snap es r)
+                             (applyf op (rev args) a s r2 m)))
+                         s))
+           r
+           m)))
 
 ; skip applym [waiting for evaluator]
 
-; skip applyf [waiting for evaluator]
+(def applyf (f args a s r m)
+  (if (= f apply)    (applyf (car args) (reduce join (cdr args)) a s r m)
+      (caris f 'lit) (if (proper f)
+                         (applylit f args a s r m)
+                         (sigerr 'bad-lit s r m))
+                     (sigerr 'cannot-apply s r m)))
 
-; skip applylit [waiting for evaluator]
+(def applylit (f args a s r m)
+  (aif (and (inwhere s) (find [(car _) f] locfns))
+       ((cadr it) f args a s r m)
+       (let (tag . rest) (cdr f)
+         (case tag
+           prim (applyprim (car rest) args s r m)
+           clo  (let ((o env) (o parms) (o body) . extra) rest
+                  (if (and (okenv env) (okparms parms))
+                      (applyclo parms args env body s r m)
+                      (sigerr 'bad-clo s r m)))
+           mac  (applym f (map [list 'quote _] args) a s r m)
+           cont (let ((o s2) (o r2) . extra) rest
+                  (if (and (okstack s2) (proper r2))
+                      (applycont s2 r2 args s r m)
+                      (sigerr 'bad-cont s r m)))
+                (aif (get tag virfns)
+                     (let e ((cdr it) f (map [list 'quote _] args))
+                       (mev (cons (list e a) s) r m))
+                     (sigerr 'unapplyable s r m))))))
 
 (set virfns nil)
 
@@ -379,7 +418,33 @@ __DATA__
              (car cdr type sym nom rdb cls stat sys)
              (coin)))
 
-; skip applyprim [waiting for evaluator]
+(def applyprim (f args s r m)
+  (aif (some [mem f _] prims)
+       (if (udrop (cdr it) args)
+           (sigerr 'overargs s r m)
+           (with (a (car args)
+                  b (cadr args))
+             ; eif v
+             (let v (case f
+                      id   (id a b)
+                      join (join a b)
+                      car  (car a)
+                      cdr  (cdr a)
+                      type (type a)
+                      xar  (xar a b)
+                      xdr  (xdr a b)
+                      sym  (sym a)
+                      nom  (nom a)
+                      wrb  (wrb a b)
+                      rdb  (rdb a)
+                      ops  (ops a b)
+                      cls  (cls a)
+                      stat (stat a)
+                      coin (coin)
+                      sys  (sys a))
+                  ; (sigerr v s r m)
+                    (mev s (cons v r) m))))
+       (sigerr 'unknown-prim s r m)))
 
 ; skip applyclo [waiting for evaluator]
 
