@@ -463,11 +463,47 @@ mac and ...args:
                     if ,e:
                         ,result
 
+- Quite a lot of non-trivial abstract interpretation has gone on
+  to get this Belfast High code from that Bel code.
+- Specifically, the inlining of the `or` is so total that no trace
+  of it is seen. A more direct rendering of `and` would be this:
+
+mac and ...args:
+    let uvar0 = args
+    if uvar0:
+        temp0 = uvar0
+    else:
+        temp0 = '(t)
+    gather let result:
+        iterate!backward let e in temp0:
+            # ...the rest is the same as above...
+
+- But presumably we have the power to simplify the above into the
+  nicer form shown originally.
+
 (def = args
   (if (no (cdr args))  t
       (some atom args) (all [id _ (car args)] (cdr args))
                        (and (apply = (map car args))
                             (apply = (map cdr args)))))
+
+def = ...args:
+    if length-less-than-1 args:
+        return 't
+    traverse!transposed!forward let es in args:
+        iterate!forward let e in es:
+            if id (id (type x) 'pair) 'nil:
+                first = car es
+                iterate!forward let _ in cdr es:
+                    unless id _ first:
+                        return 'nil
+                break
+    return 't
+
+- The `traverse` loop is for tree-like forms; it will be seen later in
+  parameter binding and bquote expansion.
+- As before `traverse!transposed` means we are iterating over _several_ trees
+  at the same time (and abstracting away the mechanism for clarity).
 
 (def symbol (x) (= (type x) 'symbol))
 
