@@ -6,7 +6,7 @@ use Test::More;
 
 use Language::Bel::Test;
 
-plan tests => 17;
+plan tests => 18;
 
 {
     is_bel_output("'a:b:c", "(compose a b c)");
@@ -26,4 +26,5 @@ plan tests => 17;
     is_bel_output("'!a", "(upon (quote a))");
     is_bel_output("(let x '(a . b) (map .x (list car cdr)))", "(a b)");
     is_bel_output("'x|~f:g!a", "(t x ((compose (compose no f) g) (quote a)))");
+    is_bel_output("inc.10", "11");
 }
