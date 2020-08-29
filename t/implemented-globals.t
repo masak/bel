@@ -100,8 +100,8 @@ while ($i < @bel_globals && !eof($SOURCE)) {
             $waiting_for{$feature}++;
         }
     }
-    elsif ($name eq "applyprim" || $name eq "randlen") {
-        # special exception for `applyprim`, which wants `eif`
+    elsif ($name eq "applyprim" || $name eq "formfn" || $name eq "randlen") {
+        # special exception for `applyprim` and `formfn`, which want `eif`
         # special exception for `randlen`, which wants `read`
         $num_implemented++;
     }

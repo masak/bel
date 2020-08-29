@@ -299,9 +299,18 @@ __DATA__
 
 (set forms (list (cons smark evmark)))
 
-; skip form [waiting for evaluator]
+(mac form (name parms . body)
+  `(set forms (put ',name ,(formfn parms body) forms)))
 
-; skip formfn [waiting for evaluator]
+(def formfn (parms body)
+  (with (v  (uvar)
+         w  (uvar)
+         ps (parameters (car parms)))
+    `(fn ,v
+       (let ,w (apply (fn ,(car parms) (list ,@ps))
+                      (car ,v))
+         (let ,ps ,w
+           (let ,(cdr params) (cdr ,v) ,@body))))))
 
 (def parameters (p)
   (if (no p)           nil
