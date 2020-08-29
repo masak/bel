@@ -272,6 +272,47 @@ HEADER
             }
             next DECLARATION;
         }
+        elsif (symbol_name($car_ast) eq "form") {
+            my $name = $bel->car($bel->cdr($ast));
+            my $parms = $bel->car($bel->cdr($bel->cdr($ast)));
+            my $body = $bel->cdr($bel->cdr($bel->cdr($ast)));
+            for my $global (@globals) {
+                if ($global->{name} eq "forms") {
+                    $global->{expr} = make_pair(
+                        make_pair(
+                            $name,
+                            $bel->eval(
+                                make_pair(
+                                    make_symbol("formfn"),
+                                    make_pair(
+                                        make_pair(
+                                            make_symbol("quote"),
+                                            make_pair(
+                                                $parms,
+                                                SYMBOL_NIL,
+                                            ),
+                                        ),
+                                        make_pair(
+                                            make_pair(
+                                                make_symbol("quote"),
+                                                make_pair(
+                                                    $body,
+                                                    SYMBOL_NIL,
+                                                )
+                                            ),
+                                            SYMBOL_NIL,
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ),
+                        $global->{expr},
+                    );
+                    last;
+                }
+            }
+            next;
+        }
         elsif (symbol_name($car_ast) eq "vir") {
             my $tag = $bel->car($bel->cdr($ast));
             my $rest = $bel->cdr($bel->cdr($ast));

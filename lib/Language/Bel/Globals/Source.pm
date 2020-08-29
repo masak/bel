@@ -310,7 +310,7 @@ __DATA__
        (let ,w (apply (fn ,(car parms) (list ,@ps))
                       (car ,v))
          (let ,ps ,w
-           (let ,(cdr params) (cdr ,v) ,@body))))))
+           (let ,(cdr parms) (cdr ,v) ,@body))))))
 
 (def parameters (p)
   (if (no p)           nil
@@ -320,7 +320,8 @@ __DATA__
                        (append (parameters (car p))
                                (parameters (cdr p)))))
 
-; skip quote [waiting for evaluator]
+(form quote ((e) a s r m)
+  (mev s (cons e r) m))
 
 ; skip if [waiting for evaluator]
 
