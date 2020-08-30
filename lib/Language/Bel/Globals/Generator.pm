@@ -418,6 +418,7 @@ HEADER
         };
     }
 
+    my $vmark = $bel->eval(make_symbol("vmark"));
     my $smark = $bel->eval(make_symbol("smark"));
     my $first = 1;
     for my $global (@globals) {
@@ -428,7 +429,7 @@ HEADER
             print("\n");
         }
 
-        print_global($global->{name}, $global->{expr}, $smark);
+        print_global($global->{name}, $global->{expr}, $vmark, $smark);
     }
 
     print <<'FOOTER';
@@ -490,9 +491,9 @@ sub print_primitive {
 }
 
 sub print_global {
-    my ($name, $value, $smark) = @_;
+    my ($name, $value, $vmark, $smark) = @_;
 
-    my $serialized = serialize($value, $smark);
+    my $serialized = serialize($value, $vmark, $smark);
     my $mangled_name = $name;
     $mangled_name =~ s/^=/eq/;
     $mangled_name =~ s/\+/_plus/g;
@@ -514,15 +515,18 @@ sub print_global {
 }
 
 sub serialize {
-    my ($value, $smark) = @_;
+    my ($value, $vmark, $smark) = @_;
 
     if (is_pair($value)) {
-        if (defined($smark) && pairs_are_identical($value, $smark)) {
+        if (defined($vmark) && pairs_are_identical($value, $vmark)) {
+            return q[pair_cdr($self->get_kv("vmark"))];
+        }
+        elsif (defined($smark) && pairs_are_identical($value, $smark)) {
             return q[pair_cdr($self->get_kv("smark"))];
         }
         else {
-            my $car = serialize(pair_car($value), $smark);
-            my $cdr = serialize(pair_cdr($value), $smark);
+            my $car = serialize(pair_car($value), $vmark, $smark);
+            my $cdr = serialize(pair_cdr($value), $vmark, $smark);
             return "make_pair($car, $cdr)";
         }
     }
