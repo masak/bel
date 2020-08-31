@@ -104,6 +104,8 @@ given a long list and a request to look up its millionth element, it will make a
 difference whether that lookup is indexed (like with arrays) or linear (like with
 linked lists).
 
+*Make it work, make it right, make it fast.* &mdash; Kent Beck
+
 It's possible to make Bel run reasonably fast, using various optimizations under the
 hood. Here is a brief summary:
 
