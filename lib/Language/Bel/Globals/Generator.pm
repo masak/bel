@@ -278,33 +278,34 @@ HEADER
             my $body = $bel->cdr($bel->cdr($bel->cdr($ast)));
             for my $global (@globals) {
                 if ($global->{name} eq "forms") {
+                    my $new_form = $bel->eval(
+                        make_pair(
+                            make_symbol("formfn"),
+                            make_pair(
+                                make_pair(
+                                    make_symbol("quote"),
+                                    make_pair(
+                                        $parms,
+                                        SYMBOL_NIL,
+                                    ),
+                                ),
+                                make_pair(
+                                    make_pair(
+                                        make_symbol("quote"),
+                                        make_pair(
+                                            $body,
+                                            SYMBOL_NIL,
+                                        )
+                                    ),
+                                    SYMBOL_NIL,
+                                ),
+                            ),
+                        ),
+                    );
                     $global->{expr} = make_pair(
                         make_pair(
                             $name,
-                            $bel->eval(
-                                make_pair(
-                                    make_symbol("formfn"),
-                                    make_pair(
-                                        make_pair(
-                                            make_symbol("quote"),
-                                            make_pair(
-                                                $parms,
-                                                SYMBOL_NIL,
-                                            ),
-                                        ),
-                                        make_pair(
-                                            make_pair(
-                                                make_symbol("quote"),
-                                                make_pair(
-                                                    $body,
-                                                    SYMBOL_NIL,
-                                                )
-                                            ),
-                                            SYMBOL_NIL,
-                                        ),
-                                    ),
-                                ),
-                            ),
+                            $new_form,
                         ),
                         $global->{expr},
                     );
