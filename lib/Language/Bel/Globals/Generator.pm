@@ -493,7 +493,12 @@ sub print_primitive {
 sub print_global {
     my ($name, $value, $vmark, $smark) = @_;
 
-    my $serialized = serialize($value, $vmark, $smark);
+    my $uvars_ref = find_uvars($value, $vmark);
+    for my $id (sort { $a <=> $b } values(%{$uvars_ref})) {
+        print_uvar_decl($id);
+    }
+
+    my $serialized = serialize($value, $vmark, $smark, $uvars_ref);
     my $mangled_name = $name;
     $mangled_name =~ s/^=/eq/;
     $mangled_name =~ s/\+/_plus/g;
@@ -514,19 +519,57 @@ sub print_global {
     print("$indented\n");
 }
 
-sub serialize {
-    my ($value, $vmark, $smark) = @_;
+sub print_uvar_decl {
+    my ($id) = @_;
+
+    my $indent = " " x 8;
+    my $vmark_value = 'pair_cdr($self->get_kv("vmark"))';
+    my $uvar_value = qq[make_pair($vmark_value, SYMBOL_NIL)];
+    print($indent, qq[my \$uvar_$id = $uvar_value;\n]);
+}
+
+my $uvar_next_unique_id = 1;
+
+sub find_uvars {
+    my ($value, $vmark, $uvars_ref) = @_;
+
+    if (!defined($uvars_ref)) {
+        $uvars_ref = {};
+    }
 
     if (is_pair($value)) {
-        if (defined($vmark) && pairs_are_identical($value, $vmark)) {
-            return q[pair_cdr($self->get_kv("vmark"))];
+        my $car = pair_car($value);
+        if (is_pair($car) && pairs_are_identical($car, $vmark)) {
+            if (!exists $uvars_ref->{$value}) {
+                $uvars_ref->{$value} = $uvar_next_unique_id++;
+            }
+        }
+        else {
+            find_uvars(pair_car($value), $vmark, $uvars_ref);
+            find_uvars(pair_cdr($value), $vmark, $uvars_ref);
+        }
+    }
+
+    return $uvars_ref;
+}
+
+sub serialize {
+    my ($value, $vmark, $smark, $uvars_ref) = @_;
+
+    if (is_pair($value)) {
+        if (exists $uvars_ref->{$value}) {
+            my $id = $uvars_ref->{$value};
+            return q[$uvar_] . $id;
+        }
+        elsif (defined($vmark) && pairs_are_identical($value, $vmark)) {
+            die "Found a bare `vmark` value";
         }
         elsif (defined($smark) && pairs_are_identical($value, $smark)) {
             return q[pair_cdr($self->get_kv("smark"))];
         }
         else {
-            my $car = serialize(pair_car($value), $vmark, $smark);
-            my $cdr = serialize(pair_cdr($value), $vmark, $smark);
+            my $car = serialize(pair_car($value), $vmark, $smark, $uvars_ref);
+            my $cdr = serialize(pair_cdr($value), $vmark, $smark, $uvars_ref);
             return "make_pair($car, $cdr)";
         }
     }
