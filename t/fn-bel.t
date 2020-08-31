@@ -6,7 +6,7 @@ use Test::More;
 
 use Language::Bel::Test;
 
-plan tests => 41;
+plan tests => 44;
 
 ## Testing all possible ways to re-invoke `mev
 
@@ -75,6 +75,13 @@ plan tests => 41;
     is_bel_output("(bel '(type nil))", "symbol");
     is_bel_output("(bel '(type '(a)))", "pair");
     is_bel_output(q[(bel '(type (ops "testfile" 'out)))], "stream");
+}
+
+# closure
+{
+    is_bel_output("(bel '(idfn 'hi))", "hi");
+    is_bel_output("(bel '(no t))", "nil");
+    is_bel_output("(bel '(no nil))", "t");
 }
 
 END {

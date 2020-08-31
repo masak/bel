@@ -899,36 +899,36 @@
         title='&lt;anon&gt;'
       />
   <rect
-        x='456'
-        y='126'
+        x='451'
+        y='121'
         width='17'
         height='17'
-        class='feature-evaluator box'
-        title='applyclo'
+        class='done box'
+        title='&lt;anon&gt;'
       />
   <rect
-        x='476'
-        y='126'
+        x='471'
+        y='121'
         width='17'
         height='17'
-        class='feature-evaluator box'
-        title='pass'
+        class='done box'
+        title='&lt;anon&gt;'
       />
   <rect
-        x='496'
-        y='126'
+        x='491'
+        y='121'
         width='17'
         height='17'
-        class='feature-evaluator box'
-        title='typecheck'
+        class='done box'
+        title='&lt;anon&gt;'
       />
   <rect
-        x='516'
-        y='126'
+        x='511'
+        y='121'
         width='17'
         height='17'
-        class='feature-evaluator box'
-        title='destructure'
+        class='done box'
+        title='&lt;anon&gt;'
       />
   <rect
         x='536'

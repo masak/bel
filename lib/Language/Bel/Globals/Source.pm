@@ -456,13 +456,57 @@ __DATA__
                     (mev s (cons v r) m))))
        (sigerr 'unknown-prim s r m)))
 
-; skip applyclo [waiting for evaluator]
+(def applyclo (parms args env body s r m)
+  (mev (cons (fu (s r m)
+               (pass parms args env s r m))
+             (fu (s r m)
+               (mev (cons (list body (car r)) s)
+                    (cdr r)
+                    m))
+             s)
+       r
+       m))
 
-; skip pass [waiting for evaluator]
+(def pass (pat arg env s r m)
+  (let ret [mev s (cons _ r) m]
+    (if (no pat)       (if arg
+                           (sigerr 'overargs s r m)
+                           (ret env))
+        (literal pat)  (sigerr 'literal-parm s r m)
+        (variable pat) (ret (cons (cons pat arg) env))
+        (caris pat t)  (typecheck (cdr pat) arg env s r m)
+        (caris pat o)  (pass (cadr pat) arg env s r m)
+                       (destructure pat arg env s r m))))
 
-; skip typecheck [waiting for evaluator]
+(def typecheck ((var f) arg env s r m)
+  (mev (cons (list (list f (list 'quote arg)) env)
+             (fu (s r m)
+               (if (car r)
+                   (pass var arg env s (cdr r) m)
+                   (sigerr 'mistype s r m)))
+             s)
+       r
+       m))
 
-; skip destructure [waiting for evaluator]
+(def destructure ((p . ps) arg env s r m)
+  (if (no arg)   (if (caris p o)
+                     (mev (cons (list (caddr p) env)
+                                (fu (s r m)
+                                  (pass (cadr p) (car r) env s (cdr r) m))
+                                (fu (s r m)
+                                  (pass ps nil (car r) s (cdr r) m))
+                                s)
+                          r
+                          m)
+                     (sigerr 'underargs s r m))
+      (atom arg) (sigerr 'atom-arg s r m)
+                 (mev (cons (fu (s r m)
+                              (pass p (car arg) env s r m))
+                            (fu (s r m)
+                              (pass ps (cdr arg) (car r) s (cdr r) m))
+                            s)
+                      r
+                      m)))
 
 ; skip applycont [waiting for evaluator]
 
