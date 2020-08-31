@@ -1206,7 +1206,8 @@ sub new {
         my $uvar_1 = make_pair(pair_cdr($self->get_kv("vmark")), SYMBOL_NIL);
         my $uvar_2 = make_pair(pair_cdr($self->get_kv("vmark")), SYMBOL_NIL);
         $self->add_global("forms", make_pair(make_pair(SYMBOL_QUOTE,
-            make_pair(make_symbol("fn"), make_pair($uvar_1,
+            make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
+            make_pair(SYMBOL_NIL, make_pair($uvar_1,
             make_pair(make_pair(make_symbol("let"), make_pair($uvar_2,
             make_pair(make_pair(make_symbol("apply"),
             make_pair(make_pair(make_symbol("fn"),
@@ -1224,7 +1225,7 @@ sub new {
             make_pair(make_pair(make_symbol("cons"), make_pair(make_symbol("e"),
             make_pair(make_symbol("r"), SYMBOL_NIL))), make_pair(make_symbol("m"),
             SYMBOL_NIL)))), SYMBOL_NIL)))), SYMBOL_NIL)))), SYMBOL_NIL)))),
-            SYMBOL_NIL)))), make_pair(make_pair(pair_cdr($self->get_kv("smark")),
+            SYMBOL_NIL)))))), make_pair(make_pair(pair_cdr($self->get_kv("smark")),
             make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
             make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("e"),
             make_pair(make_symbol("a"), make_pair(make_symbol("s"),

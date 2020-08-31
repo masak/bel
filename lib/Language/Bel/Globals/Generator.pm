@@ -278,7 +278,7 @@ HEADER
             my $body = $bel->cdr($bel->cdr($bel->cdr($ast)));
             for my $global (@globals) {
                 if ($global->{name} eq "forms") {
-                    my $new_form = $bel->eval(
+                    my $formfn = $bel->eval(
                         make_pair(
                             make_symbol("formfn"),
                             make_pair(
@@ -302,6 +302,7 @@ HEADER
                             ),
                         ),
                     );
+                    my $new_form = $bel->eval($formfn);
                     $global->{expr} = make_pair(
                         make_pair(
                             $name,
