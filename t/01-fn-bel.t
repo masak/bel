@@ -6,7 +6,7 @@ use Test::More;
 
 use Language::Bel::Test;
 
-plan tests => 44;
+plan tests => 45;
 
 ## Testing all possible ways to re-invoke `mev
 
@@ -26,7 +26,18 @@ plan tests => 44;
     # TODO: inwhere case
 }
 
-# TODO: froms (waiting for eif)
+# 'quote' form
+{
+    is_bel_output("(bel '(quote a))", "a");
+}
+
+# TODO: 'if' form
+# TODO: 'where' form
+# TODO: 'dyn' form
+# TODO: 'after' form
+# TODO: 'ccc' form
+# TODO: 'thread' form
+
 # TODO: macro/applym
 # TODO: apply
 # TODO: improper lit
