@@ -375,7 +375,17 @@ __DATA__
            r
            m)))
 
-; skip applym [waiting for evaluator]
+(def applym (mac args a s r m)
+  (applyf (caddr mac)
+          args
+          a
+          (cons (fu (s r m)
+                  (mev (cons (list (car r) a) s)
+                       (cdr r)
+                       m))
+                s)
+          r
+          m))
 
 (def applyf (f args a s r m)
   (if (= f apply)    (applyf (car args) (reduce join (cdr args)) a s r m)

@@ -6,7 +6,7 @@ use Test::More;
 
 use Language::Bel::Test;
 
-plan tests => 50;
+plan tests => 51;
 
 ## Testing all possible ways to re-invoke `mev
 
@@ -46,7 +46,11 @@ plan tests => 50;
 # TODO: 'ccc' form
 # TODO: 'thread' form
 
-# TODO: macro/applym
+# macro/applym
+{
+    is_bel_output("(bel '((lit mac (lit clo nil (x) x)) t))", "t");
+}
+
 # TODO: apply
 # TODO: improper lit
 # TODO: applyf not a lit
