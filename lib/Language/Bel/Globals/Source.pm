@@ -323,9 +323,26 @@ __DATA__
 (form quote ((e) a s r m)
   (mev s (cons e r) m))
 
-; skip if [waiting for evaluator]
+(form if (es a s r m)
+  (if (no es)
+      (mev s (cons nil r) m)
+      (mev (cons (list (car es) a)
+                 (if (cdr es)
+                     (cons (fu (s r m)
+                             (if2 (cdr es) a s r m))
+                           s)
+                     s))
+           r
+           m)))
 
-; skip if2 [waiting for evaluator]
+(def if2 (es a s r m)
+  (mev (cons (list (if (car r)
+                       (car es)
+                       (cons 'if (cdr es)))
+                   a)
+             s)
+       (cdr r)
+       m))
 
 ; skip where [waiting for evaluator]
 

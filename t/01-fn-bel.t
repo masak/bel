@@ -6,7 +6,7 @@ use Test::More;
 
 use Language::Bel::Test;
 
-plan tests => 45;
+plan tests => 50;
 
 ## Testing all possible ways to re-invoke `mev
 
@@ -31,7 +31,15 @@ plan tests => 45;
     is_bel_output("(bel '(quote a))", "a");
 }
 
-# TODO: 'if' form
+# 'if' form
+{
+    is_bel_output("(bel '(if))", "nil");
+    is_bel_output("(bel '(if 'a))", "a");
+    is_bel_output("(bel '(if 'a 'b))", "b");
+    is_bel_output("(bel '(if 'a 'b 'c))", "b");
+    is_bel_output("(bel '(if nil 'b 'c))", "c");
+}
+
 # TODO: 'where' form
 # TODO: 'dyn' form
 # TODO: 'after' form
