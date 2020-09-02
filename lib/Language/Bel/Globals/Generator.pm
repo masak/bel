@@ -350,14 +350,17 @@ HEADER
                         make_pair(
                             $tag,
                             make_pair(
-                                make_symbol("lit"),
                                 make_pair(
-                                    make_symbol("clo"),
+                                    make_symbol("lit"),
                                     make_pair(
-                                        SYMBOL_NIL,
-                                        _bqexpand($rest),
+                                        make_symbol("clo"),
+                                        make_pair(
+                                            SYMBOL_NIL,
+                                            _bqexpand($rest),
+                                        ),
                                     ),
                                 ),
+                                SYMBOL_NIL,
                             ),
                         ),
                         $global->{expr},
