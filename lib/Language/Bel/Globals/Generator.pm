@@ -342,7 +342,7 @@ HEADER
             next;
         }
         elsif (symbol_name($car_ast) eq "loc") {
-            my $tag = $bel->car($bel->cdr($ast));
+            my $tag = $bel->eval($bel->car($bel->cdr($ast)));
             my $rest = $bel->cdr($bel->cdr($ast));
             for my $global (@globals) {
                 if ($global->{name} eq "locfns") {
