@@ -6,7 +6,7 @@ use Test::More;
 
 use Language::Bel::Test;
 
-plan tests => 51;
+plan tests => 53;
 
 ## Testing all possible ways to re-invoke `mev
 
@@ -40,7 +40,12 @@ plan tests => 51;
     is_bel_output("(bel '(if nil 'b 'c))", "c");
 }
 
-# TODO: 'where' form
+# 'where' form
+{
+    is_bel_output("(bel '(where (car '(x . y))))", "((x . y) a)");
+    is_bel_output("(bel '(where (cdr '(z . w))))", "((z . w) d)");
+}
+
 # TODO: 'dyn' form
 # TODO: 'after' form
 # TODO: 'ccc' form

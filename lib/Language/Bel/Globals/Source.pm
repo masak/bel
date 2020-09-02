@@ -344,7 +344,12 @@ __DATA__
        (cdr r)
        m))
 
-; skip where [waiting for evaluator]
+(form where ((e (o new)) a s r m)
+  (mev (cons (list e a)
+             (list (list smark 'loc new) nil)
+             s)
+       r
+       m))
 
 ; skip dyn [waiting for evaluator]
 
