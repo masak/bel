@@ -6,7 +6,7 @@ use Test::More;
 
 use Language::Bel::Test;
 
-plan tests => 57;
+plan tests => 58;
 
 ## Testing all possible ways to re-invoke `mev
 
@@ -121,6 +121,11 @@ plan tests => 57;
     is_bel_output("(bel '(idfn 'hi))", "hi");
     is_bel_output("(bel '(no t))", "nil");
     is_bel_output("(bel '(no nil))", "t");
+}
+
+# continuation
+{
+    is_bel_output("(bel '(join 'a (ccc (lit clo nil (c) (c 'b)))))", "(a . b)");
 }
 
 END {

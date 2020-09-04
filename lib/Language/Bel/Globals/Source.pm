@@ -569,7 +569,14 @@ __DATA__
                       r
                       m)))
 
-; skip applycont [waiting for evaluator]
+(def applycont (s2 r2 args s r m)
+  (if (or (no args) (cdr args))
+      (sigerr 'wrong-no-args s r m)
+      (mev (append (keep [and (protected _) (no (mem _ s2 id))]
+                         s)
+                   s2)
+           (cons (car args) r2)
+           m)))
 
 (def protected (x)
   (some [begins (car x) (list smark _) id]
