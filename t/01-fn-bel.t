@@ -6,7 +6,7 @@ use Test::More;
 
 use Language::Bel::Test;
 
-plan tests => 53;
+plan tests => 54;
 
 ## Testing all possible ways to re-invoke `mev
 
@@ -46,7 +46,11 @@ plan tests => 53;
     is_bel_output("(bel '(where (cdr '(z . w))))", "((z . w) d)");
 }
 
-# TODO: 'dyn' form
+# 'dyn' form
+{
+    is_bel_output("(bel '(dyn d 2 d))", "2");
+}
+
 # TODO: 'after' form
 # TODO: 'ccc' form
 # TODO: 'thread' form
@@ -73,9 +77,6 @@ plan tests => 53;
     is_bel_output("(bel '(cdr nil))", "nil");
     is_bel_output("(bel '(cdr))", "nil");
     is_bel_error("(bel '(cdr 'atom))", "cdr-on-atom");
-    #is_bel_output("(bel '(~~mem (coin) '(t nil)))", "t");
-    #is_bel_output("(bel '(whilet _ (coin)))", "nil");
-    #is_bel_output("(bel '(til _ (coin) no))", "nil");
     is_bel_output("(bel '(id 'a 'a))", "t");
     is_bel_output("(bel '(id 'a 'b))", "nil");
     is_bel_output("(bel '(id 'a \\a))", "nil");

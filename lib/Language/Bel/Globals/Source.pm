@@ -351,9 +351,22 @@ __DATA__
        r
        m))
 
-; skip dyn [waiting for evaluator]
+(form dyn ((v e1 e2) a s r m)
+  (if (variable v)
+      (mev (cons (list e1 a)
+                 (fu (s r m) (dyn2 v e2 a s r m))
+                 s)
+           r
+           m)
+      (sigerr 'cannot-bind s r m)))
 
-; skip dyn2 [waiting for evaluator]
+(def dyn2 (v e2 a s r m)
+  (mev (cons (list e2 a)
+             (list (list smark 'bind (cons v (car r)))
+                   nil)
+             s)
+       (cdr r)
+       m))
 
 ; skip after [waiting for evaluator]
 
