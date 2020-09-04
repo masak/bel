@@ -368,7 +368,12 @@ __DATA__
        (cdr r)
        m))
 
-; skip after [waiting for evaluator]
+(form after ((e1 e2) a s r m)
+  (mev (cons (list e1 a)
+             (list (list smark 'prot e2) a)
+             s)
+       r
+       m))
 
 ; skip ccc [waiting for evaluator]
 

@@ -6,7 +6,7 @@ use Test::More;
 
 use Language::Bel::Test;
 
-plan tests => 54;
+plan tests => 56;
 
 ## Testing all possible ways to re-invoke `mev
 
@@ -51,7 +51,12 @@ plan tests => 54;
     is_bel_output("(bel '(dyn d 2 d))", "2");
 }
 
-# TODO: 'after' form
+# 'after' form
+{
+    is_bel_output("(bel '(after 1 2))", "1");
+    is_bel_error(q[(bel '(after 3 (car 'atom)))], "car-on-atom");
+}
+
 # TODO: 'ccc' form
 # TODO: 'thread' form
 
