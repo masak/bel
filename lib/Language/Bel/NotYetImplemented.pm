@@ -43,11 +43,6 @@ sub list {
             "(fn (_) (cons _ 'b))",
             "('unboundb read)",
         ],
-        evaluator => [
-            "(function load)",
-            "clo",
-            "('unboundb load)",
-        ],
     );
 }
 

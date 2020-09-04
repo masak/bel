@@ -2815,7 +2815,7 @@
         y='431'
         width='17'
         height='17'
-        class='feature-evaluator box'
+        class='feature-after box'
         title='load'
       />
   <rect
@@ -2943,7 +2943,7 @@
         y='441'
         width='17'
         height='17'
-        class='feature-evaluator box'
+        class='feature-reader box'
         title='readas'
       />
   <rect

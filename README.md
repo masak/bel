@@ -65,13 +65,6 @@ A summary of the remaining big features:
   between threads. The concurrency is "co-operative", which means that any thread
   could block the others forever by never releasing the lock.
 
-* **Evaluator**; there's a Bel evaluator written in Perl already. It hard-codes a
-  number of behaviors that shouldn't be hard-coded, most of all _itself_. In Bel,
-  any part of the evaluator could be overridden by a new function, at which point it
-  takes effect immediately. In the long run, the Bel evaluator will replace the Perl
-  evaluator. We might be able to write tests for parts of the Bel evaluator by
-  intercepting the recursive call to `mev` inside of it.
-
 * **Reader**; there's a reader written in Perl already. It hard-codes the syntactic
   forms it recognizes; these should in fact be extensible.
 

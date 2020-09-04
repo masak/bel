@@ -1410,7 +1410,7 @@ __DATA__
 
 ; skip readall [waiting for reader]
 
-; skip load [waiting for evaluator]
+; skip load [waiting for after]
 
 (mac record body
   (letu v
@@ -1479,6 +1479,6 @@ __DATA__
                    it))
        (err 'no-template)))
 
-; skip readas [waiting for evaluator]
+; skip readas [waiting for reader]
 
 (def err args)
