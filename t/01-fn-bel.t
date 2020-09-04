@@ -57,7 +57,9 @@ plan tests => 56;
     is_bel_error(q[(bel '(after 3 (car 'atom)))], "car-on-atom");
 }
 
-# TODO: 'ccc' form
+# 'ccc' form
+# see t/01-fn-bel-ccc.t
+
 # TODO: 'thread' form
 
 # macro/applym

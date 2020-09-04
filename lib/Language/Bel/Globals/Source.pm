@@ -375,7 +375,12 @@ __DATA__
        r
        m))
 
-; skip ccc [waiting for evaluator]
+(form ccc ((f) a s r m)
+  (mev (cons (list (list f (list 'lit 'cont s r))
+                   a)
+             s)
+       r
+       m))
 
 ; skip thread [waiting for evaluator]
 
