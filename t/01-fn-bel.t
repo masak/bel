@@ -6,7 +6,7 @@ use Test::More;
 
 use Language::Bel::Test;
 
-plan tests => 56;
+plan tests => 57;
 
 ## Testing all possible ways to re-invoke `mev
 
@@ -60,7 +60,10 @@ plan tests => 56;
 # 'ccc' form
 # see t/01-fn-bel-ccc.t
 
-# TODO: 'thread' form
+# 'thread' form
+{
+    is_bel_output("(bel '(thread (car '(x . y))))", "x");
+}
 
 # macro/applym
 {

@@ -382,7 +382,13 @@ __DATA__
        r
        m))
 
-; skip thread [waiting for evaluator]
+(form thread ((e) a s r (p g))
+  (mev s
+       (cons nil r)
+       (list (cons (list (list (list e a))
+                         nil)
+                   p)
+             g)))
 
 (def evcall (e a s r m)
   (mev (cons (list (car e) a)
