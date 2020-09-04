@@ -1143,6 +1143,23 @@ sub new {
             SYMBOL_NIL))), SYMBOL_NIL))), make_pair(make_symbol("id"),
             SYMBOL_NIL)))), SYMBOL_NIL))))));
 
+        $self->add_global("sigerr", make_pair(make_symbol("lit"),
+            make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+            make_pair(make_pair(make_symbol("msg"), make_pair(make_symbol("s"),
+            make_pair(make_symbol("r"), make_pair(make_symbol("m"), SYMBOL_NIL)))),
+            make_pair(make_pair(make_symbol("aif"),
+            make_pair(make_pair(make_symbol("binding"),
+            make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("err"),
+            SYMBOL_NIL)), make_pair(make_symbol("s"), SYMBOL_NIL))),
+            make_pair(make_pair(make_symbol("applyf"),
+            make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("it"),
+            SYMBOL_NIL)), make_pair(make_pair(make_symbol("list"),
+            make_pair(make_symbol("msg"), SYMBOL_NIL)), make_pair(SYMBOL_NIL,
+            make_pair(make_symbol("s"), make_pair(make_symbol("r"),
+            make_pair(make_symbol("m"), SYMBOL_NIL))))))),
+            make_pair(make_pair(make_symbol("err"), make_pair(make_symbol("msg"),
+            SYMBOL_NIL)), SYMBOL_NIL)))), SYMBOL_NIL))))));
+
         $self->add_global("fu", make_pair(make_symbol("lit"),
             make_pair(make_symbol("mac"), make_pair(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,

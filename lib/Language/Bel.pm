@@ -615,7 +615,7 @@ sub evcall {
 
                 if ($self->{globals}->is_global_of_name($op, "err")) {
                     # XXX: Need to do proper parameter handling here
-                    die symbol_name($self->car($args)), "\n";
+                    die _print($self->car($args)), "\n";
                 }
                 elsif (is_fastfunc($op)) {
                     my $e;

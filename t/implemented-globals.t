@@ -100,7 +100,8 @@ while ($i < @bel_globals && !eof($SOURCE)) {
             $waiting_for{$feature}++;
         }
     }
-    elsif ($name eq "applyprim" || $name eq "formfn" || $name eq "randlen") {
+    elsif ($name eq "sigerr" || $name eq "applyprim" || $name eq "formfn" || $name eq "randlen") {
+        # special exception for `sigerr`, which I believe was mis-specified
         # special exception for `applyprim` and `formfn`, which want `eif`
         # special exception for `randlen`, which wants `read`
         $num_implemented++;

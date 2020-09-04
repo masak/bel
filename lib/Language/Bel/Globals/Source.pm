@@ -280,7 +280,10 @@ __DATA__
                         (map car s)))
        id))
 
-; skip sigerr [waiting for evaluator]
+(def sigerr (msg s r m)
+  (aif (binding 'err s)
+       (applyf (cdr it) (list msg) nil s r m)
+       (err msg)))
 
 (mac fu args
   `(list (list smark 'fut (fn ,@args)) nil))

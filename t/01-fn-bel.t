@@ -71,8 +71,6 @@ plan tests => 58;
 }
 
 # TODO: apply
-# TODO: improper lit
-# TODO: applyf not a lit
 # TODO: locfn
 
 # primitive
