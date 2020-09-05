@@ -6,7 +6,7 @@ use Test::More;
 
 use Language::Bel::Test;
 
-plan tests => 60;
+plan tests => 64;
 
 ## Testing all possible ways to re-invoke `mev
 
@@ -68,7 +68,14 @@ plan tests => 60;
     is_bel_output("(bel '((lit mac (lit clo nil (x) x)) t))", "t");
 }
 
-# TODO: apply
+# apply
+{
+    is_bel_output("(bel '(apply idfn '(hi)))", "hi");
+    is_bel_output("(bel '(apply no '(t)))", "nil");
+    is_bel_output("(bel '(apply no '(nil)))", "t");
+    is_bel_output("(bel '(apply car '((a b))))", "a");
+}
+
 # TODO: locfn
 
 # primitive
