@@ -6,7 +6,7 @@ use Test::More;
 
 use Language::Bel::Test;
 
-plan tests => 58;
+plan tests => 60;
 
 ## Testing all possible ways to re-invoke `mev
 
@@ -20,10 +20,8 @@ plan tests => 58;
 # variable
 {
     is_bel_output("(bel 'vmark)", "(nil)");
-    # TODO: lexical variable
-    # TODO: dynamic variable
-    # TODO: unbound variable
-    # TODO: inwhere case
+    is_bel_output("(bel '((lit clo nil (x) x) 'g))", "g");
+    is_bel_output("(bel '((lit clo nil (x) (where x)) 'g))", "((x . g) d)");
 }
 
 # 'quote' form
