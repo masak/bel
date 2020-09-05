@@ -42,6 +42,10 @@ plan tests => 64;
 {
     is_bel_output("(bel '(where (car '(x . y))))", "((x . y) a)");
     is_bel_output("(bel '(where (cdr '(z . w))))", "((z . w) d)");
+    # the following two tests would probably work, but they are too slow.
+    # even `(bel 'k!a)` is too slow right now. maybe later.
+    #is_bel_output("(bel '(where ((lit tab (a . 1)) 'a)))", "((a . 1) 'd)");
+    #is_bel_output("(bel '(where ((lit tab (a . 1)) 'b)))", "((b) 'd)");
 }
 
 # 'dyn' form
@@ -75,8 +79,6 @@ plan tests => 64;
     is_bel_output("(bel '(apply no '(nil)))", "t");
     is_bel_output("(bel '(apply car '((a b))))", "a");
 }
-
-# TODO: locfn
 
 # primitive
 {
