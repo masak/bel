@@ -220,15 +220,44 @@ __DATA__
 (def isa (name)
   [begins _ `(lit ,name) id])
 
-; skip bel [waiting for evaluator]
+(def bel (e (o g globe))
+  (ev (list (list e nil))
+      nil
+      (list nil g)))
 
-; skip mev [waiting for evaluator]
+(def mev (s r (p g))
+  (if (no s)
+      (if p
+          (sched p g)
+          (car r))
+      (sched (if (cdr (binding 'lock s))
+                 (cons (list s r) p)
+                 (snoc p (list s r)))
+             g)))
 
-; skip sched [waiting for evaluator]
+(def sched (((s r) . p) g)
+  (ev s r (list p g)))
 
-; skip ev [waiting for evaluator]
+(def ev (((e a) . s) r m)
+  (aif (literal e)            (mev s (cons e r) m)
+       (variable e)           (vref e a s r m)
+       (no (proper e))        (sigerr 'malformed s r m)
+       (get (car e) forms id) ((cdr it) (cdr e) a s r m)
+                              (evcall e a s r m)))
 
-; skip vref [waiting for evaluator]
+(def vref (v a s r m)
+  (let g (cadr m)
+    (if (inwhere s)
+        (aif (or (lookup v a s g)
+                 (and (car (inwhere s))
+                      (let cell (cons v nil)
+                        (xdr g (cons cell (cdr g)))
+                        cell)))
+             (mev (cdr s) (cons (list it 'd) r) m)
+             (sigerr 'unbound s r m))
+        (aif (lookup v a s g)
+             (mev s (cons (cdr it) r) m)
+             (sigerr (list 'unboundb v) s r m)))))
 
 (set smark (join))
 
@@ -251,18 +280,40 @@ __DATA__
                         (map car s)))
        id))
 
-; skip sigerr [waiting for evaluator]
+(def sigerr (msg s r m)
+  (aif (binding 'err s)
+       (applyf (cdr it) (list msg) nil s r m)
+       (err msg)))
 
 (mac fu args
   `(list (list smark 'fut (fn ,@args)) nil))
 
-; skip evmark [waiting for evaluator]
+(def evmark (e a s r m)
+  (case (car e)
+    fut  ((cadr e) s r m)
+    bind (mev s r m)
+    loc  (sigerr 'unfindable s r m)
+    prot (mev (cons (list (cadr e) a)
+                    (fu (s r m) (mev s (cdr r) m))
+                    s)
+              r
+              m)
+         (sigerr 'unknown-mark s r m)))
 
-; skip forms [waiting for evaluator]
+(set forms (list (cons smark evmark)))
 
-; skip form [waiting for evaluator]
+(mac form (name parms . body)
+  `(set forms (put ',name ,(formfn parms body) forms)))
 
-; skip formfn [waiting for evaluator]
+(def formfn (parms body)
+  (with (v  (uvar)
+         w  (uvar)
+         ps (parameters (car parms)))
+    `(fn ,v
+       (let ,w (apply (fn ,(car parms) (list ,@ps))
+                      (car ,v))
+         (let ,ps ,w
+           (let ,(cdr parms) (cdr ,v) ,@body))))))
 
 (def parameters (p)
   (if (no p)           nil
@@ -272,33 +323,133 @@ __DATA__
                        (append (parameters (car p))
                                (parameters (cdr p)))))
 
-; skip quote [waiting for evaluator]
+(form quote ((e) a s r m)
+  (mev s (cons e r) m))
 
-; skip if [waiting for evaluator]
+(form if (es a s r m)
+  (if (no es)
+      (mev s (cons nil r) m)
+      (mev (cons (list (car es) a)
+                 (if (cdr es)
+                     (cons (fu (s r m)
+                             (if2 (cdr es) a s r m))
+                           s)
+                     s))
+           r
+           m)))
 
-; skip if2 [waiting for evaluator]
+(def if2 (es a s r m)
+  (mev (cons (list (if (car r)
+                       (car es)
+                       (cons 'if (cdr es)))
+                   a)
+             s)
+       (cdr r)
+       m))
 
-; skip where [waiting for evaluator]
+(form where ((e (o new)) a s r m)
+  (mev (cons (list e a)
+             (list (list smark 'loc new) nil)
+             s)
+       r
+       m))
 
-; skip dyn [waiting for evaluator]
+(form dyn ((v e1 e2) a s r m)
+  (if (variable v)
+      (mev (cons (list e1 a)
+                 (fu (s r m) (dyn2 v e2 a s r m))
+                 s)
+           r
+           m)
+      (sigerr 'cannot-bind s r m)))
 
-; skip dyn2 [waiting for evaluator]
+(def dyn2 (v e2 a s r m)
+  (mev (cons (list e2 a)
+             (list (list smark 'bind (cons v (car r)))
+                   nil)
+             s)
+       (cdr r)
+       m))
 
-; skip after [waiting for evaluator]
+(form after ((e1 e2) a s r m)
+  (mev (cons (list e1 a)
+             (list (list smark 'prot e2) a)
+             s)
+       r
+       m))
 
-; skip ccc [waiting for evaluator]
+(form ccc ((f) a s r m)
+  (mev (cons (list (list f (list 'lit 'cont s r))
+                   a)
+             s)
+       r
+       m))
 
-; skip thread [waiting for evaluator]
+(form thread ((e) a s r (p g))
+  (mev s
+       (cons nil r)
+       (list (cons (list (list (list e a))
+                         nil)
+                   p)
+             g)))
 
-; skip evcall [waiting for evaluator]
+(def evcall (e a s r m)
+  (mev (cons (list (car e) a)
+             (fu (s r m)
+               (evcall2 (cdr e) a s r m))
+             s)
+       r
+       m))
 
-; skip evcall2 [waiting for evaluator]
+(def evcall2 (es a s (op . r) m)
+  (if ((isa 'mac) op)
+      (applym op es a s r m)
+      (mev (append (map [list _ a] es)
+                   (cons (fu (s r m)
+                           (let (args r2) (snap es r)
+                             (applyf op (rev args) a s r2 m)))
+                         s))
+           r
+           m)))
 
-; skip applym [waiting for evaluator]
+(def applym (mac args a s r m)
+  (applyf (caddr mac)
+          args
+          a
+          (cons (fu (s r m)
+                  (mev (cons (list (car r) a) s)
+                       (cdr r)
+                       m))
+                s)
+          r
+          m))
 
-; skip applyf [waiting for evaluator]
+(def applyf (f args a s r m)
+  (if (= f apply)    (applyf (car args) (reduce join (cdr args)) a s r m)
+      (caris f 'lit) (if (proper f)
+                         (applylit f args a s r m)
+                         (sigerr 'bad-lit s r m))
+                     (sigerr 'cannot-apply s r m)))
 
-; skip applylit [waiting for evaluator]
+(def applylit (f args a s r m)
+  (aif (and (inwhere s) (find [(car _) f] locfns))
+       ((cadr it) f args a s r m)
+       (let (tag . rest) (cdr f)
+         (case tag
+           prim (applyprim (car rest) args s r m)
+           clo  (let ((o env) (o parms) (o body) . extra) rest
+                  (if (and (okenv env) (okparms parms))
+                      (applyclo parms args env body s r m)
+                      (sigerr 'bad-clo s r m)))
+           mac  (applym f (map [list 'quote _] args) a s r m)
+           cont (let ((o s2) (o r2) . extra) rest
+                  (if (and (okstack s2) (proper r2))
+                      (applycont s2 r2 args s r m)
+                      (sigerr 'bad-cont s r m)))
+                (aif (get tag virfns)
+                     (let e ((cdr it) f (map [list 'quote _] args))
+                       (mev (cons (list e a) s) r m))
+                     (sigerr 'unapplyable s r m))))))
 
 (set virfns nil)
 
@@ -341,17 +492,94 @@ __DATA__
              (car cdr type sym nom rdb cls stat sys)
              (coin)))
 
-; skip applyprim [waiting for evaluator]
+(def applyprim (f args s r m)
+  (aif (some [mem f _] prims)
+       (if (udrop (cdr it) args)
+           (sigerr 'overargs s r m)
+           (with (a (car args)
+                  b (cadr args))
+             ; eif v
+             (let v (case f
+                      id   (id a b)
+                      join (join a b)
+                      car  (car a)
+                      cdr  (cdr a)
+                      type (type a)
+                      xar  (xar a b)
+                      xdr  (xdr a b)
+                      sym  (sym a)
+                      nom  (nom a)
+                      wrb  (wrb a b)
+                      rdb  (rdb a)
+                      ops  (ops a b)
+                      cls  (cls a)
+                      stat (stat a)
+                      coin (coin)
+                      sys  (sys a))
+                  ; (sigerr v s r m)
+                    (mev s (cons v r) m))))
+       (sigerr 'unknown-prim s r m)))
 
-; skip applyclo [waiting for evaluator]
+(def applyclo (parms args env body s r m)
+  (mev (cons (fu (s r m)
+               (pass parms args env s r m))
+             (fu (s r m)
+               (mev (cons (list body (car r)) s)
+                    (cdr r)
+                    m))
+             s)
+       r
+       m))
 
-; skip pass [waiting for evaluator]
+(def pass (pat arg env s r m)
+  (let ret [mev s (cons _ r) m]
+    (if (no pat)       (if arg
+                           (sigerr 'overargs s r m)
+                           (ret env))
+        (literal pat)  (sigerr 'literal-parm s r m)
+        (variable pat) (ret (cons (cons pat arg) env))
+        (caris pat t)  (typecheck (cdr pat) arg env s r m)
+        (caris pat o)  (pass (cadr pat) arg env s r m)
+                       (destructure pat arg env s r m))))
 
-; skip typecheck [waiting for evaluator]
+(def typecheck ((var f) arg env s r m)
+  (mev (cons (list (list f (list 'quote arg)) env)
+             (fu (s r m)
+               (if (car r)
+                   (pass var arg env s (cdr r) m)
+                   (sigerr 'mistype s r m)))
+             s)
+       r
+       m))
 
-; skip destructure [waiting for evaluator]
+(def destructure ((p . ps) arg env s r m)
+  (if (no arg)   (if (caris p o)
+                     (mev (cons (list (caddr p) env)
+                                (fu (s r m)
+                                  (pass (cadr p) (car r) env s (cdr r) m))
+                                (fu (s r m)
+                                  (pass ps nil (car r) s (cdr r) m))
+                                s)
+                          r
+                          m)
+                     (sigerr 'underargs s r m))
+      (atom arg) (sigerr 'atom-arg s r m)
+                 (mev (cons (fu (s r m)
+                              (pass p (car arg) env s r m))
+                            (fu (s r m)
+                              (pass ps (cdr arg) (car r) s (cdr r) m))
+                            s)
+                      r
+                      m)))
 
-; skip applycont [waiting for evaluator]
+(def applycont (s2 r2 args s r m)
+  (if (or (no args) (cdr args))
+      (sigerr 'wrong-no-args s r m)
+      (mev (append (keep [and (protected _) (no (mem _ s2 id))]
+                         s)
+                   s2)
+           (cons (car args) r2)
+           m)))
 
 (def protected (x)
   (some [begins (car x) (list smark _) id]
@@ -1182,7 +1410,7 @@ __DATA__
 
 ; skip readall [waiting for reader]
 
-; skip load [waiting for evaluator]
+; skip load [waiting for after]
 
 (mac record body
   (letu v
@@ -1251,6 +1479,6 @@ __DATA__
                    it))
        (err 'no-template)))
 
-; skip readas [waiting for evaluator]
+; skip readas [waiting for reader]
 
 (def err args)

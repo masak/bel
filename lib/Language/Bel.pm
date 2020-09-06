@@ -48,11 +48,11 @@ Language::Bel - An interpreter for Paul Graham's language Bel
 
 =head1 VERSION
 
-Version 0.40
+Version 0.41
 
 =cut
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 =head1 SYNOPSIS
 
@@ -615,7 +615,7 @@ sub evcall {
 
                 if ($self->{globals}->is_global_of_name($op, "err")) {
                     # XXX: Need to do proper parameter handling here
-                    die symbol_name($self->car($args)), "\n";
+                    die _print($self->car($args)), "\n";
                 }
                 elsif (is_fastfunc($op)) {
                     my $e;
@@ -744,9 +744,9 @@ sub applylit {
             $self->applyprim(pair_car($rest), $args);
         }
         elsif ($tag_name eq "clo") {
-            my $env = pair_car($rest);
-            my $parms = pair_car(pair_cdr($rest));
-            my $body = pair_car(pair_cdr(pair_cdr($rest)));
+            my $env = $self->car($rest);
+            my $parms = $self->car($self->cdr($rest));
+            my $body = $self->car($self->cdr($self->cdr($rest)));
 
             # XXX: skipping `okenv` and `okparms` checks for now
             $self->applyclo($parms, $args, $env, $body);

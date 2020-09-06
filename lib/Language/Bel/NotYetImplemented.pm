@@ -34,19 +34,14 @@ sub list {
             "('unboundb print)",
         ],
         after => [
-            "(function after)",
-            "prim",
+            "(after 1 2)",
+            "1",
             "('unboundb after)",
         ],
         reader => [
             q[(read '("[cons _ 'b]"))],
             "(fn (_) (cons _ 'b))",
             "('unboundb read)",
-        ],
-        evaluator => [
-            "(bel 'hi)",
-            "hi",
-            "('unboundb bel)",
         ],
     );
 }

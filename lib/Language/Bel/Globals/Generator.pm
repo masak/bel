@@ -15,6 +15,7 @@ use Language::Bel::Types qw(
     make_symbol
     pair_car
     pair_cdr
+    pairs_are_identical
     symbol_name
 );
 use Language::Bel::Symbols::Common qw(
@@ -271,6 +272,49 @@ HEADER
             }
             next DECLARATION;
         }
+        elsif (symbol_name($car_ast) eq "form") {
+            my $name = $bel->car($bel->cdr($ast));
+            my $parms = $bel->car($bel->cdr($bel->cdr($ast)));
+            my $body = $bel->cdr($bel->cdr($bel->cdr($ast)));
+            for my $global (@globals) {
+                if ($global->{name} eq "forms") {
+                    my $formfn = $bel->eval(
+                        make_pair(
+                            make_symbol("formfn"),
+                            make_pair(
+                                make_pair(
+                                    make_symbol("quote"),
+                                    make_pair(
+                                        $parms,
+                                        SYMBOL_NIL,
+                                    ),
+                                ),
+                                make_pair(
+                                    make_pair(
+                                        make_symbol("quote"),
+                                        make_pair(
+                                            $body,
+                                            SYMBOL_NIL,
+                                        )
+                                    ),
+                                    SYMBOL_NIL,
+                                ),
+                            ),
+                        ),
+                    );
+                    my $new_form = $bel->eval($formfn);
+                    $global->{expr} = make_pair(
+                        make_pair(
+                            $name,
+                            $new_form,
+                        ),
+                        $global->{expr},
+                    );
+                    last;
+                }
+            }
+            next;
+        }
         elsif (symbol_name($car_ast) eq "vir") {
             my $tag = $bel->car($bel->cdr($ast));
             my $rest = $bel->cdr($bel->cdr($ast));
@@ -298,7 +342,7 @@ HEADER
             next;
         }
         elsif (symbol_name($car_ast) eq "loc") {
-            my $tag = $bel->car($bel->cdr($ast));
+            my $tag = $bel->eval($bel->car($bel->cdr($ast)));
             my $rest = $bel->cdr($bel->cdr($ast));
             for my $global (@globals) {
                 if ($global->{name} eq "locfns") {
@@ -306,14 +350,17 @@ HEADER
                         make_pair(
                             $tag,
                             make_pair(
-                                make_symbol("lit"),
                                 make_pair(
-                                    make_symbol("clo"),
+                                    make_symbol("lit"),
                                     make_pair(
-                                        SYMBOL_NIL,
-                                        _bqexpand($rest),
+                                        make_symbol("clo"),
+                                        make_pair(
+                                            SYMBOL_NIL,
+                                            _bqexpand($rest),
+                                        ),
                                     ),
                                 ),
+                                SYMBOL_NIL,
                             ),
                         ),
                         $global->{expr},
@@ -376,6 +423,8 @@ HEADER
         };
     }
 
+    my $vmark = $bel->eval(make_symbol("vmark"));
+    my $smark = $bel->eval(make_symbol("smark"));
     my $first = 1;
     for my $global (@globals) {
         if ($first) {
@@ -385,7 +434,7 @@ HEADER
             print("\n");
         }
 
-        print_global($global->{name}, $global->{expr});
+        print_global($global->{name}, $global->{expr}, $vmark, $smark);
     }
 
     print <<'FOOTER';
@@ -447,9 +496,14 @@ sub print_primitive {
 }
 
 sub print_global {
-    my ($name, $value) = @_;
+    my ($name, $value, $vmark, $smark) = @_;
 
-    my $serialized = serialize($value);
+    my $uvars_ref = find_uvars($value, $vmark);
+    for my $id (sort { $a <=> $b } values(%{$uvars_ref})) {
+        print_uvar_decl($id);
+    }
+
+    my $serialized = serialize($value, $vmark, $smark, $uvars_ref);
     my $mangled_name = $name;
     $mangled_name =~ s/^=/eq/;
     $mangled_name =~ s/\+/_plus/g;
@@ -470,13 +524,59 @@ sub print_global {
     print("$indented\n");
 }
 
-sub serialize {
-    my ($value) = @_;
+sub print_uvar_decl {
+    my ($id) = @_;
+
+    my $indent = " " x 8;
+    my $vmark_value = 'pair_cdr($self->get_kv("vmark"))';
+    my $uvar_value = qq[make_pair($vmark_value, SYMBOL_NIL)];
+    print($indent, qq[my \$uvar_$id = $uvar_value;\n]);
+}
+
+my $uvar_next_unique_id = 1;
+
+sub find_uvars {
+    my ($value, $vmark, $uvars_ref) = @_;
+
+    if (!defined($uvars_ref)) {
+        $uvars_ref = {};
+    }
 
     if (is_pair($value)) {
-        my $car = serialize(pair_car($value));
-        my $cdr = serialize(pair_cdr($value));
-        return "make_pair($car, $cdr)";
+        my $car = pair_car($value);
+        if (is_pair($car) && pairs_are_identical($car, $vmark)) {
+            if (!exists $uvars_ref->{$value}) {
+                $uvars_ref->{$value} = $uvar_next_unique_id++;
+            }
+        }
+        else {
+            find_uvars(pair_car($value), $vmark, $uvars_ref);
+            find_uvars(pair_cdr($value), $vmark, $uvars_ref);
+        }
+    }
+
+    return $uvars_ref;
+}
+
+sub serialize {
+    my ($value, $vmark, $smark, $uvars_ref) = @_;
+
+    if (is_pair($value)) {
+        if (exists $uvars_ref->{$value}) {
+            my $id = $uvars_ref->{$value};
+            return q[$uvar_] . $id;
+        }
+        elsif (defined($vmark) && pairs_are_identical($value, $vmark)) {
+            die "Found a bare `vmark` value";
+        }
+        elsif (defined($smark) && pairs_are_identical($value, $smark)) {
+            return q[pair_cdr($self->get_kv("smark"))];
+        }
+        else {
+            my $car = serialize(pair_car($value), $vmark, $smark, $uvars_ref);
+            my $cdr = serialize(pair_cdr($value), $vmark, $smark, $uvars_ref);
+            return "make_pair($car, $cdr)";
+        }
     }
     elsif (is_symbol($value)) {
         my $name = symbol_name($value);

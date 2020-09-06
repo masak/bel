@@ -23,7 +23,7 @@ After downloading Bel, you can run it like this:
 
 ```sh
 $ perl -Ilib bin/bel
-Language::Bel 0.40 -- msys.
+Language::Bel 0.41 -- msys.
 > (+ 2 2)
 4
 > (append "Hello" '(\sp) "world!")
@@ -36,9 +36,9 @@ Language::Bel 0.40 -- msys.
 It's not fully there yet, though it's under active development.
 
 [The spec](https://github.com/masak/bel/blob/master/pg/bel.bel) contains 353 items.
-`Language::Bel` currently defines 253 of them.
+`Language::Bel` currently defines 283 of them.
 
-![253 of 353 definitions](images/definitions.svg)
+![283 of 353 definitions](images/definitions.svg)
 
 A summary of the remaining big features:
 
@@ -64,13 +64,6 @@ A summary of the remaining big features:
   dynamic `lock` variable. Failing to do this might result in unexpected interactions
   between threads. The concurrency is "co-operative", which means that any thread
   could block the others forever by never releasing the lock.
-
-* **Evaluator**; there's a Bel evaluator written in Perl already. It hard-codes a
-  number of behaviors that shouldn't be hard-coded, most of all _itself_. In Bel,
-  any part of the evaluator could be overridden by a new function, at which point it
-  takes effect immediately. In the long run, the Bel evaluator will replace the Perl
-  evaluator. We might be able to write tests for parts of the Bel evaluator by
-  intercepting the recursive call to `mev` inside of it.
 
 * **Reader**; there's a reader written in Perl already. It hard-codes the syntactic
   forms it recognizes; these should in fact be extensible.
