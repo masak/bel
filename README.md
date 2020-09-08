@@ -42,10 +42,6 @@ It's not fully there yet, though it's under active development.
 
 A summary of the remaining big features:
 
-* **after** is a primitive that gives "`finally` semantics" to an expression. That is,
-  `(after x y)` promises to run `y` no matter what happens to `x`: normal execution,
-  continuation-based jump, exception thrown...
-
 * **ccc** (or `call-with-current-continuation`) is a control mechanism that allows the
   program to save a point in the execution, and to return to that point again later.
   Saving the execution state means saving the current evaluation stack, and being able
