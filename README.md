@@ -36,9 +36,9 @@ Language::Bel 0.42 -- msys.
 It's not fully there yet, though it's under active development.
 
 [The spec](https://github.com/masak/bel/blob/master/pg/bel.bel) contains 353 items.
-`Language::Bel` currently defines 284 of them.
+`Language::Bel` currently defines 285 of them.
 
-![284 of 353 definitions](images/definitions.svg)
+![285 of 353 definitions](images/definitions.svg)
 
 A summary of the remaining big features:
 

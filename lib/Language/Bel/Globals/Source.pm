@@ -1406,7 +1406,10 @@ __DATA__
   `(let ,var (open ,name ,dir)
      (after (do ,@body) (close ,var))))
 
-; skip from [waiting for after]
+(mac from (name . body)
+  (letu v
+    `(withfile ,v ,name 'in
+       (bind ins ,v ,@body))))
 
 ; skip to [waiting for after]
 
