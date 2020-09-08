@@ -17,9 +17,7 @@
         }
 
         .done               { fill: white; }
-        .feature-after      { fill: #faa; }
         .feature-ccc        { fill: #fb6; }
-        .feature-evaluator  { fill: #fe3; }
         .feature-reader     { fill: #7e6; }
         .feature-backquotes { fill: #6af; }
         .feature-printer    { fill: #aaf; }
@@ -43,40 +41,16 @@
         y='255'
         width='17'
         height='17'
-        class='feature-after box'
-        title='after'
-      />
-  <text
-        x='50'
-        y='270'
-      >after</text>
-  <rect
-        x='20'
-        y='285'
-        width='17'
-        height='17'
         class='feature-ccc box'
         title='ccc'
       />
   <text
         x='50'
-        y='300'
+        y='270'
       >ccc</text>
   <rect
         x='20'
-        y='315'
-        width='17'
-        height='17'
-        class='feature-evaluator box'
-        title='evaluator'
-      />
-  <text
-        x='50'
-        y='330'
-      >evaluator</text>
-  <rect
-        x='20'
-        y='345'
+        y='285'
         width='17'
         height='17'
         class='feature-reader box'
@@ -84,11 +58,11 @@
       />
   <text
         x='50'
-        y='360'
+        y='300'
       >reader</text>
   <rect
         x='20'
-        y='375'
+        y='315'
         width='17'
         height='17'
         class='feature-backquotes box'
@@ -96,11 +70,11 @@
       />
   <text
         x='50'
-        y='390'
+        y='330'
       >backquotes</text>
   <rect
         x='20'
-        y='405'
+        y='345'
         width='17'
         height='17'
         class='feature-printer box'
@@ -108,11 +82,11 @@
       />
   <text
         x='50'
-        y='420'
+        y='360'
       >printer</text>
   <rect
         x='20'
-        y='435'
+        y='375'
         width='17'
         height='17'
         class='feature-chars box'
@@ -120,7 +94,7 @@
       />
   <text
         x='50'
-        y='450'
+        y='390'
       >chars</text>
   <rect
         x='151'

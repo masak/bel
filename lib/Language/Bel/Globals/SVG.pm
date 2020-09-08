@@ -73,9 +73,7 @@ sub generate {
         }
 
         .done               { fill: white; }
-        .feature-after      { fill: #faa; }
         .feature-ccc        { fill: #fb6; }
-        .feature-evaluator  { fill: #fe3; }
         .feature-reader     { fill: #7e6; }
         .feature-backquotes { fill: #6af; }
         .feature-printer    { fill: #aaf; }
@@ -84,7 +82,7 @@ sub generate {
 
     my $y = 225;
     my $box_size = 17;
-    for my $feature (qw<done after ccc evaluator reader backquotes printer chars>) {
+    for my $feature (qw<done ccc reader backquotes printer chars>) {
         my $class = $feature eq "done"
             ? $feature
             : "feature-$feature";
