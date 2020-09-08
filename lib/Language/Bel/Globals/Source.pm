@@ -1411,7 +1411,10 @@ __DATA__
     `(withfile ,v ,name 'in
        (bind ins ,v ,@body))))
 
-; skip to [waiting for after]
+(mac to (name . body)
+  (letu v
+    `(withfile ,v ,name 'out
+       (bind outs ,v ,@body))))
 
 ; skip readall [waiting for reader]
 
