@@ -1418,7 +1418,7 @@ __DATA__
 
 ; skip readall [waiting for reader]
 
-; skip load [waiting for after]
+; skip load [waiting for reader]
 
 (mac record body
   (letu v
