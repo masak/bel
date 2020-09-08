@@ -1402,7 +1402,9 @@ __DATA__
                  f)))
     (if (< n 0) (-:r:- n) (r n))))
 
-; skip withfile [waiting for after]
+(mac withfile (var name dir . body)
+  `(let ,var (open ,name ,dir)
+     (after (do ,@body) (close ,var))))
 
 ; skip from [waiting for after]
 
