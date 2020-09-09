@@ -20,6 +20,7 @@ sub is_bel_output {
 
     $actual_output = "";
     $b->read_eval_print($expr);
+    $actual_output =~ s/\n$//;    # fudge away the final newline
 
     is($actual_output, $expected_output, "$expr ==> $expected_output");
 }
