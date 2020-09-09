@@ -24,10 +24,48 @@ After downloading Bel, you can run it like this:
 ```sh
 $ perl -Ilib bin/bel
 Language::Bel 0.43 -- msys.
-> (+ 2 2)
-4
-> (append "Hello" '(\sp) "world!")
-"Hello world!"
+>
+> ;; loops
+> (set n (len (apply append prims)))
+16
+> (each word `(there are ,n primitives) (prn word))
+there
+are
+16
+primitives
+(there are 16 primitives)
+>
+> ;; sorting and de-duplication
+> (sort < '(3 2 8 6 18 12 2 19 13 19))
+(2 2 3 6 8 12 13 18 19 19)
+> (dedup (sort < '(3 2 8 6 18 12 2 19 13 19)))
+(2 3 6 8 12 13 18 19)
+>
+> ;; templates and places
+> (tem vec2d x 0 y 0)
+((x lit clo nil nil 0) (y lit clo nil nil 0))
+> (set robot (make vec2d))
+(lit tab (x . 0) (y . 0))
+> robot!y
+0
+> (zap [+ 5 _] robot!y)
+5
+> robot!y
+5
+> (++ robot!y)
+6
+> ((of list robot) 'x 'y)
+(0 6)
+>
+> ;; arrays
+> (set I (array '(3 3) 0))
+(lit arr (lit arr 0 0 0) (lit arr 0 0 0) (lit arr 0 0 0))
+> (def diag (m n) (m n n))
+(lit clo nil (m n) (m n n))
+> (for n 1 3 (set (diag I n) 1))
+nil
+> I
+(lit arr (lit arr 1 0 0) (lit arr 0 1 0) (lit arr 0 0 1))
 ```
 
 ## State of completion
