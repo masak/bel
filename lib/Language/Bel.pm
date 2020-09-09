@@ -86,12 +86,12 @@ sub new {
     if (!defined($self->{output})) {
         $self->{output} = sub {
             my ($string) = @_;
-            print($string, "\n");
+            print($string);
         };
     }
     if (!defined($self->{primitives})) {
         $self->{primitives} = Language::Bel::Primitives->new({
-            output => $self->{output}
+            output => $self->{output},
         });
     }
     if (!defined($self->{globals})) {
@@ -159,9 +159,18 @@ sub read_eval_print {
     my $eval_result = $self->eval($ast);
     my $result_string = _print($eval_result);
 
+    $self->output($result_string);
+    $self->output("\n");
+
+    return;
+}
+
+sub output {
+    my ($self, $string) = @_;
+
     my $output = $self->{output};
     if (ref($output) eq "CODE") {
-        $output->($result_string);
+        $output->($string);
     }
 
     return;

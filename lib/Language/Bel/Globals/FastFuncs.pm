@@ -3649,18 +3649,18 @@ sub fastfunc__prn {
 
     my $last = SYMBOL_NIL;
     for (@args) {
-        print(Language::Bel::Printer::_print($_));
-        print(" ");
+        $bel->output(Language::Bel::Printer::_print($_));
+        $bel->output(" ");
         $last = $_;
     }
-    print("\n");
+    $bel->output("\n");
     return $last;
 }
 
 sub fastfunc__pr {
     my ($bel, @args) = @_;
 
-    print for
+    $bel->output($_) for
         map { Language::Bel::Printer::prnice($_) }
         @args;
 
