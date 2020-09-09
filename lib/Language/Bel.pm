@@ -48,11 +48,11 @@ Language::Bel - An interpreter for Paul Graham's language Bel
 
 =head1 VERSION
 
-Version 0.41
+Version 0.42
 
 =cut
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 =head1 SYNOPSIS
 
@@ -270,6 +270,23 @@ my %forms = (
             die "'cannot-bind\n";
         }
     },
+
+    # (form after ((e1 e2) a s r m)
+    #   (mev (cons (list e1 a)
+    #              (list (list smark 'prot e2) a)
+    #              s)
+    #        r
+    #        m))
+    after => sub {
+        my ($bel, $es, $a) = @_;
+
+        # XXX: skipping $es sanity check for now
+        my $e1 = $bel->car($es);
+        my $e2 = $bel->car($bel->cdr($es));
+
+        my $prot = [make_smark_of_type("prot", $e2), $a];
+        push @{$bel->{s}}, $prot, [$e1, $a];
+    },
 );
 
 # (def if2 (es a s r m)
@@ -358,10 +375,15 @@ sub ev {
     elsif (is_smark_of_type($e, "loc")) {
         die "'unfindable\n";
     }
+    elsif (is_smark_of_type($e, "prot")) {
+        my $fu = fut(sub {
+            pop @{$self->{r}};
+        });
+        push @{$self->{s}}, $fu, [$e->value(), $a];
+    }
     elsif (is_smark($e)) {
         die "Unknown smark";
     }
-    # XXX: skipping `loc`, `prot` for now
     elsif (!proper($e)) {
         die "'malformed\n";
     }

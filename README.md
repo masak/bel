@@ -23,7 +23,7 @@ After downloading Bel, you can run it like this:
 
 ```sh
 $ perl -Ilib bin/bel
-Language::Bel 0.41 -- msys.
+Language::Bel 0.42 -- msys.
 > (+ 2 2)
 4
 > (append "Hello" '(\sp) "world!")
@@ -36,15 +36,11 @@ Language::Bel 0.41 -- msys.
 It's not fully there yet, though it's under active development.
 
 [The spec](https://github.com/masak/bel/blob/master/pg/bel.bel) contains 353 items.
-`Language::Bel` currently defines 283 of them.
+`Language::Bel` currently defines 286 of them.
 
-![283 of 353 definitions](images/definitions.svg)
+![286 of 353 definitions](images/definitions.svg)
 
 A summary of the remaining big features:
-
-* **after** is a primitive that gives "`finally` semantics" to an expression. That is,
-  `(after x y)` promises to run `y` no matter what happens to `x`: normal execution,
-  continuation-based jump, exception thrown...
 
 * **ccc** (or `call-with-current-continuation`) is a control mechanism that allows the
   program to save a point in the execution, and to return to that point again later.

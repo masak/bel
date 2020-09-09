@@ -1402,15 +1402,23 @@ __DATA__
                  f)))
     (if (< n 0) (-:r:- n) (r n))))
 
-; skip withfile [waiting for after]
+(mac withfile (var name dir . body)
+  `(let ,var (open ,name ,dir)
+     (after (do ,@body) (close ,var))))
 
-; skip from [waiting for after]
+(mac from (name . body)
+  (letu v
+    `(withfile ,v ,name 'in
+       (bind ins ,v ,@body))))
 
-; skip to [waiting for after]
+(mac to (name . body)
+  (letu v
+    `(withfile ,v ,name 'out
+       (bind outs ,v ,@body))))
 
 ; skip readall [waiting for reader]
 
-; skip load [waiting for after]
+; skip load [waiting for reader]
 
 (mac record body
   (letu v
