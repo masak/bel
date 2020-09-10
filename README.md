@@ -99,15 +99,10 @@ A summary of the remaining big features:
 
 ## ...but is it fast?
 
-*Performance* refers to our expectations of a program executing a task efficiently;
-given a long list and a request to look up its millionth element, it will make a
-difference whether that lookup is indexed (like with arrays) or linear (like with
-linked lists).
-
 *Make it work, make it right, make it fast.* &mdash; Kent Beck
 
-It's possible to make Bel run reasonably fast, using various optimizations under the
-hood. Here is a brief summary:
+This Bel implementation won't be usable in practice until it runs reasonably fast,
+using various optimizations under the hood. Here is a brief summary:
 
 * **Fast global lookup** (Complete, #194). A lot of time was saved in the test suite by
   turning the global lookup table into a hash under the hood.
