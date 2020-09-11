@@ -80,33 +80,12 @@ sub generate {
         .feature-chars      { fill: #faf; }
       </style>\n\n");
 
-    my $y = 225;
-    my $box_size = 17;
-    for my $feature (qw<done ccc reader backquotes printer chars>) {
-        my $class = $feature eq "done"
-            ? $feature
-            : "feature-$feature";
-        push(@output, "  <rect
-        x='20'
-        y='$y'
-        width='$box_size'
-        height='$box_size'
-        class='$class box'
-        title='$feature'
-      />\n");
-      my $text_y = $y + 15;
-        push(@output, "  <text
-        x='50'
-        y='$text_y'
-      >$feature</text>\n");
-      $y += 30;
-    }
-
     my $x = 0;
-    $y = 0;
+    my $y = 0;
     my $x_offset = 151;
     my $y_offset = 1;
     my $last_features = "+1";
+    my $box_size = 17;
 
     my $max_x = 0;
     my $max_y = 0;
@@ -145,6 +124,28 @@ sub generate {
             ++$y;
         }
         $last_features = $features;
+    }
+
+    my @FEATURES = qw<done ccc reader backquotes printer chars>;
+    $y = $y_offset + 20 * $y - 30 * scalar(@FEATURES);
+    for my $feature (@FEATURES) {
+        my $class = $feature eq "done"
+            ? $feature
+            : "feature-$feature";
+        push(@output, "  <rect
+        x='20'
+        y='$y'
+        width='$box_size'
+        height='$box_size'
+        class='$class box'
+        title='$feature'
+      />\n");
+        my $text_y = $y + 15;
+        push(@output, "  <text
+        x='50'
+        y='$text_y'
+      >$feature</text>\n");
+        $y += 30;
     }
 
     push(@output, "</svg>\n");

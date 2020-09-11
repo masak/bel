@@ -25,78 +25,6 @@
       </style>
 
   <rect
-        x='20'
-        y='225'
-        width='17'
-        height='17'
-        class='done box'
-        title='done'
-      />
-  <text
-        x='50'
-        y='240'
-      >done</text>
-  <rect
-        x='20'
-        y='255'
-        width='17'
-        height='17'
-        class='feature-ccc box'
-        title='ccc'
-      />
-  <text
-        x='50'
-        y='270'
-      >ccc</text>
-  <rect
-        x='20'
-        y='285'
-        width='17'
-        height='17'
-        class='feature-reader box'
-        title='reader'
-      />
-  <text
-        x='50'
-        y='300'
-      >reader</text>
-  <rect
-        x='20'
-        y='315'
-        width='17'
-        height='17'
-        class='feature-backquotes box'
-        title='backquotes'
-      />
-  <text
-        x='50'
-        y='330'
-      >backquotes</text>
-  <rect
-        x='20'
-        y='345'
-        width='17'
-        height='17'
-        class='feature-printer box'
-        title='printer'
-      />
-  <text
-        x='50'
-        y='360'
-      >printer</text>
-  <rect
-        x='20'
-        y='375'
-        width='17'
-        height='17'
-        class='feature-chars box'
-        title='chars'
-      />
-  <text
-        x='50'
-        y='390'
-      >chars</text>
-  <rect
         x='151'
         y='1'
         width='17'
@@ -2928,4 +2856,76 @@
         class='done box'
         title='&lt;anon&gt;'
       />
+  <rect
+        x='20'
+        y='256'
+        width='17'
+        height='17'
+        class='done box'
+        title='done'
+      />
+  <text
+        x='50'
+        y='271'
+      >done</text>
+  <rect
+        x='20'
+        y='286'
+        width='17'
+        height='17'
+        class='feature-ccc box'
+        title='ccc'
+      />
+  <text
+        x='50'
+        y='301'
+      >ccc</text>
+  <rect
+        x='20'
+        y='316'
+        width='17'
+        height='17'
+        class='feature-reader box'
+        title='reader'
+      />
+  <text
+        x='50'
+        y='331'
+      >reader</text>
+  <rect
+        x='20'
+        y='346'
+        width='17'
+        height='17'
+        class='feature-backquotes box'
+        title='backquotes'
+      />
+  <text
+        x='50'
+        y='361'
+      >backquotes</text>
+  <rect
+        x='20'
+        y='376'
+        width='17'
+        height='17'
+        class='feature-printer box'
+        title='printer'
+      />
+  <text
+        x='50'
+        y='391'
+      >printer</text>
+  <rect
+        x='20'
+        y='406'
+        width='17'
+        height='17'
+        class='feature-chars box'
+        title='chars'
+      />
+  <text
+        x='50'
+        y='421'
+      >chars</text>
 </svg>
