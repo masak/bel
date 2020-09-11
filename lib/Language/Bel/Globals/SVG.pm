@@ -54,6 +54,12 @@ sub generate {
 
     my @output;
 
+    my $color1 = "#c96424";
+    my $color2 = "#f2cc86";
+    my $color3 = "#82baff";
+    my $color4 = "#ffa502";
+    my $color5 = "#2b568c";
+
     push(@output, "<svg
         xmlns='http://www.w3.org/2000/svg'
         width='{{WIDTH}}'
@@ -73,11 +79,11 @@ sub generate {
         }
 
         .done               { fill: white; }
-        .feature-ccc        { fill: #fb6; }
-        .feature-reader     { fill: #7e6; }
-        .feature-backquotes { fill: #6af; }
-        .feature-printer    { fill: #aaf; }
-        .feature-chars      { fill: #faf; }
+        .feature-ccc        { fill: $color1; }
+        .feature-reader     { fill: $color2; }
+        .feature-backquotes { fill: $color3; }
+        .feature-printer    { fill: $color4; }
+        .feature-chars      { fill: $color5; }
       </style>\n\n");
 
     my $y = 225;

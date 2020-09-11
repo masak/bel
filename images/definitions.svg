@@ -17,11 +17,11 @@
         }
 
         .done               { fill: white; }
-        .feature-ccc        { fill: #fb6; }
-        .feature-reader     { fill: #7e6; }
-        .feature-backquotes { fill: #6af; }
-        .feature-printer    { fill: #aaf; }
-        .feature-chars      { fill: #faf; }
+        .feature-ccc        { fill: #c96424; }
+        .feature-reader     { fill: #f2cc86; }
+        .feature-backquotes { fill: #82baff; }
+        .feature-printer    { fill: #ffa502; }
+        .feature-chars      { fill: #2b568c; }
       </style>
 
   <rect
