@@ -48,11 +48,11 @@ Language::Bel - An interpreter for Paul Graham's language Bel
 
 =head1 VERSION
 
-Version 0.43
+Version 0.44
 
 =cut
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 =head1 SYNOPSIS
 

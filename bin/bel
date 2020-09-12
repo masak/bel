@@ -59,7 +59,7 @@ sub repl {
 
     print("Language::Bel ", $Language::Bel::VERSION, " -- $^O.\n");
     while (defined (my $expr = prompt("> "))) {
-        next if $expr =~ /^\s*;?/;
+        next if $expr =~ /^\s*(?:;|$)/;
 
         eval {
             $b->read_eval_print($expr);
