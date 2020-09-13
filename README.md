@@ -117,9 +117,14 @@ using various optimizations under the hood. Here is a brief summary:
   (see #106).
 
 * **Fast numbers** (#140). Using Perl's numbers instead of building up and traversing the
-  data structures in Bel.
+  data structures in Bel. The fast functions can work directly with the numbers. If a user
+  ever structurally inspects a fast number, it deoptimizes back into a plain Bel structure.
 
-* **Fast strings** (#144).
+* **Fast strings** (#144). Just as with numbers, fast strings use a Perl representation
+  internally. However, because strings are really just lists of characters and because
+  lists can point to each other, the strings are built up as string fragments breaking at
+  all the points where there could be a reference. That way, for example, strings can
+  share suffixes.
 
 * **Fast lists** (#221).
 
