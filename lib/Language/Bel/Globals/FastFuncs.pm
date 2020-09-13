@@ -180,27 +180,22 @@ sub fastfunc__map {
 
     return SYMBOL_NIL
         unless @ls;
-    my @sublists;
-    my $min_length = -1;
-    for my $list (@ls) {
-        my @sublist;
-        while (!is_nil($list)) {
-            push @sublist, $bel->car($list);
+
+    my @result;
+
+    ELEMENT:
+    while (1) {
+        my @arguments;
+        for my $list (@ls) {
+            last ELEMENT
+                if (is_nil($list));
+
+            push @arguments, $bel->car($list);
             $list = $bel->cdr($list);
         }
-        push @sublists, \@sublist;
-        my $length = scalar(@sublist);
-        $min_length = $min_length == -1 || $length < $min_length
-            ? $length
-            : $min_length;
+        push @result, $bel->{call}->($f, @arguments);
     }
-    my @result;
-    for my $i (0..$min_length-1) {
-        push @result, $bel->{call}->(
-            $f,
-            map { $sublists[$_]->[$i] } 0..$#sublists
-        );
-    }
+
     my $result = SYMBOL_NIL;
     for my $v (reverse(@result)) {
         $result = make_pair($v, $result);
