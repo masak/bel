@@ -19,8 +19,8 @@
         .done               { fill: white; }
         .feature-ccc        { fill: #c96424; }
         .feature-reader     { fill: #f2cc86; }
-        .feature-backquotes { fill: #82baff; }
-        .feature-printer    { fill: #ffa502; }
+        .feature-backquotes { fill: #ffa502; }
+        .feature-printer    { fill: #82baff; }
         .feature-chars      { fill: #2b568c; }
       </style>
 
