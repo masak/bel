@@ -5386,6 +5386,26 @@ sub new {
             make_pair(make_symbol("comma-at-outside-list"), SYMBOL_NIL)),
             SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL))))), SYMBOL_NIL))));
 
+        $self->add_global("cells", make_pair(make_symbol("lit"),
+            make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+            make_pair(make_pair(make_symbol("x"),
+            make_pair(make_pair(make_symbol("o"), make_pair(make_symbol("seen"),
+            SYMBOL_NIL)), SYMBOL_NIL)), make_pair(make_pair(make_symbol("if"),
+            make_pair(make_pair(make_symbol("simple"), make_pair(make_symbol("x"),
+            SYMBOL_NIL)), make_pair(make_symbol("seen"),
+            make_pair(make_pair(make_symbol("mem"), make_pair(make_symbol("x"),
+            make_pair(make_symbol("seen"), make_pair(make_symbol("id"),
+            SYMBOL_NIL)))), make_pair(make_pair(make_symbol("snoc"),
+            make_pair(make_symbol("seen"), make_pair(make_symbol("x"),
+            SYMBOL_NIL))), make_pair(make_pair(make_symbol("cells"),
+            make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("x"),
+            SYMBOL_NIL)), make_pair(make_pair(make_symbol("cells"),
+            make_pair(make_pair(make_symbol("car"), make_pair(make_symbol("x"),
+            SYMBOL_NIL)), make_pair(make_pair(make_symbol("snoc"),
+            make_pair(make_symbol("seen"), make_pair(make_symbol("x"),
+            SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL)))))),
+            SYMBOL_NIL))))));
+
         $self->add_global("prn", make_fastfunc(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_symbol("args"), make_pair(make_pair(make_symbol("do"),

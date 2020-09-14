@@ -1158,7 +1158,11 @@ __DATA__
 
 ; skip namedups [waiting for printer]
 
-; skip cells [waiting for printer]
+(def cells (x (o seen))
+  (if (simple x)      seen
+      (mem x seen id) (snoc seen x)
+                      (cells (cdr x)
+                             (cells (car x) (snoc seen x)))))
 
 ; skip prc [waiting for printer]
 
