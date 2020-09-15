@@ -1156,7 +1156,8 @@ __DATA__
 
 ; skip print [waiting for printer]
 
-; skip namedups [waiting for printer]
+(def namedups (x (o n 0))
+  (map [cons _ (++ n)] (dups (cells x) id)))
 
 (def cells (x (o seen))
   (if (simple x)      seen

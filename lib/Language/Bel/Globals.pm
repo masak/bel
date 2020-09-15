@@ -5386,6 +5386,27 @@ sub new {
             make_pair(make_symbol("comma-at-outside-list"), SYMBOL_NIL)),
             SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL))))), SYMBOL_NIL))));
 
+        $self->add_global("namedups", make_pair(make_symbol("lit"),
+            make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+            make_pair(make_pair(make_symbol("x"),
+            make_pair(make_pair(make_symbol("o"), make_pair(make_symbol("n"),
+            make_pair(make_pair(make_symbol("lit"), make_pair(make_symbol("num"),
+            make_pair(make_pair(make_symbol("+"), make_pair(SYMBOL_NIL,
+            make_pair(make_pair(SYMBOL_T, SYMBOL_NIL), SYMBOL_NIL))),
+            make_pair(make_pair(make_symbol("+"), make_pair(SYMBOL_NIL,
+            make_pair(make_pair(SYMBOL_T, SYMBOL_NIL), SYMBOL_NIL))),
+            SYMBOL_NIL)))), SYMBOL_NIL))), SYMBOL_NIL)),
+            make_pair(make_pair(make_symbol("map"),
+            make_pair(make_pair(make_symbol("fn"),
+            make_pair(make_pair(make_symbol("_"), SYMBOL_NIL),
+            make_pair(make_pair(make_symbol("cons"), make_pair(make_symbol("_"),
+            make_pair(make_pair(make_symbol("++"), make_pair(make_symbol("n"),
+            SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL))),
+            make_pair(make_pair(make_symbol("dups"),
+            make_pair(make_pair(make_symbol("cells"), make_pair(make_symbol("x"),
+            SYMBOL_NIL)), make_pair(make_symbol("id"), SYMBOL_NIL))), SYMBOL_NIL))),
+            SYMBOL_NIL))))));
+
         $self->add_global("cells", make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("x"),
