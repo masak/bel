@@ -6,7 +6,7 @@ use Test::More;
 
 use Language::Bel::Test;
 
-plan tests => 10;
+plan tests => 11;
 
 {
     is_bel_output("(/)", "1");
@@ -27,4 +27,5 @@ plan tests => 10;
     is_bel_output("(/ 1 -1)", "-1");
     is_bel_output("(/ 1 +3i)", "-1/3i");
     is_bel_output("(/ -1/2 -2/3i)", "-3/4i");
+    is_bel_error("(/ 1 0)", "'mistype");
 }
