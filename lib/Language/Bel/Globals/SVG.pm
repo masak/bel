@@ -56,8 +56,8 @@ sub generate {
 
     my $color1 = "#c96424";
     my $color2 = "#f2cc86";
-    my $color3 = "#82baff";
-    my $color4 = "#ffa502";
+    my $color3 = "#ffa502";
+    my $color4 = "#82baff";
     my $color5 = "#2b568c";
 
     push(@output, "<svg
@@ -133,7 +133,7 @@ sub generate {
     }
 
     my @FEATURES = qw<done ccc reader backquotes printer chars>;
-    $y = $y_offset + 20 * $y - 30 * scalar(@FEATURES);
+    $y = $y_offset + 20 * $y - 30 * (scalar(@FEATURES) - 1);
     for my $feature (@FEATURES) {
         my $class = $feature eq "done"
             ? $feature

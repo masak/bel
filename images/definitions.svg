@@ -19,8 +19,8 @@
         .done               { fill: white; }
         .feature-ccc        { fill: #c96424; }
         .feature-reader     { fill: #f2cc86; }
-        .feature-backquotes { fill: #82baff; }
-        .feature-printer    { fill: #ffa502; }
+        .feature-backquotes { fill: #ffa502; }
+        .feature-printer    { fill: #82baff; }
         .feature-chars      { fill: #2b568c; }
       </style>
 
@@ -2858,7 +2858,7 @@
       />
   <rect
         x='20'
-        y='256'
+        y='286'
         width='17'
         height='17'
         class='done box'
@@ -2866,11 +2866,11 @@
       />
   <text
         x='50'
-        y='271'
+        y='301'
       >done</text>
   <rect
         x='20'
-        y='286'
+        y='316'
         width='17'
         height='17'
         class='feature-ccc box'
@@ -2878,11 +2878,11 @@
       />
   <text
         x='50'
-        y='301'
+        y='331'
       >ccc</text>
   <rect
         x='20'
-        y='316'
+        y='346'
         width='17'
         height='17'
         class='feature-reader box'
@@ -2890,11 +2890,11 @@
       />
   <text
         x='50'
-        y='331'
+        y='361'
       >reader</text>
   <rect
         x='20'
-        y='346'
+        y='376'
         width='17'
         height='17'
         class='feature-backquotes box'
@@ -2902,11 +2902,11 @@
       />
   <text
         x='50'
-        y='361'
+        y='391'
       >backquotes</text>
   <rect
         x='20'
-        y='376'
+        y='406'
         width='17'
         height='17'
         class='feature-printer box'
@@ -2914,11 +2914,11 @@
       />
   <text
         x='50'
-        y='391'
+        y='421'
       >printer</text>
   <rect
         x='20'
-        y='406'
+        y='436'
         width='17'
         height='17'
         class='feature-chars box'
@@ -2926,6 +2926,6 @@
       />
   <text
         x='50'
-        y='421'
+        y='451'
       >chars</text>
 </svg>
