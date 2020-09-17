@@ -1156,9 +1156,14 @@ __DATA__
 
 ; skip print [waiting for printer]
 
-; skip namedups [waiting for printer]
+(def namedups (x (o n 0))
+  (map [cons _ (++ n)] (dups (cells x) id)))
 
-; skip cells [waiting for printer]
+(def cells (x (o seen))
+  (if (simple x)      seen
+      (mem x seen id) (snoc seen x)
+                      (cells (cdr x)
+                             (cells (car x) (snoc seen x)))))
 
 ; skip prc [waiting for printer]
 
