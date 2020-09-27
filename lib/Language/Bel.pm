@@ -48,11 +48,11 @@ Language::Bel - An interpreter for Paul Graham's language Bel
 
 =head1 VERSION
 
-Version 0.46
+Version 0.47
 
 =cut
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 =head1 SYNOPSIS
 
@@ -325,9 +325,19 @@ sub if2 {
 sub dyn2 {
     my ($bel, $v, $e2, $a) = @_;
 
+    my $smark = $bel->cdr($bel->{globals}->get_kv("smark"));
     my $car_r = pop(@{$bel->{r}});
     push @{$bel->{s}},
-        [make_smark_of_type("bind", make_pair($v, $car_r)), SYMBOL_NIL],
+        [make_pair(
+            $smark,
+            make_pair(
+                make_symbol("bind"),
+                make_pair(
+                    make_pair($v, $car_r),
+                    SYMBOL_NIL,
+                ),
+            ),
+        ), SYMBOL_NIL],
         [$e2, $a];
 }
 
@@ -363,6 +373,10 @@ sub ev {
     elsif ($self->variable($e)) {
         $self->vref($e, $a);
     }
+    elsif (is_pair($e)
+        && $self->{globals}->is_global_of_name($self->car($e), "smark")) {
+        $self->evmark($self->cdr($e), $a);
+    }
     # (def evmark (e a s r m)
     #   (case (car e)
     #     fut  ((cadr e) s r m)
@@ -376,9 +390,6 @@ sub ev {
     #          (sigerr 'unknown-mark s r m)))
     elsif (is_smark_of_type($e, "fut")) {
         $e->value()->();
-    }
-    elsif (is_smark_of_type($e, "bind")) {
-        # do nothing; already popped it off the stack
     }
     elsif (is_smark_of_type($e, "loc")) {
         die "'unfindable\n";
@@ -582,13 +593,35 @@ sub binding {
         next if ref($entry) eq "CODE";
         my $e = $entry->[0];
 
-        next unless is_smark_of_type($e, "bind");
-        my $smark_value = $e->value();
+        next unless is_pair($e)
+            && $self->{globals}->is_global_of_name($self->car($e), "smark")
+            && is_symbol_of_name($self->car($self->cdr($e)), "bind");
+        my $smark_value = $self->car($self->cdr($self->cdr($e)));
         next unless are_identical(pair_car($smark_value), $v);
         return $smark_value;
     }
 
     return;
+}
+
+# (def evmark (e a s r m)
+#   (case (car e)
+#     fut  ((cadr e) s r m)
+#     bind (mev s r m)
+#     loc  (sigerr 'unfindable s r m)
+#     prot (mev (cons (list (cadr e) a)
+#                     (fu (s r m) (mev s (cdr r) m))
+#                     s)
+#               r
+#               m)
+#          (sigerr 'unknown-mark s r m)))
+sub evmark {
+    my ($self, $e, $a) = @_;
+
+    my $car_e = $self->car($e);
+    if (is_symbol_of_name($car_e, "bind")) {
+        # do nothing; already popped it off the stack
+    }
 }
 
 # (def evcall (e a s r m)
