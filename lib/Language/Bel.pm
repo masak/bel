@@ -304,8 +304,21 @@ my %forms = (
         # XXX: skipping $es sanity check for now
         my $e1 = $bel->car($es);
         my $e2 = $bel->car($bel->cdr($es));
+        my $smark = $bel->cdr($bel->{globals}->get_kv("smark"));
 
-        my $prot = [make_smark_of_type("prot", $e2), $a];
+        my $prot = [
+            make_pair(
+                $smark,
+                make_pair(
+                    make_symbol("prot"),
+                    make_pair(
+                        $e2,
+                        SYMBOL_NIL,
+                    ),
+                ),
+            ),
+            $a,
+        ];
         push @{$bel->{s}}, $prot, [$e1, $a];
     },
 );
@@ -403,12 +416,6 @@ sub ev {
     #          (sigerr 'unknown-mark s r m)))
     elsif (is_smark_of_type($e, "fut")) {
         $e->value()->();
-    }
-    elsif (is_smark_of_type($e, "prot")) {
-        my $fu = fut(sub {
-            pop @{$self->{r}};
-        });
-        push @{$self->{s}}, $fu, [$e->value(), $a];
     }
     elsif (is_smark($e)) {
         die "Unknown smark";
@@ -636,6 +643,15 @@ sub evmark {
     }
     elsif (is_symbol_of_name($car_e, "loc")) {
         die "'unfindable\n";
+    }
+    elsif (is_symbol_of_name($car_e, "prot")) {
+        my $fu = fut(sub {
+            pop @{$self->{r}};
+        });
+        push @{$self->{s}}, $fu, [$self->car($self->cdr($e)), $a];
+    }
+    else {
+        die "Unknown smark";
     }
 }
 
