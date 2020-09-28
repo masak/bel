@@ -246,9 +246,22 @@ my %forms = (
     where => sub {
         my ($bel, $e_new, $a) = @_;
         my $e = $bel->car($e_new);
+        my $smark = $bel->cdr($bel->{globals}->get_kv("smark"));
         my $new = $bel->car($bel->cdr($e_new));
 
-        push @{$bel->{s}}, [make_smark_of_type("loc", $new), SYMBOL_NIL];
+        push @{$bel->{s}}, [
+            make_pair(
+                $smark,
+                make_pair(
+                    make_symbol("loc"),
+                    make_pair(
+                        $new,
+                        SYMBOL_NIL,
+                    ),
+                ),
+            ),
+            SYMBOL_NIL,
+        ];
         push @{$bel->{s}}, [$e, $a];
     },
 
@@ -391,9 +404,6 @@ sub ev {
     elsif (is_smark_of_type($e, "fut")) {
         $e->value()->();
     }
-    elsif (is_smark_of_type($e, "loc")) {
-        die "'unfindable\n";
-    }
     elsif (is_smark_of_type($e, "prot")) {
         my $fu = fut(sub {
             pop @{$self->{r}};
@@ -491,7 +501,7 @@ sub vref {
     my ($self, $v, $a) = @_;
 
     my $it;
-    if ($it = inwhere($self->{s})) {
+    if ($it = $self->inwhere()) {
         my $car_inwhere = $self->car($it);
         if (is_pair($it = $self->lookup($v, $a))
             || !is_nil($car_inwhere) && ($it = $self->{globals}->install($v))) {
@@ -524,12 +534,14 @@ sub vref {
 #     (and (begins e (list smark 'loc))
 #          (cddr e))))
 sub inwhere {
-    my ($s_ref) = @_;
+    my ($self) = @_;
 
-    my $smark;
-    return @$s_ref
-        && is_smark_of_type($smark = $s_ref->[-1][0], "loc")
-        && make_pair($smark->value(), SYMBOL_NIL);
+    my $e;
+    return @{$self->{s}}
+        && is_pair($e = $self->{s}[-1][0])
+        && $self->{globals}->is_global_of_name($self->car($e), "smark")
+        && is_symbol_of_name($self->car($self->cdr($e)), "loc")
+        && $self->cdr($self->cdr($e));
 }
 
 # (def get (k kvs (o f =))
@@ -622,6 +634,9 @@ sub evmark {
     if (is_symbol_of_name($car_e, "bind")) {
         # do nothing; already popped it off the stack
     }
+    elsif (is_symbol_of_name($car_e, "loc")) {
+        die "'unfindable\n";
+    }
 }
 
 # (def evcall (e a s r m)
@@ -682,7 +697,7 @@ sub evcall {
                 }
                 elsif (is_fastfunc($op)) {
                     my $e;
-                    if (inwhere($self->{s}) && $op->handles_where()) {
+                    if ($self->inwhere() && $op->handles_where()) {
                         $e = $op->where_apply($self, @args);
                         if (!is_nil($e)) {
                             pop @{$self->{s}};  # get rid of the (smark 'loc)
@@ -795,7 +810,7 @@ sub applylit {
     my ($self, $f, $args, $a) = @_;
 
     my $it;
-    if (inwhere($self->{s}) && ($it = $self->findlocfn($f, $args))) {
+    if ($self->inwhere() && ($it = $self->findlocfn($f, $args))) {
         pop @{$self->{s}};  # get rid of the (smark 'loc)
         push @{$self->{r}}, $it;
     }
