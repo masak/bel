@@ -8,7 +8,6 @@ use Language::Bel::Types qw(
     are_identical
     atoms_are_identical
     is_char
-    is_fastfunc
     is_nil
     is_pair
     is_string
@@ -22,6 +21,12 @@ use Language::Bel::Types qw(
     symbol_name
     symbols_are_identical
 );
+use Language::Bel::Type::Pair::FastFunc qw(
+    is_fastfunc
+);
+use Language::Bel::Type::Pair::FutFunc qw(
+    make_futfunc
+);
 use Language::Bel::Symbols::Common qw(
     SYMBOL_NIL
 );
@@ -31,11 +36,6 @@ use Language::Bel::Reader qw(
 );
 use Language::Bel::Expander::Bquote qw(
     _bqexpand
-);
-use Language::Bel::Smark qw(
-    is_smark
-    is_smark_of_type
-    make_smark_of_type
 );
 use Language::Bel::Globals;
 use Language::Bel::Printer qw(
@@ -191,10 +191,28 @@ sub eval {
     return $self->{r}[-1];
 }
 
+# (mac fu args
+#   `(list (list smark 'fut (fn ,@args)) nil))
 sub fut {
-    my ($sub) = @_;
+    my ($self, $source, $sub) = @_;
+    my $smark = $self->cdr($self->{globals}->get_kv("smark"));
 
-    return [make_smark_of_type("fut", $sub), SYMBOL_NIL];
+    return [
+        make_pair(
+            $smark,
+            make_pair(
+                make_symbol("fut"),
+                make_pair(
+                    make_futfunc(
+                        $source,
+                        $sub,
+                    ),
+                    SYMBOL_NIL,
+                ),
+            ),
+        ),
+        SYMBOL_NIL,
+    ];
 }
 
 my %forms = (
@@ -228,9 +246,15 @@ my %forms = (
         else {
             my $cdr_es = $bel->cdr($es);
             if (!is_nil($cdr_es)) {
-                my $fu = fut(sub {
-                    if2($bel, $bel->cdr($es), $a);
-                });
+                my $fu = $bel->fut(
+                    <<'FUT',
+                    (fn (s r m)
+                      (if2 (cdr es) a s r m))
+FUT
+                    sub {
+                        if2($bel, $bel->cdr($es), $a);
+                    },
+                );
                 push @{$bel->{s}}, $fu;
             }
             push @{$bel->{s}}, [$bel->car($es), $a];
@@ -282,9 +306,14 @@ my %forms = (
         my $e2 = $bel->car($bel->cdr($bel->cdr($es)));
 
         if ($bel->variable($v)) {
-            my $fu = fut(sub {
-                dyn2($bel, $v, $e2, $a);
-            });
+            my $fu = $bel->fut(
+                <<'FUT',
+                    (fn (s r m) (dyn2 v e2 a s r m))
+FUT
+                sub {
+                    dyn2($bel, $v, $e2, $a);
+                },
+            );
             push @{$bel->{s}}, $fu, [$e1, $a];
         }
         else {
@@ -414,12 +443,6 @@ sub ev {
     #               r
     #               m)
     #          (sigerr 'unknown-mark s r m)))
-    elsif (is_smark_of_type($e, "fut")) {
-        $e->value()->();
-    }
-    elsif (is_smark($e)) {
-        die "Unknown smark";
-    }
     elsif (!proper($e)) {
         die "'malformed\n";
     }
@@ -468,9 +491,6 @@ sub literal {
 #       (id (car e) vmark)))
 sub variable {
     my ($self, $e) = @_;
-
-    # Smarks are not pairs in this interpreter
-    return if is_smark($e);
 
     return is_pair($e)
         ? $self->{globals}->is_global_of_name(pair_car($e), "vmark")
@@ -638,16 +658,24 @@ sub evmark {
     my ($self, $e, $a) = @_;
 
     my $car_e = $self->car($e);
-    if (is_symbol_of_name($car_e, "bind")) {
+    if (is_symbol_of_name($car_e, "fut")) {
+        $self->car($self->cdr($e))->apply();
+    }
+    elsif (is_symbol_of_name($car_e, "bind")) {
         # do nothing; already popped it off the stack
     }
     elsif (is_symbol_of_name($car_e, "loc")) {
         die "'unfindable\n";
     }
     elsif (is_symbol_of_name($car_e, "prot")) {
-        my $fu = fut(sub {
-            pop @{$self->{r}};
-        });
+        my $fu = $self->fut(
+            <<'FUT',
+                (fn (s r m) (mev s (cdr r) m))
+FUT
+            sub {
+                pop @{$self->{r}};
+            },
+        );
         push @{$self->{s}}, $fu, [$self->car($self->cdr($e)), $a];
     }
     else {
@@ -665,82 +693,94 @@ sub evmark {
 sub evcall {
     my ($self, $e, $a) = @_;
 
-    my $fu1 = fut(sub {
-        # (def evcall2 (es a s (op . r) m)
-        #   (if ((isa 'mac) op)
-        #       (applym op es a s r m)
-        #       (mev (append (map [list _ a] es)
-        #                    (cons (fu (s r m)
-        #                            (let (args r2) (snap es r)
-        #                              (applyf op (rev args) a s r2 m)))
-        #                          s))
-        #            r
-        #            m)))
+    my $fu1 = $self->fut(
+        <<'FUT',
+            (fn (s r m) (evcall2 (cdr e) a s r m))
+FUT
+        sub {
+            # (def evcall2 (es a s (op . r) m)
+            #   (if ((isa 'mac) op)
+            #       (applym op es a s r m)
+            #       (mev (append (map [list _ a] es)
+            #                    (cons (fu (s r m)
+            #                            (let (args r2) (snap es r)
+            #                              (applyf op (rev args) a s r2 m)))
+            #                          s))
+            #            r
+            #            m)))
 
-        my $es1 = pair_cdr($e);
-        my $op = pop @{$self->{r}};
+            my $es1 = pair_cdr($e);
+            my $op = pop @{$self->{r}};
 
-        my $isa_mac = sub {
-            my ($v) = @_;
+            my $isa_mac = sub {
+                my ($v) = @_;
 
-            return is_pair($v)
-                && is_symbol_of_name($self->car($v), "lit")
-                && is_pair($self->cdr($v))
-                && is_symbol_of_name($self->car($self->cdr($v)), "mac");
-        };
+                return is_pair($v)
+                    && is_symbol_of_name($self->car($v), "lit")
+                    && is_pair($self->cdr($v))
+                    && is_symbol_of_name($self->car($self->cdr($v)), "mac");
+            };
 
-        if ($isa_mac->($op)) {
-            $self->applym($op, $es1, $a);
-        }
-        else {
-            # We're consuming `es` twice, once in each fut.
-            # So we capture it twice.
-            my $es2 = $es1;
-
-            my $fu2 = fut(sub {
-                my $args = SYMBOL_NIL;
-                my @args;
-                while (!is_nil($es2)) {
-                    my $arg = pop(@{$self->{r}});
-                    $args = make_pair($arg, $args);
-                    unshift @args, $arg;
-                    $es2 = pair_cdr($es2);
-                }
-
-                if ($self->{globals}->is_global_of_name($op, "err")) {
-                    # XXX: Need to do proper parameter handling here
-                    die _print($self->car($args)), "\n";
-                }
-                elsif (is_fastfunc($op)) {
-                    my $e;
-                    if ($self->inwhere() && $op->handles_where()) {
-                        $e = $op->where_apply($self, @args);
-                        if (!is_nil($e)) {
-                            pop @{$self->{s}};  # get rid of the (smark 'loc)
-                        }
-                    }
-                    else {
-                        $e = $op->apply($self, @args);
-                    }
-                    push @{$self->{r}}, $e;
-                }
-                else {
-                    $self->applyf($op, $args, $a);
-                }
-            });
-
-            my @unevaluated_arguments;
-            while (!is_nil($es1)) {
-                push @unevaluated_arguments, [pair_car($es1), $a];
-                $es1 = pair_cdr($es1);
+            if ($isa_mac->($op)) {
+                $self->applym($op, $es1, $a);
             }
-            # We want to evaluate the arguments in the order `a b c`,
-            # so we need to put them on expression stack in the order
-            # `c b a`. That's why we use `@unevaluated_arguments` as
-            # an intermediary, to reverse the order.
-            push @{$self->{s}}, $fu2, reverse(@unevaluated_arguments);
-        }
-    });
+            else {
+                # We're consuming `es` twice, once in each fut.
+                # So we capture it twice.
+                my $es2 = $es1;
+
+                my $fu2 = $self->fut(
+                    <<'FUT',
+                        (fn (s r m)
+                          (let (args r2) (snap es r)
+                            (applyf op (rev args) a s r2 m)))
+FUT
+                    sub {
+                        my $args = SYMBOL_NIL;
+                        my @args;
+                        while (!is_nil($es2)) {
+                            my $arg = pop(@{$self->{r}});
+                            $args = make_pair($arg, $args);
+                            unshift @args, $arg;
+                            $es2 = pair_cdr($es2);
+                        }
+
+                        if ($self->{globals}->is_global_of_name($op, "err")) {
+                            # XXX: Need to do proper parameter handling here
+                            die _print($self->car($args)), "\n";
+                        }
+                        elsif (is_fastfunc($op)) {
+                            my $e;
+                            if ($self->inwhere() && $op->handles_where()) {
+                                $e = $op->where_apply($self, @args);
+                                if (!is_nil($e)) {
+                                    pop @{$self->{s}};  # get rid of the (smark 'loc)
+                                }
+                            }
+                            else {
+                                $e = $op->apply($self, @args);
+                            }
+                            push @{$self->{r}}, $e;
+                        }
+                        else {
+                            $self->applyf($op, $args, $a);
+                        }
+                    },
+                );
+
+                my @unevaluated_arguments;
+                while (!is_nil($es1)) {
+                    push @unevaluated_arguments, [pair_car($es1), $a];
+                    $es1 = pair_cdr($es1);
+                }
+                # We want to evaluate the arguments in the order `a b c`,
+                # so we need to put them on expression stack in the order
+                # `c b a`. That's why we use `@unevaluated_arguments` as
+                # an intermediary, to reverse the order.
+                push @{$self->{s}}, $fu2, reverse(@unevaluated_arguments);
+            }
+        },
+    );
     push @{$self->{s}}, $fu1, [pair_car($e), $a];
 }
 
@@ -759,10 +799,18 @@ sub applym {
     my ($self, $mac, $args, $a) = @_;
 
     my $mac_clo = $self->car($self->cdr($self->cdr($mac)));
-    my $fu = fut(sub {
-        my $macro_expansion = pop @{$self->{r}};
-        push @{$self->{s}}, [$macro_expansion, $a];
-    });
+    my $fu = $self->fut(
+        <<'FUT',
+            (fn (s r m)
+              (mev (cons (list (car r) a) s)
+                   (cdr r)
+                   m))
+FUT
+        sub {
+            my $macro_expansion = pop @{$self->{r}};
+            push @{$self->{s}}, [$macro_expansion, $a];
+        },
+    );
     push @{$self->{s}}, $fu;
     $self->applyf($mac_clo, $args, $a);
 }
@@ -893,10 +941,16 @@ sub applylit {
                         SYMBOL_NIL,
                     ),
                 );
-                my $fu = fut(sub {
-                    my $virfn_result = pop @{$self->{r}};
-                    push @{$self->{s}}, [$virfn_result, $a];
-                });
+                my $fu = $self->fut(
+                    <<'FUT',
+                        (fn (s r m)
+                          (mev (cons (list e a) s) r m))
+FUT
+                    sub {
+                        my $virfn_result = pop @{$self->{r}};
+                        push @{$self->{s}}, [$virfn_result, $a];
+                    },
+                );
                 push @{$self->{s}}, $fu;
                 $self->applyf($cdr_it, $f_and_quoted_args, $a);
             }
@@ -1037,16 +1091,30 @@ sub applyprim {
 sub applyclo {
     my ($self, $parms, $args, $env, $body) = @_;
 
-    my $fu1 = fut(sub {
-        $self->pass($parms, $args, $env);
-    });
-    my $fu2 = fut(sub {
-        my $car_r = pop @{$self->{r}};
-        push @{$self->{s}}, [
-            $body,
-            $car_r,
-        ];
-    });
+    my $fu1 = $self->fut(
+        <<'FUT',
+            (fn (s r m)
+              (pass parms args env s r m))
+FUT
+        sub {
+            $self->pass($parms, $args, $env);
+        },
+    );
+    my $fu2 = $self->fut(
+        <<'FUT',
+            (fn (s r m)
+              (mev (cons (list body (car r)) s)
+                   (cdr r)
+                   m))
+FUT
+        sub {
+            my $car_r = pop @{$self->{r}};
+            push @{$self->{s}}, [
+                $body,
+                $car_r,
+            ];
+        },
+    );
     push @{$self->{s}}, $fu2, $fu1;
 }
 
@@ -1096,14 +1164,22 @@ sub typecheck {
     my $var = $self->car($var_f);
     my $f = $self->car($self->cdr($var_f));
 
-    my $fu = fut(sub {
-        if (!is_nil(pop(@{$self->{r}}))) {
-            $self->pass($var, $arg, $env);
-        }
-        else {
-            die "'mistype\n";
-        }
-    });
+    my $fu = $self->fut(
+        <<'FUT',
+            (fn (s r m)
+              (if (car r)
+                  (pass var arg env s (cdr r) m)
+                  (sigerr 'mistype s r m)))
+FUT
+        sub {
+            if (!is_nil(pop(@{$self->{r}}))) {
+                $self->pass($var, $arg, $env);
+            }
+            else {
+                die "'mistype\n";
+            }
+        },
+    );
     push @{$self->{s}}, $fu, [
         make_pair(
             $f,
@@ -1148,12 +1224,28 @@ sub destructure {
 
     if (is_nil($arg)) {
         if (is_pair($p) && is_symbol_of_name(pair_car($p), "o")) {
-            my $fu1 = fut(sub {
-                $self->pass($self->car(pair_cdr($p)), pop(@{$self->{r}}), $env);
-            });
-            my $fu2 = fut(sub {
-                $self->pass($ps, SYMBOL_NIL, pop(@{$self->{r}}));
-            });
+            my $fu1 = $self->fut(
+                <<'FUT',
+                    (fn (s r m)
+                      (pass (cadr p) (car r) env s (cdr r) m))
+FUT
+                sub {
+                    $self->pass(
+                        $self->car(pair_cdr($p)),
+                        pop(@{$self->{r}}),
+                        $env
+                    );
+                },
+            );
+            my $fu2 = $self->fut(
+                <<'FUT',
+                    (fn (s r m)
+                      (pass ps nil (car r) s (cdr r) m))
+FUT
+                sub {
+                    $self->pass($ps, SYMBOL_NIL, pop(@{$self->{r}}));
+                },
+            );
             push @{$self->{s}}, $fu2, $fu1, [
                 $self->car($self->cdr(pair_cdr($p))),
                 $env,
@@ -1167,13 +1259,25 @@ sub destructure {
         die "'atom-arg\n";
     }
     else {
-        my $fu1 = fut(sub {
-            $self->pass($p, pair_car($arg), $env);
-        });
-        my $fu2 = fut(sub {
-            my $env = pop @{$self->{r}};
-            $self->pass($ps, pair_cdr($arg), $env);
-        });
+        my $fu1 = $self->fut(
+            <<'FUT',
+                (fn (s r m)
+                  (pass p (car arg) env s r m))
+FUT
+            sub {
+                $self->pass($p, pair_car($arg), $env);
+            },
+        );
+        my $fu2 = $self->fut(
+            <<'FUT',
+                (fn (s r m)
+                  (pass ps (cdr arg) (car r) s (cdr r) m))
+FUT
+            sub {
+                my $env = pop @{$self->{r}};
+                $self->pass($ps, pair_cdr($arg), $env);
+            },
+        );
         push @{$self->{s}}, $fu2, $fu1;
     }
 }

@@ -5,6 +5,8 @@ use 5.006;
 use strict;
 use warnings;
 
+use Exporter 'import';
+
 sub new {
     my ($class, $pair, $fn, $where_fn) = @_;
 
@@ -57,5 +59,22 @@ sub where_apply {
 
     return $self->{where_fn}->($bel, @args);
 }
+
+sub is_fastfunc {
+    my ($object) = @_;
+
+    return $object->isa("Language::Bel::Type::Pair::FastFunc");
+}
+
+sub make_fastfunc {
+    my ($pair, $fn, $where_fn) = @_;
+
+    return Language::Bel::Type::Pair::FastFunc->new($pair, $fn, $where_fn);
+}
+
+our @EXPORT_OK = qw(
+    is_fastfunc
+    make_fastfunc
+);
 
 1;

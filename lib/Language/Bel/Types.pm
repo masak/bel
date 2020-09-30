@@ -6,7 +6,6 @@ use warnings;
 
 use Language::Bel::Type::Char;
 use Language::Bel::Type::Pair;
-use Language::Bel::Type::Pair::FastFunc;
 use Language::Bel::Type::Stream;
 use Language::Bel::Type::Symbol;
 
@@ -54,12 +53,6 @@ sub is_char {
     return $object->isa("Language::Bel::Type::Char");
 }
 
-sub is_fastfunc {
-    my ($object) = @_;
-
-    return $object->isa("Language::Bel::Type::Pair::FastFunc");
-}
-
 sub is_nil {
     my ($object) = @_;
 
@@ -104,12 +97,6 @@ sub make_char {
     my ($codepoint) = @_;
 
     return Language::Bel::Type::Char->new($codepoint);
-}
-
-sub make_fastfunc {
-    my ($pair, $fn, $where_fn) = @_;
-
-    return Language::Bel::Type::Pair::FastFunc->new($pair, $fn, $where_fn);
 }
 
 sub make_pair {
@@ -199,7 +186,6 @@ our @EXPORT_OK = qw(
     char_codepoint
     chars_are_identical
     is_char
-    is_fastfunc
     is_nil
     is_pair
     is_stream
@@ -207,7 +193,6 @@ our @EXPORT_OK = qw(
     is_symbol
     is_symbol_of_name
     make_char
-    make_fastfunc
     make_pair
     make_stream
     make_symbol
