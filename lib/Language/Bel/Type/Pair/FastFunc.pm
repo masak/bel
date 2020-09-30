@@ -9,12 +9,35 @@ sub new {
     my ($class, $pair, $fn, $where_fn) = @_;
 
     my $obj = {
-        car => $pair->{car},
-        cdr => $pair->{cdr},
+        pair => $pair,
         fn => $fn,
         where_fn => $where_fn,
     };
     return bless($obj, $class);
+}
+
+sub car {
+    my ($self) = @_;
+
+    return $self->{pair}->car();
+}
+
+sub cdr {
+    my ($self) = @_;
+
+    return $self->{pair}->cdr();
+}
+
+sub xar {
+    my ($self, $car) = @_;
+
+    return $self->{pair}->xar($car);
+}
+
+sub xdr {
+    my ($self, $cdr) = @_;
+
+    return $self->{pair}->xdr($cdr);
 }
 
 sub handles_where {

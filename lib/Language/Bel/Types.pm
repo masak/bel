@@ -135,26 +135,26 @@ sub make_symbol {
 sub pair_car {
     my ($pair) = @_;
 
-    return $pair->{car};
+    return $pair->car();
 }
 
 sub pair_cdr {
     my ($pair) = @_;
 
-    return $pair->{cdr};
+    return $pair->cdr();
 }
 
 sub pair_set_car {
     my ($pair, $car) = @_;
 
-    $pair->{car} = $car;
+    $pair->xar($car);
     return;
 }
 
 sub pair_set_cdr {
     my ($pair, $cdr) = @_;
 
-    $pair->{cdr} = $cdr;
+    $pair->xdr($cdr);
     return;
 }
 
