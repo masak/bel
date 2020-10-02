@@ -6,6 +6,12 @@ use warnings;
 
 use Test::More;
 use Language::Bel;
+use Language::Bel::Reader qw(
+    read_partial
+);
+use Language::Bel::Expander::Bquote qw(
+    _bqexpand
+);
 
 use Exporter 'import';
 
@@ -87,10 +93,42 @@ sub visit {
     chdir("..");
 }
 
+sub output_of_eval_file {
+    my ($source_file) = @_;
+
+    my $output = "";
+    my $b = Language::Bel->new({ output => sub {
+        my ($string) = @_;
+        $output = "$output$string";
+    } });
+
+    my $source;
+    {
+        local $/;
+        open my $fh, '<', $source_file
+            or die "can't open $source_file for reading: $!";
+        $source = <$fh>;
+    }
+
+    while ($source) {
+        my $p = read_partial($source);
+        my $ast = _bqexpand($p->{ast});
+        my $next_pos = $p->{pos};
+
+        $b->eval($ast);
+
+        $source = substr($source, $next_pos);
+        $source =~ s/^\s+//;
+    }
+
+    return $output;
+}
+
 our @EXPORT = qw(
+    bel_todo
     is_bel_output
     is_bel_error
-    bel_todo
+    output_of_eval_file
     visit
 );
 
