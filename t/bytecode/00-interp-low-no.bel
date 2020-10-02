@@ -1,0 +1,55 @@
+(tem lowfn
+  regcount     0
+  instructions '())
+
+(set no-lowfn
+  (make lowfn
+    regcount     2
+    instructions '((param r0)
+                   (setreg r1 (id r0 'nil))
+                   (return r1))))
+
+(def register (x)
+  (and (symbol x)
+       (let s (nom x)
+         (and (= (car s \r))
+              (all digit (cdr s))))))
+
+(def regindex (r|register)
+  (inc (parsenum (cdr (nom r)) i10)))
+
+(mac target ()
+  `(regs (regindex (cadr i))))
+
+(def interp-expr (e regs)
+  (if (register e)
+      (regs (regindex e))
+      (case (car e)
+        id    (id (interp-expr (cadr e) regs)
+                  (interp-expr (caddr e) regs))
+        quote (cadr e))))
+
+(def interp-lowfn (f . args)
+  (let regs (array (list f!regcount))
+    (catch
+      (each i f!instructions
+        (case (car i)
+          param  (set (target) (car args) args (cdr args))
+          setreg (set (target) (interp-expr (caddr i) regs))
+          return (throw (target)))))))
+
+(def prlf args
+  (map pr args)
+  (pr \lf))
+
+(prlf (interp-lowfn no-lowfn nil))         ; t
+(prlf (interp-lowfn no-lowfn 'nil))        ; t
+(prlf (interp-lowfn no-lowfn '()))         ; t
+(prlf (interp-lowfn no-lowfn t))           ; nil
+(prlf (interp-lowfn no-lowfn 'x))          ; nil
+(prlf (interp-lowfn no-lowfn \c))          ; nil
+(prlf (interp-lowfn no-lowfn '(nil)))      ; nil
+(prlf (interp-lowfn no-lowfn '(a . b)))    ; nil
+(prlf (interp-lowfn no-lowfn no))          ; nil
+(prlf (interp-lowfn no-lowfn (no no)))     ; t
+
