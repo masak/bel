@@ -128,7 +128,9 @@ A summary of the remaining big features:
 If you'd like to contribute, please fork the repository and make changes as you'd like.
 Pull requests are warmly welcome.
 
-## License
+## License and copyright
+
+This software is Copyright (c) 2019-2020 by Carl Mäsak.
 
 This project is licensed under the GNU GPL 3.0.
 For details, see [`LICENSE`](https://github.com/masak/bel/blob/master/LICENSE).
