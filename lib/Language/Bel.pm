@@ -46,11 +46,11 @@ Language::Bel - An interpreter for Paul Graham's language Bel
 
 =head1 VERSION
 
-Version 0.49
+Version 0.50
 
 =cut
 
-our $VERSION = '0.49';
+our $VERSION = '0.50';
 
 =head1 SYNOPSIS
 
@@ -404,6 +404,69 @@ FUT
         my $new_thread = [[[$e, $a]], []];
         push @{$bel->{p}}, $new_thread;
     },
+
+    # (form ccc ((f) a s r m)
+    #   (mev (cons (list (list f (list 'lit 'cont s r))
+    #                    a)
+    #              s)
+    #        r
+    #        m))
+    ccc => sub {
+        my ($bel, $es, $a) = @_;
+
+        # XXX: skipping $es sanity checks for now
+        my $f = $bel->car($es);
+
+        my $s = SYMBOL_NIL;
+        for my $entry (@{$bel->{s}}) {
+            die "s stack invariant broken: ", ref($entry), "\n"
+                unless ref($entry) eq "ARRAY";
+
+            my $e = $entry->[0];
+            my $a = $entry->[1];
+
+            $s = make_pair(
+                make_pair(
+                    $e,
+                    make_pair(
+                        $a,
+                        SYMBOL_NIL,
+                    ),
+                ),
+                $s,
+            );
+        }
+
+        my $r = SYMBOL_NIL;
+        for my $value (@{$bel->{r}}) {
+            $r = make_pair(
+                $value,
+                $r,
+            );
+        }
+
+        my $continuation = make_pair(
+            make_symbol("lit"),
+            make_pair(
+                make_symbol("cont"),
+                make_pair(
+                    $s,
+                    make_pair(
+                        $r,
+                        SYMBOL_NIL,
+                    ),
+                ),
+            ),
+        );
+        my $call_f_with_cont = make_pair(
+            $f,
+            make_pair(
+                $continuation,
+                SYMBOL_NIL,
+            ),
+        );
+        push @{$bel->{s}}, [$call_f_with_cont, $a];
+    },
 );
 
 # (def if2 (es a s r m)
@@ -751,19 +814,17 @@ sub evcall {
         <<'FUT',
             (fn (s r m) (evcall2 (cdr e) a s r m))
 FUT
+        # (def evcall2 (es a s (op . r) m)
+        #   (if ((isa 'mac) op)
+        #       (applym op es a s r m)
+        #       (mev (append (map [list _ a] es)
+        #                    (cons (fu (s r m)
+        #                            (let (args r2) (snap es r)
+        #                              (applyf op (rev args) a s r2 m)))
+        #                          s))
+        #            r
+        #            m)))
         sub {
-            # (def evcall2 (es a s (op . r) m)
-            #   (if ((isa 'mac) op)
-            #       (applym op es a s r m)
-            #       (mev (append (map [list _ a] es)
-            #                    (cons (fu (s r m)
-            #                            (let (args r2) (snap es r)
-            #                              (applyf op (rev args) a s r2 m)))
-            #                          s))
-            #            r
-            #            m)))
-
-            my $es1 = pair_cdr($e);
             my $op = pop @{$self->{r}};
 
             my $isa_mac = sub {
@@ -775,14 +836,11 @@ FUT
                     && is_symbol_of_name($self->car($self->cdr($v)), "mac");
             };
 
+            my $es = pair_cdr($e);
             if ($isa_mac->($op)) {
-                $self->applym($op, $es1, $a);
+                $self->applym($op, $es, $a);
             }
             else {
-                # We're consuming `es` twice, once in each fut.
-                # So we capture it twice.
-                my $es2 = $es1;
-
                 my $fu2 = $self->fut(
                     <<'FUT',
                         (fn (s r m)
@@ -792,11 +850,12 @@ FUT
                     sub {
                         my $args = SYMBOL_NIL;
                         my @args;
-                        while (!is_nil($es2)) {
+                        my $es = pair_cdr($e);
+                        while (!is_nil($es)) {
                             my $arg = pop(@{$self->{r}});
                             $args = make_pair($arg, $args);
                             unshift @args, $arg;
-                            $es2 = pair_cdr($es2);
+                            $es = pair_cdr($es);
                         }
                         if (is_fastfunc($op)) {
                             my $e;
@@ -818,9 +877,9 @@ FUT
                 );
 
                 my @unevaluated_arguments;
-                while (!is_nil($es1)) {
-                    push @unevaluated_arguments, [pair_car($es1), $a];
-                    $es1 = pair_cdr($es1);
+                while (!is_nil($es)) {
+                    push @unevaluated_arguments, [pair_car($es), $a];
+                    $es = pair_cdr($es);
                 }
                 # We want to evaluate the arguments in the order `a b c`,
                 # so we need to put them on expression stack in the order
@@ -958,7 +1017,12 @@ sub applylit {
 
             $self->applym($f, $quoted_args, $a);
         }
-        # XXX: skipping `cont` case for now
+        elsif ($tag_name eq "cont") {
+            # XXX: Skipping `okstack`/`proper` check for now
+            my $s2 = $self->car($rest);
+            my $r2 = $self->car($self->cdr($rest));
+            $self->applycont($s2, $r2, $args);
+        }
         else {
             my $virfns = $self->cdr($self->{globals}->get_kv("virfns"));
             my $it;
@@ -1329,6 +1393,38 @@ FUT
         );
         push @{$self->{s}}, $fu2, $fu1;
     }
+}
+
+# (def applycont (s2 r2 args s r m)
+#   (if (or (no args) (cdr args))
+#       (sigerr 'wrong-no-args s r m)
+#       (mev (append (keep [and (protected _) (no (mem _ s2 id))]
+#                          s)
+#                    s2)
+#            (cons (car args) r2)
+#            m)))
+sub applycont {
+    my ($self, $s2, $r2, $args) = @_;
+
+    # XXX: skipping `args` error handling for now
+    # XXX: skipping the `protected` details for now
+
+    @{$self->{s}} = ();
+    while (!is_nil($s2)) {
+        my $entry = $self->car($s2);
+        my $e = $self->car($entry);
+        my $a = $self->car($self->cdr($entry));
+        unshift @{$self->{s}}, [$e, $a];
+        $s2 = $self->cdr($s2);
+    }
+
+    @{$self->{r}} = ();
+    while (!is_nil($r2)) {
+        my $value = $self->car($r2);
+        unshift @{$self->{r}}, $value;
+        $r2 = $self->cdr($r2);
+    }
+    push @{$self->{r}}, $self->car($args);
 }
 
 =head1 AUTHOR
