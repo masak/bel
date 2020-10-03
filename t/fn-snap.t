@@ -2,16 +2,22 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 5;
+> (snap nil nil)
+(nil nil)
 
-{
-    is_bel_output("(snap nil nil)", "(nil nil)");
-    is_bel_output("(snap nil '(a b c))", "(nil (a b c))");
-    is_bel_output("(snap '(x) '(a b c))", "((a) (b c))");
-    is_bel_output("(snap '(x y z w) '(a b c))", "((a b c nil) nil)");
-    is_bel_output("(snap '(x) '(a b c) '(d e))", "((d e a) (b c))");
-}
+> (snap nil '(a b c))
+(nil (a b c))
+
+> (snap '(x) '(a b c))
+((a) (b c))
+
+> (snap '(x y z w) '(a b c))
+((a b c nil) nil)
+
+> (snap '(x) '(a b c) '(d e))
+((d e a) (b c))
+

@@ -2,18 +2,24 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 5;
+> (len cbuf)
+1
 
-is_bel_output("(len cbuf)", "1");
-is_bel_output(q[(set s (open "testfile" 'out))], "<stream>");
-is_bel_output("(len cbuf)", "2");
-is_bel_output("(close s)", "<stream>");
-is_bel_output("(len cbuf)", "1");
+> (set s (open "testfile" 'out))
+<stream>
 
-END {
-    unlink("testfile");
-}
+> (len cbuf)
+2
+
+> (close s)
+<stream>
+
+> (len cbuf)
+1
+
+!END: unlink("testfile");
+

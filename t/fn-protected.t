@@ -2,15 +2,31 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 4;
+> (set L1 (list (list smark 'foo)))
+!IGNORE: result of assignment
 
-{
-    is_bel_output("(protected (list (list smark 'foo)))", "nil");
-    is_bel_output("(if (protected (list (list smark 'bind))) t)", "t");
-    is_bel_output("(if (protected (list (list smark 'prot))) t)", "t");
-    is_bel_output("(protected (list (list (join) 'bind)))", "nil");
-}
+> (protected L1)
+nil
+
+> (set L2 (list (list smark 'bind)))
+!IGNORE: result of assignment
+
+> (~~protected L2)
+t
+
+> (set L3 (list (list smark 'prot)))
+!IGNORE: result of assignment
+
+> (~~protected L3)
+t
+
+> (set L4 (list (list (join))))
+!IGNORE: result of assignment
+
+> (protected L4)
+nil
+

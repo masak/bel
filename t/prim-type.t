@@ -2,19 +2,30 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 6;
+> (type 'a)
+symbol
 
-is_bel_output("(type 'a)", "symbol");
-is_bel_output("(type \\a)", "char");
-is_bel_output("(type \\bel)", "char");
-is_bel_output("(type nil)", "symbol");
-is_bel_output("(type '(a))", "pair");
-is_bel_output(q[(type (ops "testfile" 'out))], "stream");
+> (type \a)
+char
 
-END {
-    unlink("testfile");
-}
+> (type \bel)
+char
+
+> (type nil)
+symbol
+
+> (type '(a))
+pair
+
+> (set f (ops "testfile" 'out))
+<stream>
+
+> (type f)
+stream
+
+!END: unlink("testfile");
+

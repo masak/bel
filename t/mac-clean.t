@@ -2,19 +2,16 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 2;
+> (set x '(1 2 3 4 5)
+(1 2 3 4 5)
 
-{
-    is_bel_output(
-        "(let x '(1 2 3 4 5) (clean odd x))",
-        "(2 4)"
-    );
-    is_bel_output(
-        "(let x '(1 2 3 4 5) (clean odd x) x)",
-        "(2 4)"
-    );
-}
+> (clean odd x)
+(2 4)
+
+> x
+(2 4)
+

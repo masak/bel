@@ -2,15 +2,22 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 4;
+> (udrop nil nil)
+nil
 
-{
-    is_bel_output("(udrop nil nil)", "nil");
-    is_bel_output("(udrop nil '(a b c))", "(a b c)");
-    is_bel_output("(udrop '(x) '(a b c))", "(b c)");
-    is_bel_output("(udrop '(x y z w) '(a b c))", "nil");
-}
+> (udrop nil '(a b c))
+(a b c)
+
+> (udrop '(x) '(a b c))
+(b c)
+
+If the first list is as long as or longer than the second list, you
+get `nil` back.
+
+> (udrop '(x y z w) '(a b c))
+nil
+

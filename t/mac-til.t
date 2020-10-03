@@ -2,15 +2,32 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 4;
+> (set L '()
+       x '(a b c d e))
+(a b c d e)
 
-{
-    is_bel_output("(with (L nil x '(a b c d e)) (til y (pop x) (= y 'c) (push y L)) L)", "(b a)");
-    is_bel_output("(with (L nil x '(a b c d e)) (til y (pop x) (= y 'c) (push y L)) x)", "(d e)");
-    is_bel_output("(with (L nil x '(c)) (til y (pop x) (= y 'c) (push y L)) L)", "nil");
-    is_bel_output("(with (L nil x '(c)) (til y (pop x) (= y 'c) (push y L)) x)", "nil");
-}
+> (til y (pop x) (= y 'c)
+    (push y L))
+nil
+
+> L
+(b a)
+
+> x
+(d e)
+
+> (set L '()
+       x '(c))
+(c)
+
+> (til y (pop x) (= y 'c)
+    (push y L))
+nil
+
+> x
+nil
+

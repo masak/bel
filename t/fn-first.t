@@ -2,14 +2,19 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 3;
+> (first 1 '(a b c))
+(a)
 
-{
-    is_bel_output("(first 1 '(a b c))", "(a)");
-    is_bel_output("(first 4 '(a b c))", "(a b c)");
-    is_bel_output("(first 2 nil)", "nil");
-}
+If the number exceeds the length of the list, the full
+list is returned.
+
+> (first 4 '(a b c))
+(a b c)
+
+> (first 2 nil)
+nil
+

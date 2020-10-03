@@ -2,36 +2,33 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 6;
+> (len cbuf)
+1
 
-is_bel_output("(len cbuf)", "1");
-is_bel_output(q[(type (open "testfile" 'out))], "stream");
-is_bel_output("(len cbuf)", "2");
+> (set f (open "testfile" 'out))
+<stream>
 
-END {
-    unlink("testfile");
-}
+> (type f)
+stream
 
-my $filename = "fwniun";
+> (len cbuf)
+2
 
-ok((!-e $filename), "file does not exist");
+> (close f)
+<stream>
 
-{
-    open(my $OUT, ">", $filename)
-        or die "Could not open '$filename' for writing: $!";
+> (len cbuf)
+1
 
-    print {$OUT} "bel";
+> (type (open "testfile" 'in))
+stream
 
-    close($OUT);
-}
+> (len cbuf)
+2
 
-is_bel_output(qq[(type (open "$filename" 'in))], "stream");
-is_bel_output("(len cbuf)", "3");
+!END: unlink($filename);
 
-END {
-    unlink($filename);
-}

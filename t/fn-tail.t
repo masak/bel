@@ -2,16 +2,22 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 5;
+> (tail idfn nil)
+nil
 
-{
-    is_bel_output("(tail idfn nil)", "nil");
-    is_bel_output("(tail car '(a b c))", "(a b c)");
-    is_bel_output("(tail car '(nil b c))", "(b c)");
-    is_bel_output("(tail no:cdr '(a b c))", "(c)");
-    is_bel_output(q!(tail [caris _ \-] "non-nil")!, q["-nil"]);
-}
+> (tail car '(a b c))
+(a b c)
+
+> (tail car '(nil b c))
+(b c)
+
+> (tail no:cdr '(a b c))
+(c)
+
+> (tail [caris _ \-] "non-nil")
+"-nil"
+

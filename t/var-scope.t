@@ -2,13 +2,13 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 2;
+> scope
+nil
 
-{
-    is_bel_output("scope", "nil");
-    is_bel_output("((lit clo nil (x) scope) 'a)", "((x . a))");
-}
+> ((lit clo nil (x) scope) 'a)
+((x . a))
+

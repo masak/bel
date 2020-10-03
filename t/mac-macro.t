@@ -2,14 +2,17 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 3;
+> ((macro (v) v) 'b)
+b
 
-{
-    is_bel_output("((macro (v) v) 'b)", "b");
-    is_bel_output("((macro (v) `(cons ,v 'a)) 'b)", "(b . a)");
-    is_bel_output("((fn (x) ((macro (v) `(cons ,v 'a)) x)) 'b)", "(b . a)");
-}
+> ((macro (v) `(cons ,v 'a)) 'b)
+(b . a)
+
+> ((fn (x)
+    ((macro (v) `(cons ,v 'a)) x)) 'b)
+(b . a)
+

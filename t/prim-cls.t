@@ -2,16 +2,24 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 3;
+> (set f (ops "testfile" 'out))
+<stream>
 
-is_bel_output(q[(cls (ops "testfile" 'out))], "<stream>");
-is_bel_error(q[(cls (cls (ops "testfile" 'out)))], "'already-closed");
-is_bel_error(q[(cls 'not-a-stream)], "'mistype");
+> (cls f)
+<stream>
 
-END {
-    unlink("testfile");
-}
+> (stat f)
+closed
+
+> (cls f)
+!ERROR: 'already-closed
+
+> (cls 'not-a-stream)
+!ERROR: 'mistype
+
+!END: unlink("testfile");
+

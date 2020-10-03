@@ -2,13 +2,21 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 2;
+> (with (x '(a b c)
+         L '())
+    (while (pop x)
+      (push x L))
+    L)
+(nil (c) (b c))
 
-{
-    is_bel_output("(with (x '(a b c) L '()) (while (pop x) (push x L)) L)", "(nil (c) (b c))");
-    is_bel_output("(with (x '() L '()) (while (pop x) (push x L)) L)", "nil");
-}
+> (with (x '()
+         L '())
+    (while (pop x)
+      (push x L))
+    L)
+nil
+

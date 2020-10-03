@@ -2,26 +2,30 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 5;
+> (set c1 `((+ ,i1 ,i1) (+ ,i0 ,i1))
+       c2 `((- ,i1 ,i1) (+ ,i0 ,i1))
+       c0 `((+ ,i0 ,i1) (+ ,i0 ,i1))
+       c3 `((+ ,i0 ,i1) (+ ,i1 ,i1))
+       c4 `((+ ,i2 (t t t)) (+ ,i1 ,i1))
+       c5 `((+ ,i1 (t t t)) (- ,i1 ,i1)))
+!IGNORE: result of assignment
 
-{
-    is_bel_output("(c+ (list (list '+ i1 i1) (list '+ i0 i1)) " .
-        "(list (list '+ i1 i1) (list '+ i0 i1)))",
-        "((+ (t t) (t)) (+ nil (t)))");
-    is_bel_output("(c+ (list (list '+ i1 i1) (list '+ i0 i1)) " .
-        "(list (list '- i1 i1) (list '+ i0 i1)))",
-        "((- nil (t)) (+ nil (t)))");
-    is_bel_output("(c+ (list (list '+ i0 i1) (list '+ i0 i1)) " .
-        "(list (list '+ i0 i1) (list '+ i0 i1)))",
-        "((+ nil (t)) (+ nil (t)))");
-    is_bel_output("(c+ (list (list '+ i0 i1) (list '+ i1 i1)) " .
-        "(list (list '+ i0 i1) (list '+ i1 i1)))",
-        "((+ nil (t)) (+ (t t) (t)))");
-    is_bel_output("(c+ (list (list '+ i2 '(t t t)) (list '+ i1 i1)) " .
-        "(list (list '+ i1 '(t t t)) (list '- i1 i1)))",
-        "((+ (t t t t t t t t t) (t t t t t t t t t)) (- nil (t)))");
-}
+> (c+ c1 c1)
+((+ (t t) (t)) (+ nil (t)))
+
+> (c+ c1 c2)
+((- nil (t)) (+ nil (t)))
+
+> (c+ c0 c0)
+((+ nil (t)) (+ nil (t)))
+
+> (c+ c3 c3)
+((+ nil (t)) (+ (t t) (t)))
+
+> (c+ c4 c5)
+((+ (t t t t t t t t t) (t t t t t t t t t)) (- nil (t)))
+

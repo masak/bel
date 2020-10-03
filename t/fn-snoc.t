@@ -2,14 +2,16 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 3;
+> (snoc '(a b c) 'd 'e)
+(a b c d e)
 
-{
-    is_bel_output("(snoc '(a b c) 'd 'e)", "(a b c d e)");
-    is_bel_output("(snoc '())", "nil");
-    is_bel_output("(snoc)", "nil");
-}
+> (snoc '())
+nil
+
+> (snoc)
+nil
+

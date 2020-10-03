@@ -2,15 +2,19 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 4;
+> (dock nil)
+nil
 
-{
-    is_bel_output("(dock nil)", "nil");
-    is_bel_output("(dock '(a))", "nil");
-    is_bel_output("(dock '(a b))", "(a)");
-    is_bel_output("(dock '(a b c))", "(a b)");
-}
+> (dock '(a))
+nil
+
+> (dock '(a b))
+(a)
+
+> (dock '(a b c))
+(a b)
+

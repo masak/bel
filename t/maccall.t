@@ -2,13 +2,13 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 2;
+> ((lit mac (lit clo nil (x) (list 'cons nil x))) 'a)
+(nil . a)
 
-{
-    is_bel_output("((lit mac (lit clo nil (x) (list 'cons nil x))) 'a)", "(nil . a)");
-    is_bel_output("((lit mac (lit clo nil (x) (list 'cons nil x))) 'b)", "(nil . b)");
-}
+> ((lit mac (lit clo nil (x) (list 'cons nil x))) 'b)
+(nil . b)
+

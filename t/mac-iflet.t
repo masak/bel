@@ -2,14 +2,24 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 3;
+> (iflet x)
+nil
 
-{
-    is_bel_output("(iflet x)", "nil");
-    is_bel_output("(iflet y 'a (list y 'b))", "(a b)");
-    is_bel_output("(iflet z 'a (list 'b z) 'c)", "(b a)");
-}
+> (iflet y 'a
+    (list y 'b))
+(a b)
+
+> (iflet z 'a
+    (list 'b z)
+    'c)
+(b a)
+
+> (iflet w nil
+    (list 'd w)
+    'e)
+e
+

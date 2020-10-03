@@ -2,34 +2,40 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
 
-use Language::Bel::Test;
+BEGIN {
+    {
+        open(my $OUT, ">", "temp3627")
+            or die "Could not open 'temp3627' for writing: $!";
 
-plan tests => 7;
+        print {$OUT} "zoo";
 
-my $filename = "oiwyet";
-
-ok((!-e $filename), "file does not exist");
-
-{
-    open(my $OUT, ">", $filename)
-        or die "Could not open '$filename' for writing: $!";
-
-    print {$OUT} "zoo";
-
-    close($OUT);
+        close($OUT);
+    }
 }
 
-is_bel_output(qq[(set s (ops "$filename" 'in))], "<stream>");
-is_bel_output("(nof 8 (rdb s))", q["01111010"]);
-is_bel_output("(nof 8 (rdb s))", q["01101111"]);
-is_bel_output("(nof 8 (rdb s))", q["01101111"]);
-is_bel_output("(rdb s)", "eof");
+use Language::Bel::Test::DSL;
 
-is_bel_error(qq[(let s (ops "$filename" 'out) (rdb s))], "'badmode");
+__DATA__
 
-END {
-    unlink($filename);
-}
+> (set s (ops "temp3627" 'in))
+<stream>
+
+> (nof 8 (rdb s))
+"01111010"
+
+> (nof 8 (rdb s))
+"01101111"
+
+> (nof 8 (rdb s))
+"01101111"
+
+> (rdb s)
+eof
+
+> (let s (ops "temp3627" 'out)
+    (rdb s))
+!ERROR: 'badmode
+
+!END: unlink("temp3627");
 

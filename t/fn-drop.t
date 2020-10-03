@@ -2,15 +2,21 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 4;
+> (drop 2 '(a b c))
+(c)
 
-{
-    is_bel_output("(drop 2 '(a b c))", "(c)");
-    is_bel_output("(drop 0 '(a b c))", "(a b c)");
-    is_bel_output("(drop 5 '(a b c))", "nil");
-    is_bel_output("(drop 2 nil)", "nil");
-}
+> (drop 0 '(a b c))
+(a b c)
+
+If you drop more from the list than is available, you get `nil`.
+
+> (drop 5 '(a b c))
+nil
+
+> (drop 2 nil)
+nil
+

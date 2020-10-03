@@ -2,15 +2,47 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 4;
+> (set L1 nil)
+nil
 
-{
-    is_bel_output("(let L nil (repeat 5 (push 'hi L)) L)", "(hi hi hi hi hi)");
-    is_bel_output("(let L nil (repeat 1 (push 'hi L)) L)", "(hi)");
-    is_bel_output("(let L nil (repeat 0 (push 'hi L)) L)", "nil");
-    is_bel_output("(let L nil (repeat -2 (push 'hi L)) L)", "nil");
-}
+> (repeat 5
+    (push 'hi L1))
+nil
+
+> L1
+(hi hi hi hi hi)
+
+> (set L2 nil)
+nil
+
+> (repeat 1
+    (push 'hi L2))
+nil
+
+> L2
+(hi)
+
+> (set L3 nil)
+nil
+
+> (repeat 0
+    (push 'hi L3))
+nil
+
+> L3
+nil
+
+> (set L4 nil)
+nil
+
+> (repeat -2
+    (push 'hi L4))
+nil
+
+> L4
+nil
+

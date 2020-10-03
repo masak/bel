@@ -2,16 +2,34 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 5;
+> (and)
+t
 
-{
-    is_bel_output("(and)", "t");
-    is_bel_output("(and nil)", "nil");
-    is_bel_output("(and t)", "t");
-    is_bel_output("(and 'a)", "a");
-    is_bel_output("(and 'b nil 'c)", "nil");
-}
+> (and nil)
+nil
+
+> (and t)
+t
+
+> (and 'a)
+a
+
+> (and 'b nil 'c)
+nil
+
+Later side effects don't run if the conjunction has already
+been falsified.
+
+> (set x "original")
+"original"
+
+> (and nil (set x "changed"))
+nil
+
+> x
+"original"
+

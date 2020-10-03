@@ -2,17 +2,25 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 6;
+> (simple 'x)
+t
 
-{
-    is_bel_output("(simple 'x)", "t");
-    is_bel_output("(simple \\c)", "t");
-    is_bel_output("(simple nil)", "t");
-    is_bel_output("(simple '(a b))", "nil");
-    is_bel_output("(simple 3)", "t");
-    is_bel_output(q[(simple "ab")], "nil");
-}
+> (simple \c)
+t
+
+> (simple nil)
+t
+
+> (simple '(a b))
+nil
+
+> (simple 3)
+t
+
+> (simple "ab")
+nil
+

@@ -2,16 +2,22 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 5;
+> (simplify '(+ nil (t t t)))
+(+ nil (t))
 
-{
-    is_bel_output("(simplify '(+ nil (t t t)))", "(+ nil (t))");
-    is_bel_output("(simplify '(+ nil (t)))", "(+ nil (t))");
-    is_bel_output("(simplify '(+ nil nil))", "(+ nil (t))");
-    is_bel_output("(simplify '(+ (t t t t t t) (t t t t)))", "(+ (t t t) (t t))");
-    is_bel_output("(simplify '(+ (t t t t t t) (t t t)))", "(+ (t t) (t))");
-}
+> (simplify '(+ nil (t)))
+(+ nil (t))
+
+> (simplify '(+ nil nil))
+(+ nil (t))
+
+> (simplify '(+ (t t t t t t) (t t t t)))
+(+ (t t t) (t t))
+
+> (simplify '(+ (t t t t t t) (t t t)))
+(+ (t t) (t))
+

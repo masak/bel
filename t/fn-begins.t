@@ -2,23 +2,46 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 12;
+> (begins nil nil)
+t
 
-{
-    is_bel_output("(begins nil nil)", "t");
-    is_bel_output("(begins '(a b c) nil)", "t");
-    is_bel_output("(begins '(a b c) '(a))", "t");
-    is_bel_output("(begins '(a b c) '(x))", "nil");
-    is_bel_output("(begins '(a b c) '(a b))", "t");
-    is_bel_output("(begins '(a b c) '(a y))", "nil");
-    is_bel_output("(begins '(a b c) '(a b c))", "t");
-    is_bel_output("(begins '(a b c) '(a b z))", "nil");
-    is_bel_output("(let p (join) (begins (list p) (list p)))", "t");
-    is_bel_output("(let p (join) (begins (list p) (list (join))))", "t");
-    is_bel_output("(let p (join) (begins (list p) (list p) id))", "t");
-    is_bel_output("(let p (join) (begins (list p) (list (join)) id))", "nil");
-}
+> (begins '(a b c) nil)
+t
+
+> (begins '(a b c) '(a))
+t
+
+> (begins '(a b c) '(x))
+nil
+
+> (begins '(a b c) '(a b))
+t
+
+> (begins '(a b c) '(a y))
+nil
+
+> (begins '(a b c) '(a b c))
+t
+
+> (begins '(a b c) '(a b z))
+nil
+
+> (set p (join))
+(nil)
+
+> (begins `(,p) `(,p))
+t
+
+> (begins `(,p) `(,(join)))
+t
+
+> (begins `(,p) `(,p) id)
+t
+
+> (begins `(,p) `(,(join)) id)
+nil
+

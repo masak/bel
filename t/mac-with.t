@@ -2,13 +2,13 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 2;
+> (with (x 'a y 'b) (cons x y))
+(a . b)
 
-{
-    is_bel_output("(with (x 'a y 'b) (cons x y))", "(a . b)");
-    is_bel_output("(let x 'a (with (x 'b y x) y))", "a");
-}
+> (let x 'a (with (x 'b y x) y))
+a
+

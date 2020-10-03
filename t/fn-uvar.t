@@ -2,18 +2,28 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 6;
+> vmark
+(nil)
 
-{
-    is_bel_output("vmark", "(nil)");
-    is_bel_output("(id vmark vmark)", "t");
-    is_bel_output("(id vmark (join))", "nil");
-    is_bel_output("(id vmark '(nil))", "nil");
+> (id vmark vmark)
+t
 
-    is_bel_output("(uvar)", "((nil))");
-    is_bel_output("(id (uvar) (uvar))", "nil");
-}
+> (id vmark (join))
+nil
+
+> (id vmark '(nil))
+nil
+
+> (uvar)
+((nil))
+
+> (id (uvar) (uvar))
+nil
+
+> (id (car (uvar)) vmark)
+t
+

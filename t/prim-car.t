@@ -2,14 +2,22 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 5;
+> (car '(a . b))
+a
 
-is_bel_output("(car '(a . b))", "a");
-is_bel_output("(car '(a b))", "a");
-is_bel_output("(car nil)", "nil");
-is_bel_output("(car)", "nil");
-is_bel_error("(car 'atom)", "car-on-atom");
+> (car '(a b))
+a
+
+> (car nil)
+nil
+
+> (car)
+nil
+
+> (car 'atom)
+!ERROR: car-on-atom
+

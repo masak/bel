@@ -2,15 +2,24 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 4;
+> (buildnum '(+ (t) (t)) '(+ nil (t)))
+1
 
-{
-    is_bel_output("(buildnum '(+ (t) (t)) '(+ nil (t)))", "1");
-    is_bel_output("(buildnum '(+ (t t) (t t)) '(+ nil (t)))", "1");
-    is_bel_output("(cadr (caddr (buildnum '(+ (t t) (t t)) '(+ nil (t)))))", "(t)");
-    is_bel_output("(cadr (caddr (buildnum '(+ (t t t t) (t t t t t t)) '(+ nil (t)))))", "(t t)");
-}
+> (buildnum '(+ (t t) (t t)) '(+ nil (t)))
+1
+
+> (set i2i2 '(+ (t t) (t t))
+       i4i6 '(+ (t t t t) (t t t t t t))
+       i0i1 '(+ nil (t)))
+!IGNORE: result of assignment
+
+> (srnum:numr (buildnum i2i2 i0i1))
+(t)
+
+> (srnum:numr (buildnum i4i6 i0i1))
+(t t)
+

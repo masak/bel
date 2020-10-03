@@ -2,17 +2,30 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 6;
+> ((fn (x) (list x x)) 'a)
+(a a)
 
-{
-    is_bel_output("((fn (x) (list x x)) 'a)", "(a a)");
-    is_bel_output("((fn (x y) (list x y)) 'a 'b)", "(a b)");
-    is_bel_output("((fn () (list 'a 'b 'c)))", "(a b c)");
-    is_bel_output("((fn (x) ((fn (y) (list x y)) 'g)) 'f)", "(f g)");
-    is_bel_output("((fn () 'irrelevant 'relevant))", "relevant");
-    is_bel_error("((fn () (car 'atom) 'never))", "car-on-atom");
-}
+> ((fn (x y) (list x y)) 'a 'b)
+(a b)
+
+> ((fn () (list 'a 'b 'c)))
+(a b c)
+
+> ((fn (x) ((fn (y) (list x y)) 'g)) 'f)
+(f g)
+
+If there are several expressions in a function, the result of the whole
+function call is the value of the last expression.
+
+> ((fn () 'irrelevant 'relevant))
+relevant
+
+Side effects of the expressions prior to the last still run, in order.
+
+> ((fn () (car 'atom) 'never))
+!ERROR: car-on-atom
+

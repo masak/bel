@@ -2,15 +2,19 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 4;
+> (idfn nil)
+nil
 
-{
-    is_bel_output("(idfn nil)", "nil");
-    is_bel_output("(idfn '(a b c))", "(a b c)");
-    is_bel_output("(idfn \\bel)", "\\bel");
-    is_bel_output("(idfn 'x)", "x");
-}
+> (idfn '(a b c))
+(a b c)
+
+> (idfn \bel)
+\bel
+
+> (idfn 'x)
+x
+

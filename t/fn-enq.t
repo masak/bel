@@ -2,14 +2,19 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 3;
+> (set q (newq))
+(nil)
 
-{
-    is_bel_output("(let q (newq) (enq 'a q))", "((a))");
-    is_bel_output("(let q (newq) (enq 'a q) (enq 'b q))", "((a b))");
-    is_bel_output("(let q (newq) (enq 'a q) (enq 'b q) (enq 'c q))", "((a b c))");
-}
+> (enq 'a q)
+((a))
+
+> (enq 'b q)
+((a b))
+
+> (enq 'c q)
+((a b c))
+

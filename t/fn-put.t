@@ -2,16 +2,28 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 5;
+> (put 'a 'x nil)
+((a . x))
 
-{
-    is_bel_output("(put 'a 'x nil)", "((a . x))");
-    is_bel_output("(put 'a 'x '((b . y) (c . z)))", "((a . x) (b . y) (c . z))");
-    is_bel_output("(put 'a 'x '((b . y) (a . w)))", "((a . x) (b . y))");
-    is_bel_output("(put (join) 'x (list '(b . y) (cons (join) 'w)))", "(((nil) . x) (b . y))");
-    is_bel_output("(put (join) 'x (list '(b . y) (cons (join) 'w)) id)", "(((nil) . x) (b . y) ((nil) . w))");
-}
+> (put 'a 'x '((b . y) (c . z)))
+((a . x) (b . y) (c . z))
+
+> (put 'a 'x '((b . y) (a . w)))
+((a . x) (b . y))
+
+> (put (join) 'x (list '(b . y) (cons (join) 'w)))
+(((nil) . x) (b . y))
+
+> (put (join) 'x (list '(b . y) (cons (join) 'w)) id)
+(((nil) . x) (b . y) ((nil) . w))
+
+> (set p (join))
+(nil)
+
+> (put p 'x (list '(b . y) (cons p 'w)) id)
+(((nil) . x) (b . y))
+

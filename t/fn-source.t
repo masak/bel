@@ -3,19 +3,25 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 7;
+> (source 'x)
+nil
 
-is_bel_output("(source nil)", "t");
-is_bel_output("(source 'x)", "nil");
-is_bel_output(q[(source (open "testfile" 'out))], "t");
-is_bel_output("(source '(x))", "nil");
-is_bel_output(q[(source (list ""))], "t");
-is_bel_output(q[(source (list "abc"))], "t");
-is_bel_output(q[(source (list \\c))], "nil");
+> (source (open "testfile" 'out))
+t
 
-END {
-    unlink("testfile");
-}
+> (source '(x))
+nil
+
+> (source (list ""))
+t
+> (source (list "abc"))
+t
+> (source (list \c))
+nil
+
+!END: unlink("testfile");
+

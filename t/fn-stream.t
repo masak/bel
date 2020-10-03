@@ -2,19 +2,30 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 6;
+> (stream 'x)
+nil
 
-is_bel_output("(stream 'x)", "nil");
-is_bel_output("(stream nil)", "nil");
-is_bel_output("(stream '(a))", "nil");
-is_bel_output("(stream (join))", "nil");
-is_bel_output("(stream \\c)", "nil");
-is_bel_output(q[(stream (ops "testfile" 'out))], "t");
+> (stream nil)
+nil
 
-END {
-    unlink("testfile");
-}
+> (stream '(a))
+nil
+
+> (stream (join))
+nil
+
+> (stream \c)
+nil
+
+> (set f (ops "testfile" 'out))
+<stream>
+
+> (stream f)
+t
+
+!END: unlink("testfile");
+

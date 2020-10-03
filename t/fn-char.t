@@ -2,16 +2,22 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 5;
+> (char 'x)
+nil
 
-{
-    is_bel_output("(char 'x)", "nil");
-    is_bel_output("(char nil)", "nil");
-    is_bel_output("(char '(a))", "nil");
-    is_bel_output("(char (join))", "nil");
-    is_bel_output("(char \\c)", "t");
-}
+> (char nil)
+nil
+
+> (char '(a))
+nil
+
+> (char (join))
+nil
+
+> (char \c)
+t
+

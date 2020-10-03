@@ -2,13 +2,13 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 2;
+> (newq)
+(nil)
 
-{
-    is_bel_output("(newq)", "(nil)");
-    is_bel_output("(id (newq) (newq))", "nil");
-}
+> (id (newq) (newq))
+nil
+

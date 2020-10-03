@@ -2,15 +2,19 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 4;
+> (cddr nil)
+nil
 
-{
-    is_bel_output("(cddr nil)", "nil");
-    is_bel_output("(cddr '(a))", "nil");
-    is_bel_output("(cddr '(a b))", "nil");
-    is_bel_output("(cddr '(a b c))", "(c)");
-}
+> (cddr '(a))
+nil
+
+> (cddr '(a b))
+nil
+
+> (cddr '(a b c))
+(c)
+

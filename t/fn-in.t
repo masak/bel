@@ -2,14 +2,16 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 3;
+> (in 'e 'x 'y 'z)
+nil
 
-{
-    is_bel_output("(in 'e 'x 'y 'z)", "nil");
-    is_bel_output("(in 'b 'a 'b 'c)", "(b c)");
-    is_bel_output("(in nil 'a nil 'c)", "(nil c)");
-}
+> (in 'b 'a 'b 'c)
+(b c)
+
+> (in nil 'a nil 'c)
+(nil c)
+

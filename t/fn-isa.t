@@ -2,19 +2,31 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 8;
+> (isa!clo (fn (x) x))
+t
 
-{
-    is_bel_output("((isa 'clo) (fn (x) x))", "t");
-    is_bel_output("((isa 'clo) [_])", "t");
-    is_bel_output("((isa 'clo) idfn)", "t");
-    is_bel_output("((isa 'prim) car)", "t");
-    is_bel_output("((isa 'clo) nil)", "nil");
-    is_bel_output("((isa 'clo) 'c)", "nil");
-    is_bel_output("((isa 'clo) '(a b c))", "nil");
-    is_bel_output("((isa 'mac) def)", "t");
-}
+> (isa!clo [_])
+t
+
+> (isa!clo idfn)
+t
+
+> (isa!prim car)
+t
+
+> (isa!clo nil)
+nil
+
+> (isa!clo 'c)
+nil
+
+> (isa!clo '(a b c))
+nil
+
+> (isa!mac def)
+t
+

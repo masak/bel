@@ -2,21 +2,58 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 10;
+> (let L '(a b c b d)
+    (pull 'b L))
+(a c d)
 
-{
-    is_bel_output("(let l '(a b c b d) (pull 'b l))", "(a c d)");
-    is_bel_output("(let l '(a b a c a a d) (pull 'a (cdr l)) l)", "(a b c d)");
-    is_bel_output("(do (set l '(d e f)) (pull 'z l))", "(d e f)");
-    is_bel_output("(do (set l '(d e f)) (pull 'f (cddr l)) l)", "(d e)");
-    is_bel_output("(do (set l '(a)) (pull 'a l))", "nil");
-    is_bel_output("(bind l '(g h g i g) (pull 'g l))", "(h i)");
-    is_bel_output("(do (def f () (pull 'h l)) (bind l '(g h h h i) (f)))", "(g i)");
-    is_bel_output("(let l '((a) (b)) (pull '(b) l))", "((a))");
-    is_bel_output("(let l '((a) (b)) (pull '(b) l id))", "((a) (b))");
-    is_bel_output("(withs (q '(b) l (list '(a) q)) (pull q l id))", "((a))");
-}
+You can `pull` from the inside of a list!
+
+> (set L '(a b a c a a d))
+(a b a c a a d)
+
+> (pull 'a (cdr L))
+(b c d)
+
+> L
+(a b c d)
+
+> (pull 'z L)
+(a b c d)
+
+> (set L '(a))
+(a)
+
+> (pull 'a L)
+nil
+
+> (bind L '(g h g i g)
+    (pull 'g L))
+(h i)
+
+> (def f ()
+    (pull 'h L))
+!IGNORE: result of definition
+
+> (bind L '(g h h h i)
+    (f))
+(g i)
+
+> (set q '(b))
+(b)
+
+> (let L `((a) ,q)
+    (pull q L))
+((a))
+
+> (let L `((a) ,q)
+    (pull '(b) L id))
+((a) (b))
+
+> (let L `((a) ,q)
+    (pull q L id))
+((a))
+

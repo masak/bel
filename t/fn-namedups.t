@@ -2,15 +2,23 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 4;
+> (len (namedups '(a)))
+0
 
-{
-    is_bel_output("(let L '(a) (len (namedups L)))", "0");
-    is_bel_output("(let L '(a b c) (len (namedups L)))", "0");
-    is_bel_output("(let L '(a) (xar L L) (len (namedups L)))", "1");
-    is_bel_output("(let L '(a) (xdr L L) (len (namedups L)))", "1");
-}
+> (len (namedups '(a b c)))
+0
+
+> (let L '(a)
+    (xar L L)
+    (len (namedups L)))
+1
+
+> (let L '(a)
+    (xdr L L)
+    (len (namedups L)))
+1
+

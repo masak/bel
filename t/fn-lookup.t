@@ -2,39 +2,48 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 11;
+> (lookup 'foo nil nil nil)
+nil
 
-{
-    is_bel_output("(lookup 'foo nil nil nil)", "nil");
+`scope`, `globe`
 
-    # scope, globe
-    is_bel_output("(lookup 'scope '((a . 1)) nil nil)", "(scope (a . 1))");
-    is_bel_output("(lookup 'globe nil nil '((b . 2)))", "(globe (b . 2))");
+> (lookup 'scope '((a . 1)) nil nil)
+(scope (a . 1))
 
-    # global lookup (trumps scope and globe)
-    is_bel_output("(lookup 'foo nil nil '((foo . 0)))", "(foo . 0)");
-    is_bel_output("(lookup 'scope nil nil '((scope . 1)))", "(scope . 1)");
-    is_bel_output("(lookup 'globe nil nil '((globe . 2)))", "(globe . 2)");
+> (lookup 'globe nil nil '((b . 2)))
+(globe (b . 2))
 
-    # lexical lookup (trumps global lookup)
-    is_bel_output("(lookup 'foo '((foo . 0)) nil nil)", "(foo . 0)");
-    is_bel_output("(lookup 'foo '((foo . 1)) nil '((foo . 2)))", "(foo . 1)");
+Global lookup (trumps `scope` and `globe`).
 
-    # dynamic lookup (trumps lexical lookup)
-    is_bel_output(
-        "(lookup 'foo nil (list (cons (list smark 'bind '(foo . 0)) nil)) nil)",
-        "(foo . 0)",
-    );
-    is_bel_output(
-        "(lookup 'foo '((foo . 2)) (list (cons (list smark 'bind '(foo . 1)) nil)) nil)",
-        "(foo . 1)",
-    );
-    is_bel_output(
-        "(lookup 'foo nil (list (cons (list smark 'bind '(foo . 1)) '((foo . 3)))) nil)",
-        "(foo . 1)",
-    );
-}
+> (lookup 'foo nil nil '((foo . 0)))
+(foo . 0)
+
+> (lookup 'scope nil nil '((scope . 1)))
+(scope . 1)
+
+> (lookup 'globe nil nil '((globe . 2)))
+(globe . 2)
+
+Lexical lookup (trumps global lookup).
+
+> (lookup 'foo '((foo . 0)) nil nil)
+(foo . 0)
+
+> (lookup 'foo '((foo . 1)) nil '((foo . 2)))
+(foo . 1)
+
+Dynamic lookup (trumps lexical lookup).
+
+> (lookup 'foo nil (list (cons (list smark 'bind '(foo . 0)) nil)) nil)
+(foo . 0)
+
+> (lookup 'foo '((foo . 2)) (list (cons (list smark 'bind '(foo . 1)) nil)) nil)
+(foo . 1)
+
+> (lookup 'foo nil (list (cons (list smark 'bind '(foo . 1)) '((foo . 3)))) nil)
+(foo . 1)
+

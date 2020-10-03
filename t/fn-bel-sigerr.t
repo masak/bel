@@ -2,30 +2,64 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 19;
+> (bel '(a . b))
+!ERROR: malformed
 
-{
-    is_bel_error("(bel '(a . b))", "malformed");
-    is_bel_error("(bel '(where x))", "unbound");
-    is_bel_error("(bel 'x)", "(unboundb x)");
-    is_bel_error("(bel '(where 'a))", "unfindable");
-    is_bel_error("(bel '(dyn \\x 1 'hi))", "cannot-bind");
-    is_bel_error("(bel '((lit . x)))", "bad-lit");
-    is_bel_error("(bel '(t))", "cannot-apply");
-    is_bel_error("(bel '((lit clo (\\x) nil t)))", "bad-clo");
-    is_bel_error("(bel '((lit clo nil \\y t)))", "bad-clo");
-    is_bel_error("(bel '((lit cont (\\x) nil)))", "bad-cont");
-    is_bel_error("(bel '((lit unp)))", "unapplyable");
-    is_bel_error("(bel '(car 'x 'y))", "overargs");
-    is_bel_error("(bel '((lit prim unk)))", "unknown-prim");
-    is_bel_error("(bel '(no 'a 'b))", "overargs");
-    is_bel_error("(pass t nil nil nil nil nil)", "literal-parm");
-    is_bel_error("(bel '(no))", "underargs");
-    is_bel_error("(bel '((lit clo nil ((x y)) nil) 'd)", "atom-arg");
-    is_bel_error("(bel '(join 'a (ccc (lit clo nil (c) (c)))))", "wrong-no-args");
-    is_bel_error("(bel '(join 'a (ccc (lit clo nil (c) (c 'x 'y)))))", "wrong-no-args");
-}
+> (bel '(where x))
+!ERROR: unbound
+
+> (bel 'x)
+!ERROR: (unboundb x)
+
+> (bel '(where 'a))
+!ERROR: unfindable
+
+> (bel '(dyn \x 1 'hi))
+!ERROR: cannot-bind
+
+> (bel '((lit . x)))
+!ERROR: bad-lit
+
+> (bel '(t))
+!ERROR: cannot-apply
+
+> (bel '((lit clo (\x) nil t)))
+!ERROR: bad-clo
+
+> (bel '((lit clo nil \y t)))
+!ERROR: bad-clo
+
+> (bel '((lit cont (\x) nil)))
+!ERROR: bad-cont
+
+> (bel '((lit unp)))
+!ERROR: unapplyable
+
+> (bel '(car 'x 'y))
+!ERROR: overargs
+
+> (bel '((lit prim unk)))
+!ERROR: unknown-prim
+
+> (bel '(no 'a 'b))
+!ERROR: overargs
+
+> (pass t nil nil nil nil nil)
+!ERROR: literal-parm
+
+> (bel '(no))
+!ERROR: underargs
+
+> (bel '((lit clo nil ((x y)) nil) 'd)
+!ERROR: atom-arg
+
+> (bel '(join 'a (ccc (lit clo nil (c) (c)))))
+!ERROR: wrong-no-args
+
+> (bel '(join 'a (ccc (lit clo nil (c) (c 'x 'y)))))
+!ERROR: wrong-no-args
+

@@ -2,17 +2,33 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 6;
+> (unless t
+    "OH"
+    " "
+    "HAI")
+nil
 
-{
-    is_bel_output(q[(unless t "OH" " " "HAI")], "nil");
-    is_bel_output(q[(unless t "OH")], "nil");
-    is_bel_output(q[(unless t)], "nil");
-    is_bel_output(q[(unless nil "OH" " " "HAI")], q["HAI"]);
-    is_bel_output(q[(unless nil "OH")], q["OH"]);
-    is_bel_output(q[(unless nil)], "nil");
-}
+> (unless t
+    "OH")
+nil
+
+> (unless t)
+nil
+
+> (unless nil
+    "OH"
+    " "
+    "HAI")
+"HAI"
+
+> (unless nil
+    "OH")
+"OH"
+
+> (unless nil)
+nil
+

@@ -2,19 +2,31 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 8;
+> (recip (lit num (+ (t) (t)) (+ nil (t))))
+1
 
-{
-    is_bel_output("(recip (lit num (+ (t) (t)) (+ nil (t))))", "1");
-    is_bel_output("(recip (lit num (- (t) (t)) (+ nil (t))))", "-1");
-    is_bel_output("(recip (lit num (+ (t t) (t)) (+ nil (t))))", "1/2");
-    is_bel_output("(recip (lit num (- (t t t) (t)) (+ nil (t))))", "-1/3");
-    is_bel_output("(recip (lit num (+ nil (t)) (+ (t) (t))))", "-i");
-    is_bel_output("(recip (lit num (+ nil (t)) (- (t) (t))))", "+i");
-    is_bel_output("(recip (lit num (+ (t t t) (t)) (+ (t t t t) (t))))", "3/25-4/25i");
-    is_bel_error("(recip 0)", "'mistype");
-}
+> (recip (lit num (- (t) (t)) (+ nil (t))))
+-1
+
+> (recip (lit num (+ (t t) (t)) (+ nil (t))))
+1/2
+
+> (recip (lit num (- (t t t) (t)) (+ nil (t))))
+-1/3
+
+> (recip (lit num (+ nil (t)) (+ (t) (t))))
+-i
+
+> (recip (lit num (+ nil (t)) (- (t) (t))))
++i
+
+> (recip (lit num (+ (t t t) (t)) (+ (t t t t) (t))))
+3/25-4/25i
+
+> (recip 0)
+!ERROR: 'mistype
+

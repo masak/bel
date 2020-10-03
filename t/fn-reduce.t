@@ -2,15 +2,19 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 4;
+> (reduce join '(a b c))
+(a b . c)
 
-{
-    is_bel_output("(reduce join '(a b c))", "(a b . c)");
-    is_bel_output("(reduce (lit clo nil (x y) x) '(a b c))", "a");
-    is_bel_output("(reduce (lit clo nil (x y) y) '(a b c))", "c");
-    is_bel_output("(reduce join '())", "nil");
-}
+> (reduce (fn (x y) x) '(a b c))
+a
+
+> (reduce (fn (x y) y) '(a b c))
+c
+
+> (reduce join '())
+nil
+

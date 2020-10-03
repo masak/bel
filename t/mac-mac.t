@@ -2,13 +2,21 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 2;
+> (mac foo (x)
+    ''b)
+!IGNORE: output of definition
 
-{
-    is_bel_output("(do (mac foo (x) ''b) (foo 'a))", "b");
-    is_bel_output("(do (mac bar (x) `(cons ,x ,x)) (bar 'a))", "(a . a)");
-}
+> (foo 'a)
+b
+
+> (mac bar (x)
+    `(cons ,x ,x))
+!IGNORE: output of definition
+
+> (bar 'a)
+(a . a)
+

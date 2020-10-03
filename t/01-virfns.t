@@ -2,22 +2,60 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 11;
+> (2 '(a b c))
+b
 
-{
-    is_bel_output("(2 '(a b c))", "b");
-    is_bel_output("(let a (array '(3) 0) (a 2))", "0");
-    is_bel_output("(let a (array '(3) 'x) (a 3))", "x");
-    is_bel_output("(let a (array '(2 2) 0) (a 2 1))", "0");
-    is_bel_output("(let a (array '(2 2) 'x) (a 1 2))", "x");
-    is_bel_output("(let tab (table '((a . 1) (b . 2))) (tab 'a))", "1");
-    is_bel_output("(let tab (table '((a . 1) (b . 2))) (tab 'b))", "2");
-    is_bel_output("(let tab (table '((a . 1) (b . 2))) (tab 'c))", "nil");
-    is_bel_output("(let tab (table '((a . 1) (b . 2))) (tab 'c 3))", "3");
-    is_bel_output("(let tab (table '((x . 1) (x . 2))) (tab 'x))", "1");
-    is_bel_output("(do (push (cons 'num (fn (f args) ''haha)) virfns) (2 '(a b c)))", "haha");
-}
+> (let arr (array '(3) 0)
+    (arr 2))
+0
+
+> (let arr (array '(3) 'x)
+    (arr 3))
+x
+
+> (let arr (array '(2 2) 0)
+    (arr 2 1))
+0
+
+> (let arr (array '(2 2) 'x)
+    (arr 1 2))
+x
+
+> (set tab (table '((a . 1)
+                    (b . 2)))
+!IGNORE: result of assignment
+
+> (tab 'a)
+1
+
+> (tab 'b)
+2
+
+> (tab 'c)
+nil
+
+> (tab 'c 3)
+3
+
+> (let tab (table '((x . 1)
+                    (x . 2)))
+    (tab 'x))
+1
+
+> (push `(num . ,(fn (f args) ''haha))
+        virfns)
+!IGNORE: result of `push`
+
+> (2 '(a b c))
+haha
+
+> (pop virfns)
+!IGNORE: result of `pop`
+
+> (2 '(a b c))
+b
+

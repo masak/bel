@@ -2,17 +2,25 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 6;
+> (okstack nil)
+t
 
-{
-    is_bel_output("(okstack nil)", "t");
-    is_bel_output("(okstack '(a))", "nil");
-    is_bel_output("(okstack '((b)))", "nil");
-    is_bel_output("(okstack '((c ((x . y)))))", "t");
-    is_bel_output("(okstack '((d ((x . y) (z . w)))))", "t");
-    is_bel_output("(okstack '((e nil) (f ((m . n)))))", "t");
-}
+> (okstack '(a))
+nil
+
+> (okstack '((b)))
+nil
+
+> (okstack '((c ((x . y)))))
+t
+
+> (okstack '((d ((x . y) (z . w)))))
+t
+
+> (okstack '((e nil) (f ((m . n)))))
+t
+

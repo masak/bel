@@ -2,19 +2,31 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 8;
+> (signc nil)
+nil
 
-{
-    is_bel_output("(signc nil)", "nil");
-    is_bel_output("(signc \\0)", "nil");
-    is_bel_output("(signc \\a)", "nil");
-    is_bel_output("(if (signc \\+) t)", "t");
-    is_bel_output("(if (signc \\-) t)", "t");
-    is_bel_output("(signc \\;)", "nil");
-    is_bel_output("(signc \\3)", "nil");
-    is_bel_output("(signc \\D)", "nil");
-}
+> (signc \0)
+nil
+
+> (signc \a)
+nil
+
+> (~~signc \+)
+t
+
+> (~~signc \-)
+t
+
+> (signc \;)
+nil
+
+> (signc \3)
+nil
+
+> (signc \D)
+nil
+

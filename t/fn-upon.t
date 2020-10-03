@@ -2,14 +2,16 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 3;
+> (function (upon '(a b c)))
+clo
 
-{
-    is_bel_output("(function (upon '(a b c)))", "clo");
-    is_bel_output("((upon '(a b c)) cdr)", "(b c)");
-    is_bel_output("(map (upon '(a b c)) (list car cadr cdr))", "(a b (b c))");
-}
+> ((upon '(a b c)) cdr)
+(b c)
+
+> (map (upon '(a b c)) (list car cadr cdr))
+(a b (b c))
+

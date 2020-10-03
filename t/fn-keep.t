@@ -2,15 +2,22 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 4;
+> (keep [id _ \a] "abracadabra")
+"aaaaa"
 
-{
-    is_bel_output(q[(keep [id _ \\a] "abracadabra")], q["aaaaa"]);
-    is_bel_output(q[(keep [id _ 'b] '(a b c b a b))], "(b b b)");
-    is_bel_output(q[(keep [id _ 'b] '(a c a))], "nil");
-    is_bel_output(q[(keep [id _ 'x] nil)], "nil");
-}
+> (keep is!b '(a b c b a b))
+(b b b)
+
+> (keep is!b '(a c a))
+nil
+
+> (keep is!x nil)
+nil
+
+> (keep [] '(a b c b a b))
+nil
+

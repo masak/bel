@@ -2,14 +2,25 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 3;
+> (let x 'a
+    (cons x 'b))
+(a . b)
 
-{
-    is_bel_output("(let x 'a (cons x 'b))", "(a . b)");
-    is_bel_output("(let x 'a (cons (let x 'b x) x))", "(b . a)");
-    is_bel_output("(let x 'a (let y 'b (list x y)))", "(a b)");
-}
+`let` declarations can shadow one another, creating a lexically
+nested structure of definitions.
+
+> (let x 'a
+    (cons (let x 'b
+            x)
+    x))
+(b . a)
+
+> (let x 'a
+    (let y 'b
+      (list x y)))
+(a b)
+

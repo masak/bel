@@ -2,15 +2,25 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 4;
+> (def popx ()
+    (let (xa . xd) x
+      (set x xd)
+      xa))
+!IGNORE: result of definition
 
-{
-    is_bel_output("(do (def popx () (let (xa . xd) x (set x xd) xa)) (function popx))", "clo");
-    is_bel_output("(do (set x '(nil nil a b c)) (len x))", "5");
-    is_bel_output("(wait (fn () (popx)))", "a");
-    is_bel_output("(len x)", "2");
-}
+> (set x '(nil nil a b c))
+(nil nil a b c)
+
+> (len x)
+5
+
+> (wait popx)
+a
+
+> (len x)
+2
+

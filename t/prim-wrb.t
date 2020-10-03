@@ -2,53 +2,50 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 7;
+> (set bang-bits "00100001")
+"00100001"
 
-is_bel_output("(do (each c (list \\0 \\0 \\1 \\0 \\0 \\0 \\0 \\1) (wrb c nil)) nil)", "!nil");
-is_bel_output("(do (each c (list \\0 \\0 \\1 \\0 \\0 \\0 \\0 \\1) (wrb c nil)))", q[!"00100001"]);
+> (do (each c bang-bits
+        (wrb c nil))
+      (pr \lf)
+      '(ignore return value))
+!
+(ignore return value)
 
-sub bits {
-    my ($char) = @_;
+> (set hello-bits (append "01101000"        ; h
+                          "01100101"        ; e
+                          "01101100"        ; l
+                          "01101100"        ; l
+                          "01101111"))      ; o
+"0110100001100101011011000110110001101111"
 
-    my $ord = ord($char);
+> (set f (ops "temp9283" 'out))
+<stream>
 
-    my @bits;
-    for my $b (128, 64, 32, 16, 8, 4, 2, 1) {
-        push(@bits, $ord & $b ? "\\1" : "\\0");
-    }
+> (each c hello-bits
+    (wrb c f))
+!IGNORE: result of `each`
 
-    return join(" ", @bits);
-}
+> (cls f)
+<stream>
 
-my $hello_bits = join(" ", map { bits($_) } split("", "hello"));
-my $filename = "hellofile";
+> (set f (ops "temp9283" 'in)
+       read-bits '())
+nil
 
-ok((!-e $filename), "`$filename` does not exist");
-is_bel_output(
-    qq[(let s (ops "$filename" 'out) (each c (list $hello_bits) (wrb c s)) nil)],
-    "nil"
-);
-ok((-e $filename), "`$filename` now exists");
+> (til b (rdb f) (= b 'eof)
+    (push b read-bits))
+nil
 
-SKIP: {
-    skip("opening '$filename' for reading", 1)
-        unless -e $filename;
+> (cls f)
+<stream>
 
-    open(my $HELLO, "<", $filename)
-        or die "Could not open $filename for reading: $!";
+> (= hello-bits (rev read-bits))
+t
 
-    my $line = do { local $/; <$HELLO> };
-    is $line, "hello", "the file has the expected contents";
+!END: unlink("temp9283");
 
-    close($HELLO);
-}
-
-is_bel_error(qq[(let s (ops "$filename" 'in) (wrb \\0 s))], "'badmode");
-
-END {
-    unlink($filename);
-}

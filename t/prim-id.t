@@ -2,20 +2,40 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 11;
+> (id 'a 'a)
+t
 
-is_bel_output("(id 'a 'a)", "t");
-is_bel_output("(id 'a 'b)", "nil");
-is_bel_output("(id 'a \\a)", "nil");
-is_bel_output("(id \\a \\a)", "t");
-is_bel_output("(id 't t)", "t");
-is_bel_output("(id nil 'nil)", "t");
-is_bel_output("(id id id)", "t");
-is_bel_output("(id id 'id)", "nil");
-is_bel_output("(id id nil)", "nil");
-is_bel_output("(id nil)", "t");
-is_bel_output("(id)", "t");
+> (id 'a 'b)
+nil
+
+> (id 'a \a)
+nil
+
+> (id \a \a)
+t
+
+> (id 't t)
+t
+
+> (id nil 'nil)
+t
+
+> (id id id)
+t
+
+> (id id 'id)
+nil
+
+> (id id nil)
+nil
+
+> (id nil)
+t
+
+> (id)
+t
+

@@ -2,14 +2,16 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 3;
+> (list)
+nil
 
-{
-    is_bel_output("(list)", "nil");
-    is_bel_output("(list 'a)", "(a)");
-    is_bel_output("(list 'a 'b)", "(a b)");
-}
+> (list 'a)
+(a)
+
+> (list 'a 'b)
+(a b)
+

@@ -2,16 +2,22 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 5;
+> (foldl cons nil '(a b))
+(b a)
 
-{
-    is_bel_output("(foldl cons nil '(a b))", "(b a)");
-    is_bel_output("(foldl cons (cons 'a nil) '(b))", "(b a)");
-    is_bel_output("(foldl cons (cons 'b (cons 'a nil)) nil)", "(b a)");
-    is_bel_output("(foldl put nil '(a b c) '(x y z))", "((c . z) (b . y) (a . x))");
-    is_bel_output("(foldl err nil)", "nil");
-}
+> (foldl cons (cons 'a nil) '(b))
+(b a)
+
+> (foldl cons (cons 'b (cons 'a nil)) nil)
+(b a)
+
+> (foldl put nil '(a b c) '(x y z))
+((c . z) (b . y) (a . x))
+
+> (foldl err nil)
+nil
+

@@ -2,13 +2,27 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 2;
+> (set L nil)
+nil
 
-{
-    is_bel_output("(let L nil (loop x 1 (+ x 1) (i< (srnum:numr x) (srnum:numr 5)) (push x L)) L)", "(4 3 2 1)");
-    is_bel_output("(let L nil (loop x 1 (+ x 1) (i< (srnum:numr x) (srnum:numr 1)) (push x L)) L)", "nil");
-}
+> (loop x 1 (+ x 1) (< x 5)
+    (push x L))
+nil
+
+> L
+(4 3 2 1)
+
+> (set L nil)
+nil
+
+> (loop x 1 (+ x 1) (< x 1)
+    (push x L))
+nil
+
+> L
+nil
+

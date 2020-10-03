@@ -2,14 +2,31 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 3;
+The `do1` macro returns the value of the _first_ expression
+it evaluates.
 
-{
-    is_bel_output("(do1 1 2)", "1");
-    is_bel_output("(let x 'hi (do1 x (set x 'hey)))", "hi");
-    is_bel_output("(let x 'hi (do1 x (set y 'hey)) y)", "hey");
-}
+> (do1 1
+       2)
+1
+
+It doesn't matter if the variable the value was originally
+from subsequently changes.
+
+> (let x 'hi
+    (do1 x
+         (set x 'hey)))
+hi
+
+However, the subsequent expressions are still evaluated, and
+so any side effects from them are still visible.
+
+> (let x 'hi
+    (do1 x
+         (set y 'hey))
+    y)
+hey
+

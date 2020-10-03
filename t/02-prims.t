@@ -2,20 +2,61 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 18;
+> (type prims)
+pair
 
-{
-    is_bel_output("(type prims)", "pair");
-    is_bel_output("(all pair prims)", "t");
-    is_bel_output("(if (mem 'coin (1 (rev prims))) t)", "t");
-    for my $name (qw( car cdr type sym nom rdb cls stat sys )) {
-        is_bel_output("(if (mem '$name (2 (rev prims))) t)", "t");
-    }
-    for my $name (qw( id join xar xdr wrb ops )) {
-        is_bel_output("(if (mem '$name (3 (rev prims))) t)", "t");
-    }
-}
+> (all pair prims)
+t
+
+> (if (mem 'coin (1 (rev prims))) t)
+t
+
+> (~~mem 'car (2 (rev prims)))
+t
+
+> (~~mem 'cdr (2 (rev prims)))
+t
+
+> (~~mem 'type (2 (rev prims)))
+t
+
+> (~~mem 'sym (2 (rev prims)))
+t
+
+> (~~mem 'nom (2 (rev prims)))
+t
+
+> (~~mem 'rdb (2 (rev prims)))
+t
+
+> (~~mem 'cls (2 (rev prims)))
+t
+
+> (~~mem 'stat (2 (rev prims)))
+t
+
+> (~~mem 'sys (2 (rev prims)))
+t
+
+> (~~mem 'id (3 (rev prims)))
+t
+
+> (~~mem 'join (3 (rev prims)))
+t
+
+> (~~mem 'xar (3 (rev prims)))
+t
+
+> (~~mem 'xdr (3 (rev prims)))
+t
+
+> (~~mem 'wrb (3 (rev prims)))
+t
+
+> (~~mem 'ops (3 (rev prims)))
+t
+

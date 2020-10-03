@@ -2,15 +2,19 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 4;
+> (caddr nil)
+nil
 
-{
-    is_bel_output("(caddr nil)", "nil");
-    is_bel_output("(caddr '(a))", "nil");
-    is_bel_output("(caddr '(a b))", "nil");
-    is_bel_output("(caddr '(a b c))", "c");
-}
+> (caddr '(a))
+nil
+
+> (caddr '(a b))
+nil
+
+> (caddr '(a b c))
+c
+

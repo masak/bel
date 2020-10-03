@@ -2,16 +2,22 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 5;
+> (if)
+nil
 
-{
-    is_bel_output("(if)", "nil");
-    is_bel_output("(if 'a)", "a");
-    is_bel_output("(if 'a 'b)", "b");
-    is_bel_output("(if 'a 'b 'c)", "b");
-    is_bel_output("(if nil 'b 'c)", "c");
-}
+> (if 'a)
+a
+
+> (if 'a 'b)
+b
+
+> (if 'a 'b 'c)
+b
+
+> (if nil 'b 'c)
+c
+

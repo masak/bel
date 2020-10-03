@@ -2,36 +2,30 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 6;
+> (set x1 (cons `(,smark bind (x . 1)) nil)
+       x2 (cons `(,smark bind (x . 2)) nil)
+       y1 (cons `(,smark bind (y . 1)) nil))
+!IGNORE: result of assignment
 
-{
-    my $x1 = "(cons (list smark 'bind '(x . 1)) nil)";
-    my $x2 = "(cons (list smark 'bind '(x . 2)) nil)";
-    my $y1 = "(cons (list smark 'bind '(y . 1)) nil)";
+> (binding 'x nil)
+nil
 
-    is_bel_output("(binding 'x nil)", "nil");
-    is_bel_output(
-        "(binding 'x (list $y1))",
-        "nil"
-    );
-    is_bel_output(
-        "(binding 'x (list $x2))",
-        "(x . 2)"
-    );
-    is_bel_output(
-        "(binding 'x (list $y1 $x2))",
-        "(x . 2)"
-    );
-    is_bel_output(
-        "(binding 'x (list $x2 $y1))",
-        "(x . 2)"
-    );
-    is_bel_output(
-        "(binding 'x (list $x1 $x2))",
-        "(x . 1)"
-    );
-}
+> (binding 'x (list y1))
+nil
+
+> (binding 'x (list x2))
+(x . 2)
+
+> (binding 'x (list y1 x2))
+(x . 2)
+
+> (binding 'x (list x2 y1))
+(x . 2)
+
+> (binding 'x (list x1 x2))
+(x . 1)
+
