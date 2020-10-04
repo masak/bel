@@ -21,28 +21,6 @@ my $b = Language::Bel->new({ output => sub {
     $actual_output = "$actual_output$string";
 } });
 
-sub is_bel_output {
-    my ($expr, $expected_output) = @_;
-
-    $actual_output = "";
-    $b->read_eval_print($expr);
-    $actual_output =~ s/\n$//;    # fudge away the final newline
-
-    is($actual_output, $expected_output, "$expr ==> $expected_output");
-}
-
-sub is_bel_error {
-    my ($expr, $expected_error) = @_;
-
-    eval {
-        $b->read_eval_print($expr);
-    };
-
-    my $actual_error = $@;
-    $actual_error =~ s/\n$//;
-    is($actual_error, $expected_error, "$expr ==> ERROR[$expected_error]");
-}
-
 sub bel_todo {
     my ($expr, $expected_output, $expected_todo_error) = @_;
 
@@ -126,8 +104,6 @@ sub output_of_eval_file {
 
 our @EXPORT = qw(
     bel_todo
-    is_bel_output
-    is_bel_error
     output_of_eval_file
     visit
 );
