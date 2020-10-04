@@ -9,7 +9,7 @@ __DATA__
 > (len cbuf)
 1
 
-> (set f (open "testfile" 'out))
+> (set f (open "fn-open-testfile" 'out))
 <stream>
 
 > (type f)
@@ -24,11 +24,11 @@ stream
 > (len cbuf)
 1
 
-> (type (open "testfile" 'in))
+> (type (open "fn-open-testfile" 'in))
 stream
 
 > (len cbuf)
 2
 
-!END: unlink($filename);
+!END: unlink("fn-open-testfile");
 
