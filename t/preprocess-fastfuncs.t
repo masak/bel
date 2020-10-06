@@ -29,4 +29,3 @@ plan tests => 1;
 
     is $actual_fastfuncs, $generated_fastfuncs, "the fastfuncs are up to date";
 }
-

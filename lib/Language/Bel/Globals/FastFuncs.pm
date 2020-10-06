@@ -42,8 +42,7 @@ sub fastfunc__all {
     my ($bel, $f, $xs) = @_;
 
     while (!is_nil($xs)) {
-        my $p = $bel->call($f, $bel->car($xs));
-        if (is_nil($p)) {
+        if (is_nil($bel->call($f, $bel->car($xs)))) {
             return SYMBOL_NIL;
         }
         $xs = $bel->cdr($xs);
@@ -56,8 +55,7 @@ sub fastfunc__some {
     my ($bel, $f, $xs) = @_;
 
     while (!is_nil($xs)) {
-        my $p = $bel->call($f, $bel->car($xs));
-        if (!is_nil($p)) {
+        if (!is_nil($bel->call($f, $bel->car($xs)))) {
             return $xs;
         }
         $xs = $bel->cdr($xs);
@@ -2819,112 +2817,112 @@ sub fastfunc__c_plus {
 
 sub fastfunc__c_star {
     my ($bel, $x, $y) = @_;
-    
+
     my $xr = $bel->car($x);
     my $xi = $bel->car($bel->cdr($x));
-    
+
     my $yr = $bel->car($y);
     my $yi = $bel->car($bel->cdr($y));
-    
+
     my $real_part;
     {
         my $term1s;
         my $term1n_n;
         my $term1d_n;
-        
+
         {
             my $xs = $bel->car($xr);
             my $xn = $bel->car($bel->cdr($xr));
             my $xd = $bel->car($bel->cdr($bel->cdr($xr)));
-        
+
             my $ys = $bel->car($yr);
             my $yn = $bel->car($bel->cdr($yr));
             my $yd = $bel->car($bel->cdr($bel->cdr($yr)));
-        
+
             $term1s = is_symbol_of_name($xs, "-")
                 ? make_symbol(is_symbol_of_name($ys, "-") ? "+" : "-")
                 : $ys;
-        
+
             my $xn_n = 0;
             while (!is_nil($xn)) {
                 ++$xn_n;
                 $xn = $bel->cdr($xn);
             }
-        
+
             my $xd_n = 0;
             while (!is_nil($xd)) {
                 ++$xd_n;
                 $xd = $bel->cdr($xd);
             }
-        
+
             my $yn_n = 0;
             while (!is_nil($yn)) {
                 ++$yn_n;
                 $yn = $bel->cdr($yn);
             }
-        
+
             my $yd_n = 0;
             while (!is_nil($yd)) {
                 ++$yd_n;
                 $yd = $bel->cdr($yd);
             }
-        
+
             $term1n_n = $xn_n * $yn_n;
             $term1d_n = $xd_n * $yd_n;
         }
-    
+
         my $term2s;
         my $term2n_n;
         my $term2d_n;
-        
+
         {
             my $xs = $bel->car($xi);
             my $xn = $bel->car($bel->cdr($xi));
             my $xd = $bel->car($bel->cdr($bel->cdr($xi)));
-        
+
             my $ys = $bel->car($yi);
             my $yn = $bel->car($bel->cdr($yi));
             my $yd = $bel->car($bel->cdr($bel->cdr($yi)));
-        
+
             $term2s = is_symbol_of_name($xs, "-")
                 ? make_symbol(is_symbol_of_name($ys, "-") ? "+" : "-")
                 : $ys;
-        
+
             my $xn_n = 0;
             while (!is_nil($xn)) {
                 ++$xn_n;
                 $xn = $bel->cdr($xn);
             }
-        
+
             my $xd_n = 0;
             while (!is_nil($xd)) {
                 ++$xd_n;
                 $xd = $bel->cdr($xd);
             }
-        
+
             my $yn_n = 0;
             while (!is_nil($yn)) {
                 ++$yn_n;
                 $yn = $bel->cdr($yn);
             }
-        
+
             my $yd_n = 0;
             while (!is_nil($yd)) {
                 ++$yd_n;
                 $yd = $bel->cdr($yd);
             }
-        
+
             $term2n_n = $xn_n * $yn_n;
             $term2d_n = $xd_n * $yd_n;
         }
-    
+
         if (is_symbol_of_name($term1s, "-")) {
             if (is_symbol_of_name($term2s, "-")) {
                 my $n_n = $term2n_n * $term1d_n - $term1n_n * $term2d_n;
                 my $sign = $n_n < 1 ? "-" : "+";
                 $n_n = abs($n_n);
                 my $d_n = $term2d_n * $term1d_n;
-    
+
                 my $n = SYMBOL_NIL;
                 for (1..$n_n) {
                     $n = make_pair(
@@ -2932,7 +2930,7 @@ sub fastfunc__c_star {
                         $n,
                     );
                 }
-    
+
                 my $d = SYMBOL_NIL;
                 for (1..$d_n) {
                     $d = make_pair(
@@ -2940,7 +2938,7 @@ sub fastfunc__c_star {
                         $d,
                     );
                 }
-    
+
                 $real_part = make_pair(
                     make_symbol($sign),
                     make_pair(
@@ -2955,7 +2953,7 @@ sub fastfunc__c_star {
             else {
                 my $n_n = $term1n_n * $term2d_n + $term2n_n * $term1d_n;
                 my $d_n = $term1d_n * $term2d_n;
-    
+
                 my $n = SYMBOL_NIL;
                 for (1..$n_n) {
                     $n = make_pair(
@@ -2963,7 +2961,7 @@ sub fastfunc__c_star {
                         $n,
                     );
                 }
-    
+
                 my $d = SYMBOL_NIL;
                 for (1..$d_n) {
                     $d = make_pair(
@@ -2971,7 +2969,7 @@ sub fastfunc__c_star {
                         $d,
                     );
                 }
-    
+
                 $real_part = make_pair(
                     make_symbol("-"),
                     make_pair(
@@ -2988,7 +2986,7 @@ sub fastfunc__c_star {
             if (is_symbol_of_name($term2s, "-")) {
                 my $n_n = $term1n_n * $term2d_n + $term2n_n * $term1d_n;
                 my $d_n = $term1d_n * $term2d_n;
-    
+
                 my $n = SYMBOL_NIL;
                 for (1..$n_n) {
                     $n = make_pair(
@@ -2996,7 +2994,7 @@ sub fastfunc__c_star {
                         $n,
                     );
                 }
-    
+
                 my $d = SYMBOL_NIL;
                 for (1..$d_n) {
                     $d = make_pair(
@@ -3004,7 +3002,7 @@ sub fastfunc__c_star {
                         $d,
                     );
                 }
-    
+
                 $real_part = make_pair(
                     make_symbol("+"),
                     make_pair(
@@ -3021,7 +3019,7 @@ sub fastfunc__c_star {
                 my $sign = $n_n < 1 && $term2n_n > 0 ? "-" : "+";
                 $n_n = abs($n_n);
                 my $d_n = $term1d_n * $term2d_n;
-    
+
                 my $n = SYMBOL_NIL;
                 for (1..$n_n) {
                     $n = make_pair(
@@ -3029,7 +3027,7 @@ sub fastfunc__c_star {
                         $n,
                     );
                 }
-    
+
                 my $d = SYMBOL_NIL;
                 for (1..$d_n) {
                     $d = make_pair(
@@ -3037,7 +3035,7 @@ sub fastfunc__c_star {
                         $d,
                     );
                 }
-    
+
                 $real_part = make_pair(
                     make_symbol($sign),
                     make_pair(
@@ -3051,104 +3049,104 @@ sub fastfunc__c_star {
             }
         }
     }
-    
+
     my $imaginary_part;
     {
         my $term1s;
         my $term1n_n;
         my $term1d_n;
-        
+
         {
             my $xs = $bel->car($xi);
             my $xn = $bel->car($bel->cdr($xi));
             my $xd = $bel->car($bel->cdr($bel->cdr($xi)));
-        
+
             my $ys = $bel->car($yr);
             my $yn = $bel->car($bel->cdr($yr));
             my $yd = $bel->car($bel->cdr($bel->cdr($yr)));
-        
+
             $term1s = is_symbol_of_name($xs, "-")
                 ? make_symbol(is_symbol_of_name($ys, "-") ? "+" : "-")
                 : $ys;
-        
+
             my $xn_n = 0;
             while (!is_nil($xn)) {
                 ++$xn_n;
                 $xn = $bel->cdr($xn);
             }
-        
+
             my $xd_n = 0;
             while (!is_nil($xd)) {
                 ++$xd_n;
                 $xd = $bel->cdr($xd);
             }
-        
+
             my $yn_n = 0;
             while (!is_nil($yn)) {
                 ++$yn_n;
                 $yn = $bel->cdr($yn);
             }
-        
+
             my $yd_n = 0;
             while (!is_nil($yd)) {
                 ++$yd_n;
                 $yd = $bel->cdr($yd);
             }
-        
+
             $term1n_n = $xn_n * $yn_n;
             $term1d_n = $xd_n * $yd_n;
         }
-    
+
         my $term2s;
         my $term2n_n;
         my $term2d_n;
-        
+
         {
             my $xs = $bel->car($xr);
             my $xn = $bel->car($bel->cdr($xr));
             my $xd = $bel->car($bel->cdr($bel->cdr($xr)));
-        
+
             my $ys = $bel->car($yi);
             my $yn = $bel->car($bel->cdr($yi));
             my $yd = $bel->car($bel->cdr($bel->cdr($yi)));
-        
+
             $term2s = is_symbol_of_name($xs, "-")
                 ? make_symbol(is_symbol_of_name($ys, "-") ? "+" : "-")
                 : $ys;
-        
+
             my $xn_n = 0;
             while (!is_nil($xn)) {
                 ++$xn_n;
                 $xn = $bel->cdr($xn);
             }
-        
+
             my $xd_n = 0;
             while (!is_nil($xd)) {
                 ++$xd_n;
                 $xd = $bel->cdr($xd);
             }
-        
+
             my $yn_n = 0;
             while (!is_nil($yn)) {
                 ++$yn_n;
                 $yn = $bel->cdr($yn);
             }
-        
+
             my $yd_n = 0;
             while (!is_nil($yd)) {
                 ++$yd_n;
                 $yd = $bel->cdr($yd);
             }
-        
+
             $term2n_n = $xn_n * $yn_n;
             $term2d_n = $xd_n * $yd_n;
         }
-    
+
         if (is_symbol_of_name($term1s, "-")) {
             if (is_symbol_of_name($term2s, "-")) {
                 my $n_n = $term1n_n * $term2d_n + $term2n_n * $term1d_n;
                 my $d_n = $term1d_n * $term2d_n;
-    
+
                 my $n = SYMBOL_NIL;
                 for (1..$n_n) {
                     $n = make_pair(
@@ -3156,7 +3154,7 @@ sub fastfunc__c_star {
                         $n,
                     );
                 }
-    
+
                 my $d = SYMBOL_NIL;
                 for (1..$d_n) {
                     $d = make_pair(
@@ -3164,7 +3162,7 @@ sub fastfunc__c_star {
                         $d,
                     );
                 }
-    
+
                 $imaginary_part = make_pair(
                     make_symbol("-"),
                     make_pair(
@@ -3181,7 +3179,7 @@ sub fastfunc__c_star {
                 my $sign = $n_n < 1 ? "-" : "+";
                 $n_n = abs($n_n);
                 my $d_n = $term2d_n * $term1d_n;
-    
+
                 my $n = SYMBOL_NIL;
                 for (1..$n_n) {
                     $n = make_pair(
@@ -3189,7 +3187,7 @@ sub fastfunc__c_star {
                         $n,
                     );
                 }
-    
+
                 my $d = SYMBOL_NIL;
                 for (1..$d_n) {
                     $d = make_pair(
@@ -3197,7 +3195,7 @@ sub fastfunc__c_star {
                         $d,
                     );
                 }
-    
+
                 $imaginary_part = make_pair(
                     make_symbol($sign),
                     make_pair(
@@ -3216,7 +3214,7 @@ sub fastfunc__c_star {
                 my $sign = $n_n < 1 ? "-" : "+";
                 $n_n = abs($n_n);
                 my $d_n = $term1d_n * $term2d_n;
-    
+
                 my $n = SYMBOL_NIL;
                 for (1..$n_n) {
                     $n = make_pair(
@@ -3224,7 +3222,7 @@ sub fastfunc__c_star {
                         $n,
                     );
                 }
-    
+
                 my $d = SYMBOL_NIL;
                 for (1..$d_n) {
                     $d = make_pair(
@@ -3232,7 +3230,7 @@ sub fastfunc__c_star {
                         $d,
                     );
                 }
-    
+
                 $imaginary_part = make_pair(
                     make_symbol($sign),
                     make_pair(
@@ -3247,7 +3245,7 @@ sub fastfunc__c_star {
             else {
                 my $n_n = $term1n_n * $term2d_n + $term2n_n * $term1d_n;
                 my $d_n = $term1d_n * $term2d_n;
-    
+
                 my $n = SYMBOL_NIL;
                 for (1..$n_n) {
                     $n = make_pair(
@@ -3255,7 +3253,7 @@ sub fastfunc__c_star {
                         $n,
                     );
                 }
-    
+
                 my $d = SYMBOL_NIL;
                 for (1..$d_n) {
                     $d = make_pair(
@@ -3263,7 +3261,7 @@ sub fastfunc__c_star {
                         $d,
                     );
                 }
-    
+
                 $imaginary_part = make_pair(
                     make_symbol("+"),
                     make_pair(
@@ -3277,7 +3275,7 @@ sub fastfunc__c_star {
             }
         }
     }
-    
+
     return make_pair(
         $real_part,
         make_pair(
