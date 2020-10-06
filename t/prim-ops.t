@@ -6,7 +6,7 @@ use Language::Bel::Test::DSL;
 
 __DATA__
 
-> (set f (ops "testfile" 'out))
+> (set f (ops "prim-ops-testfile" 'out))
 <stream>
 
 > (type f)
@@ -15,7 +15,7 @@ stream
 > (cls f)
 <stream>
 
-> (set f (ops "testfile" 'in))
+> (set f (ops "prim-ops-testfile" 'in))
 <stream>
 
 > (type f)
@@ -24,5 +24,5 @@ stream
 > (ops "rukyerw" 'in)
 !ERROR: 'notexist
 
-!END: unlink($filename);
+!END: unlink("prim-ops-testfile");
 
