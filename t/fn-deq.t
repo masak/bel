@@ -2,16 +2,30 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 5;
+> (set q '((a b c d)))
+((a b c d))
 
-{
-    is_bel_output("(let q '((a b c d)) (deq q))", "a");
-    is_bel_output("(let q '((b c d)) (deq q))", "b");
-    is_bel_output("(let q '((c d)) (deq q))", "c");
-    is_bel_output("(let q '((d)) (deq q))", "d");
-    is_bel_output("(let q '(()) (deq q))", "nil");
-}
+> (deq q)
+a
+
+> (deq q)
+b
+
+`deq` also affects the nested list, removing elements.
+
+> q
+((c d))
+
+> (deq q)
+c
+
+> (deq q)
+d
+
+> (deq q)
+nil
+

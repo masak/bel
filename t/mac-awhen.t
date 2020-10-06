@@ -2,15 +2,24 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 4;
+> (awhen nil)
+nil
 
-{
-    is_bel_output("(awhen nil)", "nil");
-    is_bel_output("(awhen 'a (list it 'b))", "(a b)");
-    is_bel_output("(awhen 'a (list 'b it) 'c)", "c");
-    is_bel_output("(awhen nil (list 'b it) 'c)", "nil");
-}
+> (awhen 'a
+    (list it 'b))
+(a b)
+
+> (awhen 'a
+    (list 'b it)
+    'c)
+c
+
+> (awhen nil
+    (list 'b it)
+    'c)
+nil
+

@@ -2,16 +2,22 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 5;
+> (fuse idfn '((a b) (c d) (e f)))
+(a b c d e f)
 
-{
-    is_bel_output("(fuse idfn '((a b) (c d) (e f)))", "(a b c d e f)");
-    is_bel_output("(fuse list '(a b c) '(1 2 3))", "(a 1 b 2 c 3)");
-    is_bel_output("(fuse list '(a b c) '(1 2))", "(a 1 b 2)");
-    is_bel_output("(fuse join)", "nil");
-    is_bel_error("(fuse car '(a b c) '(1 2 3))", "car-on-atom");
-}
+> (fuse list '(a b c) '(1 2 3))
+(a 1 b 2 c 3)
+
+> (fuse list '(a b c) '(1 2))
+(a 1 b 2)
+
+> (fuse join)
+nil
+
+> (fuse car '(a b c) '(1 2 3))
+!ERROR: car-on-atom
+

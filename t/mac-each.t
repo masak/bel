@@ -2,15 +2,47 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 4;
+> (set L '())
+nil
 
-{
-    is_bel_output("(let L '() (each n '(1 2 3) (push (inc n) L)) L)", "(4 3 2)");
-    is_bel_output("(let L '() (each n '() (push (inc n) L)) L)", "nil");
-    is_bel_output("(let L '((a) (b) (c)) (each e L (xar e 'z)) L)", "((z) (z) (z))");
-    is_bel_output("(let x nil (each y '(a b c) (push y x)) x)", "(c b a)");
-}
+> (each n '(1 2 3)
+    (push (inc n) L))
+((2) (3 2) (4 3 2))
+
+> L
+(4 3 2)
+
+> (set L '())
+nil
+
+> (each n '()
+    (push (inc n) L))
+nil
+
+> L
+nil
+
+> (set L '((a) (b) (c)))
+((a) (b) (c))
+
+> (each e L
+    (xar e 'z))
+(z z z)
+
+> L
+((z) (z) (z))
+
+> (set L nil)
+nil
+
+> (each e '(a b c)
+    (push e L))
+((a) (b a) (c b a))
+
+> L
+(c b a)
+

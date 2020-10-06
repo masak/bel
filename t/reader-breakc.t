@@ -2,14 +2,21 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 3;
+Just checking that we properly roundtrip some characters via
+the reader and the printer.
 
-{
-    is_bel_output("\\)", "\\)");
-    is_bel_output("\\]", "\\]");
-    is_bel_output("\\ ", "\\sp");
-}
+> \)
+\)
+
+> \]
+\]
+
+Note that there's a space (0x20) after the backslash.
+
+> \     ; backslash space
+\sp
+

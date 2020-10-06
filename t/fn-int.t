@@ -2,17 +2,25 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 6;
+> (int 0)
+t
 
-{
-    is_bel_output("(int 0)", "t");
-    is_bel_output("(int \\x)", "nil");
-    is_bel_output("(int -1)", "t");
-    is_bel_output("(int \\0)", "nil");
-    is_bel_output("(int 1/2)", "nil");
-    is_bel_output("(int 4/2)", "t");
-}
+> (int \x)
+nil
+
+> (int -1)
+t
+
+> (int \0)
+nil
+
+> (int 1/2)
+nil
+
+> (int 4/2)
+t
+

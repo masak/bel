@@ -90,7 +90,7 @@ while ($i < @bel_globals && !eof($SOURCE)) {
         ? $1
         : "<no name found>";
     my $skip_decl = "; skip $name\n";
-    
+
     if ($source_definition eq $bel_global) {
         $num_implemented++;
     }

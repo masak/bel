@@ -2,14 +2,16 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 3;
+> (litnum '(+ nil (t)))
+0
 
-{
-    is_bel_output("(litnum '(+ nil (t)))", "0");
-    is_bel_output("(litnum '(+ (t) (t)))", "1");
-    is_bel_output("(litnum '(+ nil (t)) '(+ (t) (t)))", "+i");
-}
+> (litnum '(+ (t) (t)))
+1
+
+> (litnum '(+ nil (t)) '(+ (t) (t)))
++i
+

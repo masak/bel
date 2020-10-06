@@ -2,15 +2,17 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 2;
+> (withfile f "testfile" 'out
+    (set ff f)
+    (stat f))
+out
 
-is_bel_output(q[(withfile f "testfile" 'out (set ff f) (stat f))], "out");
-is_bel_output("(stat ff)", "closed");
+> (stat ff)
+closed
 
-END {
-    unlink("testfile");
-}
+!END: unlink("testfile");
+

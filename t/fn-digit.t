@@ -2,28 +2,61 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 17;
+> (~~digit \0)
+t
 
-{
-    is_bel_output("(if (digit \\0) t)", "t");
-    is_bel_output("(if (digit \\7) t)", "t");
-    is_bel_output("(if (digit \\9) t)", "t");
-    is_bel_output("(if (digit \\0 i10) t)", "t");
-    is_bel_output("(if (digit \\7 i10) t)", "t");
-    is_bel_output("(if (digit \\9 i10) t)", "t");
-    is_bel_output("(if (digit \\a) t)", "nil");
-    is_bel_output("(if (digit \\a i16) t)", "t");
-    is_bel_output("(if (digit \\b) t)", "nil");
-    is_bel_output("(if (digit \\b i16) t)", "t");
-    is_bel_output("(if (digit \\f) t)", "nil");
-    is_bel_output("(if (digit \\f i16) t)", "t");
-    is_bel_output("(if (digit \\g) t)", "nil");
-    is_bel_output("(if (digit \\g i16) t)", "nil");
-    is_bel_output("(let i8 '(t t t t t t t t) (if (digit \\0 i8) t))", "t");
-    is_bel_output("(let i8 '(t t t t t t t t) (if (digit \\7 i8) t))", "t");
-    is_bel_output("(let i8 '(t t t t t t t t) (if (digit \\9 i8) t))", "nil");
-}
+> (~~digit \7)
+t
+
+> (~~digit \9)
+t
+
+> (~~digit \0 i10)
+t
+
+> (~~digit \7 i10)
+t
+
+> (~~digit \9 i10)
+t
+
+> (digit \a)
+nil
+
+> (~~digit \a i16)
+t
+
+> (digit \b)
+nil
+
+> (~~digit \b i16)
+t
+
+> (digit \f)
+nil
+
+> (~~digit \f i16)
+t
+
+> (digit \g)
+nil
+
+> (digit \g i16)
+nil
+
+> (set i8 '(t t t t t t t t))
+(t t t t t t t t)
+
+> (~~digit \0 i8)
+t
+
+> (~~digit \7 i8)
+t
+
+> (digit \9 i8)
+nil
+

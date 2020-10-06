@@ -2,16 +2,22 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 5;
+> (pair 'x)
+nil
 
-{
-    is_bel_output("(pair 'x)", "nil");
-    is_bel_output("(pair nil)", "nil");
-    is_bel_output("(pair '(a))", "t");
-    is_bel_output("(pair (join))", "t");
-    is_bel_output("(pair \\c)", "nil");
-}
+> (pair nil)
+nil
+
+> (pair '(a))
+t
+
+> (pair (join))
+t
+
+> (pair \c)
+nil
+

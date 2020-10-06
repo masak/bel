@@ -2,19 +2,31 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 8;
+> (clog2 0)
+1
 
-{
-    is_bel_output("(clog2 0)", "1");
-    is_bel_output("(clog2 1)", "1");
-    is_bel_output("(clog2 2)", "1");
-    is_bel_output("(clog2 3)", "2");
-    is_bel_output("(clog2 4)", "2");
-    is_bel_output("(clog2 7)", "3");
-    is_bel_output("(clog2 8)", "3");
-    is_bel_output("(clog2 11)", "4");
-}
+> (clog2 1)
+1
+
+> (clog2 2)
+1
+
+> (clog2 3)
+2
+
+> (clog2 4)
+2
+
+> (clog2 7)
+3
+
+> (clog2 8)
+3
+
+> (clog2 11)
+4
+

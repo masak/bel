@@ -2,18 +2,34 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 7;
+> (check t idfn)
+t
 
-{
-    is_bel_output("(check t idfn)", "t");
-    is_bel_output("(check nil idfn)", "nil");
-    is_bel_output("(check 2 [= _ 2])", "2");
-    is_bel_output("(check 1 [= _ 2])", "nil");
-    is_bel_output("(check 2 [= _ 2] 0)", "2");
-    is_bel_output("(check 1 [= _ 2] 0)", "0");
-    is_bel_output("(do (set x 1) (check (do (set x (inc x)) x) [= _ 2]))", "2");
-}
+> (check nil idfn)
+nil
+
+> (check 2 is.2)
+2
+
+> (check 1 is.2)
+nil
+
+> (check 2 is.2 0)
+2
+
+> (check 1 is.2 0)
+0
+
+> (set x 1)
+1
+
+> (check (++ x) is.2))
+2
+
+> x
+2
+

@@ -2,18 +2,37 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 7;
+> (let f (fn () d) (f))
+!ERROR: ('unboundb d)
 
-{
-    is_bel_error("(let f (fn () d) (f))", "('unboundb d)");
-    is_bel_output("(let f (fn () d) (bind d 'hai (f)))", "hai");
-    is_bel_output("(bind d 'yes d)", "yes");
-    is_bel_output("(bind d 'yes 'no 'but d)", "yes");
-    is_bel_output("(bind d 'one (cons (bind d 'two d) d))", "(two . one)");
-    is_bel_output("(let v 'lexical (bind v 'dynamic v))", "dynamic");
-    is_bel_output("(bind v 'dynamic (let v 'lexical v))", "dynamic");
-}
+> (let f (fn () d) (bind d 'hai (f)))
+hai
+
+> (bind d 'yes
+    d)
+yes
+
+> (bind d 'yes
+    'no
+    'but
+    d)
+yes
+
+> (bind d 'one
+    (cons (bind d 'two d) d))
+(two . one)
+
+Dynamic variables trump lexical variables, no matter how they nest.
+
+> (let v 'lexical
+    (bind v 'dynamic v))
+dynamic
+
+> (bind v 'dynamic
+    (let v 'lexical v))
+dynamic
+

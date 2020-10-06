@@ -2,15 +2,20 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 4;
+> (tokens "the age of the essay")
+("the" "age" "of" "the" "essay")
 
-{
-    is_bel_output(qq[(tokens "the age of the essay")], qq[("the" "age" "of" "the" "essay")]);
-    is_bel_output(qq[(tokens "A|B|C")], qq[("A|B|C")]);
-    is_bel_output(qq[(tokens "A|B|C" \\|)], qq[("A" "B" "C")]);
-    is_bel_output(qq[(tokens "A.B:C.D!E:F" (cor (is \\.) (is \\:)))], qq[("A" "B" "C" "D!E" "F")]);
-}
+> (tokens "A|B|C")
+("A|B|C")
+
+> (tokens "A|B|C" \|)
+("A" "B" "C")
+
+> (tokens "A.B:C.D!E:F"
+          (cor (is \.) (is \:)))
+("A" "B" "C" "D!E" "F")
+

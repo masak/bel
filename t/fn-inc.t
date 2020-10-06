@@ -2,17 +2,25 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 6;
+> (inc 0)
+1
 
-{
-    is_bel_output("(inc 0)", "1");
-    is_bel_output("(inc 1)", "2");
-    is_bel_output("(inc 3)", "4");
-    is_bel_output("(inc -1)", "0");
-    is_bel_output("(inc -4.5)", "-7/2");
-    is_bel_output("(inc .5)", "3/2");
-}
+> (inc 1)
+2
+
+> (inc 3)
+4
+
+> (inc -1)
+0
+
+> (inc -4.5)
+-7/2
+
+> (inc .5)
+3/2
+

@@ -2,137 +2,241 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 64;
+= Testing all possible ways to re-invoke `mev`.
 
-## Testing all possible ways to re-invoke `mev
+== literal
 
-# literal
-{
-    is_bel_output("(bel nil)", "nil");
-    is_bel_output("(bel t)", "t");
-    is_bel_output("(bel \\x)", "\\x");
-}
+> (bel nil)
+nil
 
-# variable
-{
-    is_bel_output("(bel 'vmark)", "(nil)");
-    is_bel_output("(bel '((lit clo nil (x) x) 'g))", "g");
-    is_bel_output("(bel '((lit clo nil (x) (where x)) 'g))", "((x . g) d)");
-}
+> (bel t)
+t
 
-# 'quote' form
-{
-    is_bel_output("(bel '(quote a))", "a");
-}
+> (bel \x)
+\x
 
-# 'if' form
-{
-    is_bel_output("(bel '(if))", "nil");
-    is_bel_output("(bel '(if 'a))", "a");
-    is_bel_output("(bel '(if 'a 'b))", "b");
-    is_bel_output("(bel '(if 'a 'b 'c))", "b");
-    is_bel_output("(bel '(if nil 'b 'c))", "c");
-}
+== variable
 
-# 'where' form
-{
-    is_bel_output("(bel '(where (car '(x . y))))", "((x . y) a)");
-    is_bel_output("(bel '(where (cdr '(z . w))))", "((z . w) d)");
-    # the following two tests would probably work, but they are too slow.
-    # even `(bel 'k!a)` is too slow right now. maybe later.
-    #is_bel_output("(bel '(where ((lit tab (a . 1)) 'a)))", "((a . 1) 'd)");
-    #is_bel_output("(bel '(where ((lit tab (a . 1)) 'b)))", "((b) 'd)");
-}
+> (bel 'vmark)
+(nil)
 
-# 'dyn' form
-{
-    is_bel_output("(bel '(dyn d 2 d))", "2");
-}
+> (bel '((lit clo nil (x) x) 'g))
+g
 
-# 'after' form
-{
-    is_bel_output("(bel '(after 1 2))", "1");
-    is_bel_error(q[(bel '(after 3 (car 'atom)))], "car-on-atom");
-}
+> (bel '((lit clo nil (x) (where x)) 'g))
+((x . g) d)
 
-# 'ccc' form
-# see t/01-fn-bel-ccc.t
+== `quote` form
 
-# 'thread' form
-{
-    is_bel_output("(bel '(thread (car '(x . y))))", "x");
-}
+> (bel '(quote a))
+a
 
-# macro/applym
-{
-    is_bel_output("(bel '((lit mac (lit clo nil (x) x)) t))", "t");
-}
+== `if` form
 
-# apply
-{
-    is_bel_output("(bel '(apply idfn '(hi)))", "hi");
-    is_bel_output("(bel '(apply no '(t)))", "nil");
-    is_bel_output("(bel '(apply no '(nil)))", "t");
-    is_bel_output("(bel '(apply car '((a b))))", "a");
-}
+> (bel '(if))
+nil
 
-# primitive
-{
-    is_bel_output("(bel '(car '(a . b)))", "a");
-    is_bel_output("(bel '(car '(a b)))", "a");
-    is_bel_output("(bel '(car nil))", "nil");
-    is_bel_output("(bel '(car))", "nil");
-    is_bel_error("(bel '(car 'atom))", "car-on-atom");
-    is_bel_output("(bel '(cdr '(a . b)))", "b");
-    is_bel_output("(bel '(cdr '(a b)))", "(b)");
-    is_bel_output("(bel '(cdr nil))", "nil");
-    is_bel_output("(bel '(cdr))", "nil");
-    is_bel_error("(bel '(cdr 'atom))", "cdr-on-atom");
-    is_bel_output("(bel '(id 'a 'a))", "t");
-    is_bel_output("(bel '(id 'a 'b))", "nil");
-    is_bel_output("(bel '(id 'a \\a))", "nil");
-    is_bel_output("(bel '(id \\a \\a))", "t");
-    is_bel_output("(bel '(id 't t))", "t");
-    is_bel_output("(bel '(id nil 'nil))", "t");
-    is_bel_output("(bel '(id id id))", "t");
-    is_bel_output("(bel '(id id 'id))", "nil");
-    is_bel_output("(bel '(id id nil))", "nil");
-    is_bel_output("(bel '(id nil))", "t");
-    is_bel_output("(bel '(id))", "t");
-    is_bel_output("(bel '(join 'a 'b))", "(a . b)");
-    is_bel_output("(bel '(join 'a))", "(a)");
-    is_bel_output("(bel '(join))", "(nil)");
-    is_bel_output("(bel '(join nil 'b))", "(nil . b)");
-    is_bel_output("(bel '(id (join 'a 'b) (join 'a 'b)))", "nil");
-    is_bel_output("(bel '(nom 'a))", q["a"]);
-    is_bel_error("(bel '(nom \\a))", "not-a-symbol");
-    is_bel_output("(bel '(nom nil))", q["nil"]);
-    is_bel_error("(bel '(nom '(a)))", "not-a-symbol");
-    is_bel_error(q[(bel '(nom "a")], "not-a-symbol");
-    is_bel_output("(bel '(type 'a))", "symbol");
-    is_bel_output("(bel '(type \\a))", "char");
-    is_bel_output("(bel '(type \\bel))", "char");
-    is_bel_output("(bel '(type nil))", "symbol");
-    is_bel_output("(bel '(type '(a)))", "pair");
-    is_bel_output(q[(bel '(type (ops "testfile" 'out)))], "stream");
-}
+> (bel '(if 'a))
+a
 
-# closure
-{
-    is_bel_output("(bel '(idfn 'hi))", "hi");
-    is_bel_output("(bel '(no t))", "nil");
-    is_bel_output("(bel '(no nil))", "t");
-}
+> (bel '(if 'a 'b))
+b
 
-# continuation
-{
-    is_bel_output("(bel '(join 'a (ccc (lit clo nil (c) (c 'b)))))", "(a . b)");
-}
+> (bel '(if 'a 'b 'c))
+b
 
-END {
-    unlink "testfile";
-}
+> (bel '(if nil 'b 'c))
+c
+
+== `where` form
+
+> (bel '(where (car '(x . y))))
+((x . y) a)
+
+> (bel '(where (cdr '(z . w))))
+((z . w) d)
+
+The following two tests would probably work, but they are too slow.
+Even `(bel 'k!a)` is too slow right now. Maybe later.
+
+SKIP: > (bel '(where ((lit tab (a . 1)) 'a)))
+SKIP: ((a . 1) 'd)
+
+SKIP: > (bel '(where ((lit tab (a . 1)) 'b)))
+SKIP: ((b) 'd)
+
+== `dyn` form
+
+> (bel '(dyn d 2 d))
+2
+
+== `after` form
+
+> (bel '(after 1 2))
+1
+
+> (bel '(after 3 (car 'atom)))
+!ERROR: car-on-atom
+
+== `ccc` form
+(see t/01-fn-bel-ccc.t)
+
+== `thread` form
+
+> (bel '(thread (car '(x . y))))
+x
+
+== macro/applym
+
+> (bel '((lit mac (lit clo nil (x) x)) t))
+t
+
+== apply
+
+> (bel '(apply idfn '(hi)))
+hi
+
+> (bel '(apply no '(t)))
+nil
+
+> (bel '(apply no '(nil)))
+t
+
+> (bel '(apply car '((a b))))
+a
+
+== primitive
+
+> (bel '(car '(a . b)))
+a
+
+> (bel '(car '(a b)))
+a
+
+> (bel '(car nil))
+nil
+
+> (bel '(car))
+nil
+
+> (bel '(car 'atom))
+!ERROR: car-on-atom
+
+> (bel '(cdr '(a . b)))
+b
+
+> (bel '(cdr '(a b)))
+(b)
+
+> (bel '(cdr nil))
+nil
+
+> (bel '(cdr))
+nil
+
+> (bel '(cdr 'atom))
+!ERROR: cdr-on-atom
+
+> (bel '(id 'a 'a))
+t
+
+> (bel '(id 'a 'b))
+nil
+
+> (bel '(id 'a \a))
+nil
+
+> (bel '(id \a \a))
+t
+
+> (bel '(id 't t))
+t
+
+> (bel '(id nil 'nil))
+t
+
+> (bel '(id id id))
+t
+
+> (bel '(id id 'id))
+nil
+
+> (bel '(id id nil))
+nil
+
+> (bel '(id nil))
+t
+
+> (bel '(id))
+t
+
+> (bel '(join 'a 'b))
+(a . b)
+
+> (bel '(join 'a))
+(a)
+
+> (bel '(join))
+(nil)
+
+> (bel '(join nil 'b))
+(nil . b)
+
+> (bel '(id (join 'a 'b) (join 'a 'b)))
+nil
+
+> (bel '(nom 'a))
+"a"
+
+> (bel '(nom \a))
+!ERROR: not-a-symbol
+
+> (bel '(nom nil))
+"nil"
+
+> (bel '(nom '(a)))
+!ERROR: not-a-symbol
+
+> (bel '(nom "a"))
+!ERROR: not-a-symbol
+
+> (bel '(type 'a))
+symbol
+
+> (bel '(type \a))
+char
+
+> (bel '(type \bel))
+char
+
+> (bel '(type nil))
+symbol
+
+> (bel '(type '(a)))
+pair
+
+> (bel '(type (ops "testfile" 'out)))
+stream
+
+== closure
+
+> (bel '(idfn 'hi))
+hi
+
+> (bel '(no t))
+nil
+
+> (bel '(no nil))
+t
+
+== continuation
+
+> (bel '(join 'a (ccc (lit clo nil (c) (c 'b)))))
+(a . b)
+
+!END: unlink "testfile";
+

@@ -2,18 +2,40 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 7;
+Push is destructive, in the sense that it actually changes its second
+argument.
 
-{
-    is_bel_output("(let l '(b c) (push 'a l) l)", "(a b c)");
-    is_bel_output("(let l '(b c) (push 'a (cdr l)) l)", "(b a c)");
-    is_bel_output("(do (set l '(e f)) (push 'd l) l)", "(d e f)");
-    is_bel_output("(do (set l '(e f)) (push 'd (cddr l)) l)", "(e f d)");
-    is_bel_output("(do (set l nil) (push 'a l) l)", "(a)");
-    is_bel_output("(bind l '(h i) (push 'g l) l)", "(g h i)");
-    is_bel_output("(do (def f (v) (push 'g l)) (bind l '(h i) (f 'g) l))", "(g h i)");
-}
+> (let L '(b c)
+    (push 'a L)
+    L)
+(a b c)
+
+You can push to the `cdr` of a list!
+
+> (let L '(b c)
+    (push 'a (cdr L))
+    L)
+(b a c)
+
+> (let L nil
+    (push 'a L)
+    L)
+(a)
+
+> (bind L '(h i)
+    (push 'g L)
+    L)
+(g h i)
+
+> (def f (v) (push 'g L))
+!IGNORE: result of definition
+
+> (bind L '(h i)
+    (f 'g)
+    L)
+(g h i)
+

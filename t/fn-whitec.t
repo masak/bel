@@ -2,19 +2,31 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 8;
+> (~~whitec \sp)
+t
 
-{
-    is_bel_output("(~~whitec \\sp)", "t");
-    is_bel_output("(~~whitec \\lf)", "t");
-    is_bel_output("(~~whitec \\tab)", "t");
-    is_bel_output("(~~whitec \\cr)", "t");
-    is_bel_output("(~~whitec \\a)", "nil");
-    is_bel_output("(~~whitec \\b)", "nil");
-    is_bel_output("(~~whitec \\x)", "nil");
-    is_bel_output("(~~whitec \\1)", "nil");
-}
+> (~~whitec \lf)
+t
+
+> (~~whitec \tab)
+t
+
+> (~~whitec \cr)
+t
+
+> (~~whitec \a)
+nil
+
+> (~~whitec \b)
+nil
+
+> (~~whitec \x)
+nil
+
+> (~~whitec \1)
+nil
+

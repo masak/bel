@@ -21,4 +21,6 @@ $b2->read_eval_print("(set xyzzy 'wrong)");
 $actual_output = "";
 $b1->read_eval_print("xyzzy");
 
-is($actual_output, "right\n", "two Bel instances have distinct globals and don't interfere");
+is($actual_output,
+    "right\n",
+    "two Bel instances have distinct globals and don't interfere");

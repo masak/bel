@@ -2,15 +2,19 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 4;
+> (atom \a)
+t
 
-{
-    is_bel_output("(atom \\a)", "t");
-    is_bel_output("(atom nil)", "t");
-    is_bel_output("(atom 'a)", "t");
-    is_bel_output("(atom '(a))", "nil");
-}
+> (atom nil)
+t
+
+> (atom 'a)
+t
+
+> (atom '(a))
+nil
+

@@ -2,18 +2,28 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 7;
+> (rem \a "abracadabra")
+"brcdbr"
 
-{
-    is_bel_output(q[(rem \\a "abracadabra")], q["brcdbr"]);
-    is_bel_output("(rem 'b '(a b c b a b))", "(a c a)");
-    is_bel_output("(rem 'b '(a c a))", "(a c a)");
-    is_bel_output("(rem 'x nil)", "nil");
-    is_bel_output("(rem '() '(a () c () a ()))", "(a c a)");
-    is_bel_output("(rem '(z) '(a (z) c) id)", "(a (z) c)");
-    is_bel_output("(rem 'x '((a) (x y) (b) (x)) caris)", "((a) (b))");
-}
+> (rem 'b '(a b c b a b))
+(a c a)
+
+> (rem 'b '(a c a))
+(a c a)
+
+> (rem 'x nil)
+nil
+
+> (rem '() '(a () c () a ()))
+(a c a)
+
+> (rem '(z) '(a (z) c) id)
+(a (z) c)
+
+> (rem 'x '((a) (x y) (b) (x)) caris)
+((a) (b))
+

@@ -2,38 +2,27 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 6;
+> (set f (ops "testfile" 'out))
+<stream>
 
-is_bel_output(q[(ops "testfile" 'out)], "<stream>");
-is_bel_output(q[(type (ops "testfile" 'out))], "stream");
+> (type f)
+stream
 
-END {
-    unlink("testfile");
-}
+> (cls f)
+<stream>
 
-my $filename = "fwniun";
+> (set f (ops "testfile" 'in))
+<stream>
 
-ok((!-e $filename), "file does not exist");
+> (type f)
+stream
 
-{
-    open(my $OUT, ">", $filename)
-        or die "Could not open '$filename' for writing: $!";
+> (ops "rukyerw" 'in)
+!ERROR: 'notexist
 
-    print {$OUT} "bel";
-
-    close($OUT);
-}
-
-is_bel_output(qq[(ops "$filename" 'in)], "<stream>");
-is_bel_output(qq[(type (ops "$filename" 'in))], "stream");
-
-END {
-    unlink($filename);
-}
-
-is_bel_error(qq[(ops "rukyerw" 'in)], "'notexist");
+!END: unlink($filename);
 

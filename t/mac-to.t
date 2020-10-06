@@ -2,14 +2,12 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 1;
+> (to "alsieu" 'choo)
+choo
 
-is_bel_output(q[(to "alsieu" 'choo)], "choo");
+!END: unlink("alsieu");
 
-END {
-    unlink("alsieu");
-}

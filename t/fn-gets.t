@@ -2,17 +2,38 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 6;
+> (let L '((a . 1) (b . 2) (c . 3))
+    (gets 2 L))
+(b . 2)
 
-{
-    is_bel_output("(let l '((a . 1) (b . 2) (c . 3)) (gets 2 l))", "(b . 2)");
-    is_bel_output("(let l '((a . 1) (b . 2) (c . 3)) (gets 4 l))", "nil");
-    is_bel_output("(let l nil (gets 5 l))", "nil");
-    is_bel_output("(let l '((1 . (a)) (2 . (b)) (3 . (c))) (gets '(b) l))", "(2 b)");
-    is_bel_output("(let l '((1 . (a)) (2 . (b)) (3 . (c))) (gets '(b) l id))", "nil");
-    is_bel_output("(let q '(b) (let l (list '(1 . (a)) (cons 'two q) '(3 . (c))) (gets q l id))", "(two b)");
-}
+> (let L '((a . 1) (b . 2) (c . 3))
+    (gets 4 L))
+nil
+
+> (let L nil
+    (gets 5 L))
+nil
+
+> (let L '((1 . (a))
+           (2 . (b))
+           (3 . (c)))
+    (gets '(b) L))
+(2 b)
+
+> (let L '((1 . (a))
+           (2 . (b))
+           (3 . (c)))
+    (gets '(b) L id))
+nil
+
+> (withs (q '(b)
+          L `((1 . (a))
+              (two . ,q)
+              (3 . (c))))
+    (gets q L id))
+(two b)
+

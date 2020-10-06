@@ -2,24 +2,43 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 9;
+> (set sr1 (list '+ i1 i1)
+       sr2 (list '- i1 i1)
+       sr3 (list '+ i0 i1)
+       sr4 (list '+ i2 i1)
+       sr5 (list '- i2 i1)
+       sr6 (list '+ i1 i2)
+       sr7 (list '+ '(t t t) i2))
+!IGNORE: result of assignment
 
-{
-    is_bel_output("(sr- (list '+ i1 i1) (list '+ i1 i1))", "(- nil (t))");
-    is_bel_output("(sr- (list '+ i1 i1) (list '- i1 i1))", "(+ (t t) (t))");
-    is_bel_output("(sr- (list '+ i0 i1) (list '+ i0 i1))", "(+ nil (t))");
-    is_bel_output("(sr- (list '+ i2 i1) (list '+ i2 i1))", "(- nil (t))");
-    is_bel_output("(sr- (list '+ i1 i1) (list '- i2 i1))", "(+ (t t t) (t))");
-    is_bel_output("(sr- (list '+ i1 i2) (list '+ i1 i2))",
-        "(- nil (t t t t))");
-    is_bel_output("(sr- (list '+ i2 '(t t t)) (list '+ '(t t t) i2))",
-        "(- (t t t t t) (t t t t t t))");
-    is_bel_output("(sr- (list '- i2 '(t t t)) (list '+ '(t t t) i2))",
-        "(- (" . (join " ", ("t") x 13) . ") (t t t t t t))");
-    is_bel_output("(sr- (list '+ i2 i0) (list '+ '(t t t) i2))",
-        "(+ (t t t t) nil)");
-}
+> (sr- sr1 sr1)
+(- nil (t))
+
+> (sr- sr1 sr2)
+(+ (t t) (t))
+
+> (sr- sr3 sr3)
+(+ nil (t))
+
+> (sr- sr4 sr4)
+(- nil (t))
+
+> (sr- sr1 sr5)
+(+ (t t t) (t))
+
+> (sr- sr6 sr6)
+(- nil (t t t t))
+
+> (sr- (list '+ i2 '(t t t)) sr7)
+(- (t t t t t) (t t t t t t))
+
+> (sr- (list '- i2 '(t t t)) sr7)
+(- (t t t t t t t t t t t t t) (t t t t t t))
+
+> (sr- (list '+ i2 i0) sr7)
+(+ (t t t t) nil)
+

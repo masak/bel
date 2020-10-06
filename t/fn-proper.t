@@ -2,14 +2,16 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 3;
+> (proper nil)
+t
 
-{
-    is_bel_output("(proper nil)", "t");
-    is_bel_output("(proper '(a . b))", "nil");
-    is_bel_output("(proper '(a b))'", "t");
-}
+> (proper '(a . b))
+nil
+
+> (proper '(a b))
+t
+

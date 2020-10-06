@@ -2,19 +2,35 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 8;
+> (even 0)
+t
 
-{
-    is_bel_output("(even 0)", "t");
-    is_bel_error("(even \\x)", "cdr-on-atom");
-    is_bel_output("(even -1)", "nil");
-    is_bel_error("(even \\0)", "cdr-on-atom");
-    is_bel_output("(even 1/2)", "nil");
-    is_bel_output("(even 4/2)", "t");
-    is_bel_output("(even 3)", "nil");
-    is_bel_output("(even 4)", "t");
-}
+> (even -1)
+nil
+
+> (even 1/2)
+nil
+
+> (even 4/2)
+t
+
+> (even 3)
+nil
+
+> (even 4)
+t
+
+Arguably, it is a bug that `even` produces an error on non-numeric
+values. But it is according to spec -- so if it's a bug, it's a bug
+in the spec.
+
+> (even \x)
+!ERROR: cdr-on-atom
+
+> (even \0)
+!ERROR: cdr-on-atom
+

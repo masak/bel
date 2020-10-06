@@ -2,17 +2,25 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 6;
+> ((is car) car)
+t
 
-{
-    is_bel_output("((is car) car)", "t");
-    is_bel_output("((is car) cdr)", "nil");
-    is_bel_output("((is 'x) 'x)", "t");
-    is_bel_output("((is 'x) 'y)", "nil");
-    is_bel_output("((is 'x) \\x)", "nil");
-    is_bel_output("((is (join)) (join))", "t");
-}
+> ((is car) cdr)
+nil
+
+> ((is 'x) 'x)
+t
+
+> ((is 'x) 'y)
+nil
+
+> ((is 'x) \x)
+nil
+
+> ((is (join)) (join))
+t
+

@@ -2,15 +2,12 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 1;
+This test is so slow it ends up in its own .t file.
 
-#  This test is so slow it ends up in its own .t file
+> (bel '(list 'a (ccc (lit clo nil (c) 'b))))
+(a b)
 
-# 'ccc' form
-{
-    is_bel_output("(bel '(list 'a (ccc (lit clo nil (c) 'b))))", "(a b)");
-}

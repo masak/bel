@@ -2,21 +2,50 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 10;
+> (set x '(a b c))
+(a b c)
 
-{
-    is_bel_output("(let x '(a b c) (pushnew 'a x))", "(a b c)");
-    is_bel_output("(let x '(a b c) (pushnew 'a x) x)", "(a b c)");
-    is_bel_output("(let x '(a b c) (pushnew 'z x))", "(z a b c)");
-    is_bel_output("(let x '(a b c) (pushnew 'z x) x)", "(z a b c)");
-    is_bel_output("(let x '(a b c) (pushnew 'a x =))", "(a b c)");
-    is_bel_output("(let x '(a b c) (pushnew 'z x =))", "(z a b c)");
-    is_bel_output("(let x '(a b c) (pushnew 'z x =))", "(z a b c)");
-    is_bel_output("(let x '((a) (b) (c)) (pushnew '(a) x))", "((a) (b) (c))");
-    is_bel_output("(let x '((a) (b) (c)) (pushnew '(a) x id))", "((a) (a) (b) (c))");
-    is_bel_output("(withs (p '(a) x (list p '(b) '(c))) (pushnew p x id))", "((a) (b) (c))");
-}
+> (pushnew 'a x)
+(a b c)
+
+> x
+(a b c)
+
+> (pushnew 'z x)
+(z a b c)
+
+> x
+(z a b c)
+
+> (set y '(a b c))
+(a b c)
+
+> (pushnew 'a y =)
+(a b c)
+
+> (pushnew 'z y =)
+(z a b c)
+
+> (pushnew 'z y =)
+(z a b c)
+
+> (set p '(a)
+       L `(,p (b) (c)))
+((a) (b) (c))
+
+> (pushnew p L)
+((a) (b) (c))
+
+> (pushnew '(a) L id)
+((a) (a) (b) (c))
+
+> (set L `(,p (b) (c)))
+!IGNORE: result of assignment, same as before
+
+> (pushnew p L id)
+((a) (b) (c))
+

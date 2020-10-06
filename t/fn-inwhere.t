@@ -2,22 +2,34 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 9;
+> smark
+(nil)
 
-{
-    is_bel_output("smark", "(nil)");
-    is_bel_output("(id vmark smark)", "nil");
+> (id vmark smark)
+nil
 
-    is_bel_output("(inwhere nil)", "nil");
-    is_bel_output("(inwhere (list (list (list smark))))", "nil");
-    is_bel_output("(inwhere (list (list (list smark 'nope))))", "nil");
+> (inwhere nil)
+nil
 
-    is_bel_output("(inwhere (list (list (list smark 'loc t))))", "(t)");
-    is_bel_output("(inwhere (list (list (list smark 'loc nil))))", "(nil)");
-    is_bel_output("(inwhere (list (list (list smark 'loc 'foo))))", "(foo)");
-    is_bel_output("(inwhere (list (list (list smark 'loc))))", "nil");
-}
+> (inwhere `(((,smark))))
+nil
+
+> (inwhere `(((,smark nope))))
+nil
+
+> (inwhere `(((,smark loc t))))
+(t)
+
+> (inwhere `(((,smark loc nil))))
+(nil)
+
+> (inwhere `(((,smark loc foo))))
+(foo)
+
+> (inwhere `(((,smark loc))))
+nil
+

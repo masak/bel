@@ -2,15 +2,37 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 4;
+> (whenlet x nil)
+nil
 
-{
-    is_bel_output("(whenlet x nil)", "nil");
-    is_bel_output("(whenlet y 'a (list y 'b))", "(a b)");
-    is_bel_output("(whenlet z 'a (list 'b z) 'c)", "c");
-    is_bel_output("(whenlet z nil (list 'b z) 'c)", "nil");
-}
+> (whenlet y 'a
+    (list y 'b))
+(a b)
+
+> (whenlet z 'a
+    (list 'b z)
+    'c)
+c
+
+> (whenlet z nil
+    (list 'b z)
+    'c)
+nil
+
+If the condition is not true, side effects do not run.
+
+> (set x "original")
+"original"
+
+> (whenlet w nil
+    (set x "changed"))
+nil
+
+> x
+"original"
+
+

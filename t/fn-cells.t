@@ -2,21 +2,37 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 10;
+> (cells nil)
+nil
 
-{
-    is_bel_output("(cells nil)", "nil");
-    is_bel_output("(cells \\c)", "nil");
-    is_bel_output("(cells '())", "nil");
-    is_bel_output("(cells '(nil))", "((nil))");
-    is_bel_output("(cells '(a b c))", "((a b c) (b c) (c))");
-    is_bel_output("(cells '(a nil c))", "((a nil c) (nil c) (c))");
-    is_bel_output("(let L '(a) (xar L L) (len (cells L)))", "2");
-    is_bel_output("(let L '(a) (xdr L L) (len (cells L)))", "2");
-    is_bel_output("(let L '(a) (xar L L) (len (dups (cells L) id)))", "1");
-    is_bel_output("(let L '(a) (xdr L L) (len (dups (cells L) id)))", "1");
-}
+> (cells \c)
+nil
+
+> (cells '())
+nil
+
+> (cells '(nil))
+((nil))
+
+> (cells '(a b c))
+((a b c) (b c) (c))
+
+> (cells '(a nil c))
+((a nil c) (nil c) (c))
+
+> (let L '(a)
+    (xar L L)
+    (list (len (cells L))
+          (len (dups (cells L) id))))
+(2 1)
+
+> (let L '(a)
+    (xdr L L)
+    (list (len (cells L))
+          (len (dups (cells L) id))))
+(2 1)
+

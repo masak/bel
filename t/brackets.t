@@ -2,15 +2,19 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 4;
+> (atom [id _ t])
+nil
 
-{
-    is_bel_output("(atom [id _ t])", "nil");
-    is_bel_output("([id _ 'd] 'd)", "t");
-    is_bel_output("(map [car _] '((a b) (c d) (e f)))", "(a c e)");
-    is_bel_output("([] t)", "nil");
-}
+> ([id _ 'd] 'd)
+t
+
+> (map [car _] '((a b) (c d) (e f)))
+(a c e)
+
+> ([] t)
+nil
+

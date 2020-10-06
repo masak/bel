@@ -2,18 +2,45 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 7;
+> (pcase nil
+    no   'one
+    char 'two
+         'three)
+one
 
-{
-    is_bel_output("(pcase nil no 'one char 'two 'three)", "one");
-    is_bel_output("(pcase \\x no 'one char 'two 'three)", "two");
-    is_bel_output("(pcase (join) no 'one char 'two 'three)", "three");
-    is_bel_output(q[(pcase "hi" string 'four function 'five)], "four");
-    is_bel_output("(pcase idfn string 'four function 'five)", "five");
-    is_bel_output("(pcase car string 'four function 'five)", "five");
-    is_bel_output("(pcase 'symbol string 'four function 'five)", "nil");
-}
+> (pcase \x
+    no   'one
+    char 'two
+         'three)
+two
+
+> (pcase (join)
+    no   'one
+    char 'two
+         'three)
+three
+
+> (pcase "hi"
+    string   'four
+    function 'five)
+four
+
+> (pcase idfn
+    string   'four
+    function 'five)
+five
+
+> (pcase car
+    string   'four
+    function 'five)
+five
+
+> (pcase 'symbol
+    string   'four
+    function 'five)
+nil
+

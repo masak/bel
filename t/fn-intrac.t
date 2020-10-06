@@ -2,19 +2,31 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 8;
+> (intrac nil)
+nil
 
-{
-    is_bel_output("(intrac nil)", "nil");
-    is_bel_output("(intrac \\0)", "nil");
-    is_bel_output("(intrac \\a)", "nil");
-    is_bel_output("(if (intrac \\.) t)", "t");
-    is_bel_output("(if (intrac \\!) t)", "t");
-    is_bel_output("(intrac \\+)", "nil");
-    is_bel_output("(intrac \\-)", "nil");
-    is_bel_output("(intrac \\D)", "nil");
-}
+> (intrac \0)
+nil
+
+> (intrac \a)
+nil
+
+> (~~intrac \.)
+t
+
+> (~~intrac \!)
+t
+
+> (intrac \+)
+nil
+
+> (intrac \-)
+nil
+
+> (intrac \D)
+nil
+

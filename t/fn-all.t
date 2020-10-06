@@ -2,15 +2,19 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 4;
+> (all atom '(a b c))
+t
 
-{
-    is_bel_output("(all atom '(a b c))", "t");
-    is_bel_output("(all atom '(a (b c) d))", "nil");
-    is_bel_output("(all atom '())", "t");
-    is_bel_output("(all no '(nil nil nil))", "t");
-}
+> (all atom '(a (b c) d))
+nil
+
+> (all atom '())
+t
+
+> (all no '(nil nil nil))
+t
+

@@ -2,16 +2,22 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 5;
+> ((cand atom no) nil)
+t
 
-{
-    is_bel_output("((cand atom no) nil)", "t");
-    is_bel_output("((cand atom no) t)", "nil");
-    is_bel_output("((cand atom) t)", "t");
-    is_bel_output("((cand atom) (join))", "nil");
-    is_bel_output("((cand) nil)", "t");
-}
+> ((cand atom no) t)
+nil
+
+> ((cand atom) t)
+t
+
+> ((cand atom) (join))
+nil
+
+> ((cand) nil)
+t
+

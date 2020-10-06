@@ -2,14 +2,20 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 3;
+> (do 'a
+      'b
+      'c
+      (list 'hello 'world))
+(hello world)
 
-{
-    is_bel_output("(do 'a 'b 'c (list 'hello 'world))", "(hello world)");
-    is_bel_output("(do)", "nil");
-    is_bel_output("(do 'x 'y)", "y");
-}
+> (do)
+nil
+
+> (do 'x
+      'y)
+y
+

@@ -2,13 +2,17 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 2;
+> (do
+    (def foo (x) x)
+    (foo 'a))
+a
 
-{
-    is_bel_output("(do (def foo (x) x) (foo 'a))", "a");
-    is_bel_output("(do (def bar (x) (cons x x)) (bar 'a))", "(a . a)");
-}
+> (do
+    (def bar (x) (cons x x))
+    (bar 'a))
+(a . a)
+

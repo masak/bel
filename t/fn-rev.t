@@ -2,14 +2,16 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 3;
+> (rev nil)
+nil
 
-{
-    is_bel_output("(rev nil)", "nil");
-    is_bel_output("(rev '(a b c))", "(c b a)");
-    is_bel_output("(rev '(a (x y) c))", "(c (x y) a)");
-}
+> (rev '(a b c))
+(c b a)
+
+> (rev '(a (x y) c))
+(c (x y) a)
+

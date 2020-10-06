@@ -2,16 +2,22 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 5;
+> (last nil)
+nil
 
-{
-    is_bel_output("(last nil)", "nil");
-    is_bel_output("(last '(a))", "a");
-    is_bel_output("(last '(a b))", "b");
-    is_bel_output("(last '(a b c))", "c");
-    is_bel_output("(last '(a b nil))", "nil");
-}
+> (last '(a))
+a
+
+> (last '(a b))
+b
+
+> (last '(a b c))
+c
+
+> (last '(a b nil))
+nil
+

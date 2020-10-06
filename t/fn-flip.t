@@ -2,14 +2,16 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 3;
+> ((flip -) 1 10)
+9
 
-{
-    is_bel_output("((flip -) 1 10)", "9");
-    is_bel_output("((flip list) 5 4 3 2 1)", "(1 2 3 4 5)");
-    is_bel_output("((flip all) '(nil nil nil) no)", "t");
-}
+> ((flip list) 5 4 3 2 1)
+(1 2 3 4 5)
+
+> ((flip all) '(nil nil nil) no)
+t
+

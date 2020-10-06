@@ -2,14 +2,22 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 5;
+> (nom 'a)
+"a"
 
-is_bel_output("(nom 'a)", q["a"]);
-is_bel_error("(nom \\a)", "not-a-symbol");
-is_bel_output("(nom nil)", q["nil"]);
-is_bel_error("(nom '(a))", "not-a-symbol");
-is_bel_error(q[(nom "a")], "not-a-symbol");
+> (nom \a)
+!ERROR: not-a-symbol
+
+> (nom nil)
+"nil"
+
+> (nom '(a))
+!ERROR: not-a-symbol
+
+> (nom "a")
+!ERROR: not-a-symbol
+

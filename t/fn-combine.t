@@ -2,21 +2,37 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 10;
+> (((combine and) atom no) nil)
+t
 
-{
-    is_bel_output("(((combine and) atom no) nil)", "t");
-    is_bel_output("(((combine and) atom no) t)", "nil");
-    is_bel_output("(((combine and) atom) t)", "t");
-    is_bel_output("(((combine and) atom) (join))", "nil");
-    is_bel_output("(((combine and)) nil)", "t");
-    is_bel_output("(((combine or) pair no) nil)", "t");
-    is_bel_output("(((combine or) pair no) t)", "nil");
-    is_bel_output("(((combine or) pair no) '(x y))", "t");
-    is_bel_output("(((combine or) pair) (join))", "t");
-    is_bel_output("(((combine or)) nil)", "nil");
-}
+> (((combine and) atom no) t)
+nil
+
+> (((combine and) atom) t)
+t
+
+> (((combine and) atom) (join))
+nil
+
+> (((combine and)) nil)
+t
+
+> (((combine or) pair no) nil)
+t
+
+> (((combine or) pair no) t)
+nil
+
+> (((combine or) pair no) '(x y))
+t
+
+> (((combine or) pair) (join))
+t
+
+> (((combine or)) nil)
+nil
+

@@ -2,15 +2,19 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 4;
+> ((trap cons 'a) 'b)
+(b . a)
 
-{
-    is_bel_output("((trap cons 'a) 'b)", "(b . a)");
-    is_bel_output("((trap list 1 2 3) 4 5)", "(4 5 1 2 3)");
-    is_bel_output("((trap no) t)", "nil");
-    is_bel_output("((trap no) nil)", "t");
-}
+> ((trap list 1 2 3) 4 5)
+(4 5 1 2 3)
+
+> ((trap no) t)
+nil
+
+> ((trap no) nil)
+t
+

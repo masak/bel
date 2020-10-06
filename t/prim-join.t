@@ -2,14 +2,22 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 5;
+> (join 'a 'b)
+(a . b)
 
-is_bel_output("(join 'a 'b)", "(a . b)");
-is_bel_output("(join 'a)", "(a)");
-is_bel_output("(join)", "(nil)");
-is_bel_output("(join nil 'b)", "(nil . b)");
-is_bel_output("(id (join 'a 'b) (join 'a 'b))", "nil");
+> (join 'a)
+(a)
+
+> (join)
+(nil)
+
+> (join nil 'b)
+(nil . b)
+
+> (id (join 'a 'b) (join 'a 'b))
+nil
+

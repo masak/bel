@@ -2,16 +2,22 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More;
+use Language::Bel::Test::DSL;
 
-use Language::Bel::Test;
+__DATA__
 
-plan tests => 5;
+> (len nil)
+0
 
-{
-    is_bel_output("(len nil)", "0");
-    is_bel_output("(len '(t))", "1");
-    is_bel_output("(len '(t t))", "2");
-    is_bel_output("(len '(t t t))", "3");
-    is_bel_output("(len '(t t t t))", "4");
-}
+> (len '(t))
+1
+
+> (len '(t t))
+2
+
+> (len '(t t t))
+3
+
+> (len '(t t t t))
+4
+
