@@ -83,6 +83,12 @@ sub deparse {
         my $args = deparse($children[1]);
         return "$fn$args";
     }
+    elsif ($type eq "method_call") {
+        my $invocant = deparse($children[0]);
+        my $method = deparse($children[1]);
+        my $args = deparse($children[2]);
+        return "$invocant\->$method$args";
+    }
     elsif ($type eq "argument_list") {
         my $arguments = join(", ", map { deparse($_) } @children);
         return "($arguments)";

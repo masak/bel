@@ -8,7 +8,7 @@ use Language::Bel::Globals::FastFuncs::Preprocessor qw(
     expand
 );
 
-plan tests => 5;
+plan tests => 6;
 
 my $INDENT = " " x 4;
 
@@ -28,6 +28,24 @@ my $INDENT = " " x 4;
     my $actual_output = expand($input);
 
     is $actual_output, $expected_output, "T expands to SYMBOL_T";
+}
+
+{
+    my $input = <<'EOF';
+    my ($bel, $f, $xs) = @_;
+
+    return $bel->call($f, $xs);
+EOF
+
+    my $expected_output = <<'EOF';
+    my ($bel, $f, $xs) = @_;
+
+    return $bel->call($f, $xs);
+EOF
+
+    my $actual_output = expand($input);
+
+    is $actual_output, $expected_output, "can parse/emit method calls";
 }
 
 {

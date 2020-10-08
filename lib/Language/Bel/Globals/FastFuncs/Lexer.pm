@@ -6,7 +6,11 @@ use warnings;
 
 use Exporter 'import';
 
-my %PUNCTUATION = (
+my %PUNCTUATION_2 = (
+    "->" => "arrow",
+);
+
+my %PUNCTUATION_1 = (
     "(" => "opening_paren",
     ")" => "closing_paren",
     "," => "comma",
@@ -54,7 +58,11 @@ sub tokenize {
             $PUSH_TOKEN->("variable", name => $1);
             $pos += length($1);
         }
-        elsif (my $type = $PUNCTUATION{substr($s, 0, 1)}) {
+        elsif (my $type = $PUNCTUATION_2{substr($s, 0, 2)}) {
+            $PUSH_TOKEN->($type);
+            $pos += 2;
+        }
+        elsif ($type = $PUNCTUATION_1{substr($s, 0, 1)}) {
             $PUSH_TOKEN->($type);
             $pos += 1;
         }

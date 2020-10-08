@@ -211,20 +211,35 @@ sub parse_expression {
                 my $argument_list = $self->parse_argument_list();
                 $self->consume_token_of_type("closing_paren");
 
-                my $term = pop @term_stack;
+                my $fn = pop @term_stack;
                 $SHIFT->({
                     type => "call",
-                    children => [$term, $argument_list],
+                    children => [$fn, $argument_list],
                 });
 
-                # function call parens are a postcircumfix; so we're still
-                # expecting an op after it
+                # function call parens are a postcircumfix
                 $expect_mode = "op";
             }
             elsif ($token->{type} =~ /^(?:colon|qmark)$/) {
                 push @op_stack, $self->consume_token();
 
                 $expect_mode = "term";
+            }
+            elsif ($token->{type} eq "arrow") {
+                $self->consume_token();
+                my $method = $self->consume_token_of_type("bareword");
+                $self->consume_token_of_type("opening_paren");
+                my $argument_list = $self->parse_argument_list();
+                $self->consume_token_of_type("closing_paren");
+
+                my $invocant = pop @term_stack;
+                $SHIFT->({
+                    type => "method_call",
+                    children => [$invocant, $method, $argument_list],
+                });
+
+                # method calls are a postcircumfix (in this parser)
+                $expect_mode = "op";
             }
             else {
                 die "Unrecognized token in operator position: ",
