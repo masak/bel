@@ -9,6 +9,12 @@ use Language::Bel::Types qw(
     make_pair
     make_symbol
 );
+use Language::Bel::Type::Pair::Num qw(
+    make_num
+);
+use Language::Bel::Type::Pair::SignedRat qw(
+    make_signed_rat
+);
 use Language::Bel::Symbols::Common qw(
     SYMBOL_BQUOTE
     SYMBOL_COMMA
@@ -456,9 +462,9 @@ sub make_number_or_symbol {
     return parsenum($cs) || make_symbol($cs);
 }
 
-my $srzero = make_sr("+", 0, 1);
-my $srone = make_sr("+", 1, 1);
-my $srminusone = make_sr("-", 1, 1);
+my $srzero = make_signed_rat("+", 0, 1);
+my $srone = make_signed_rat("+", 1, 1);
+my $srminusone = make_signed_rat("-", 1, 1);
 
 # (def parsenum (cs base)
 #   (if (validi cs base)
@@ -473,14 +479,19 @@ sub parsenum {
     my ($cs) = @_;
 
     if (validi($cs)) {
-        return buildnum($srzero, parsei($cs));
+        return make_num($srzero, parsei($cs));
     }
     else {
-        my ($sign, $ds, $es) = $cs =~ /^([+\-]?+)([^+\-]*+)((?:[+\-][^+\-]*+)?+)$/
+        my ($sign, $ds, $es)
+            = $cs =~ /^([+\-]?+)([^+\-]*+)((?:[+\-][^+\-]*+)?+)$/
             or return;
         return validr($ds)
             && ($es eq "" || validi($es))
-            && buildnum(parsesr("$sign$ds"), $es eq "" ? $srzero : parsei($es));
+            && make_num(
+                parsesr("$sign$ds"),
+                $es eq ""
+                    ? $srzero
+                    : parsei($es));
     }
 }
 
@@ -602,26 +613,7 @@ sub parsesr {
     };
 
     my $r = [$rn->[0] * $rd->[1], $rd->[0] * $rn->[1]];
-    return make_sr($simplify->($sign || "+", $r->[0], $r->[1]));
-}
-
-# (set buildnum (of litnum simplify))
-sub buildnum {
-    my ($r, $i) = @_;
-
-    return make_pair(
-        make_symbol("lit"),
-        make_pair(
-            make_symbol("num"),
-            make_pair(
-                $r,
-                make_pair(
-                    $i,
-                    SYMBOL_NIL,
-                ),
-            ),
-        ),
-    );
+    return make_signed_rat($simplify->($sign || "+", $r->[0], $r->[1]));
 }
 
 # (def parsed (cs base)
@@ -658,31 +650,6 @@ sub parseint {
         $result += ord($d) - ord("0");
     }
     return $result;
-}
-
-sub make_sr {
-    my ($sign, $n, $d) = @_;
-
-    return make_pair(
-        make_symbol($sign),
-        make_pair(
-            make_t_list($n),
-            make_pair(
-                make_t_list($d),
-                SYMBOL_NIL,
-            ),
-        ),
-    );
-}
-
-sub make_t_list {
-    my ($n) = @_;
-
-    my $list = SYMBOL_NIL;
-    for (1..$n) {
-        $list = make_pair(SYMBOL_T, $list);
-    }
-    return $list;
 }
 
 our @EXPORT_OK = qw(
