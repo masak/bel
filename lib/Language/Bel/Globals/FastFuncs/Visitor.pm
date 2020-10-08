@@ -407,8 +407,99 @@ sub visit {
     return $node;
 }
 
+sub visit_where {
+    my ($node) = @_;
+
+    if ($node->{type} eq "return_statement"
+        && $node->{children}[0]{type} eq "variable") {
+        my $variable = $node->{children}[0];
+        my $name = $variable->{name};
+        my $desigilled_name = substr($name, 1);
+        $node->{children}[0] = {
+            type => "call",
+            children => [
+                {
+                    type => "bareword",
+                    name => "make_pair",
+                },
+                {
+                    type => "argument_list",
+                    children => [
+                        {
+                            type => "call",
+                            children => [
+                                {
+                                    type => "bareword",
+                                    name => "make_pair",
+                                },
+                                {
+                                    type => "argument_list",
+                                    children => [
+                                        {
+                                            type => "call",
+                                            children => [
+                                                {
+                                                    type => "bareword",
+                                                    name => "make_symbol",
+                                                },
+                                                {
+                                                    type => "argument_list",
+                                                    children => [
+                                                        {
+                                                            type => "string",
+                                                            value => $desigilled_name,
+                                                        }
+                                                    ],
+                                                },
+                                            ],
+                                        },
+                                        $variable,
+                                    ],
+                                },
+                            ],
+                        },
+                        {
+                            type => "call",
+                            children => [
+                                {
+                                    type => "bareword",
+                                    name => "make_pair",
+                                },
+                                {
+                                    type => "argument_list",
+                                    children => [
+                                        {
+                                            type => "bareword",
+                                            name => "SYMBOL_D",
+                                        },
+                                        {
+                                            type => "bareword",
+                                            name => "SYMBOL_NIL",
+                                        },
+                                    ],
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ],
+        };
+    }
+
+    my @children = exists $node->{children}
+        ? @{ $node->{children} }
+        : ();
+
+    for my $child (@children) {
+        $child = visit_where($child);
+    }
+
+    return $node;
+}
+
 our @EXPORT_OK = qw(
     visit
+    visit_where
 );
 
 1;

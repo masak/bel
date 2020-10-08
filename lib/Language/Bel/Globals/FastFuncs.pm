@@ -68,8 +68,7 @@ sub fastfunc__where__some {
     my ($bel, $f, $xs) = @_;
 
     while (!is_nil($xs)) {
-        my $p = $bel->call($f, $bel->car($xs));
-        if (!is_nil($p)) {
+        if (!is_nil($bel->call($f, $bel->car($xs)))) {
             return make_pair(
                 make_pair(
                     make_symbol("xs"),

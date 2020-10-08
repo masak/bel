@@ -6,9 +6,10 @@ use Test::More;
 
 use Language::Bel::Globals::FastFuncs::Preprocessor qw(
     expand
+    expand_where
 );
 
-plan tests => 6;
+plan tests => 7;
 
 my $INDENT = " " x 4;
 
@@ -128,5 +129,46 @@ EOF
     my $actual_output = expand($input);
 
     is $actual_output, $expected_output, "expansion of fastfunc__some";
+}
+
+{
+    my $input = <<'EOF';
+    my ($bel, $f, $xs) = @_;
+
+    my ($x, $p);
+    ITERATE_FORWARD_OF($x, $p, $xs, sub {
+        IF(CALL($f, $x), sub {
+            return $p;
+        });
+    });
+
+    return NIL;
+EOF
+
+    my $expected_output = <<'EOF';
+    my ($bel, $f, $xs) = @_;
+
+    while (!is_nil($xs)) {
+        if (!is_nil($bel->call($f, $bel->car($xs)))) {
+            return make_pair(
+                make_pair(
+                    make_symbol("xs"),
+                    $xs,
+                ),
+                make_pair(
+                    SYMBOL_D,
+                    SYMBOL_NIL,
+                ),
+            );
+        }
+        $xs = $bel->cdr($xs);
+    }
+
+    return SYMBOL_NIL;
+EOF
+
+    my $actual_output = expand_where($input);
+
+    is $actual_output, $expected_output, "expansion of fastfunc__where__some";
 }
 
