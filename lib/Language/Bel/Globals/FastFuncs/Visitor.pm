@@ -43,18 +43,19 @@ sub visit {
                                 children => [
                                     $list_var,
                                     {
-                                        type => "call",
+                                        type => "method_call",
                                         children => [
                                             {
-                                                # hack
                                                 type => "variable",
-                                                name => q[$bel->cdr],
+                                                name => q[$bel],
+                                            },
+                                            {
+                                                type => "bareword",
+                                                name => q[cdr],
                                             },
                                             {
                                                 type => "argument_list",
-                                                children => [
-                                                    $list_var,
-                                                ],
+                                                children => [$list_var],
                                             },
                                         ],
                                     },
@@ -122,11 +123,15 @@ sub visit {
                 if ($descendant_node->{type} eq "variable"
                     && $descendant_node->{name} eq $elem_var->{name}) {
                     %{ $descendant_node } = (
-                        type => "call",
+                        type => "method_call",
                         children => [
                             {
                                 type => "variable",
-                                name => q[$bel->car],
+                                name => q[$bel],
+                            },
+                            {
+                                type => "bareword",
+                                name => q[car],
                             },
                             {
                                 type => "argument_list",
@@ -156,18 +161,19 @@ sub visit {
                                 children => [
                                     $list_var,
                                     {
-                                        type => "call",
+                                        type => "method_call",
                                         children => [
                                             {
-                                                # hack
                                                 type => "variable",
-                                                name => q[$bel->cdr],
+                                                name => q[$bel],
+                                            },
+                                            {
+                                                type => "bareword",
+                                                name => q[cdr],
                                             },
                                             {
                                                 type => "argument_list",
-                                                children => [
-                                                    $list_var,
-                                                ],
+                                                children => [$list_var],
                                             },
                                         ],
                                     },
@@ -252,11 +258,15 @@ sub visit {
                 elsif ($descendant_node->{type} eq "variable"
                     && $descendant_node->{name} eq $elem_var->{name}) {
                     %{ $descendant_node } = (
-                        type => "call",
+                        type => "method_call",
                         children => [
                             {
                                 type => "variable",
-                                name => q[$bel->car],
+                                name => q[$bel],
+                            },
+                            {
+                                type => "variable",
+                                name => q[car],
                             },
                             {
                                 type => "argument_list",
@@ -331,13 +341,16 @@ sub visit {
             my ($fn, @args) = @{ $node->{children}[1]{children} };
 
             # $bel->call($f, $bel->car($xs))
-            # cheatish, hackish, I don't care
             %{ $node } = (
-                type => "call",
+                type => "method_call",
                 children => [
                     {
                         type => "variable",
-                        name => q[$bel->call],
+                        name => q[$bel],
+                    },
+                    {
+                        type => "bareword",
+                        name => q[call],
                     },
                     {
                         type => "argument_list",
