@@ -99,30 +99,6 @@ sub new {
             primitives => $self->{primitives},
         );
     }
-    if (!defined($self->{call})) {
-        $self->{call} = sub {
-            my ($fn, @args) = @_;
-
-            if (is_fastfunc($fn)) {
-                return $fn->apply($self, @args);
-            }
-            else {
-                my $args = SYMBOL_NIL;
-                for my $arg (reverse(@args)) {
-                    $args = make_pair($arg, $args);
-                }
-
-                my $s_level = scalar(@{$self->{s}});
-                $self->applyf($fn, $args, SYMBOL_NIL);
-
-                while (scalar(@{$self->{s}}) > $s_level) {
-                    $self->ev();
-                }
-                my $retval = pop(@{$self->{r}});
-                return $retval;
-            }
-        };
-    }
 
     return $self;
 }
@@ -143,6 +119,29 @@ sub xdr {
     my ($self, $pair, $d) = @_;
 
     $self->{primitives}->prim_xdr($pair, $d);
+}
+
+sub call {
+    my ($self, $fn, @args) = @_;
+
+    if (is_fastfunc($fn)) {
+        return $fn->apply($self, @args);
+    }
+    else {
+        my $args = SYMBOL_NIL;
+        for my $arg (reverse(@args)) {
+            $args = make_pair($arg, $args);
+        }
+
+        my $s_level = scalar(@{$self->{s}});
+        $self->applyf($fn, $args, SYMBOL_NIL);
+
+        while (scalar(@{$self->{s}}) > $s_level) {
+            $self->ev();
+        }
+        my $retval = pop(@{$self->{r}});
+        return $retval;
+    }
 }
 
 =head2 read_eval_print
