@@ -42,7 +42,7 @@ sub fastfunc__all {
     my ($bel, $f, $xs) = @_;
 
     while (!is_nil($xs)) {
-        my $p = $bel->{call}->($f, $bel->car($xs));
+        my $p = $bel->call($f, $bel->car($xs));
         if (is_nil($p)) {
             return SYMBOL_NIL;
         }
@@ -56,7 +56,7 @@ sub fastfunc__some {
     my ($bel, $f, $xs) = @_;
 
     while (!is_nil($xs)) {
-        my $p = $bel->{call}->($f, $bel->car($xs));
+        my $p = $bel->call($f, $bel->car($xs));
         if (!is_nil($p)) {
             return $xs;
         }
@@ -70,7 +70,7 @@ sub fastfunc__where__some {
     my ($bel, $f, $xs) = @_;
 
     while (!is_nil($xs)) {
-        my $p = $bel->{call}->($f, $bel->car($xs));
+        my $p = $bel->call($f, $bel->car($xs));
         if (!is_nil($p)) {
             return make_pair(
                 make_pair(
@@ -101,7 +101,7 @@ sub fastfunc__reduce {
     my $result = @values ? pop(@values) : SYMBOL_NIL;
     while (@values) {
         my $value = pop(@values);
-        $result = $bel->{call}->($f, $value, $result);
+        $result = $bel->call($f, $value, $result);
     }
 
     return $result;
@@ -193,7 +193,7 @@ sub fastfunc__map {
             push @arguments, $bel->car($list);
             $list = $bel->cdr($list);
         }
-        push @result, $bel->{call}->($f, @arguments);
+        push @result, $bel->call($f, @arguments);
     }
 
     my $result = SYMBOL_NIL;
@@ -287,7 +287,7 @@ sub fastfunc__mem {
 
     if (defined($f)) {
         while (!is_nil($ys)) {
-            my $p = $bel->{call}->($f, $bel->car($ys), $x);
+            my $p = $bel->call($f, $bel->car($ys), $x);
             if (!is_nil($p)) {
                 return $ys;
             }
@@ -335,7 +335,7 @@ sub fastfunc__where__mem {
 
     if (defined($f)) {
         while (!is_nil($ys)) {
-            my $p = $bel->{call}->($f, $bel->car($ys), $x);
+            my $p = $bel->call($f, $bel->car($ys), $x);
             if (!is_nil($p)) {
                 return make_pair(
                     make_pair(
@@ -544,7 +544,7 @@ sub fastfunc__find {
 
     while (!is_nil($xs)) {
         my $value = $bel->car($xs);
-        if (!is_nil($bel->{call}->($f, $value))) {
+        if (!is_nil($bel->call($f, $value))) {
             return $value;
         }
         $xs = $bel->cdr($xs);
@@ -557,7 +557,7 @@ sub fastfunc__where__find {
 
     while (!is_nil($xs)) {
         my $value = $bel->car($xs);
-        if (!is_nil($bel->{call}->($f, $value))) {
+        if (!is_nil($bel->call($f, $value))) {
             return make_pair(
                 $xs,
                 make_pair(
@@ -580,7 +580,7 @@ sub fastfunc__begins {
                 return SYMBOL_NIL;
             }
             else {
-                my $p = $bel->{call}->($f, $bel->car($xs), $bel->car($pat));
+                my $p = $bel->call($f, $bel->car($xs), $bel->car($pat));
                 if (is_nil($p)) {
                     return SYMBOL_NIL;
                 }
@@ -636,7 +636,7 @@ sub fastfunc__caris {
     }
 
     if (defined($f)) {
-        return $bel->{call}->($f, $bel->car($x), $y);
+        return $bel->call($f, $bel->car($x), $y);
     }
     else {
         my @stack = [$bel->car($x), $y];
@@ -675,11 +675,11 @@ sub fastfunc__hug {
     my $cdr_xs;
     if (defined($f)) {
         while (!is_nil($cdr_xs = $bel->cdr($xs))) {
-            push @values, $bel->{call}->($f, $bel->car($xs), $bel->car($cdr_xs));
+            push @values, $bel->call($f, $bel->car($xs), $bel->car($cdr_xs));
             $xs = $bel->cdr($cdr_xs);
         }
         if (!is_nil($xs)) {
-            push @values, $bel->{call}->($f, $bel->car($xs));
+            push @values, $bel->call($f, $bel->car($xs));
         }
     }
     else {
@@ -709,7 +709,7 @@ sub fastfunc__keep {
     my @values;
     while (!is_nil($xs)) {
         my $value = $bel->car($xs);
-        if (!is_nil($bel->{call}->($f, $value))) {
+        if (!is_nil($bel->call($f, $value))) {
             push @values, $value;
         }
         $xs = $bel->cdr($xs);
@@ -729,7 +729,7 @@ sub fastfunc__rem {
     if (defined($f)) {
         while (!is_nil($ys)) {
             my $value = $bel->car($ys);
-            if (is_nil($bel->{call}->($f, $value, $x))) {
+            if (is_nil($bel->call($f, $value, $x))) {
                 push @values, $value;
             }
             $ys = $bel->cdr($ys);
@@ -769,7 +769,7 @@ sub fastfunc__get {
     if (defined($f)) {
         while (!is_nil($kvs)) {
             my $kv = $bel->car($kvs);
-            if (!is_nil($bel->{call}->($f, $bel->car($kv), $k))) {
+            if (!is_nil($bel->call($f, $bel->car($kv), $k))) {
                 return $kv;
             }
             $kvs = $bel->cdr($kvs);
@@ -806,7 +806,7 @@ sub fastfunc__where__get {
     if (defined($f)) {
         while (!is_nil($kvs)) {
             my $kv = $bel->car($kvs);
-            if (!is_nil($bel->{call}->($f, $bel->car($kv), $k))) {
+            if (!is_nil($bel->call($f, $bel->car($kv), $k))) {
                 return make_pair(
                     $kvs,
                     make_pair(
@@ -856,7 +856,7 @@ sub fastfunc__put {
     if (defined($f)) {
         while (!is_nil($kvs)) {
             my $kv = $bel->car($kvs);
-            if (is_nil($bel->{call}->($f, $k, $bel->car($kv)))) {
+            if (is_nil($bel->call($f, $k, $bel->car($kv)))) {
                 push @values, $kv;
             }
             $kvs = $bel->cdr($kvs);
@@ -972,7 +972,7 @@ sub fastfunc__pairwise {
 
     my $cdr_xs;
     while (!is_nil($cdr_xs = $bel->cdr($xs))) {
-        if (is_nil($bel->{call}->($f, $bel->car($xs), $bel->car($cdr_xs)))) {
+        if (is_nil($bel->call($f, $bel->car($xs), $bel->car($cdr_xs)))) {
             return SYMBOL_NIL;
         }
         $xs = $cdr_xs;
@@ -989,7 +989,7 @@ sub fastfunc__foldl {
 
     while (!grep { is_nil($_) } @args) {
         my @car_args = map { $bel->car($_) } @args;
-        $base = $bel->{call}->($f, @car_args, $base);
+        $base = $bel->call($f, @car_args, $base);
         @args = map { $bel->cdr($_) } @args;
     }
 
@@ -1009,7 +1009,7 @@ sub fastfunc__foldr {
     }
 
     for my $cars (reverse(@cars)) {
-        $base = $bel->{call}->($f, @{$cars}, $base);
+        $base = $bel->call($f, @{$cars}, $base);
     }
 
     return $base;
@@ -1036,7 +1036,7 @@ sub fastfunc__fuse {
     }
     my @result;
     for my $i (0..$min_length-1) {
-        push @result, $bel->{call}->(
+        push @result, $bel->call(
             $f,
             map { $sublists[$_]->[$i] } 0..$#sublists
         );
@@ -1072,7 +1072,7 @@ sub fastfunc__match {
             && is_pair($bel->cdr($v1))
             && (is_symbol_of_name($bel->car($bel->cdr($v1)), "prim")
                 || is_symbol_of_name($bel->car($bel->cdr($v1)), "clo"))) {
-            if (is_nil($bel->{call}->($v1, $v0))) {
+            if (is_nil($bel->call($v1, $v0))) {
                 return SYMBOL_NIL;
             }
         }
@@ -1099,7 +1099,7 @@ sub fastfunc__split {
     my @acc;
     while (!is_nil($xs)) {
         last
-            if !is_pair($xs) || !is_nil($bel->{call}->($f, $bel->car($xs)));
+            if !is_pair($xs) || !is_nil($bel->call($f, $bel->car($xs)));
         push(@acc, $bel->car($xs));
         $xs = $bel->cdr($xs);
     }
