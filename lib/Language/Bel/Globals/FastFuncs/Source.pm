@@ -52,6 +52,7 @@ sub fastfunc__all {
     return T;
 }
 
+{[ GENERATE_WHERE ]}
 sub fastfunc__some {
     my ($bel, $f, $xs) = @_;
 
@@ -63,29 +64,6 @@ sub fastfunc__some {
     });
 
     return NIL;
-}
-
-sub fastfunc__where__some {
-    my ($bel, $f, $xs) = @_;
-
-    while (!is_nil($xs)) {
-        my $p = $bel->call($f, $bel->car($xs));
-        if (!is_nil($p)) {
-            return make_pair(
-                make_pair(
-                    make_symbol("xs"),
-                    $xs,
-                ),
-                make_pair(
-                    SYMBOL_D,
-                    SYMBOL_NIL,
-                ),
-            );
-        }
-        $xs = $bel->cdr($xs);
-    }
-
-    return SYMBOL_NIL;
 }
 
 sub fastfunc__reduce {

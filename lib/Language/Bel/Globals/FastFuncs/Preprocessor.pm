@@ -9,6 +9,7 @@ use Language::Bel::Globals::FastFuncs::Parser qw(
 );
 use Language::Bel::Globals::FastFuncs::Visitor qw(
     visit
+    visit_where
 );
 use Language::Bel::Globals::FastFuncs::Deparser qw(
     deparse
@@ -22,6 +23,12 @@ sub expand {
     return deparse(visit(parse($input)));
 }
 
+sub expand_where {
+    my ($input) = @_;
+
+    return deparse(visit_where(visit(parse($input))));
+}
+
 sub preprocess {
     open my $SOURCE, "<", "lib/Language/Bel/Globals/FastFuncs/Source.pm"
         or die "Couldn't open source file: $!";
@@ -29,6 +36,8 @@ sub preprocess {
     my @function_body_lines;
     my $reading_function_body = 0;
     my $seen_cutoff = 0;
+    my $generate_where = 0;
+    my $function_name;
 
     my @result;
     while (my $line = <$SOURCE>) {
@@ -40,15 +49,25 @@ sub preprocess {
 
         $line =~ s/^ +$//;
 
-        if ($line =~ /^sub (\w+)/) {
+        if ($line =~ /^\{\[\s*(\w+)\s*\]\}$/) {
+            my $annotation = $1;
+            if ($annotation eq "GENERATE_WHERE") {
+                $generate_where = 1;
+            }
+            else {
+                die "Unknown annotation: '$annotation'";
+            }
+            # and we don't emit the line into @result
+        }
+        elsif ($line =~ /^sub (\w+)/) {
             push @result, $line;
 
-            my $sub_name = $1;
+            $function_name = $1;
             # right now we have a cutoff, so we don't have to parse/handle
             # all of the fastfuncs source before benefitting from some of
             # them -- this cutoff will move gradually downwards and
             # eventually disappear
-            if ($sub_name eq "fastfunc__where__some") {
+            if ($function_name eq "fastfunc__reduce") {
                 $seen_cutoff = 1;
             }
 
@@ -59,10 +78,22 @@ sub preprocess {
         }
         elsif ($reading_function_body) {
             if ($line =~ /^\}$/) {
-                push @result, expand(join("", @function_body_lines));
-                push @result, $line;
+                push @result,
+                    expand(join("", @function_body_lines)),
+                    $line;
+
+                if ($generate_where) {
+                    my $where_function_name = $function_name;
+                    $where_function_name =~ s/fastfunc__/fastfunc__where__/;
+
+                    push @result, "\n",
+                        "sub $where_function_name {\n",
+                        expand_where(join("", @function_body_lines)),
+                        $line;
+                }
 
                 $reading_function_body = 0;
+                $generate_where = 0;
             }
             else {
                 push @function_body_lines, $line;
@@ -89,6 +120,7 @@ sub generate_target_file {
 
 our @EXPORT_OK = qw(
     expand
+    expand_where
     generate_target_file
     preprocess
 );

@@ -6,6 +6,12 @@ use warnings;
 
 use Exporter 'import';
 
+my $INDENT = " " x 4;
+my $LINEBREAK_THRESHOLD = 70;
+my $SHORT_ARG_THRESHOLD = 12;
+
+our $dyn_linebreak_on_parens = 0;
+
 sub deparse {
     my ($ast) = @_;
 
@@ -18,12 +24,11 @@ sub deparse {
         my $i = 0;
 
         return join("", map {
-            my $indent = " " x 4;
             my $newline = "\n";
             my $statement = deparse($_);
 
             my $indented = join("\n", map {
-                "$indent$_"
+                "$INDENT$_"
             } split(/\n/, $statement));
 
             $i++ == 0 && $_->{type} eq "my_statement"
@@ -34,7 +39,16 @@ sub deparse {
         } @children);
     }
     elsif ($type eq "return_statement") {
-        return "return " . deparse($children[0]) . ";";
+        my $statement = "return " . deparse($children[0]) . ";";
+
+        if (length($statement) > $LINEBREAK_THRESHOLD) {
+            my $saved_value = $dyn_linebreak_on_parens;
+            $dyn_linebreak_on_parens = 1;
+            $statement = "return " . deparse($children[0]) . ";";
+            $dyn_linebreak_on_parens = $saved_value;
+        }
+
+        return $statement;
     }
     elsif ($type eq "my_statement") {
         return deparse($children[0]) . ";";
@@ -90,8 +104,31 @@ sub deparse {
         return "$invocant\->$method$args";
     }
     elsif ($type eq "argument_list") {
-        my $arguments = join(", ", map { deparse($_) } @children);
-        return "($arguments)";
+        if (scalar(@children) == 0) {
+            return "()";
+        }
+        elsif (scalar(@children) == 1
+                && length(deparse($children[0])) < $SHORT_ARG_THRESHOLD) {
+            my $arg = deparse($children[0]);
+            return "($arg)";
+        }
+        elsif ($dyn_linebreak_on_parens) {
+            my $arguments = join("", map {
+                my $arg = deparse($_);
+
+                my $indented = join("\n", map {
+                    "$INDENT$_"
+                } split(/\n/, "$arg,"));
+
+                "$indented\n";
+            } @children);
+
+            return "(\n$arguments)";
+        }
+        else {
+            my $arguments = join(", ", map { deparse($_) } @children);
+            return "($arguments)";
+        }
     }
     elsif ($type eq "sub") {
         my $statement_list = deparse($children[0]);
@@ -100,6 +137,12 @@ sub deparse {
     elsif ($type eq "not") {
         my $expr = deparse($children[0]);
         return "!$expr";
+    }
+    elsif ($type eq "string") {
+        my $value = $ast->{value};
+        die "Haven't implemented string escape, sorry"
+            if $value =~ /"|\\/;
+        return qq["$value"];
     }
     else {
         die "Unknown AST type '$type'";
