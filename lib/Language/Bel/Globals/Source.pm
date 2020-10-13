@@ -1130,7 +1130,13 @@ __DATA__
 
 ; skip parsesr [waiting for reader]
 
-; skip parsed [waiting for reader]
+(def parsed (cs base)
+  (let (i f) (split (is \.) cs)
+    (if (cdr f)
+        (list (parseint (rev (append i (cdr f))) base)
+              (i^ base
+                  (apply i+ (map (con i1) (cdr f)))))
+        (list (parseint (rev i) base) i1))))
 
 (def parseint (ds base)
   (if ds
