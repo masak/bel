@@ -1126,7 +1126,12 @@ __DATA__
        (some [digit _ base] cs)
        (~cdr (keep (is \.) cs))))
 
-; skip parsei [waiting for reader]
+(def parsei (cs base)
+  (if (cddr cs)
+      (parsesr (dock cs) base)
+      (if (caris cs \+)
+          srone
+          (srinv srone))))
 
 (def parsesr (cs base)
   (withs (sign  (if (signc (car cs)) (sym (list (car cs))))
