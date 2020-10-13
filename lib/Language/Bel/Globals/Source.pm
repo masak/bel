@@ -1132,7 +1132,11 @@ __DATA__
 
 ; skip parsed [waiting for reader]
 
-; skip parseint [waiting for reader]
+(def parseint (ds base)
+  (if ds
+      (i+ (charint (car ds))
+          (i* base (parseint (cdr ds) base)))
+      i0))
 
 (def charint (c)
   (map (con t) (mem c "fedcba987654321")))
