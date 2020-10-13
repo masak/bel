@@ -1134,7 +1134,8 @@ __DATA__
 
 ; skip parseint [waiting for reader]
 
-; skip charint [waiting for reader]
+(def charint (c)
+  (map (con t) (mem c "fedcba987654321")))
 
 ; skip parset [waiting for reader]
 

@@ -5422,6 +5422,23 @@ sub new {
             SYMBOL_NIL)), make_pair(make_symbol("cs"), SYMBOL_NIL))), SYMBOL_NIL)),
             SYMBOL_NIL)))), SYMBOL_NIL))))));
 
+        $self->add_global("charint", make_pair(make_symbol("lit"),
+            make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+            make_pair(make_pair(make_symbol("c"), SYMBOL_NIL),
+            make_pair(make_pair(make_symbol("map"),
+            make_pair(make_pair(make_symbol("con"), make_pair(SYMBOL_T,
+            SYMBOL_NIL)), make_pair(make_pair(make_symbol("mem"),
+            make_pair(make_symbol("c"), make_pair(make_pair(make_char(102),
+            make_pair(make_char(101), make_pair(make_char(100),
+            make_pair(make_char(99), make_pair(make_char(98),
+            make_pair(make_char(97), make_pair(make_char(57),
+            make_pair(make_char(56), make_pair(make_char(55),
+            make_pair(make_char(54), make_pair(make_char(53),
+            make_pair(make_char(52), make_pair(make_char(51),
+            make_pair(make_char(50), make_pair(make_char(49),
+            SYMBOL_NIL))))))))))))))), SYMBOL_NIL))), SYMBOL_NIL))),
+            SYMBOL_NIL))))));
+
         $self->add_global("comma", make_pair(make_symbol("lit"),
             make_pair(make_symbol("mac"), make_pair(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
