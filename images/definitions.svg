@@ -1985,12 +1985,12 @@
         title='parsenum'
       />
   <rect
-        x='476'
-        y='266'
+        x='481'
+        y='271'
         width='17'
         height='17'
-        class='feature-reader box'
-        title='validi'
+        class='done box'
+        title='&lt;anon&gt;'
       />
   <rect
         x='501'

@@ -1109,7 +1109,11 @@ __DATA__
 
 ; skip parsenum [waiting for reader]
 
-; skip validi [waiting for reader]
+(def validi (cs base)
+  (and (signc (car cs))
+       (= (last cs) \i)
+       (let digs (cdr (dock cs))
+         (or (no digs) (validr digs base)))))
 
 (def validr (cs base)
   (or (validd cs base)
