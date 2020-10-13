@@ -1128,7 +1128,17 @@ __DATA__
 
 ; skip parsei [waiting for reader]
 
-; skip parsesr [waiting for reader]
+(def parsesr (cs base)
+  (withs (sign  (if (signc (car cs)) (sym (list (car cs))))
+          (n d) (split (is \/) (if sign (cdr cs) cs)))
+    (simplify (cons (or sign '+)
+                    (r/ (parsed n base)
+                        (if d
+                            (let rd (parsed (cdr d) base)
+                              (if (caris rd i0)
+                                  (err 'zero-denominator)
+                                  rd))
+                            (list i1 i1)))))))
 
 (def parsed (cs base)
   (let (i f) (split (is \.) cs)

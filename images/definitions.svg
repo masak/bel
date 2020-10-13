@@ -2017,12 +2017,12 @@
         title='parsei'
       />
   <rect
-        x='566'
-        y='276'
+        x='571'
+        y='281'
         width='17'
         height='17'
-        class='feature-reader box'
-        title='parsesr'
+        class='done box'
+        title='&lt;anon&gt;'
       />
   <rect
         x='591'
