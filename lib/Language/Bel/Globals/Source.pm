@@ -1111,7 +1111,11 @@ __DATA__
 
 ; skip validi [waiting for reader]
 
-; skip validr [waiting for reader]
+(def validr (cs base)
+  (or (validd cs base)
+      (let (n d) (split (is \/) cs)
+        (and (validd n base)
+             (validd (cdr d) base)))))
 
 (def validd (cs base)
   (and (all (cor [digit _ base] (is \.)) cs)

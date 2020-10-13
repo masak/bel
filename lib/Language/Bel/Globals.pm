@@ -5359,6 +5359,25 @@ sub new {
             SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))))),
             SYMBOL_NIL))));
 
+        $self->add_global("validr", make_pair(make_symbol("lit"),
+            make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+            make_pair(make_pair(make_symbol("cs"), make_pair(make_symbol("base"),
+            SYMBOL_NIL)), make_pair(make_pair(make_symbol("or"),
+            make_pair(make_pair(make_symbol("validd"), make_pair(make_symbol("cs"),
+            make_pair(make_symbol("base"), SYMBOL_NIL))),
+            make_pair(make_pair(make_symbol("let"),
+            make_pair(make_pair(make_symbol("n"), make_pair(make_symbol("d"),
+            SYMBOL_NIL)), make_pair(make_pair(make_symbol("split"),
+            make_pair(make_pair(make_symbol("is"), make_pair(make_char(47),
+            SYMBOL_NIL)), make_pair(make_symbol("cs"), SYMBOL_NIL))),
+            make_pair(make_pair(make_symbol("and"),
+            make_pair(make_pair(make_symbol("validd"), make_pair(make_symbol("n"),
+            make_pair(make_symbol("base"), SYMBOL_NIL))),
+            make_pair(make_pair(make_symbol("validd"),
+            make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("d"),
+            SYMBOL_NIL)), make_pair(make_symbol("base"), SYMBOL_NIL))),
+            SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL))), SYMBOL_NIL))))));
+
         $self->add_global("validd", make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("cs"), make_pair(make_symbol("base"),
