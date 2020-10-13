@@ -1113,7 +1113,10 @@ __DATA__
 
 ; skip validr [waiting for reader]
 
-; skip validd [waiting for reader]
+(def validd (cs base)
+  (and (all (cor [digit _ base] (is \.)) cs)
+       (some [digit _ base] cs)
+       (~cdr (keep (is \.) cs))))
 
 ; skip parsei [waiting for reader]
 
