@@ -1176,7 +1176,12 @@ __DATA__
 
 ; skip parsecom [waiting for reader]
 
-; skip parseno [waiting for reader]
+(def parseno (cs base)
+  (if (caris cs \~)
+      (if (cdr cs)
+          (list 'compose 'no (parseno (cdr cs) base))
+          'no)
+      (or (parsenum cs base) (sym cs))))
 
 ; skip bquote [waiting for backquotes]
 
