@@ -1107,7 +1107,15 @@ __DATA__
 
 ; skip parseword [waiting for reader]
 
-; skip parsenum [waiting for reader]
+(def parsenum (cs base)
+  (if (validi cs base)
+      (buildnum srzero (parsei cs base))
+      (let sign (check (car cs) signc)
+        (let (ds es) (split signc (if sign (cdr cs) cs))
+          (and (validr ds base)
+               (or (no es) (validi es base))
+               (buildnum (parsesr (consif sign ds) base)
+                         (if (no es) srzero (parsei es base))))))))
 
 (def validi (cs base)
   (and (signc (car cs))
