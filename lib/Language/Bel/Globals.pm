@@ -5583,6 +5583,25 @@ sub new {
             SYMBOL_NIL))))))))))))))), SYMBOL_NIL))), SYMBOL_NIL))),
             SYMBOL_NIL))))));
 
+        $self->add_global("parsecom", make_pair(make_symbol("lit"),
+            make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+            make_pair(make_pair(make_symbol("cs"), make_pair(make_symbol("base"),
+            SYMBOL_NIL)), make_pair(make_pair(make_symbol("if"),
+            make_pair(make_pair(make_symbol("mem"), make_pair(make_char(58),
+            make_pair(make_symbol("cs"), SYMBOL_NIL))),
+            make_pair(make_pair(make_symbol("cons"),
+            make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("compose"),
+            SYMBOL_NIL)), make_pair(make_pair(make_symbol("map"),
+            make_pair(make_pair(make_symbol("fn"),
+            make_pair(make_pair(make_symbol("_"), SYMBOL_NIL),
+            make_pair(make_pair(make_symbol("parseno"), make_pair(make_symbol("_"),
+            make_pair(make_symbol("base"), SYMBOL_NIL))), SYMBOL_NIL))),
+            make_pair(make_pair(make_symbol("tokens"), make_pair(make_symbol("cs"),
+            make_pair(make_char(58), SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))),
+            make_pair(make_pair(make_symbol("parseno"), make_pair(make_symbol("cs"),
+            make_pair(make_symbol("base"), SYMBOL_NIL))), SYMBOL_NIL)))),
+            SYMBOL_NIL))))));
+
         $self->add_global("parseno", make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("cs"), make_pair(make_symbol("base"),

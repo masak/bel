@@ -1174,7 +1174,10 @@ __DATA__
 
 ; skip parseslist [waiting for reader]
 
-; skip parsecom [waiting for reader]
+(def parsecom (cs base)
+  (if (mem \: cs)
+      (cons 'compose (map [parseno _ base] (tokens cs \:)))
+      (parseno cs base)))
 
 (def parseno (cs base)
   (if (caris cs \~)
