@@ -1105,7 +1105,12 @@ __DATA__
 
 ; skip rdword [waiting for reader]
 
-; skip parseword [waiting for reader]
+(def parseword (cs base)
+  (or (parsenum cs base)
+      (if (= cs ".")       (err 'unexpected-dot)
+          (mem \| cs)      (parset cs base)
+          (some intrac cs) (parseslist (runs intrac cs) base)
+                           (parsecom cs base))))
 
 (def parsenum (cs base)
   (if (validi cs base)
