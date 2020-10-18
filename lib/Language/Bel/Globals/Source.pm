@@ -1035,7 +1035,15 @@ __DATA__
         (if (= c 'eof) nil c))
       (car (car s))))
 
-; skip rdc [waiting for chars]
+(def rdc ((o s ins))
+  (if ((cor no stream) s)
+      (let c (wait (fn ()
+                     (atomic (let p (get s cbuf)
+                               (aif (cdr p)
+                                    (do (xdr p nil) it)
+                                    (bitc s))))))
+        (if (= c 'eof) nil c))
+      (deq s)))
 
 (set bbuf nil)
 
