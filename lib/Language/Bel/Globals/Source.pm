@@ -1175,7 +1175,13 @@ __DATA__
 (def charint (c)
   (map (con t) (mem c "fedcba987654321")))
 
-; skip parset [waiting for reader]
+(def parset (cs base)
+  (if (cdr (keep (is \|) cs))
+      (err 'multiple-bars)
+      (let vt (tokens cs \|)
+        (if (= (len vt) 2)
+            (cons t (map [parseword _ base] vt))
+            (err 'bad-tspec)))))
 
 (def parseslist (rs base)
   (if (intrac (car (last rs)))

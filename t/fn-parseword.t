@@ -13,7 +13,7 @@ __DATA__
 !ERROR: unexpected-dot
 
 > (parseword "x|int" i10)
-!ERROR: ('unboundb parset)
+(t x int)
 
 > (parseword "one.two" i10)
 (one two)
