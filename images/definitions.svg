@@ -1961,12 +1961,12 @@
         title='rdtarget'
       />
   <rect
-        x='406'
-        y='256'
+        x='411'
+        y='261'
         width='17'
         height='17'
-        class='feature-reader box'
-        title='rdword'
+        class='done box'
+        title='&lt;anon&gt;'
       />
   <rect
         x='431'

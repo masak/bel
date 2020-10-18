@@ -1121,7 +1121,8 @@ __DATA__
 
 ; skip rdtarget [waiting for reader]
 
-; skip rdword [waiting for reader]
+(def rdword (s c base)
+  (parseword (cons c (charstil s breakc)) base))
 
 (def parseword (cs base)
   (or (parsenum cs base)

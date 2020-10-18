@@ -5436,6 +5436,16 @@ sub new {
             SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))))),
             SYMBOL_NIL))));
 
+        $self->add_global("rdword", make_pair(make_symbol("lit"),
+            make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+            make_pair(make_pair(make_symbol("s"), make_pair(make_symbol("c"),
+            make_pair(make_symbol("base"), SYMBOL_NIL))),
+            make_pair(make_pair(make_symbol("parseword"),
+            make_pair(make_pair(make_symbol("cons"), make_pair(make_symbol("c"),
+            make_pair(make_pair(make_symbol("charstil"), make_pair(make_symbol("s"),
+            make_pair(make_symbol("breakc"), SYMBOL_NIL))), SYMBOL_NIL))),
+            make_pair(make_symbol("base"), SYMBOL_NIL))), SYMBOL_NIL))))));
+
         $self->add_global("parseword", make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("cs"), make_pair(make_symbol("base"),
