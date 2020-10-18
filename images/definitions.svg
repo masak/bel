@@ -1793,12 +1793,12 @@
         title='eatwhite'
       />
   <rect
-        x='396'
-        y='226'
+        x='401'
+        y='231'
         width='17'
         height='17'
-        class='feature-reader box'
-        title='charstil'
+        class='done box'
+        title='&lt;anon&gt;'
       />
   <rect
         x='421'

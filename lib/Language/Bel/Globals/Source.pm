@@ -1070,7 +1070,10 @@ __DATA__
 
 ; skip eatwhite [waiting for reader]
 
-; skip charstil [waiting for reader]
+(def charstil (s f)
+  (if ((cor no f) (peek s))
+      nil
+      (cons (rdc s) (charstil s f))))
 
 (set syntax nil)
 

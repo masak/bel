@@ -5384,6 +5384,20 @@ sub new {
             make_pair(make_symbol("args"), SYMBOL_NIL))), SYMBOL_NIL))),
             SYMBOL_NIL))))));
 
+        $self->add_global("charstil", make_pair(make_symbol("lit"),
+            make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+            make_pair(make_pair(make_symbol("s"), make_pair(make_symbol("f"),
+            SYMBOL_NIL)), make_pair(make_pair(make_symbol("if"),
+            make_pair(make_pair(make_pair(make_symbol("cor"),
+            make_pair(make_symbol("no"), make_pair(make_symbol("f"), SYMBOL_NIL))),
+            make_pair(make_pair(make_symbol("peek"), make_pair(make_symbol("s"),
+            SYMBOL_NIL)), SYMBOL_NIL)), make_pair(SYMBOL_NIL,
+            make_pair(make_pair(make_symbol("cons"),
+            make_pair(make_pair(make_symbol("rdc"), make_pair(make_symbol("s"),
+            SYMBOL_NIL)), make_pair(make_pair(make_symbol("charstil"),
+            make_pair(make_symbol("s"), make_pair(make_symbol("f"), SYMBOL_NIL))),
+            SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL))))));
+
         $self->add_global("syntax", make_pair(make_pair(make_char(93),
             make_pair(make_symbol("lit"), make_pair(make_symbol("clo"),
             make_pair(SYMBOL_NIL, make_symbol("args"))))),
