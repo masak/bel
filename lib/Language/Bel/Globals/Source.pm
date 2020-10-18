@@ -1026,7 +1026,14 @@ __DATA__
   (pull s cbuf caris)
   (cls s))
 
-; skip peek [waiting for chars]
+(def peek ((o s ins))
+  (if ((cor no stream) s)
+      (let c (wait (fn ()
+                     (atomic (let p (get s cbuf)
+                               (or (cdr p)
+                                   (aif (bitc s) (xdr p it) nil))))))
+        (if (= c 'eof) nil c))
+      (car (car s))))
 
 ; skip rdc [waiting for chars]
 

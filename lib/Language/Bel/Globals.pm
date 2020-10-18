@@ -4736,6 +4736,38 @@ sub new {
             make_pair(make_symbol("s"), SYMBOL_NIL)), SYMBOL_NIL))),
             SYMBOL_NIL))))));
 
+        $self->add_global("peek", make_pair(make_symbol("lit"),
+            make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+            make_pair(make_pair(make_pair(make_symbol("o"),
+            make_pair(make_symbol("s"), make_pair(make_symbol("ins"), SYMBOL_NIL))),
+            SYMBOL_NIL), make_pair(make_pair(make_symbol("if"),
+            make_pair(make_pair(make_pair(make_symbol("cor"),
+            make_pair(make_symbol("no"), make_pair(make_symbol("stream"),
+            SYMBOL_NIL))), make_pair(make_symbol("s"), SYMBOL_NIL)),
+            make_pair(make_pair(make_symbol("let"), make_pair(make_symbol("c"),
+            make_pair(make_pair(make_symbol("wait"),
+            make_pair(make_pair(make_symbol("fn"), make_pair(SYMBOL_NIL,
+            make_pair(make_pair(make_symbol("atomic"),
+            make_pair(make_pair(make_symbol("let"), make_pair(make_symbol("p"),
+            make_pair(make_pair(make_symbol("get"), make_pair(make_symbol("s"),
+            make_pair(make_symbol("cbuf"), SYMBOL_NIL))),
+            make_pair(make_pair(make_symbol("or"),
+            make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("p"),
+            SYMBOL_NIL)), make_pair(make_pair(make_symbol("aif"),
+            make_pair(make_pair(make_symbol("bitc"), make_pair(make_symbol("s"),
+            SYMBOL_NIL)), make_pair(make_pair(make_symbol("xdr"),
+            make_pair(make_symbol("p"), make_pair(make_symbol("it"), SYMBOL_NIL))),
+            make_pair(SYMBOL_NIL, SYMBOL_NIL)))), SYMBOL_NIL))), SYMBOL_NIL)))),
+            SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL)),
+            make_pair(make_pair(make_symbol("if"),
+            make_pair(make_pair(make_symbol("="), make_pair(make_symbol("c"),
+            make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("eof"),
+            SYMBOL_NIL)), SYMBOL_NIL))), make_pair(SYMBOL_NIL,
+            make_pair(make_symbol("c"), SYMBOL_NIL)))), SYMBOL_NIL)))),
+            make_pair(make_pair(make_symbol("car"),
+            make_pair(make_pair(make_symbol("car"), make_pair(make_symbol("s"),
+            SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL)))), SYMBOL_NIL))))));
+
         $self->add_global("bbuf", SYMBOL_NIL);
 
         $self->add_global("digit", make_pair(make_symbol("lit"),
