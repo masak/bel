@@ -1172,7 +1172,16 @@ __DATA__
 
 ; skip parset [waiting for reader]
 
-; skip parseslist [waiting for reader]
+(def parseslist (rs base)
+  (if (intrac (car (last rs)))
+      (err 'final-intrasymbol)
+      (map (fn ((cs ds))
+             (if (cdr cs)      (err 'double-intrasymbol)
+                 (caris cs \!) (list 'quote (parsecom ds base))
+                               (parsecom ds base)))
+           (hug (if (intrac (car (car rs)))
+                    (cons "." "upon" rs)
+                    (cons "." rs))))))
 
 (def parsecom (cs base)
   (if (mem \: cs)

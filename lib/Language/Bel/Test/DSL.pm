@@ -118,6 +118,9 @@ sub parse {
             $state = $AWAITING_INPUT;
         }
     }
+    elsif ($line =~ /^ERROR:/) {
+        die "Line accidentally begins 'ERROR:' -- did you mean '!ERROR:' ?";
+    }
     else {
         if ($state == $AWAITING_INPUT) {
             $accumulated_diagnostic = $line;

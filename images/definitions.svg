@@ -2057,12 +2057,12 @@
         title='parset'
       />
   <rect
-        x='246'
-        y='296'
+        x='251'
+        y='301'
         width='17'
         height='17'
-        class='feature-reader box'
-        title='parseslist'
+        class='done box'
+        title='&lt;anon&gt;'
       />
   <rect
         x='271'
