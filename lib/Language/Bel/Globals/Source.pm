@@ -1068,7 +1068,12 @@ __DATA__
 
 ; skip rdex [waiting for reader]
 
-; skip eatwhite [waiting for reader]
+(def eatwhite (s)
+  (pcase (peek s)
+    whitec  (do (rdc s)
+                (eatwhite s))
+    (is \;) (do (charstil s (is \lf))
+                (eatwhite s))))
 
 (def charstil (s f)
   (if ((cor no f) (peek s))

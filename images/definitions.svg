@@ -1785,12 +1785,12 @@
         title='rdex'
       />
   <rect
-        x='376'
-        y='226'
+        x='381'
+        y='231'
         width='17'
         height='17'
-        class='feature-reader box'
-        title='eatwhite'
+        class='done box'
+        title='&lt;anon&gt;'
       />
   <rect
         x='401'

@@ -5384,6 +5384,24 @@ sub new {
             make_pair(make_symbol("args"), SYMBOL_NIL))), SYMBOL_NIL))),
             SYMBOL_NIL))))));
 
+        $self->add_global("eatwhite", make_pair(make_symbol("lit"),
+            make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+            make_pair(make_pair(make_symbol("s"), SYMBOL_NIL),
+            make_pair(make_pair(make_symbol("pcase"),
+            make_pair(make_pair(make_symbol("peek"), make_pair(make_symbol("s"),
+            SYMBOL_NIL)), make_pair(make_symbol("whitec"),
+            make_pair(make_pair(make_symbol("do"),
+            make_pair(make_pair(make_symbol("rdc"), make_pair(make_symbol("s"),
+            SYMBOL_NIL)), make_pair(make_pair(make_symbol("eatwhite"),
+            make_pair(make_symbol("s"), SYMBOL_NIL)), SYMBOL_NIL))),
+            make_pair(make_pair(make_symbol("is"), make_pair(make_char(59),
+            SYMBOL_NIL)), make_pair(make_pair(make_symbol("do"),
+            make_pair(make_pair(make_symbol("charstil"), make_pair(make_symbol("s"),
+            make_pair(make_pair(make_symbol("is"), make_pair(make_char(10),
+            SYMBOL_NIL)), SYMBOL_NIL))),
+            make_pair(make_pair(make_symbol("eatwhite"), make_pair(make_symbol("s"),
+            SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL)))))), SYMBOL_NIL))))));
+
         $self->add_global("charstil", make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("s"), make_pair(make_symbol("f"),
