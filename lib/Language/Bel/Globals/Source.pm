@@ -1066,7 +1066,12 @@ __DATA__
 
 ; skip saferead [waiting for reader]
 
-; skip rdex [waiting for reader]
+(def rdex ((o s ins) (o base i10) (o eof) (o share))
+  (eatwhite s)
+  (let c (rdc s)
+    (aif (no c)         (list eof share)
+         (get c syntax) ((cdr it) s base share)
+                        (list (rdword s c base) share))))
 
 (def eatwhite (s)
   (pcase (peek s)

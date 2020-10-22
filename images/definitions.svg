@@ -1777,12 +1777,12 @@
         title='saferead'
       />
   <rect
-        x='356'
-        y='226'
+        x='361'
+        y='231'
         width='17'
         height='17'
-        class='feature-reader box'
-        title='rdex'
+        class='done box'
+        title='&lt;anon&gt;'
       />
   <rect
         x='381'
