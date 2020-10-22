@@ -389,7 +389,7 @@ HEADER
         }
         elsif (symbol_name($car_ast) eq "syn") {
             my $c = $bel->car($bel->cdr($ast));
-            my $rest = $bel->car($bel->cdr($bel->cdr($ast)));
+            my $rest = $bel->cdr($bel->cdr($ast));
             for my $global (@globals) {
                 if ($global->{name} eq "syntax") {
                     $global->{expr} = make_pair(
