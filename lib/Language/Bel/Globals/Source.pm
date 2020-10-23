@@ -1129,17 +1129,35 @@ __DATA__
     (let v (rdex s base eof share)
       (if (id (car v) eof) (err msg) v))))
 
-; skip namecs [waiting for reader]
+(set namecs '((bel . \bel) (tab . \tab) (lf . \lf) (cr . \cr) (sp . \sp)))
 
-; skip \\ [waiting for reader]
+(syn \\ (s base share)
+  (list (pcase (peek s)
+          no     (err 'escape-without-char)
+          breakc (rdc s)
+                 (let cs (charstil s breakc)
+                   (if (cdr cs)
+                       (aif (get (sym cs) namecs)
+                            (cdr it)
+                            (err 'unknown-named-char))
+                       (car cs))))
+        share))
 
-; skip \' [waiting for reader]
+(syn \' (s base share)
+  (rdwrap s 'quote base share))
 
-; skip \` [waiting for reader]
+(syn \` (s base share)
+  (rdwrap s 'bquote base share))
 
-; skip \, [waiting for reader]
+(syn \, (s base share)
+  (case (peek s)
+    \@ (do (rdc s)
+           (rdwrap s 'comma-at base share))
+       (rdwrap s 'comma base share)))
 
-; skip rdwrap [waiting for reader]
+(def rdwrap (s token base share)
+  (let (e newshare) (hard-rdex s base share 'missing-expression)
+    (list (list token e) newshare)))
 
 ; skip \" [waiting for reader]
 
