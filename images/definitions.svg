@@ -1921,28 +1921,28 @@
         title='&lt;anon&gt;'
       />
   <rect
-        x='306'
-        y='256'
+        x='301'
+        y='251'
         width='17'
         height='17'
-        class='feature-reader box'
-        title='\"'
+        class='done box'
+        title='&lt;anon&gt;'
       />
   <rect
-        x='326'
-        y='256'
+        x='321'
+        y='251'
         width='17'
         height='17'
-        class='feature-reader box'
-        title='\¦'
+        class='done box'
+        title='&lt;anon&gt;'
       />
   <rect
-        x='346'
-        y='256'
+        x='341'
+        y='251'
         width='17'
         height='17'
-        class='feature-reader box'
-        title='rddelim'
+        class='done box'
+        title='&lt;anon&gt;'
       />
   <rect
         x='366'

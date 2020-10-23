@@ -1159,11 +1159,19 @@ __DATA__
   (let (e newshare) (hard-rdex s base share 'missing-expression)
     (list (list token e) newshare)))
 
-; skip \" [waiting for reader]
+(syn \" (s base share)
+  (list (rddelim s \") share))
 
-; skip \¦ [waiting for reader]
+(syn \¦ (s base share)
+  (list (sym (rddelim s \¦)) share))
 
-; skip rddelim [waiting for reader]
+(def rddelim (s d (o esc))
+  (let c (rdc s)
+    (if (no c)   (err 'missing-delimiter)
+        esc      (cons c (rddelim s d))
+        (= c \\) (rddelim s d t)
+        (= c d)  nil
+                 (cons c (rddelim s d)))))
 
 ; skip \# [waiting for reader]
 

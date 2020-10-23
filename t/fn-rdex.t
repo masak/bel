@@ -42,3 +42,17 @@ __DATA__
 > (rdex '(",@foo"))
 ((comma-at foo) nil)
 
+> (def wrap (s c)
+    `(,c ,@s ,c))
+!IGNORE: result of definition
+
+> (rdex (list (wrap "hi" \")))
+("hi" nil)
+
+> (rdex (list (wrap "hi" \¦)))
+(hi nil)
+
+!TODO: currently the printer doesn't handle "special" symbols
+> (rdex (list (wrap "hi there" \¦)))
+(¦hi there¦ nil)
+
