@@ -1124,7 +1124,10 @@ __DATA__
                            newshare))))
            (rdlist s term base share (snoc acc (rdword s \. base)))))
 
-; skip hard-rdex [waiting for reader]
+(def hard-rdex (s base share msg)
+  (let eof (join)
+    (let v (rdex s base eof share)
+      (if (id (car v) eof) (err msg) v))))
 
 ; skip namecs [waiting for reader]
 

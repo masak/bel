@@ -13,10 +13,10 @@ __DATA__
 !ERROR: missing-car
 
 > (rddot '(" foo)") \) i10 nil '(bar))
-!ERROR: ('unboundb hard-rdex)
+((bar . foo) nil)
 
 > (rddot '(" foo bar)") \) i10 nil '(bar))
-!ERROR: ('unboundb hard-rdex)
+!ERROR: duplicate-cdr
 
 > (rddot '("2)") \) i10 nil nil)
 ((1/5) nil)

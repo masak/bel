@@ -5585,6 +5585,24 @@ sub new {
             make_pair(make_symbol("base"), SYMBOL_NIL)))), SYMBOL_NIL))),
             SYMBOL_NIL)))))), SYMBOL_NIL))))))), SYMBOL_NIL))))));
 
+        $self->add_global("hard-rdex", make_pair(make_symbol("lit"),
+            make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+            make_pair(make_pair(make_symbol("s"), make_pair(make_symbol("base"),
+            make_pair(make_symbol("share"), make_pair(make_symbol("msg"),
+            SYMBOL_NIL)))), make_pair(make_pair(make_symbol("let"),
+            make_pair(make_symbol("eof"), make_pair(make_pair(make_symbol("join"),
+            SYMBOL_NIL), make_pair(make_pair(make_symbol("let"),
+            make_pair(make_symbol("v"), make_pair(make_pair(make_symbol("rdex"),
+            make_pair(make_symbol("s"), make_pair(make_symbol("base"),
+            make_pair(make_symbol("eof"), make_pair(make_symbol("share"),
+            SYMBOL_NIL))))), make_pair(make_pair(make_symbol("if"),
+            make_pair(make_pair(make_symbol("id"),
+            make_pair(make_pair(make_symbol("car"), make_pair(make_symbol("v"),
+            SYMBOL_NIL)), make_pair(make_symbol("eof"), SYMBOL_NIL))),
+            make_pair(make_pair(make_symbol("err"), make_pair(make_symbol("msg"),
+            SYMBOL_NIL)), make_pair(make_symbol("v"), SYMBOL_NIL)))),
+            SYMBOL_NIL)))), SYMBOL_NIL)))), SYMBOL_NIL))))));
+
         $self->add_global("rdword", make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("s"), make_pair(make_symbol("c"),

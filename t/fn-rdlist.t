@@ -10,7 +10,7 @@ __DATA__
 !ERROR: unterminated-list
 
 > (rdlist '("a . b)") \) i10 nil)
-!ERROR: ('unboundb hard-rdex)
+((a . b) nil)
 
 > (rdlist '("a b c)") \) i10 nil)
 ((a b c) nil)
