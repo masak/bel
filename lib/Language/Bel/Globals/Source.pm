@@ -1103,7 +1103,14 @@ __DATA__
 (syn \] args
   (err 'unexpected-terminator))
 
-; skip rdlist [waiting for reader]
+(def rdlist (s term base share (o acc))
+  (eatwhite s)
+  (pcase (peek s)
+    no        (err 'unterminated-list)
+    (is \.)   (do (rdc s) (rddot s term base share acc))
+    (is term) (do (rdc s) (list acc share))
+              (let (e newshare) (rdex s base nil share)
+                (rdlist s term base newshare (snoc acc e)))))
 
 ; skip rddot [waiting for reader]
 

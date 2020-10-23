@@ -19,5 +19,5 @@ __DATA__
 (eof nil)
 
 > (rdex '("(foo bar baz)"))
-!ERROR: ('unboundb rdlist)
+((foo bar baz) nil)
 
