@@ -1112,7 +1112,17 @@ __DATA__
               (let (e newshare) (rdex s base nil share)
                 (rdlist s term base newshare (snoc acc e)))))
 
-; skip rddot [waiting for reader]
+(def rddot (s term base share acc)
+  (pcase (peek s)
+    no     (err 'unterminated-list)
+    breakc (if (no acc)
+               (err 'missing-car)
+               (let (e newshare) (hard-rdex s base share 'missing-cdr)
+                 (if (car (rdlist s term base share))
+                     (err 'duplicate-cdr)
+                     (list (apply cons (snoc acc e))
+                           newshare))))
+           (rdlist s term base share (snoc acc (rdword s \. base)))))
 
 ; skip hard-rdex [waiting for reader]
 
