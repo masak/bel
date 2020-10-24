@@ -24,6 +24,7 @@ plan tests => 1;
         close $FASTFUNCS;
 
         $actual_fastfuncs = join("", @lines);
+        $actual_fastfuncs =~ s/\r//g;   # Windows likes these; we don't
     }
     my $generated_fastfuncs = preprocess();
 
