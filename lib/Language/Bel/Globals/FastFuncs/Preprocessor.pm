@@ -41,6 +41,8 @@ sub preprocess {
 
     my @result;
     while (my $line = <$SOURCE>) {
+        $line =~ s/\r//;
+
         next
             if $line =~ /^use Language::Bel::Globals::FastFuncs::Macros;$/;
 
