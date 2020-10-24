@@ -1657,6 +1657,11 @@ __DATA__
                    it))
        (err 'no-template)))
 
-; skip readas [waiting for reader]
+(def readas (name (o s ins))
+  (withs (eof (join)
+          v   (read s 10 eof))
+    (if (id v eof)  nil
+        (isa!tab v) (inst name (cddr v))
+                    (err 'inst-nontable))))
 
 (def err args)

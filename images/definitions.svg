@@ -1,8 +1,8 @@
 <svg
         xmlns='http://www.w3.org/2000/svg'
         width='670'
-        height='460'
-        viewbox='0 0 670 460'
+        height='450'
+        viewbox='0 0 670 450'
         onclick=''>
   <style>
         text {
@@ -2717,7 +2717,7 @@
         y='416'
         width='17'
         height='17'
-        class='feature-reader box'
+        class='feature-chars box'
         title='load'
       />
   <rect
@@ -2841,16 +2841,16 @@
         title='&lt;anon&gt;'
       />
   <rect
-        x='576'
-        y='426'
+        x='571'
+        y='421'
         width='17'
         height='17'
-        class='feature-reader box'
-        title='readas'
+        class='done box'
+        title='&lt;anon&gt;'
       />
   <rect
-        x='601'
-        y='431'
+        x='591'
+        y='421'
         width='17'
         height='17'
         class='done box'
@@ -2858,7 +2858,7 @@
       />
   <rect
         x='20'
-        y='281'
+        y='271'
         width='17'
         height='17'
         class='done box'
@@ -2866,11 +2866,11 @@
       />
   <text
         x='50'
-        y='296'
+        y='286'
       >done</text>
   <rect
         x='20'
-        y='311'
+        y='301'
         width='17'
         height='17'
         class='feature-ccc box'
@@ -2878,11 +2878,11 @@
       />
   <text
         x='50'
-        y='326'
+        y='316'
       >ccc</text>
   <rect
         x='20'
-        y='341'
+        y='331'
         width='17'
         height='17'
         class='feature-reader box'
@@ -2890,11 +2890,11 @@
       />
   <text
         x='50'
-        y='356'
+        y='346'
       >reader</text>
   <rect
         x='20'
-        y='371'
+        y='361'
         width='17'
         height='17'
         class='feature-backquotes box'
@@ -2902,11 +2902,11 @@
       />
   <text
         x='50'
-        y='386'
+        y='376'
       >backquotes</text>
   <rect
         x='20'
-        y='401'
+        y='391'
         width='17'
         height='17'
         class='feature-printer box'
@@ -2914,11 +2914,11 @@
       />
   <text
         x='50'
-        y='416'
+        y='406'
       >printer</text>
   <rect
         x='20'
-        y='431'
+        y='421'
         width='17'
         height='17'
         class='feature-chars box'
@@ -2926,6 +2926,6 @@
       />
   <text
         x='50'
-        y='446'
+        y='436'
       >chars</text>
 </svg>
