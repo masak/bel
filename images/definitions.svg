@@ -18,7 +18,6 @@
 
         .done               { fill: white; }
         .feature-ccc        { fill: #c96424; }
-        .feature-reader     { fill: #f2cc86; }
         .feature-backquotes { fill: #ffa502; }
         .feature-printer    { fill: #82baff; }
         .feature-chars      { fill: #2b568c; }
@@ -2858,7 +2857,7 @@
       />
   <rect
         x='20'
-        y='271'
+        y='301'
         width='17'
         height='17'
         class='done box'
@@ -2866,11 +2865,11 @@
       />
   <text
         x='50'
-        y='286'
+        y='316'
       >done</text>
   <rect
         x='20'
-        y='301'
+        y='331'
         width='17'
         height='17'
         class='feature-ccc box'
@@ -2878,20 +2877,8 @@
       />
   <text
         x='50'
-        y='316'
-      >ccc</text>
-  <rect
-        x='20'
-        y='331'
-        width='17'
-        height='17'
-        class='feature-reader box'
-        title='reader'
-      />
-  <text
-        x='50'
         y='346'
-      >reader</text>
+      >ccc</text>
   <rect
         x='20'
         y='361'

@@ -99,9 +99,6 @@ A summary of the remaining big features:
   between threads. The concurrency is "co-operative", which means that any thread
   could block the others forever by never releasing the lock.
 
-* **Reader**; there's a reader written in Perl already. It hard-codes the syntactic
-  forms it recognizes; these should in fact be extensible.
-
 * **Backquotes** (or "quasiquoting"); there's a backquote expander written in Perl
   already. It runs earlier than it should. (It runs right after reading, before
   evaluation. It should run as a normal macro, and then be evaluated. There must be

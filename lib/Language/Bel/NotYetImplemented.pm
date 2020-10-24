@@ -33,11 +33,6 @@ sub list {
             "clo",
             "('unboundb print)",
         ],
-        reader => [
-            q[(read '("[cons _ 'b]"))],
-            "(fn (_) (cons _ 'b))",
-            "('unboundb read)",
-        ],
     );
 }
 
