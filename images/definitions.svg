@@ -1773,7 +1773,7 @@
         y='226'
         width='17'
         height='17'
-        class='feature-reader box'
+        class='feature-ccc box'
         title='saferead'
       />
   <rect
@@ -2705,12 +2705,12 @@
         title='&lt;anon&gt;'
       />
   <rect
-        x='646'
-        y='396'
+        x='641'
+        y='391'
         width='17'
         height='17'
-        class='feature-reader box'
-        title='readall'
+        class='done box'
+        title='&lt;anon&gt;'
       />
   <rect
         x='246'

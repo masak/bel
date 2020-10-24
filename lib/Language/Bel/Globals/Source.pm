@@ -1584,7 +1584,9 @@ __DATA__
     `(withfile ,v ,name 'out
        (bind outs ,v ,@body))))
 
-; skip readall [waiting for reader]
+(def readall ((o s ins) (o base 10))
+  (let eof (join)
+    (drain (read s base eof) [id _ eof])))
 
 ; skip load [waiting for reader]
 
