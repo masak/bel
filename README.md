@@ -74,9 +74,9 @@ nil
 It's not fully there yet, though it's under active development.
 
 [The spec](https://github.com/masak/bel/blob/master/pg/bel.bel) contains 353 items.
-`Language::Bel` currently defines 320 of them.
+`Language::Bel` currently defines 322 of them.
 
-![320 of 353 definitions](images/definitions.svg)
+![322 of 353 definitions](images/definitions.svg)
 
 A summary of the remaining big features:
 

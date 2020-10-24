@@ -1173,9 +1173,23 @@ __DATA__
         (= c d)  nil
                  (cons c (rddelim s d)))))
 
-; skip \# [waiting for reader]
+(syn \# (s base share)
+  (let name (charstil s ~digit)
+    (if (= (peek s) \=)
+        (do (rdc s)
+            (rdtarget s base name (join) share))
+        (aif (get name share)
+             (list (cdr it) share)
+             (err 'unknown-label)))))
 
-; skip rdtarget [waiting for reader]
+(def rdtarget (s base name cell oldshare)
+  (withs (share        (cons (cons name cell) oldshare)
+          (e newshare) (hard-rdex s base share 'missing-target))
+    (if (simple e)
+        (err 'bad-target)
+        (do (xar cell (car e))
+            (xdr cell (cdr e))
+            (list cell newshare)))))
 
 (def rdword (s c base)
   (parseword (cons c (charstil s breakc)) base))
