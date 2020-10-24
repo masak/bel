@@ -1062,7 +1062,8 @@ __DATA__
 
 (set source (cor no stream (cand pair string:car)))
 
-; skip read [waiting for reader]
+(def read ((o s|source ins) (o (t base [<= 2 _ 16]) 10) (o eof))
+  (car (rdex s (srnum:numr base) eof)))
 
 ; skip saferead [waiting for reader]
 
