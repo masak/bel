@@ -1588,7 +1588,7 @@ __DATA__
   (let eof (join)
     (drain (read s base eof) [id _ eof])))
 
-; skip load [waiting for reader]
+; skip load [waiting for chars]
 
 (mac record body
   (letu v
