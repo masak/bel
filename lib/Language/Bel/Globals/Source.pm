@@ -1026,9 +1026,24 @@ __DATA__
   (pull s cbuf caris)
   (cls s))
 
-; skip peek [waiting for chars]
+(def peek ((o s ins))
+  (if ((cor no stream) s)
+      (let c (wait (fn ()
+                     (atomic (let p (get s cbuf)
+                               (or (cdr p)
+                                   (aif (bitc s) (xdr p it) nil))))))
+        (if (= c 'eof) nil c))
+      (car (car s))))
 
-; skip rdc [waiting for chars]
+(def rdc ((o s ins))
+  (if ((cor no stream) s)
+      (let c (wait (fn ()
+                     (atomic (let p (get s cbuf)
+                               (aif (cdr p)
+                                    (do (xdr p nil) it)
+                                    (bitc s))))))
+        (if (= c 'eof) nil c))
+      (deq s)))
 
 (set bbuf nil)
 
@@ -1047,15 +1062,29 @@ __DATA__
 
 (set source (cor no stream (cand pair string:car)))
 
-; skip read [waiting for reader]
+(def read ((o s|source ins) (o (t base [<= 2 _ 16]) 10) (o eof))
+  (car (rdex s (srnum:numr base) eof)))
 
-; skip saferead [waiting for reader]
+; skip saferead [waiting for ccc]
 
-; skip rdex [waiting for reader]
+(def rdex ((o s ins) (o base i10) (o eof) (o share))
+  (eatwhite s)
+  (let c (rdc s)
+    (aif (no c)         (list eof share)
+         (get c syntax) ((cdr it) s base share)
+                        (list (rdword s c base) share))))
 
-; skip eatwhite [waiting for reader]
+(def eatwhite (s)
+  (pcase (peek s)
+    whitec  (do (rdc s)
+                (eatwhite s))
+    (is \;) (do (charstil s (is \lf))
+                (eatwhite s))))
 
-; skip charstil [waiting for reader]
+(def charstil (s f)
+  (if ((cor no f) (peek s))
+      nil
+      (cons (rdc s) (charstil s f))))
 
 (set syntax nil)
 
@@ -1075,63 +1104,197 @@ __DATA__
 (syn \] args
   (err 'unexpected-terminator))
 
-; skip rdlist [waiting for reader]
+(def rdlist (s term base share (o acc))
+  (eatwhite s)
+  (pcase (peek s)
+    no        (err 'unterminated-list)
+    (is \.)   (do (rdc s) (rddot s term base share acc))
+    (is term) (do (rdc s) (list acc share))
+              (let (e newshare) (rdex s base nil share)
+                (rdlist s term base newshare (snoc acc e)))))
 
-; skip rddot [waiting for reader]
+(def rddot (s term base share acc)
+  (pcase (peek s)
+    no     (err 'unterminated-list)
+    breakc (if (no acc)
+               (err 'missing-car)
+               (let (e newshare) (hard-rdex s base share 'missing-cdr)
+                 (if (car (rdlist s term base share))
+                     (err 'duplicate-cdr)
+                     (list (apply cons (snoc acc e))
+                           newshare))))
+           (rdlist s term base share (snoc acc (rdword s \. base)))))
 
-; skip hard-rdex [waiting for reader]
+(def hard-rdex (s base share msg)
+  (let eof (join)
+    (let v (rdex s base eof share)
+      (if (id (car v) eof) (err msg) v))))
 
-; skip namecs [waiting for reader]
+(set namecs '((bel . \bel) (tab . \tab) (lf . \lf) (cr . \cr) (sp . \sp)))
 
-; skip \\ [waiting for reader]
+(syn \\ (s base share)
+  (list (pcase (peek s)
+          no     (err 'escape-without-char)
+          breakc (rdc s)
+                 (let cs (charstil s breakc)
+                   (if (cdr cs)
+                       (aif (get (sym cs) namecs)
+                            (cdr it)
+                            (err 'unknown-named-char))
+                       (car cs))))
+        share))
 
-; skip \' [waiting for reader]
+(syn \' (s base share)
+  (rdwrap s 'quote base share))
 
-; skip \` [waiting for reader]
+(syn \` (s base share)
+  (rdwrap s 'bquote base share))
 
-; skip \, [waiting for reader]
+(syn \, (s base share)
+  (case (peek s)
+    \@ (do (rdc s)
+           (rdwrap s 'comma-at base share))
+       (rdwrap s 'comma base share)))
 
-; skip rdwrap [waiting for reader]
+(def rdwrap (s token base share)
+  (let (e newshare) (hard-rdex s base share 'missing-expression)
+    (list (list token e) newshare)))
 
-; skip \" [waiting for reader]
+(syn \" (s base share)
+  (list (rddelim s \") share))
 
-; skip \¦ [waiting for reader]
+(syn \¦ (s base share)
+  (list (sym (rddelim s \¦)) share))
 
-; skip rddelim [waiting for reader]
+(def rddelim (s d (o esc))
+  (let c (rdc s)
+    (if (no c)   (err 'missing-delimiter)
+        esc      (cons c (rddelim s d))
+        (= c \\) (rddelim s d t)
+        (= c d)  nil
+                 (cons c (rddelim s d)))))
 
-; skip \# [waiting for reader]
+(syn \# (s base share)
+  (let name (charstil s ~digit)
+    (if (= (peek s) \=)
+        (do (rdc s)
+            (rdtarget s base name (join) share))
+        (aif (get name share)
+             (list (cdr it) share)
+             (err 'unknown-label)))))
 
-; skip rdtarget [waiting for reader]
+(def rdtarget (s base name cell oldshare)
+  (withs (share        (cons (cons name cell) oldshare)
+          (e newshare) (hard-rdex s base share 'missing-target))
+    (if (simple e)
+        (err 'bad-target)
+        (do (xar cell (car e))
+            (xdr cell (cdr e))
+            (list cell newshare)))))
 
-; skip rdword [waiting for reader]
+(def rdword (s c base)
+  (parseword (cons c (charstil s breakc)) base))
 
-; skip parseword [waiting for reader]
+(def parseword (cs base)
+  (or (parsenum cs base)
+      (if (= cs ".")       (err 'unexpected-dot)
+          (mem \| cs)      (parset cs base)
+          (some intrac cs) (parseslist (runs intrac cs) base)
+                           (parsecom cs base))))
 
-; skip parsenum [waiting for reader]
+(def parsenum (cs base)
+  (if (validi cs base)
+      (buildnum srzero (parsei cs base))
+      (let sign (check (car cs) signc)
+        (let (ds es) (split signc (if sign (cdr cs) cs))
+          (and (validr ds base)
+               (or (no es) (validi es base))
+               (buildnum (parsesr (consif sign ds) base)
+                         (if (no es) srzero (parsei es base))))))))
 
-; skip validi [waiting for reader]
+(def validi (cs base)
+  (and (signc (car cs))
+       (= (last cs) \i)
+       (let digs (cdr (dock cs))
+         (or (no digs) (validr digs base)))))
 
-; skip validr [waiting for reader]
+(def validr (cs base)
+  (or (validd cs base)
+      (let (n d) (split (is \/) cs)
+        (and (validd n base)
+             (validd (cdr d) base)))))
 
-; skip validd [waiting for reader]
+(def validd (cs base)
+  (and (all (cor [digit _ base] (is \.)) cs)
+       (some [digit _ base] cs)
+       (~cdr (keep (is \.) cs))))
 
-; skip parsei [waiting for reader]
+(def parsei (cs base)
+  (if (cddr cs)
+      (parsesr (dock cs) base)
+      (if (caris cs \+)
+          srone
+          (srinv srone))))
 
-; skip parsesr [waiting for reader]
+(def parsesr (cs base)
+  (withs (sign  (if (signc (car cs)) (sym (list (car cs))))
+          (n d) (split (is \/) (if sign (cdr cs) cs)))
+    (simplify (cons (or sign '+)
+                    (r/ (parsed n base)
+                        (if d
+                            (let rd (parsed (cdr d) base)
+                              (if (caris rd i0)
+                                  (err 'zero-denominator)
+                                  rd))
+                            (list i1 i1)))))))
 
-; skip parsed [waiting for reader]
+(def parsed (cs base)
+  (let (i f) (split (is \.) cs)
+    (if (cdr f)
+        (list (parseint (rev (append i (cdr f))) base)
+              (i^ base
+                  (apply i+ (map (con i1) (cdr f)))))
+        (list (parseint (rev i) base) i1))))
 
-; skip parseint [waiting for reader]
+(def parseint (ds base)
+  (if ds
+      (i+ (charint (car ds))
+          (i* base (parseint (cdr ds) base)))
+      i0))
 
-; skip charint [waiting for reader]
+(def charint (c)
+  (map (con t) (mem c "fedcba987654321")))
 
-; skip parset [waiting for reader]
+(def parset (cs base)
+  (if (cdr (keep (is \|) cs))
+      (err 'multiple-bars)
+      (let vt (tokens cs \|)
+        (if (= (len vt) 2)
+            (cons t (map [parseword _ base] vt))
+            (err 'bad-tspec)))))
 
-; skip parseslist [waiting for reader]
+(def parseslist (rs base)
+  (if (intrac (car (last rs)))
+      (err 'final-intrasymbol)
+      (map (fn ((cs ds))
+             (if (cdr cs)      (err 'double-intrasymbol)
+                 (caris cs \!) (list 'quote (parsecom ds base))
+                               (parsecom ds base)))
+           (hug (if (intrac (car (car rs)))
+                    (cons "." "upon" rs)
+                    (cons "." rs))))))
 
-; skip parsecom [waiting for reader]
+(def parsecom (cs base)
+  (if (mem \: cs)
+      (cons 'compose (map [parseno _ base] (tokens cs \:)))
+      (parseno cs base)))
 
-; skip parseno [waiting for reader]
+(def parseno (cs base)
+  (if (caris cs \~)
+      (if (cdr cs)
+          (list 'compose 'no (parseno (cdr cs) base))
+          'no)
+      (or (parsenum cs base) (sym cs))))
 
 ; skip bquote [waiting for backquotes]
 
@@ -1421,9 +1584,11 @@ __DATA__
     `(withfile ,v ,name 'out
        (bind outs ,v ,@body))))
 
-; skip readall [waiting for reader]
+(def readall ((o s ins) (o base 10))
+  (let eof (join)
+    (drain (read s base eof) [id _ eof])))
 
-; skip load [waiting for reader]
+; skip load [waiting for chars]
 
 (mac record body
   (letu v
@@ -1492,6 +1657,11 @@ __DATA__
                    it))
        (err 'no-template)))
 
-; skip readas [waiting for reader]
+(def readas (name (o s ins))
+  (withs (eof (join)
+          v   (read s 10 eof))
+    (if (id v eof)  nil
+        (isa!tab v) (inst name (cddr v))
+                    (err 'inst-nontable))))
 
 (def err args)

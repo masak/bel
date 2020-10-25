@@ -23,7 +23,7 @@ After downloading Bel, you can run it like this:
 
 ```sh
 $ perl -Ilib bin/bel
-Language::Bel 0.45 -- msys.
+Language::Bel 0.46 -- msys.
 >
 > ;; loops
 > (set n (len (apply append prims)))
@@ -74,9 +74,9 @@ nil
 It's not fully there yet, though it's under active development.
 
 [The spec](https://github.com/masak/bel/blob/master/pg/bel.bel) contains 353 items.
-`Language::Bel` currently defines 288 of them.
+`Language::Bel` currently defines 325 of them.
 
-![288 of 353 definitions](images/definitions.svg)
+![325 of 353 definitions](images/definitions.svg)
 
 A summary of the remaining big features:
 
@@ -98,9 +98,6 @@ A summary of the remaining big features:
   dynamic `lock` variable. Failing to do this might result in unexpected interactions
   between threads. The concurrency is "co-operative", which means that any thread
   could block the others forever by never releasing the lock.
-
-* **Reader**; there's a reader written in Perl already. It hard-codes the syntactic
-  forms it recognizes; these should in fact be extensible.
 
 * **Backquotes** (or "quasiquoting"); there's a backquote expander written in Perl
   already. It runs earlier than it should. (It runs right after reading, before

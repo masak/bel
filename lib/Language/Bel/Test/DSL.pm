@@ -118,6 +118,9 @@ sub parse {
             $state = $AWAITING_INPUT;
         }
     }
+    elsif ($line =~ /^ERROR:/) {
+        die "Line accidentally begins 'ERROR:' -- did you mean '!ERROR:' ?";
+    }
     else {
         if ($state == $AWAITING_INPUT) {
             $accumulated_diagnostic = $line;
@@ -213,9 +216,12 @@ CHECK {
                 eval {
                     $b->read_eval_print($input);
                 };
+                # fudge away the final newline
+                $actual_output =~ s/\n$//;
 
                 my $actual_error = $@;
                 $actual_error =~ s/\n$//;
+                $actual_error ||= "!OUTPUT: $actual_output";
                 is(
                     $actual_error,
                     $expected_error,

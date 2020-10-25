@@ -112,10 +112,10 @@ sub read_partial {
             }
         }
         my $name = substr($expr, $start, $pos - $start);
-        my $ord = length($name) == 1
+        my $ord = $name eq "¦" || length($name) == 1
             ? ord($name)
             : $char_codepoints{$name};
-        die "'unknown-named-char\n"
+        die "'unknown-named-char $name\n"
             if !defined($ord);
         my $ast = make_char($ord);
         return { ast => $ast, pos => $pos };
