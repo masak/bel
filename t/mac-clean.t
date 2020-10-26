@@ -6,7 +6,7 @@ use Language::Bel::Test::DSL;
 
 __DATA__
 
-> (set x '(1 2 3 4 5)
+> (set x '(1 2 3 4 5))
 (1 2 3 4 5)
 
 > (clean odd x)

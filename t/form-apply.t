@@ -24,6 +24,6 @@ nil
 > (apply cons '())
 nil
 
-> (map apply (list (fn () 'x) (fn () 'y))
+> (map apply (list (fn () 'x) (fn () 'y)))
 (x y)
 

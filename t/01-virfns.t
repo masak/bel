@@ -26,7 +26,7 @@ x
 x
 
 > (set tab (table '((a . 1)
-                    (b . 2)))
+                    (b . 2))))
 !IGNORE: result of assignment
 
 > (tab 'a)
