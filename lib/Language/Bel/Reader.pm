@@ -279,7 +279,7 @@ sub parseword {
     }
     elsif (contains_intrac($cs)) {
         my @runs;
-        while ($cs) {
+        while ($cs ne "") {
             my $next = substr($cs, 0, 1);
             $cs = substr($cs, 1);
             while (length($cs) && intrac(substr($cs, 0, 1)) == intrac(substr($next, 0, 1))) {
