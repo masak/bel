@@ -169,7 +169,7 @@ is $first_number_in_readme,
 
 is $second_number_in_readme,
     $num_implemented,
-    "the README.md file correctly reports the number of implemented globals (first number)";
+    "the README.md file correctly reports the number of implemented globals (second number)";
 
 {
     my $waiting_for_but_not_listed = join ", ", set_difference(\%waiting_for, \%listed);

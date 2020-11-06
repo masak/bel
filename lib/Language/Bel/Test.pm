@@ -26,6 +26,7 @@ sub bel_todo {
     eval {
         $b->read_eval_print($expr);
     };
+    $actual_output =~ s/\r?\n$//;
 
     my $error = $@;
     $error =~ s/\n$//;

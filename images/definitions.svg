@@ -17,7 +17,6 @@
         }
 
         .done               { fill: white; }
-        .feature-ccc        { fill: #c96424; }
         .feature-printer    { fill: #82baff; }
         .feature-chars      { fill: #2b568c; }
       </style>
@@ -2856,7 +2855,7 @@
       />
   <rect
         x='20'
-        y='321'
+        y='351'
         width='17'
         height='17'
         class='done box'
@@ -2864,20 +2863,8 @@
       />
   <text
         x='50'
-        y='336'
-      >done</text>
-  <rect
-        x='20'
-        y='351'
-        width='17'
-        height='17'
-        class='feature-ccc box'
-        title='ccc'
-      />
-  <text
-        x='50'
         y='366'
-      >ccc</text>
+      >done</text>
   <rect
         x='20'
         y='381'

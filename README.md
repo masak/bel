@@ -80,16 +80,6 @@ It's not fully there yet, though it's under active development.
 
 A summary of the remaining big features:
 
-* **ccc** (or `call-with-current-continuation`) is a control mechanism that allows the
-  program to save a point in the execution, and to return to that point again later.
-  Saving the execution state means saving the current evaluation stack, and being able
-  to reinstate it when a continuation is invoked. The current Perl implementation uses
-  a mutable Perl array for the evaluation stack, instead of a persistent Bel list; this
-  means that unlike the Bel implementation of the evaluator, the Perl implementation
-  has to defensively copy the whole stack both when taking the continuation and when
-  invoking it. (Either that, or we modify the Perl evaluator to use a persistent
-  Bel list too.)
-
 * **Printer**; there's a printer written in Perl already. It's largely
   feature-complete, but just like the evaluator and reader, it's not extensible
   enough. It also doesn't handle cyclic structures and named pairs, although it
