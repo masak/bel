@@ -745,7 +745,7 @@ FUT
                             $es2 = pair_cdr($es2);
                         }
 
-                        if ($self->{globals}->is_global_of_name($op, "err")) {
+                        if ($self->{globals}->is_original_err($op)) {
                             # XXX: Need to do proper parameter handling here
                             die _print($self->car($args)), "\n";
                         }

@@ -7976,6 +7976,9 @@ sub new {
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_symbol("args"), make_pair(SYMBOL_NIL, SYMBOL_NIL))))));
     }
+    $self->{original_err} = $self->{primitives}->prim_cdr(
+        $self->{hash_ref}->{err}
+    );
 
     return $self;
 }
@@ -7992,6 +7995,12 @@ sub is_global_of_name {
     my $kv = $self->get_kv($global_name);
     my $global = pair_cdr($kv);
     return $global && are_identical($e, $global);
+}
+
+sub is_original_err {
+    my ($self, $e) = @_;
+
+    return are_identical($e, $self->{original_err});
 }
 
 # (let cell (cons v nil)
