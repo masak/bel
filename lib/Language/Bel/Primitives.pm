@@ -114,18 +114,19 @@ sub prim_join {
 sub prim_nom {
     my ($self, $value) = @_;
 
-    if (!is_symbol($value)) {
-        die "not-a-symbol\n";
+    if (is_symbol($value)) {
+        my $result = SYMBOL_NIL;
+        for my $char (reverse(split //, symbol_name($value))) {
+            $result = make_pair(
+                make_char(ord($char)),
+                $result,
+            );
+        }
+        return $result;
     }
-
-    my $result = SYMBOL_NIL;
-    for my $char (reverse(split //, symbol_name($value))) {
-        $result = make_pair(
-            make_char(ord($char)),
-            $result,
-        );
+    else {
+        $self->{err}->("mistype");
     }
-    return $result;
 }
 
 sub prim_ops {

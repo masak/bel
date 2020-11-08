@@ -10,14 +10,14 @@ __DATA__
 "a"
 
 > (nom \a)
-!ERROR: not-a-symbol
+!ERROR: mistype
 
 > (nom nil)
 "nil"
 
 > (nom '(a))
-!ERROR: not-a-symbol
+!ERROR: mistype
 
 > (nom "a")
-!ERROR: not-a-symbol
+!ERROR: mistype
 

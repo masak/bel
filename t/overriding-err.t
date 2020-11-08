@@ -39,3 +39,9 @@ cdr-on-atom
     n)
 mistype
 
+> (let n nil
+    (dyn err (fn (msg) (set n msg))
+      (nom "nonsymbol"))
+    n)
+mistype
+
