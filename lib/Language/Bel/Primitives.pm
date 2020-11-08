@@ -74,7 +74,7 @@ sub prim_cdr {
         return SYMBOL_NIL;
     }
     elsif (!is_pair($object)) {
-        die "cdr-on-atom\n";
+        $self->{err}->("cdr-on-atom");
     }
     else {
         return pair_cdr($object);

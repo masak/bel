@@ -27,3 +27,9 @@ But you cannot override `err` lexically.
     n)
 nil
 
+> (let n nil
+    (dyn err (fn args (set n t))
+      (cdr 'nonpair))
+    n)
+t
+
