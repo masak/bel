@@ -33,3 +33,9 @@ nil
     n)
 t
 
+> (let n nil
+    (dyn err (fn args (set n t))
+      (cls 'nonstream))
+    n)
+t
+

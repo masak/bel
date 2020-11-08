@@ -19,7 +19,7 @@ closed
 !ERROR: 'already-closed
 
 > (cls 'not-a-stream)
-!ERROR: 'mistype
+!ERROR: mistype
 
 !END: unlink("testfile");
 

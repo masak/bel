@@ -84,11 +84,13 @@ sub prim_cdr {
 sub prim_cls {
     my ($self, $stream) = @_;
 
-    die "'mistype\n"
-        unless is_stream($stream);
-
-    $stream->close();
-    return $stream;
+    if (is_stream($stream)) {
+        $stream->close();
+        return $stream;
+    }
+    else {
+        $self->{err}->("mistype");
+    }
 }
 
 sub prim_coin {
