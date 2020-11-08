@@ -14,28 +14,28 @@ __DATA__
 overridden
 
 > (let n nil
-    (dyn err (fn args (set n t))
+    (dyn err (fn (msg) (set n msg))
       (car 'nonpair))
     n)
-t
+car-on-atom
 
 But you cannot override `err` lexically.
 
 > (let n nil
-    (let err (fn args (set n t))
+    (let err (fn (msg) (set n msg))
       (car 'nonpair))
     n)
 nil
 
 > (let n nil
-    (dyn err (fn args (set n t))
+    (dyn err (fn (msg) (set n msg))
       (cdr 'nonpair))
     n)
-t
+cdr-on-atom
 
 > (let n nil
-    (dyn err (fn args (set n t))
+    (dyn err (fn (msg) (set n msg))
       (cls 'nonstream))
     n)
-t
+mistype
 
