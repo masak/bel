@@ -19,3 +19,11 @@ overridden
     n)
 t
 
+But you cannot override `err` lexically.
+
+> (let n nil
+    (let err (fn args (set n t))
+      (car 'nonpair))
+    n)
+nil
+
