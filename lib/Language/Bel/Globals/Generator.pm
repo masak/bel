@@ -151,7 +151,12 @@ sub new {
 
     $self = bless($self, $class);
     if (!defined($self->{primitives})) {
-        $self->{primitives} = Language::Bel::Primitives->new({ output => sub {} });
+        $self->{primitives} = Language::Bel::Primitives->new({
+            output => sub {},
+            err => sub {
+                die "Unexpected error while building globals",
+            },
+        });
     }
     if (!defined($self->{hash_ref}) && !defined($self->{list})) {
         $self->{hash_ref} = {};

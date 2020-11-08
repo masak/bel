@@ -42,6 +42,9 @@ sub new {
     if (!defined($self->{output}) || ref($self->{output}) ne "CODE") {
         die "Named parameter 'output' of type CODE required";
     }
+    if (!defined($self->{err}) || ref($self->{err}) ne "CODE") {
+        die "Named parameter 'err' of type CODE required";
+    }
     if (!defined($self->{wrb_buffer_of})) {
         $self->{wrb_buffer_of} = {
             nil => []
@@ -57,7 +60,7 @@ sub prim_car {
         return SYMBOL_NIL;
     }
     elsif (!is_pair($object)) {
-        die "car-on-atom\n";
+        $self->{err}->("car-on-atom");
     }
     else {
         return pair_car($object);

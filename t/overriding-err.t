@@ -13,3 +13,9 @@ __DATA__
 > (err 'something)
 overridden
 
+> (let n nil
+    (dyn err (fn args (set n t))
+      (car 'nonpair))
+    n)
+t
+

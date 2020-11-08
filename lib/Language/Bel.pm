@@ -92,6 +92,23 @@ sub new {
     if (!defined($self->{primitives})) {
         $self->{primitives} = Language::Bel::Primitives->new({
             output => $self->{output},
+            err => sub {
+                my ($message_str) = @_;
+
+                my $message_symbol = make_symbol($message_str);
+                my $symbol_err = make_symbol("err");
+                # XXX: pass the lexical context
+                my $err_kv = $self->lookup($symbol_err, SYMBOL_NIL);
+                die "Fatal: could not find 'err'"
+                    unless $err_kv && is_pair($err_kv);
+                my $err = $self->cdr($err_kv);
+                if ($self->{globals}->is_original_err($err)) {
+                    die _print($message_symbol), "\n";
+                }
+                else {
+                    $self->call($err, $message_symbol);
+                }
+            },
         });
     }
     if (!defined($self->{globals})) {
