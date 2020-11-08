@@ -466,12 +466,6 @@ sub is_global_of_name {
     return $global && are_identical($e, $global);
 }
 
-sub is_original_err {
-    my ($self, $e) = @_;
-
-    return are_identical($e, $self->{original_err});
-}
-
 # (let cell (cons v nil)
 #   (xdr g (cons cell (cdr g)))
 #   cell)))

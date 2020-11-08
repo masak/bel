@@ -22,7 +22,9 @@ use Language::Bel::Symbols::Common qw(
     SYMBOL_NIL
     SYMBOL_T
 );
-use Language::Bel::Printer;
+use Language::Bel::Printer qw(
+    _print
+);
 use Language::Bel::Globals::FastFuncs::Macros;
 
 use Exporter 'import';
@@ -3662,6 +3664,12 @@ sub fastfunc__prs {
     return $result;
 }
 
+sub fastfunc__err {
+    my ($bel, $msg) = @_;
+
+    die _print($msg), "\n";
+}
+
 our @EXPORT_OK = qw(
     fastfunc__no
     fastfunc__atom
@@ -3744,6 +3752,7 @@ our @EXPORT_OK = qw(
     fastfunc__prn
     fastfunc__pr
     fastfunc__prs
+    fastfunc__err
 );
 
 1;

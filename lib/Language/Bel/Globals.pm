@@ -107,6 +107,7 @@ use Language::Bel::Globals::FastFuncs qw(
     fastfunc__prn
     fastfunc__pr
     fastfunc__prs
+    fastfunc__err
 );
 
 sub make_prim {
@@ -7977,9 +7978,10 @@ sub new {
             make_pair(make_symbol("inst-nontable"), SYMBOL_NIL)), SYMBOL_NIL)),
             SYMBOL_NIL)))))), SYMBOL_NIL))), SYMBOL_NIL))))));
 
-        $self->add_global("err", make_pair(make_symbol("lit"),
+        $self->add_global("err", make_fastfunc(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
-            make_pair(make_symbol("args"), make_pair(SYMBOL_NIL, SYMBOL_NIL))))));
+            make_pair(make_symbol("args"), make_pair(SYMBOL_NIL, SYMBOL_NIL))))),
+            \&fastfunc__err));
     }
     $self->{original_err} = $self->{primitives}->prim_cdr(
         $self->{hash_ref}->{err}
@@ -8000,12 +8002,6 @@ sub is_global_of_name {
     my $kv = $self->get_kv($global_name);
     my $global = pair_cdr($kv);
     return $global && are_identical($e, $global);
-}
-
-sub is_original_err {
-    my ($self, $e) = @_;
-
-    return are_identical($e, $self->{original_err});
 }
 
 # (let cell (cons v nil)

@@ -102,12 +102,7 @@ sub new {
                 die "Fatal: could not find 'err'"
                     unless $err_kv && is_pair($err_kv);
                 my $err = $self->cdr($err_kv);
-                if ($self->{globals}->is_original_err($err)) {
-                    die _print($message_symbol), "\n";
-                }
-                else {
-                    $self->call($err, $message_symbol);
-                }
+                $self->call($err, $message_symbol);
             },
         });
     }
@@ -761,12 +756,7 @@ FUT
                             unshift @args, $arg;
                             $es2 = pair_cdr($es2);
                         }
-
-                        if ($self->{globals}->is_original_err($op)) {
-                            # XXX: Need to do proper parameter handling here
-                            die _print($self->car($args)), "\n";
-                        }
-                        elsif (is_fastfunc($op)) {
+                        if (is_fastfunc($op)) {
                             my $e;
                             if ($self->inwhere() && $op->handles_where()) {
                                 $e = $op->where_apply($self, @args);
