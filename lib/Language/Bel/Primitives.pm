@@ -135,18 +135,27 @@ sub prim_ops {
     my @stack;
     while (is_pair($path)) {
         my $elem = pair_car($path);
-        die "not-a-string"
+        $self->{err}->("mistype") && return
             unless is_char($elem);
         push @stack, chr(char_codepoint($elem));
         $path = pair_cdr($path);
     }
-    my $path_str = join("", @stack);
+    if (!is_nil($path)) {
+        $self->{err}->("mistype");
+    }
+    else {
+        my $path_str = join("", @stack);
 
-    if (!is_symbol($mode)) {
-        die "not-a-symbol\n";
+        if (is_symbol($mode) &&
+            (symbol_name($mode) eq "in" || symbol_name($mode) eq "out")) {
+            return make_stream($path_str, $mode);
+        }
+        else {
+            $self->{err}->("mistype");
+        }
     }
 
-    return make_stream($path_str, $mode);
+    return SYMBOL_NIL;
 }
 
 my $CHAR_0 = make_char(ord("0"));

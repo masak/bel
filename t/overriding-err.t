@@ -45,3 +45,21 @@ mistype
     n)
 mistype
 
+> (let n nil
+    (dyn err (fn (msg) (set n msg))
+      (ops 'nonstring 'out))
+    n)
+mistype
+
+> (let n nil
+    (dyn err (fn (msg) (set n msg))
+      (ops "some-file" "nonsymbol"))
+    n)
+mistype
+
+> (let n nil
+    (dyn err (fn (msg) (set n msg))
+      (ops "some-file" 'neither-in-or-out))
+    n)
+mistype
+
