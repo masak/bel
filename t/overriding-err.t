@@ -63,3 +63,7 @@ mistype
     n)
 mistype
 
+> (dyn err (fn (msg) 'hi-from-err)
+    (car 'nonpair))
+hi-from-err
+

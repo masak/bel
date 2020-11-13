@@ -60,7 +60,7 @@ sub prim_car {
         return SYMBOL_NIL;
     }
     elsif (!is_pair($object)) {
-        $self->{err}->("car-on-atom");
+        return $self->{err}->("car-on-atom");
     }
     else {
         return pair_car($object);
@@ -74,7 +74,7 @@ sub prim_cdr {
         return SYMBOL_NIL;
     }
     elsif (!is_pair($object)) {
-        $self->{err}->("cdr-on-atom");
+        return $self->{err}->("cdr-on-atom");
     }
     else {
         return pair_cdr($object);
@@ -89,7 +89,7 @@ sub prim_cls {
         return $stream;
     }
     else {
-        $self->{err}->("mistype");
+        return $self->{err}->("mistype");
     }
 }
 
@@ -125,7 +125,7 @@ sub prim_nom {
         return $result;
     }
     else {
-        $self->{err}->("mistype");
+        return $self->{err}->("mistype");
     }
 }
 
@@ -135,13 +135,13 @@ sub prim_ops {
     my @stack;
     while (is_pair($path)) {
         my $elem = pair_car($path);
-        $self->{err}->("mistype") && return
+        return $self->{err}->("mistype")
             unless is_char($elem);
         push @stack, chr(char_codepoint($elem));
         $path = pair_cdr($path);
     }
     if (!is_nil($path)) {
-        $self->{err}->("mistype");
+        return $self->{err}->("mistype");
     }
     else {
         my $path_str = join("", @stack);
@@ -151,7 +151,7 @@ sub prim_ops {
             return make_stream($path_str, $mode);
         }
         else {
-            $self->{err}->("mistype");
+            return $self->{err}->("mistype");
         }
     }
 
