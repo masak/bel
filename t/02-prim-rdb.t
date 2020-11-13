@@ -35,7 +35,7 @@ eof
 
 > (let s (ops "temp3627" 'out)
     (rdb s))
-!ERROR: 'badmode
+!ERROR: badmode
 
 !END: unlink("temp3627");
 

@@ -73,3 +73,11 @@ hi-from-err
     n)
 mistype
 
+> (let n nil
+    (dyn err (fn (msg) (set n msg))
+      (let s (ops "temp9832" 'out)
+        (rdb s)))
+    n)
+badmode
+
+!END: unlink("temp9832");

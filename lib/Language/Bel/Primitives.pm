@@ -168,7 +168,7 @@ sub prim_rdb {
         unless is_nil($stream) || is_stream($stream);
     die "XXX: can't handle nil stream just yet"
         if is_nil($stream);
-    die "'badmode\n"
+    return $self->{err}->("badmode")
         if is_stream($stream) && $stream->mode() ne "in";
 
     my $rdb_buffer = is_nil($stream)
