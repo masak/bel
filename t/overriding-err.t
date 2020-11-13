@@ -67,3 +67,9 @@ mistype
     (car 'nonpair))
 hi-from-err
 
+> (let n nil
+    (dyn err (fn (msg) (set n msg))
+      (rdb 'nonstream))
+    n)
+mistype
+

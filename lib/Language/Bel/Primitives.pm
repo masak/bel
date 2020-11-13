@@ -164,7 +164,7 @@ my $CHAR_1 = make_char(ord("1"));
 sub prim_rdb {
     my ($self, $stream) = @_;
 
-    die "'mistype\n"
+    return $self->{err}->("mistype")
         unless is_nil($stream) || is_stream($stream);
     die "XXX: can't handle nil stream just yet"
         if is_nil($stream);
