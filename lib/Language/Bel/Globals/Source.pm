@@ -1438,7 +1438,9 @@ __DATA__
       (cons (car xs)
             (first (- n 1) (cdr xs)))))
 
-; skip catch [waiting for ccc]
+(mac catch body
+  (letu v
+    `(ccc (fn (,v) (bind throw ,v ,@body)))))
 
 (def cut (xs (o start 1) (o end (len xs)))
   (first (- (+ end 1 (if (< end 0) (len xs) 0))
