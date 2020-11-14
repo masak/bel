@@ -245,7 +245,7 @@ sub prim_wrb {
                 || $codepoint == ord("1"));
     return $self->{err}->("mistype")
         unless is_nil($stream) || is_stream($stream);
-    die "'badmode\n"
+    return $self->{err}->("badmode")
         if is_stream($stream) && $stream->mode() ne "out";
 
     my $n = is_char($bit) && $codepoint eq ord("1") ? 1 : 0;

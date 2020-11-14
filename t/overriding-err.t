@@ -112,3 +112,10 @@ mistype
     n)
 mistype
 
+> (let n nil
+    (dyn err (fn (msg) (set n msg))
+      (let s (ops "README.md" 'in)
+        (wrb \0 s)))
+    n)
+badmode
+
