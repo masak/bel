@@ -119,3 +119,15 @@ mistype
     n)
 badmode
 
+> (let n nil
+    (dyn err (fn (msg) (set n msg))
+      (xar 'nonpair 'a))
+    n)
+xar-on-atom
+
+> (let n nil
+    (dyn err (fn (msg) (set n msg))
+      (xdr 'nonpair 'd))
+    n)
+xdr-on-atom
+

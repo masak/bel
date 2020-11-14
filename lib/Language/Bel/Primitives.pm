@@ -272,9 +272,9 @@ sub prim_wrb {
 sub prim_xar {
     my ($self, $object, $a_value) = @_;
 
-    if (!is_pair($object)) {
-        die "xar-on-atom\n";
-    }
+    return $self->{err}->("xar-on-atom")
+        unless is_pair($object);
+
     pair_set_car($object, $a_value);
     return $a_value;
 }
@@ -282,9 +282,9 @@ sub prim_xar {
 sub prim_xdr {
     my ($self, $object, $d_value) = @_;
 
-    if (!is_pair($object)) {
-        die "xdr-on-atom\n";
-    }
+    return $self->{err}->("xdr-on-atom")
+        unless is_pair($object);
+
     pair_set_cdr($object, $d_value);
     return $d_value;
 }
