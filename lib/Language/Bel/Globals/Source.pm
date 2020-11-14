@@ -211,7 +211,9 @@ __DATA__
              (let ,var (cdr ,w) ,fail)
              (let ,var ,w ,ok))))))
 
-; skip onerr [waiting for ccc]
+(mac onerr (e1 e2)
+  (let v (uvar)
+    `(eif ,v ,e2 ,e1 ,v)))
 
 ; skip safe [waiting for ccc]
 
