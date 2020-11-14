@@ -10,9 +10,11 @@ use Language::Bel::Types qw(
     make_char
     make_pair
     make_symbol
-    make_fastfunc
     pair_cdr
     symbol_name
+);
+use Language::Bel::Type::Pair::FastFunc qw(
+    make_fastfunc
 );
 use Language::Bel::Symbols::Common qw(
     SYMBOL_CHAR

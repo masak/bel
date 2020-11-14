@@ -23,7 +23,7 @@ After downloading Bel, you can run it like this:
 
 ```sh
 $ perl -Ilib bin/bel
-Language::Bel 0.46 -- msys.
+Language::Bel 0.47 -- darwin.
 >
 > ;; loops
 > (set n (len (apply append prims)))
