@@ -200,7 +200,16 @@ __DATA__
 (def is (x)
   [= _ x])
 
-; skip eif [waiting for ccc]
+(mac eif (var (o expr) (o fail) (o ok))
+  (with (v (uvar)
+         w (uvar)
+         c (uvar))
+    `(let ,v (join)
+       (let ,w (ccc (fn (,c)
+                      (dyn err [,c (cons ,v _)] ,expr)))
+         (if (caris ,w ,v id)
+             (let ,var (cdr ,w) ,fail)
+             (let ,var ,w ,ok))))))
 
 ; skip onerr [waiting for ccc]
 
