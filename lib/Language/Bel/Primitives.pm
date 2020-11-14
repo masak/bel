@@ -243,7 +243,7 @@ sub prim_wrb {
         unless is_char($bit)
             && (($codepoint = char_codepoint($bit)) == ord("0")
                 || $codepoint == ord("1"));
-    die "'mistype\n"
+    return $self->{err}->("mistype")
         unless is_nil($stream) || is_stream($stream);
     die "'badmode\n"
         if is_stream($stream) && $stream->mode() ne "out";
