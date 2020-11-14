@@ -203,12 +203,12 @@ sub prim_sym {
     my @stack;
     while (is_pair($value)) {
         my $elem = pair_car($value);
-        die "not-a-string"
+        return $self->{err}->("mistype")
             unless is_char($elem);
         push @stack, chr(char_codepoint($elem));
         $value = pair_cdr($value);
     }
-    die "not-a-string"
+    return $self->{err}->("mistype")
         unless is_nil($value);
 
     my $name = join("", @stack);

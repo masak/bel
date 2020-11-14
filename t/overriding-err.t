@@ -88,3 +88,15 @@ badmode
     n)
 mistype
 
+> (let n nil
+    (dyn err (fn (msg) (set n msg))
+      (sym 'nonstring))
+    n)
+mistype
+
+> (let n nil
+    (dyn err (fn (msg) (set n msg))
+      (sym '(\a \b \c . \d)))
+    n)
+mistype
+
