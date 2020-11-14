@@ -1029,6 +1029,17 @@ sub new {
             SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))),
             SYMBOL_NIL)))), SYMBOL_NIL))))), SYMBOL_NIL))));
 
+        $self->add_global("safe", make_pair(make_symbol("lit"),
+            make_pair(make_symbol("mac"), make_pair(make_pair(make_symbol("lit"),
+            make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+            make_pair(make_pair(make_symbol("expr"), SYMBOL_NIL),
+            make_pair(make_pair(make_symbol("cons"),
+            make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_symbol("onerr"),
+            SYMBOL_NIL)), make_pair(make_pair(make_symbol("cons"),
+            make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("cons"),
+            make_pair(make_symbol("expr"), make_pair(SYMBOL_NIL, SYMBOL_NIL))),
+            SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))))), SYMBOL_NIL))));
+
         $self->add_global("literal", make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("e"), SYMBOL_NIL),

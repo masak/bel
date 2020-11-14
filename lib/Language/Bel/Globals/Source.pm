@@ -215,7 +215,8 @@ __DATA__
   (let v (uvar)
     `(eif ,v ,e2 ,e1 ,v)))
 
-; skip safe [waiting for ccc]
+(mac safe (expr)
+  `(onerr nil ,expr))
 
 (def literal (e)
   (or (in e t nil o apply)
