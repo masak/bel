@@ -100,3 +100,9 @@ mistype
     n)
 mistype
 
+> (let n nil
+    (dyn err (fn (msg) (set n msg))
+      (wrb 'nonbit nil))
+    n)
+mistype
+
