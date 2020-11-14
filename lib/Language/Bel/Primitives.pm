@@ -191,7 +191,7 @@ sub prim_rdb {
 sub prim_stat {
     my ($self, $stream) = @_;
 
-    die "'mistype\n"
+    return $self->{err}->("mistype")
         unless is_stream($stream);
 
     return make_symbol($stream->stat());

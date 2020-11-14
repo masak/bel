@@ -81,3 +81,10 @@ mistype
 badmode
 
 !END: unlink("temp9832");
+
+> (let n nil
+    (dyn err (fn (msg) (set n msg))
+      (stat 'nonstream))
+    n)
+mistype
+
