@@ -1077,7 +1077,8 @@ __DATA__
 (def read ((o s|source ins) (o (t base [<= 2 _ 16]) 10) (o eof))
   (car (rdex s (srnum:numr base) eof)))
 
-; skip saferead [waiting for ccc]
+(def saferead ((o s ins) (o alt) (o base 10))
+  (onerr alt (read s base alt)))
 
 (def rdex ((o s ins) (o base i10) (o eof) (o share))
   (eatwhite s)

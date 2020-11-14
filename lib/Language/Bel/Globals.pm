@@ -5558,6 +5558,26 @@ sub new {
             make_pair(make_symbol("eof"), SYMBOL_NIL)))), SYMBOL_NIL)),
             SYMBOL_NIL))))));
 
+        $self->add_global("saferead", make_pair(make_symbol("lit"),
+            make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+            make_pair(make_pair(make_pair(make_symbol("o"),
+            make_pair(make_symbol("s"), make_pair(make_symbol("ins"), SYMBOL_NIL))),
+            make_pair(make_pair(make_symbol("o"), make_pair(make_symbol("alt"),
+            SYMBOL_NIL)), make_pair(make_pair(make_symbol("o"),
+            make_pair(make_symbol("base"), make_pair(make_pair(make_symbol("lit"),
+            make_pair(make_symbol("num"), make_pair(make_pair(make_symbol("+"),
+            make_pair(make_pair(SYMBOL_T, make_pair(SYMBOL_T, make_pair(SYMBOL_T,
+            make_pair(SYMBOL_T, make_pair(SYMBOL_T, make_pair(SYMBOL_T,
+            make_pair(SYMBOL_T, make_pair(SYMBOL_T, make_pair(SYMBOL_T,
+            make_pair(SYMBOL_T, SYMBOL_NIL)))))))))), make_pair(make_pair(SYMBOL_T,
+            SYMBOL_NIL), SYMBOL_NIL))), make_pair(make_pair(make_symbol("+"),
+            make_pair(SYMBOL_NIL, make_pair(make_pair(SYMBOL_T, SYMBOL_NIL),
+            SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL))), SYMBOL_NIL))),
+            make_pair(make_pair(make_symbol("onerr"), make_pair(make_symbol("alt"),
+            make_pair(make_pair(make_symbol("read"), make_pair(make_symbol("s"),
+            make_pair(make_symbol("base"), make_pair(make_symbol("alt"),
+            SYMBOL_NIL)))), SYMBOL_NIL))), SYMBOL_NIL))))));
+
         $self->add_global("rdex", make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_pair(make_symbol("o"),
