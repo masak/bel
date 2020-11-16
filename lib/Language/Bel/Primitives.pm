@@ -42,6 +42,9 @@ sub new {
     if (!defined($self->{output}) || ref($self->{output}) ne "CODE") {
         die "Named parameter 'output' of type CODE required";
     }
+    if (!defined($self->{err}) || ref($self->{err}) ne "CODE") {
+        die "Named parameter 'err' of type CODE required";
+    }
     if (!defined($self->{wrb_buffer_of})) {
         $self->{wrb_buffer_of} = {
             nil => []
@@ -57,7 +60,7 @@ sub prim_car {
         return SYMBOL_NIL;
     }
     elsif (!is_pair($object)) {
-        die "car-on-atom\n";
+        return $self->{err}->("car-on-atom");
     }
     else {
         return pair_car($object);
@@ -71,7 +74,7 @@ sub prim_cdr {
         return SYMBOL_NIL;
     }
     elsif (!is_pair($object)) {
-        die "cdr-on-atom\n";
+        return $self->{err}->("cdr-on-atom");
     }
     else {
         return pair_cdr($object);
@@ -81,11 +84,13 @@ sub prim_cdr {
 sub prim_cls {
     my ($self, $stream) = @_;
 
-    die "'mistype\n"
-        unless is_stream($stream);
-
-    $stream->close();
-    return $stream;
+    if (is_stream($stream)) {
+        $stream->close();
+        return $stream;
+    }
+    else {
+        return $self->{err}->("mistype");
+    }
 }
 
 sub prim_coin {
@@ -109,18 +114,19 @@ sub prim_join {
 sub prim_nom {
     my ($self, $value) = @_;
 
-    if (!is_symbol($value)) {
-        die "not-a-symbol\n";
+    if (is_symbol($value)) {
+        my $result = SYMBOL_NIL;
+        for my $char (reverse(split //, symbol_name($value))) {
+            $result = make_pair(
+                make_char(ord($char)),
+                $result,
+            );
+        }
+        return $result;
     }
-
-    my $result = SYMBOL_NIL;
-    for my $char (reverse(split //, symbol_name($value))) {
-        $result = make_pair(
-            make_char(ord($char)),
-            $result,
-        );
+    else {
+        return $self->{err}->("mistype");
     }
-    return $result;
 }
 
 sub prim_ops {
@@ -129,18 +135,27 @@ sub prim_ops {
     my @stack;
     while (is_pair($path)) {
         my $elem = pair_car($path);
-        die "not-a-string"
+        return $self->{err}->("mistype")
             unless is_char($elem);
         push @stack, chr(char_codepoint($elem));
         $path = pair_cdr($path);
     }
-    my $path_str = join("", @stack);
+    if (!is_nil($path)) {
+        return $self->{err}->("mistype");
+    }
+    else {
+        my $path_str = join("", @stack);
 
-    if (!is_symbol($mode)) {
-        die "not-a-symbol\n";
+        if (is_symbol($mode) &&
+            (symbol_name($mode) eq "in" || symbol_name($mode) eq "out")) {
+            return make_stream($path_str, $mode);
+        }
+        else {
+            return $self->{err}->("mistype");
+        }
     }
 
-    return make_stream($path_str, $mode);
+    return SYMBOL_NIL;
 }
 
 my $CHAR_0 = make_char(ord("0"));
@@ -149,11 +164,11 @@ my $CHAR_1 = make_char(ord("1"));
 sub prim_rdb {
     my ($self, $stream) = @_;
 
-    die "'mistype\n"
+    return $self->{err}->("mistype")
         unless is_nil($stream) || is_stream($stream);
     die "XXX: can't handle nil stream just yet"
         if is_nil($stream);
-    die "'badmode\n"
+    return $self->{err}->("badmode")
         if is_stream($stream) && $stream->mode() ne "in";
 
     my $rdb_buffer = is_nil($stream)
@@ -176,7 +191,7 @@ sub prim_rdb {
 sub prim_stat {
     my ($self, $stream) = @_;
 
-    die "'mistype\n"
+    return $self->{err}->("mistype")
         unless is_stream($stream);
 
     return make_symbol($stream->stat());
@@ -188,12 +203,12 @@ sub prim_sym {
     my @stack;
     while (is_pair($value)) {
         my $elem = pair_car($value);
-        die "not-a-string"
+        return $self->{err}->("mistype")
             unless is_char($elem);
         push @stack, chr(char_codepoint($elem));
         $value = pair_cdr($value);
     }
-    die "not-a-string"
+    return $self->{err}->("mistype")
         unless is_nil($value);
 
     my $name = join("", @stack);
@@ -224,13 +239,13 @@ sub prim_wrb {
     my ($self, $bit, $stream) = @_;
 
     my $codepoint;
-    die "'mistype\n"
+    return $self->{err}->("mistype")
         unless is_char($bit)
-            && ($codepoint = char_codepoint($bit)) == ord("0")
-                || $codepoint == ord("1");
-    die "'mistype\n"
+            && (($codepoint = char_codepoint($bit)) == ord("0")
+                || $codepoint == ord("1"));
+    return $self->{err}->("mistype")
         unless is_nil($stream) || is_stream($stream);
-    die "'badmode\n"
+    return $self->{err}->("badmode")
         if is_stream($stream) && $stream->mode() ne "out";
 
     my $n = is_char($bit) && $codepoint eq ord("1") ? 1 : 0;
@@ -257,9 +272,9 @@ sub prim_wrb {
 sub prim_xar {
     my ($self, $object, $a_value) = @_;
 
-    if (!is_pair($object)) {
-        die "xar-on-atom\n";
-    }
+    return $self->{err}->("xar-on-atom")
+        unless is_pair($object);
+
     pair_set_car($object, $a_value);
     return $a_value;
 }
@@ -267,9 +282,9 @@ sub prim_xar {
 sub prim_xdr {
     my ($self, $object, $d_value) = @_;
 
-    if (!is_pair($object)) {
-        die "xdr-on-atom\n";
-    }
+    return $self->{err}->("xdr-on-atom")
+        unless is_pair($object);
+
     pair_set_cdr($object, $d_value);
     return $d_value;
 }

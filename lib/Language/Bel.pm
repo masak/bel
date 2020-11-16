@@ -92,6 +92,18 @@ sub new {
     if (!defined($self->{primitives})) {
         $self->{primitives} = Language::Bel::Primitives->new({
             output => $self->{output},
+            err => sub {
+                my ($message_str) = @_;
+
+                my $message_symbol = make_symbol($message_str);
+                my $symbol_err = make_symbol("err");
+                # XXX: pass the lexical context
+                my $err_kv = $self->lookup($symbol_err, SYMBOL_NIL);
+                die "Fatal: could not find 'err'"
+                    unless $err_kv && is_pair($err_kv);
+                my $err = $self->cdr($err_kv);
+                $self->call($err, $message_symbol);
+            },
         });
     }
     if (!defined($self->{globals})) {
@@ -744,12 +756,7 @@ FUT
                             unshift @args, $arg;
                             $es2 = pair_cdr($es2);
                         }
-
-                        if ($self->{globals}->is_global_of_name($op, "err")) {
-                            # XXX: Need to do proper parameter handling here
-                            die _print($self->car($args)), "\n";
-                        }
-                        elsif (is_fastfunc($op)) {
+                        if (is_fastfunc($op)) {
                             my $e;
                             if ($self->inwhere() && $op->handles_where()) {
                                 $e = $op->where_apply($self, @args);

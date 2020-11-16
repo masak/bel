@@ -107,6 +107,7 @@ use Language::Bel::Globals::FastFuncs qw(
     fastfunc__prn
     fastfunc__pr
     fastfunc__prs
+    fastfunc__err
 );
 
 sub make_prim {
@@ -141,7 +142,12 @@ sub new {
 
     $self = bless($self, $class);
     if (!defined($self->{primitives})) {
-        $self->{primitives} = Language::Bel::Primitives->new({ output => sub {} });
+        $self->{primitives} = Language::Bel::Primitives->new({
+            output => sub {},
+            err => sub {
+                die "Unexpected error while building globals",
+            },
+        });
     }
     if (!defined($self->{hash_ref}) && !defined($self->{list})) {
         $self->{hash_ref} = {};
@@ -7972,10 +7978,14 @@ sub new {
             make_pair(make_symbol("inst-nontable"), SYMBOL_NIL)), SYMBOL_NIL)),
             SYMBOL_NIL)))))), SYMBOL_NIL))), SYMBOL_NIL))))));
 
-        $self->add_global("err", make_pair(make_symbol("lit"),
+        $self->add_global("err", make_fastfunc(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
-            make_pair(make_symbol("args"), make_pair(SYMBOL_NIL, SYMBOL_NIL))))));
+            make_pair(make_symbol("args"), make_pair(SYMBOL_NIL, SYMBOL_NIL))))),
+            \&fastfunc__err));
     }
+    $self->{original_err} = $self->{primitives}->prim_cdr(
+        $self->{hash_ref}->{err}
+    );
 
     return $self;
 }
