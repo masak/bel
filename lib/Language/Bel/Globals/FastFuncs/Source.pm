@@ -5,10 +5,12 @@ use strict;
 use warnings;
 
 use Language::Bel::Core qw(
+    are_identical
     atoms_are_identical
     is_char
     is_nil
     is_pair
+    is_stream
     is_symbol
     is_symbol_of_name
     make_char
@@ -154,6 +156,12 @@ sub fastfunc__char {
     my ($bel, $x) = @_;
 
     return is_char($x) ? SYMBOL_T : SYMBOL_NIL;
+}
+
+sub fastfunc__stream {
+    my ($bel, $x) = @_;
+
+    return is_stream($x) ? SYMBOL_T : SYMBOL_NIL;
 }
 
 sub fastfunc__proper {
@@ -400,6 +408,236 @@ sub fastfunc__where__idfn {
         ),
         make_pair(
             SYMBOL_D,
+            SYMBOL_NIL,
+        ),
+    );
+}
+
+sub fastfunc__literal {
+    my ($bel, $e) = @_;
+
+    return SYMBOL_T
+        if is_symbol_of_name($e, "t")
+        || is_nil($e)
+        || is_symbol_of_name($e, "o")
+        || is_symbol_of_name($e, "apply");
+
+    return SYMBOL_T
+        if is_char($e)
+        || is_stream($e);
+
+    return SYMBOL_T
+        if is_pair($e)
+        && is_symbol_of_name($bel->car($e), "lit");
+
+    while (!is_nil($e)) {
+        if (!is_pair($e)) {
+            return SYMBOL_NIL;
+        }
+        if (!is_char($bel->car($e))) {
+            return SYMBOL_NIL;
+        }
+        $e = $bel->cdr($e);
+    }
+
+    return SYMBOL_T;
+}
+
+sub fastfunc__variable {
+    my ($bel, $e) = @_;
+
+    if (is_pair($e)) {
+        my $symbol_vmark = make_symbol("vmark");
+        my $vmark = $bel->lookup($symbol_vmark, SYMBOL_NIL);
+        my $is_vmark = are_identical($bel->car($e), $vmark);
+        return $is_vmark
+            ? SYMBOL_T
+            : SYMBOL_NIL;
+    }
+    else {
+        return SYMBOL_NIL
+            if is_symbol_of_name($e, "t")
+            || is_nil($e)
+            || is_symbol_of_name($e, "o")
+            || is_symbol_of_name($e, "apply");
+
+        return SYMBOL_T;
+    }
+}
+
+sub fastfunc__inwhere {
+    my ($bel, $s) = @_;
+
+    my $e = $bel->car($bel->car($s));
+
+    return SYMBOL_NIL
+        unless is_pair($e);
+
+    my $symbol_smark = make_symbol("smark");
+    my $smark = $bel->lookup($symbol_smark, SYMBOL_NIL);
+    return SYMBOL_NIL
+        unless are_identical($bel->car($e), $smark);
+
+    my $cdr = $bel->cdr($e);
+    return SYMBOL_NIL
+        unless is_symbol_of_name($bel->car($cdr), "loc");
+
+    return $bel->cdr($cdr);
+}
+
+sub fastfunc__pairwise {
+    my ($bel, $f, $xs) = @_;
+
+    my $cdr_xs;
+    while (!is_nil($cdr_xs = $bel->cdr($xs))) {
+        if (is_nil($bel->call($f, $bel->car($xs), $bel->car($cdr_xs)))) {
+            return SYMBOL_NIL;
+        }
+        $xs = $cdr_xs;
+    }
+
+    return SYMBOL_T;
+}
+
+sub fastfunc__foldl {
+    my ($bel, $f, $base, @args) = @_;
+
+    return $base
+        unless @args;
+
+    while (!grep { is_nil($_) } @args) {
+        my @car_args = map { $bel->car($_) } @args;
+        $base = $bel->call($f, @car_args, $base);
+        @args = map { $bel->cdr($_) } @args;
+    }
+
+    return $base;
+}
+
+sub fastfunc__foldr {
+    my ($bel, $f, $base, @args) = @_;
+
+    return $base
+        unless @args;
+
+    my @cars;
+    while (!grep { is_nil($_) } @args) {
+        push @cars, [map { $bel->car($_) } @args];
+        @args = map { $bel->cdr($_) } @args;
+    }
+
+    for my $cars (reverse(@cars)) {
+        $base = $bel->call($f, @{$cars}, $base);
+    }
+
+    return $base;
+}
+
+sub fastfunc__fuse {
+    my ($bel, $f, @args) = @_;
+
+    return SYMBOL_NIL
+        unless @args;
+    my @sublists;
+    my $min_length = -1;
+    for my $list (@args) {
+        my @sublist;
+        while (!is_nil($list)) {
+            push @sublist, $bel->car($list);
+            $list = $bel->cdr($list);
+        }
+        push @sublists, \@sublist;
+        my $length = scalar(@sublist);
+        $min_length = $min_length == -1 || $length < $min_length
+            ? $length
+            : $min_length;
+    }
+    my @result;
+    for my $i (0..$min_length-1) {
+        push @result, $bel->call(
+            $f,
+            map { $sublists[$_]->[$i] } 0..$#sublists
+        );
+    }
+    my $result = @result ? pop(@result) : SYMBOL_NIL;
+    while (@result) {
+        my $list = pop(@result);
+        my @values;
+        while (!is_nil($list)) {
+            push @values, $bel->car($list);
+            $list = $bel->cdr($list);
+        }
+        while (@values) {
+            my $value = pop(@values);
+            $result = make_pair($value, $result);
+        }
+    }
+
+    return $result;
+}
+
+sub fastfunc__match {
+    my ($bel, $x, $pat) = @_;
+
+    my @stack = [$x, $pat];
+    while (@stack) {
+        my ($v0, $v1) = @{pop(@stack)};
+        if (is_symbol_of_name($v1, "t")) {
+            # succeed
+        }
+        elsif (is_pair($v1)
+            && is_symbol_of_name($bel->car($v1), "lit")
+            && is_pair($bel->cdr($v1))
+            && (is_symbol_of_name($bel->car($bel->cdr($v1)), "prim")
+                || is_symbol_of_name($bel->car($bel->cdr($v1)), "clo"))) {
+            if (is_nil($bel->call($v1, $v0))) {
+                return SYMBOL_NIL;
+            }
+        }
+        elsif (!is_pair($v0) || !is_pair($v1)) {
+            if (!atoms_are_identical($v0, $v1)) {
+                return SYMBOL_NIL;
+            }
+        }
+        else {
+            push @stack, [$bel->cdr($v0), $bel->cdr($v1)];
+            push @stack, [$bel->car($v0), $bel->car($v1)];
+        }
+    }
+
+    return SYMBOL_T;
+}
+
+sub fastfunc__split {
+    my ($bel, $f, $xs, $acc) = @_;
+
+    if (!defined($acc)) {
+        $acc = SYMBOL_NIL;
+    }
+    my @acc;
+    while (!is_nil($xs)) {
+        last
+            if !is_pair($xs) || !is_nil($bel->call($f, $bel->car($xs)));
+        push(@acc, $bel->car($xs));
+        $xs = $bel->cdr($xs);
+    }
+
+    my @prefix;
+    while (!is_nil($acc)) {
+        push(@prefix, $bel->car($acc));
+        $acc = $bel->cdr($acc);
+    }
+    my $first = SYMBOL_NIL;
+    while (@acc) {
+        $first = make_pair(pop(@acc), $first);
+    }
+    while (@prefix) {
+        $first = make_pair(pop(@prefix), $first);
+    }
+    return make_pair(
+        $first,
+        make_pair(
+            $xs,
             SYMBOL_NIL,
         ),
     );
@@ -2982,6 +3220,7 @@ our @EXPORT_OK = qw(
     fastfunc__symbol
     fastfunc__pair
     fastfunc__char
+    fastfunc__stream
     fastfunc__proper
     fastfunc__string
     fastfunc__in
@@ -2997,6 +3236,15 @@ our @EXPORT_OK = qw(
     fastfunc__udrop
     fastfunc__idfn
     fastfunc__where__idfn
+    fastfunc__literal
+    fastfunc__variable
+    fastfunc__inwhere
+    fastfunc__pairwise
+    fastfunc__foldl
+    fastfunc__foldr
+    fastfunc__fuse
+    fastfunc__match
+    fastfunc__split
     fastfunc__i_lt
     fastfunc__i_plus
     fastfunc__i_minus
