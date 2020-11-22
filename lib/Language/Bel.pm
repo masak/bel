@@ -48,11 +48,11 @@ Language::Bel - An interpreter for Paul Graham's language Bel
 
 =head1 VERSION
 
-Version 0.47
+Version 0.48
 
 =cut
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 =head1 SYNOPSIS
 
@@ -196,9 +196,31 @@ sub eval {
 
     $self->{s} = [[$ast, SYMBOL_NIL]];
     $self->{r} = [];
+    $self->{p} = [];
 
-    while (@{$self->{s}}) {
+    while (@{$self->{s}} || @{$self->{p}}) {
         $self->ev();
+
+        # (def mev (s r (p g))  
+        #   (if (no s) 
+        #       (if p  
+        #           (sched p g)
+        #           (car r))
+        #       (sched (if (cdr (binding 'lock s))
+        #                  (cons (list s r) p)
+        #                  (snoc p (list s r)))
+        #              g)))
+        if (@{$self->{s}}) {
+            my $s = $self->{s};
+            my $r = $self->{r};
+            push @{$self->{p}}, [$s, $r];
+        }
+
+        if (@{$self->{p}}) {
+            my $sr = shift @{$self->{p}};
+            $self->{s} = $sr->[0];
+            $self->{r} = $sr->[1];
+        }
     }
     return $self->{r}[-1];
 }
@@ -361,6 +383,25 @@ FUT
             $a,
         ];
         push @{$bel->{s}}, $prot, [$e1, $a];
+    },
+
+    # (form thread ((e) a s r (p g))
+    #   (mev s
+    #        (cons nil r)
+    #        (list (cons (list (list (list e a))
+    #                          nil)
+    #                    p)
+    #              g)))
+    thread => sub {
+        my ($bel, $es, $a) = @_;
+
+        # XXX: skipping $es sanity check for now
+        my $e = $bel->car($es);
+
+        push @{$bel->{r}}, SYMBOL_NIL;
+
+        my $new_thread = [[[$e, $a]], []];
+        push @{$bel->{p}}, $new_thread;
     },
 );
 
