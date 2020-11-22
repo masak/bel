@@ -246,11 +246,15 @@ CHECK {
             }
         }
         elsif ($item->{type} eq "DIAGNOSTIC") {
-            diag($item->{text});
+            if ($ENV{BEL_TEST_DIAG}) {
+                diag($item->{text});
+            }
         }
         elsif ($item->{type} eq "DIRECTIVE" && $item->{name} eq "TODO") {
             $todo_toggle = 1;
-            diag($item->{payload});
+            if ($ENV{BEL_TEST_DIAG}) {
+                diag($item->{payload});
+            }
         }
         # everything else, we ignore
     }
