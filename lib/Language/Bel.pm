@@ -28,6 +28,7 @@ use Language::Bel::Type::Pair::FutFunc qw(
     make_futfunc
 );
 use Language::Bel::Symbols::Common qw(
+    SYMBOL_LOCK
     SYMBOL_NIL
 );
 use Language::Bel::Primitives;
@@ -210,16 +211,19 @@ sub eval {
         #                  (cons (list s r) p)
         #                  (snoc p (list s r)))
         #              g)))
-        if (@{$self->{s}}) {
-            my $s = $self->{s};
-            my $r = $self->{r};
-            push @{$self->{p}}, [$s, $r];
-        }
+        my $b = $self->binding(SYMBOL_LOCK);
+        if (!$b || is_nil($self->cdr($b))) {
+            if (@{$self->{s}}) {
+                my $s = $self->{s};
+                my $r = $self->{r};
+                push @{$self->{p}}, [$s, $r];
+            }
 
-        if (@{$self->{p}}) {
-            my $sr = shift @{$self->{p}};
-            $self->{s} = $sr->[0];
-            $self->{r} = $sr->[1];
+            if (@{$self->{p}}) {
+                my $sr = shift @{$self->{p}};
+                $self->{s} = $sr->[0];
+                $self->{r} = $sr->[1];
+            }
         }
     }
     return $self->{r}[-1];

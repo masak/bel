@@ -49,6 +49,12 @@ sub SYMBOL_EOF {
     return $symbol_eof;
 }
 
+my $symbol_lock = make_symbol("lock");
+
+sub SYMBOL_LOCK {
+    return $symbol_lock;
+}
+
 my $symbol_nil = make_symbol("nil");
 
 sub SYMBOL_NIL {
@@ -93,6 +99,7 @@ our @EXPORT_OK = qw(
     SYMBOL_COMMA_AT
     SYMBOL_D
     SYMBOL_EOF
+    SYMBOL_LOCK
     SYMBOL_NIL 
     SYMBOL_PAIR
     SYMBOL_QUOTE
