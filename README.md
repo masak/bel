@@ -23,7 +23,7 @@ After downloading Bel, you can run it like this:
 
 ```sh
 $ perl -Ilib bin/bel
-Language::Bel 0.47 -- darwin.
+Language::Bel 0.48 -- darwin.
 >
 > ;; loops
 > (set n (len (apply append prims)))
@@ -89,15 +89,6 @@ A summary of the remaining big features:
   has to defensively copy the whole stack both when taking the continuation and when
   invoking it. (Either that, or we modify the Perl evaluator to use a persistent
   Bel list too.)
-
-* **Threads** (so called "green threads") allow execution of different evaluation
-  stacks to be interleaved and executed in "round-robin" style. Therefore, threads
-  can be seen as "parallel execution contexts". Dynamic and lexical variables are
-  local to a thread; global variables are shared between all threads. It's possible
-  to prevent the scheduler from de-scheduling the current thread by binding the
-  dynamic `lock` variable. Failing to do this might result in unexpected interactions
-  between threads. The concurrency is "co-operative", which means that any thread
-  could block the others forever by never releasing the lock.
 
 * **Backquotes** (or "quasiquoting"); there's a backquote expander written in Perl
   already. It runs earlier than it should. (It runs right after reading, before
