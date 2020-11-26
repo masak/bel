@@ -8,6 +8,24 @@ use Language::Bel::NotYetImplemented;
 
 plan tests => 3;
 
+my %exception_of = (
+    # special exception for `sigerr`, which I believe was mis-specified
+    sigerr => 1,
+    # special exception for `applyprim` and `formfn`, which want `eif`
+    applyprim => 1,
+    formfn => 1,
+    # special exception for `randlen`, which wants `read`
+    randlen => 1,
+    # special exception for the bquote built-ins, which would otherwise
+    # be circular
+    bquote => 1,
+    bqex => 1,
+    bqthru => 1,
+    bqexpair => 1,
+    spa => 1,
+    spd => 1,
+);
+
 my %listed = Language::Bel::NotYetImplemented::list();
 my %waiting_for;
 
@@ -100,10 +118,7 @@ while ($i < @bel_globals && !eof($SOURCE)) {
             $waiting_for{$feature}++;
         }
     }
-    elsif ($name eq "sigerr" || $name eq "applyprim" || $name eq "formfn" || $name eq "randlen") {
-        # special exception for `sigerr`, which I believe was mis-specified
-        # special exception for `applyprim` and `formfn`, which want `eif`
-        # special exception for `randlen`, which wants `read`
+    elsif ($exception_of{$name}) {
         $num_implemented++;
     }
     else {

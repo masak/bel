@@ -9,9 +9,6 @@ use Language::Bel;
 use Language::Bel::Reader qw(
     read_partial
 );
-use Language::Bel::Expander::Bquote qw(
-    _bqexpand
-);
 
 use Exporter 'import';
 
@@ -90,7 +87,7 @@ sub output_of_eval_file {
 
     while ($source) {
         my $p = read_partial($source);
-        my $ast = _bqexpand($p->{ast});
+        my $ast = $p->{ast};
         my $next_pos = $p->{pos};
 
         $b->eval($ast);

@@ -23,7 +23,7 @@ After downloading Bel, you can run it like this:
 
 ```sh
 $ perl -Ilib bin/bel
-Language::Bel 0.48 -- darwin.
+Language::Bel 0.49 -- darwin.
 >
 > ;; loops
 > (set n (len (apply append prims)))
@@ -74,9 +74,9 @@ nil
 It's not fully there yet, though it's under active development.
 
 [The spec](https://github.com/masak/bel/blob/master/pg/bel.bel) contains 353 items.
-`Language::Bel` currently defines 325 of them.
+`Language::Bel` currently defines 331 of them.
 
-![325 of 353 definitions](images/definitions.svg)
+![331 of 353 definitions](images/definitions.svg)
 
 A summary of the remaining big features:
 
@@ -89,13 +89,6 @@ A summary of the remaining big features:
   has to defensively copy the whole stack both when taking the continuation and when
   invoking it. (Either that, or we modify the Perl evaluator to use a persistent
   Bel list too.)
-
-* **Backquotes** (or "quasiquoting"); there's a backquote expander written in Perl
-  already. It runs earlier than it should. (It runs right after reading, before
-  evaluation. It should run as a normal macro, and then be evaluated. There must be
-  a conformance test that could expose this difference.) The main difficulty in
-  getting rid of the Perl version and running backquotes in Bel is that the
-  definition of the backquotes macro relies on working backquotes.
 
 * **Printer**; there's a printer written in Perl already. It's largely
   feature-complete, but just like the evaluator and reader, it's not extensible

@@ -35,9 +35,6 @@ use Language::Bel::Primitives;
 use Language::Bel::Reader qw(
     read_whole
 );
-use Language::Bel::Expander::Bquote qw(
-    _bqexpand
-);
 use Language::Bel::Globals;
 use Language::Bel::Printer qw(
     _print
@@ -49,11 +46,11 @@ Language::Bel - An interpreter for Paul Graham's language Bel
 
 =head1 VERSION
 
-Version 0.48
+Version 0.49
 
 =cut
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 =head1 SYNOPSIS
 
@@ -167,7 +164,7 @@ Prints the result.
 sub read_eval_print {
     my ($self, $expr) = @_;
 
-    my $ast = _bqexpand(read_whole($expr));
+    my $ast = read_whole($expr);
     my $eval_result = $self->eval($ast);
     my $result_string = _print($eval_result);
 

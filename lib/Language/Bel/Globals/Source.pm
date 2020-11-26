@@ -1296,17 +1296,59 @@ __DATA__
           'no)
       (or (parsenum cs base) (sym cs))))
 
-; skip bquote [waiting for backquotes]
+(mac bquote (e)
+  ((list 'lit 'clo scope '((sub change))
+     '(if change sub (list 'quote e)))
+   (bqex e nil)))
 
-; skip bqex [waiting for backquotes]
+(def bqex (e n)
+  (if (no e)   (list nil nil)
+      (atom e) (list (list 'quote e) nil)
+               (if (id (car e) 'bquote)   (bqthru e (list n) 'bquote)
+                   (id (car e) 'comma)    (if (no n)
+                                              (list (cadr e) t)
+                                              (bqthru e (car n) 'comma))
+                   (id (car e) 'comma-at) (if (no n)
+                                              (list (list 'splice (cadr e)) t)
+                                              (bqthru e (car n) 'comma-at))
+                                          (bqexpair e n))))
 
-; skip bqthru [waiting for backquotes]
+(def bqthru (e n op)
+  ((list 'lit 'clo scope '((sub change))
+     '(if change
+          (list (if (caris sub 'splice id)
+                    (list 'cons (list 'quote op) (cadr sub))
+                    (list 'list (list 'quote op) sub))
+                t)
+          (list (list 'quote e) nil)))
+   (bqex (cadr e) n)))
 
-; skip bqexpair [waiting for backquotes]
+(def bqexpair (e n)
+  ((list 'lit 'clo scope '((a achange) (d dchange))
+     '(if (if achange t dchange)
+          (list (if (caris d 'splice id)
+                    (if (caris a 'splice id)
+                        (list 'apply 'append (list 'spa (cadr a))
+                                             (list 'spd (cadr d)))
+                        (list 'apply 'cons a (list 'spd (cadr d))))
+                    (caris a 'splice id)
+                    (list 'append (list 'spa (cadr a)) d)
+                    (list 'cons a d))
+                t)
+          (list (list 'quote e) nil)))
+   (bqex (car e) n)
+   (bqex (cdr e) n)))
 
-; skip spa [waiting for backquotes]
+(def spa (x)
+  (if (if x (atom x))
+      (err 'splice-atom)
+      x))
 
-; skip spd [waiting for backquotes]
+(def spd (x)
+  (if (no x)   (err 'splice-empty-cdr)
+      (atom x) (err 'splice-atom)
+      (cdr x)  (err 'splice-multiple-cdrs)
+               x))
 
 (mac comma args
   '(err 'comma-outside-backquote))
