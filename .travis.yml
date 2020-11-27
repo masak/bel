@@ -1,4 +1,0 @@
-language: perl
-perl:
-  - "5.8"
-  - "5.30"
