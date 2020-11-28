@@ -26,4 +26,4 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Run tests
-        run: prove -e'perl -Ilib -T' --timer
+        run: prove -e'perl -Ilib -T' --timer -j4
