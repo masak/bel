@@ -18,11 +18,6 @@ sub list {
             "(a b)",
             "('unboundb ccc)",
         ],
-        backquotes => [
-            "(isa!mac bquote)",
-            "t",
-            "('unboundb bquote)",
-        ],
         printer => [
             "(function print)",
             "clo",
