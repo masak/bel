@@ -80,7 +80,6 @@ sub generate {
 
         .done               { fill: white; }
         .feature-ccc        { fill: $color1; }
-        .feature-backquotes { fill: $color3; }
         .feature-printer    { fill: $color4; }
         .feature-chars      { fill: $color5; }
       </style>\n\n");
@@ -131,7 +130,7 @@ sub generate {
         $last_features = $features;
     }
 
-    my @FEATURES = qw<done ccc backquotes printer chars>;
+    my @FEATURES = qw<done ccc printer chars>;
     $y = $y_offset + 20 * $y - 30 * (scalar(@FEATURES) - 1);
     for my $feature (@FEATURES) {
         my $class = $feature eq "done"
