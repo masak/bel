@@ -1407,8 +1407,32 @@ sub applycont {
     my ($self, $s2, $r2, $args) = @_;
 
     # XXX: skipping `args` error handling for now
-    # XXX: skipping the `protected` details for now
 
+    my %mem_s2;
+    my $s2_copy = $s2;
+    while (!is_nil($s2_copy)) {
+        $mem_s2{$s2_copy} = 1;
+        $s2_copy = $self->cdr($s2_copy);
+    }
+
+    my $smark = $self->cdr($self->{globals}->get_kv("smark"));
+
+    # (def protected (x)
+    #   (some [begins (car x) (list smark _) id]
+    #         '(bind prot)))
+    my $protected = sub {
+        my $e = $_->[0];
+        my $cdr;
+        return is_pair($e)
+            && are_identical($self->car($e), $smark)
+            && is_pair($cdr = $self->cdr($e))
+            && (is_symbol_of_name($self->car($cdr), "bind")
+                || is_symbol_of_name($self->car($cdr), "prot"));
+    };
+
+    my @kept_s = grep {
+        $protected->($_) && !$mem_s2{$_}
+    } @{$self->{s}};
     @{$self->{s}} = ();
     while (!is_nil($s2)) {
         my $entry = $self->car($s2);
@@ -1417,6 +1441,7 @@ sub applycont {
         unshift @{$self->{s}}, [$e, $a];
         $s2 = $self->cdr($s2);
     }
+    unshift @{$self->{s}}, @kept_s;
 
     @{$self->{r}} = ();
     while (!is_nil($r2)) {
