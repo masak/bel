@@ -200,11 +200,23 @@ __DATA__
 (def is (x)
   [= _ x])
 
-; skip eif [waiting for ccc]
+(mac eif (var (o expr) (o fail) (o ok))
+  (with (v (uvar)
+         w (uvar)
+         c (uvar))
+    `(let ,v (join)
+       (let ,w (ccc (fn (,c)
+                      (dyn err [,c (cons ,v _)] ,expr)))
+         (if (caris ,w ,v id)
+             (let ,var (cdr ,w) ,fail)
+             (let ,var ,w ,ok))))))
 
-; skip onerr [waiting for ccc]
+(mac onerr (e1 e2)
+  (let v (uvar)
+    `(eif ,v ,e2 ,e1 ,v)))
 
-; skip safe [waiting for ccc]
+(mac safe (expr)
+  `(onerr nil ,expr))
 
 (def literal (e)
   (or (in e t nil o apply)
@@ -1065,7 +1077,8 @@ __DATA__
 (def read ((o s|source ins) (o (t base [<= 2 _ 16]) 10) (o eof))
   (car (rdex s (srnum:numr base) eof)))
 
-; skip saferead [waiting for ccc]
+(def saferead ((o s ins) (o alt) (o base 10))
+  (onerr alt (read s base alt)))
 
 (def rdex ((o s ins) (o base i10) (o eof) (o share))
   (eatwhite s)
@@ -1425,7 +1438,9 @@ __DATA__
       (cons (car xs)
             (first (- n 1) (cdr xs)))))
 
-; skip catch [waiting for ccc]
+(mac catch body
+  (letu v
+    `(ccc (fn (,v) (bind throw ,v ,@body)))))
 
 (def cut (xs (o start 1) (o end (len xs)))
   (first (- (+ end 1 (if (< end 0) (len xs) 0))

@@ -23,7 +23,7 @@ After downloading Bel, you can run it like this:
 
 ```sh
 $ perl -Ilib bin/bel
-Language::Bel 0.49 -- darwin.
+Language::Bel 0.50 -- darwin.
 >
 > ;; loops
 > (set n (len (apply append prims)))
@@ -74,21 +74,11 @@ nil
 It's not fully there yet, though it's under active development.
 
 [The spec](https://github.com/masak/bel/blob/master/pg/bel.bel) contains 353 items.
-`Language::Bel` currently defines 331 of them.
+`Language::Bel` currently defines 336 of them.
 
-![331 of 353 definitions](images/definitions.svg)
+![336 of 353 definitions](images/definitions.svg)
 
 A summary of the remaining big features:
-
-* **ccc** (or `call-with-current-continuation`) is a control mechanism that allows the
-  program to save a point in the execution, and to return to that point again later.
-  Saving the execution state means saving the current evaluation stack, and being able
-  to reinstate it when a continuation is invoked. The current Perl implementation uses
-  a mutable Perl array for the evaluation stack, instead of a persistent Bel list; this
-  means that unlike the Bel implementation of the evaluator, the Perl implementation
-  has to defensively copy the whole stack both when taking the continuation and when
-  invoking it. (Either that, or we modify the Perl evaluator to use a persistent
-  Bel list too.)
 
 * **Printer**; there's a printer written in Perl already. It's largely
   feature-complete, but just like the evaluator and reader, it's not extensible

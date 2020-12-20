@@ -13,11 +13,6 @@ sub list {
             "\\A",
             "('unboundb nchar)",
         ],
-        ccc => [
-            "(list 'a (ccc (fn (c) 'b)))",
-            "(a b)",
-            "('unboundb ccc)",
-        ],
         printer => [
             "(function print)",
             "clo",
