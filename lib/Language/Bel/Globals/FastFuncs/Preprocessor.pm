@@ -69,7 +69,7 @@ sub preprocess {
             # all of the fastfuncs source before benefitting from some of
             # them -- this cutoff will move gradually downwards and
             # eventually disappear
-            if ($function_name eq "fastfunc__reduce") {
+            if ($function_name eq "fastfunc__cons") {
                 $seen_cutoff = 1;
             }
 
