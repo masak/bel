@@ -102,6 +102,9 @@ use Language::Bel::Core qw(
 use Language::Bel::Pair::FastFunc qw(
     make_fastfunc
 );
+use Language::Bel::Pair::CharsList qw(
+    make_chars_list
+);
 use Language::Bel::Primitives;
 use Language::Bel::Globals::FastFuncs qw(
 HEADER
@@ -160,6 +163,8 @@ sub new {
         $self->{list} = SYMBOL_NIL;
 
 HEADER
+
+    print_chars();
 
     for my $prim_name (Language::Bel::Primitives->all_primitives()) {
         print_primitive($prim_name);
@@ -494,6 +499,10 @@ FOOTER
 }
 
 my $ADD = q[$self->add_global];
+
+sub print_chars {
+    print(qq[        $ADD("chars", make_chars_list(0));\n\n]);
+}
 
 sub print_primitive {
     my ($name) = @_;

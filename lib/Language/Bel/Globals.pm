@@ -22,6 +22,9 @@ use Language::Bel::Core qw(
 use Language::Bel::Pair::FastFunc qw(
     make_fastfunc
 );
+use Language::Bel::Pair::CharsList qw(
+    make_chars_list
+);
 use Language::Bel::Primitives;
 use Language::Bel::Globals::FastFuncs qw(
     fastfunc__no
@@ -140,6 +143,8 @@ sub new {
     if (!defined($self->{hash_ref}) && !defined($self->{list})) {
         $self->{hash_ref} = {};
         $self->{list} = SYMBOL_NIL;
+
+        $self->add_global("chars", make_chars_list(0));
 
         $self->add_global("car", make_prim("car"));
 
