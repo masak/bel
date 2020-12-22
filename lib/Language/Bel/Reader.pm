@@ -182,12 +182,14 @@ sub _rdlist {
     ++$pos;
     my @list;
     my $seen_dot = "";
+    my $seen_stopper = "";
     my $seen_element_after_dot = "";
     while ($pos < length($expr)) {
         $skip_whitespace->();
         my $c = substr($expr, $pos, 1);
         if ($c eq $stopper) {
             ++$pos;
+            $seen_stopper = 1;
             last;
         }
         elsif ($c eq ".") {
@@ -211,6 +213,8 @@ sub _rdlist {
         push @list, $r->{ast};
         $pos = $r->{pos};
     }
+    die "Expected '$stopper', got end of input\n"
+        unless $seen_stopper;
     my $ast = $seen_dot ? pop(@list) : SYMBOL_NIL;
     for my $e (reverse(@list)) {
         $ast = make_pair($e, $ast);

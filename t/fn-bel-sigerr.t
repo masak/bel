@@ -54,7 +54,7 @@ __DATA__
 > (bel '(no))
 !ERROR: underargs
 
-> (bel '((lit clo nil ((x y)) nil) 'd)
+> (bel '((lit clo nil ((x y)) nil) 'd))
 !ERROR: atom-arg
 
 > (bel '(join 'a (ccc (lit clo nil (c) (c)))))

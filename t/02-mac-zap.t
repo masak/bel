@@ -24,7 +24,7 @@ __DATA__
 > y
 "Bel"
 
-> (set L '(a b c)
+> (set L '(a b c))
 (a b c)
 
 > (zap (fn () 'z) (cadr L))

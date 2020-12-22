@@ -60,7 +60,7 @@ bye
 > (where (some pair '(a b (c d) e)))
 ((xs (c d) e) d)
 
-> (where (some symbol '((a b) c d e)
+> (where (some symbol '((a b) c d e)))
 ((xs c d e) d)
 
 > (where (mem 'b '(a b c)))
