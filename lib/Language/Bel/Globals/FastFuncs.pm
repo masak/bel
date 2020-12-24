@@ -3419,6 +3419,20 @@ sub fastfunc__pint {
     return SYMBOL_T;
 }
 
+sub fastfunc__charn {
+    my ($bel, $c) = @_;
+
+    if (!is_char($c)) {
+        die "not-a-char\n";
+    }
+
+    my $n = $c->codepoint();
+    return make_num(
+        make_signed_rat("+", $n, 1),
+        make_signed_rat("+", 0, 1),
+    );
+}
+
 sub fastfunc__prn {
     my ($bel, @args) = @_;
 
@@ -3647,6 +3661,7 @@ our @EXPORT_OK = qw(
     fastfunc__real
     fastfunc__int
     fastfunc__pint
+    fastfunc__charn
     fastfunc__prn
     fastfunc__pr
     fastfunc__prs
