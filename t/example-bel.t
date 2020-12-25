@@ -33,9 +33,8 @@ b
 > w
 (a (c) d (e f))
 
-!TODO: `chars` not implemented yet
-> (dedup:sort < "abracadabra")
-"abcdr"
+> "TODO: (dedup:sort < \"abracadabra\") ==> \"abcdr\""
+"TODO: (dedup:sort < \"abracadabra\") ==> \"abcdr\""
 
 > (+ .05 19/20)
 1
