@@ -1438,7 +1438,8 @@ __DATA__
 (vir num (f args)
   `(nth ,f ,@args))
 
-; skip nchar [waiting for chars]
+(def nchar (n)
+  (car ((+ n 1) chars)))
 
 (def first (n|whole xs)
   (if (or (= n 0) (no xs))
