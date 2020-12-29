@@ -1,4 +1,6 @@
-# `Language::Bel`, a Perl implementation of Bel
+# `Language::Bel`
+
+![CI](https://github.com/masak/bel/workflows/CI/badge.svg)
 
 A Perl 5 implementation of Paul Graham's [Bel](http://www.paulgraham.com/bel.html).
 Bel is a self-hosting Lisp dialect, released October 2019.
