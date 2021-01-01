@@ -99,6 +99,7 @@ use Language::Bel::Globals::FastFuncs qw(
     fastfunc__pr
     fastfunc__prs
     fastfunc__len
+    fastfunc__nchar
     fastfunc__dedup
     fastfunc__err
 );
@@ -6783,7 +6784,7 @@ sub new {
             make_pair(make_symbol("xs"), SYMBOL_NIL)), SYMBOL_NIL))),
             SYMBOL_NIL)))), SYMBOL_NIL))))));
 
-        $self->add_global("nchar", make_pair(make_symbol("lit"),
+        $self->add_global("nchar", make_fastfunc(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("n"), SYMBOL_NIL),
             make_pair(make_pair(make_symbol("car"),
@@ -6795,7 +6796,7 @@ sub new {
             make_pair(SYMBOL_NIL, make_pair(make_pair(SYMBOL_T, SYMBOL_NIL),
             SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL))),
             make_pair(make_symbol("chars"), SYMBOL_NIL)), SYMBOL_NIL)),
-            SYMBOL_NIL))))));
+            SYMBOL_NIL))))), \&fastfunc__nchar));
 
         $self->add_global("first", make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,

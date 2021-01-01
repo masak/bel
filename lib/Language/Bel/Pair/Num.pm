@@ -6,6 +6,8 @@ use strict;
 use warnings;
 
 use Language::Bel::Core qw(
+    is_nil
+    is_symbol_of_name
     make_pair
     make_symbol
     SYMBOL_NIL
@@ -72,14 +74,78 @@ sub xdr {
     return $self->{pair}->xdr($cdr);
 }
 
+sub is_num {
+    my ($object) = @_;
+
+    return $object->isa(__PACKAGE__);
+}
+
 sub make_num {
     my ($real_sr, $imag_sr) = @_;
 
     return __PACKAGE__->new($real_sr, $imag_sr);
 }
 
+sub maybe_get_int {
+    my ($bel, $x) = @_;
+
+    # skip past the 'lit' and the 'num'
+    $x = $bel->cdr($bel->cdr($x));
+
+    my $xr = $bel->car($x);
+    my $xi = $bel->car($bel->cdr($x));
+
+    my $real_part;
+    {
+        my $xs = $bel->car($xr);
+        my $xn = $bel->car($bel->cdr($xr));
+        my $xd = $bel->car($bel->cdr($bel->cdr($xr)));
+
+        my $xn_n = 0;
+        while (!is_nil($xn)) {
+            ++$xn_n;
+            $xn = $bel->cdr($xn);
+        }
+
+        my $xd_n = 0;
+        while (!is_nil($xd)) {
+            ++$xd_n;
+            $xd = $bel->cdr($xd);
+        }
+
+        $real_part = is_symbol_of_name($xs, "+")
+            ? $xn_n / $xd_n
+            : -$xn_n / $xd_n;
+    }
+
+    {
+        my $xn = $bel->car($bel->cdr($xi));
+        my $xd = $bel->car($bel->cdr($bel->cdr($xi)));
+
+        my $xn_n = 0;
+        while (!is_nil($xn)) {
+            ++$xn_n;
+            $xn = $bel->cdr($xn);
+        }
+
+        my $xd_n = 0;
+        while (!is_nil($xd)) {
+            ++$xd_n;
+            $xd = $bel->cdr($xd);
+        }
+
+        my $imaginary_part = $xn_n / $xd_n;
+        return
+            if $imaginary_part != 0;
+    }
+
+    return int($real_part);
+}
+
 our @EXPORT_OK = qw(
+    is_num
     make_num
+    maybe_get_int
 );
 
 1;

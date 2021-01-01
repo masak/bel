@@ -23,6 +23,7 @@ use Language::Bel::Core qw(
 );
 use Language::Bel::Pair::Num qw(
     make_num
+    maybe_get_int
 );
 use Language::Bel::Pair::SignedRat qw(
     make_signed_rat
@@ -3496,6 +3497,18 @@ sub fastfunc__len {
     );
 }
 
+sub fastfunc__nchar {
+    my ($bel, $n) = @_;
+
+    my $nn = maybe_get_int($bel, $n);
+    die "mistype\n"
+        unless defined($nn);
+    die "mistype\n"
+        unless $nn >= 0;
+
+    return make_char($nn);
+}
+
 sub fastfunc__dedup  {
     my ($bel, $xs, $f) = @_;
 
@@ -3666,6 +3679,7 @@ our @EXPORT_OK = qw(
     fastfunc__pr
     fastfunc__prs
     fastfunc__len
+    fastfunc__nchar
     fastfunc__dedup
     fastfunc__err
 );
