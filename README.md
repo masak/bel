@@ -101,7 +101,7 @@ Pull requests are warmly welcome.
 
 ## License and copyright
 
-This software is Copyright (c) 2019-2020 by Carl Mäsak.
+This software is Copyright (c) 2019-2021 by Carl Mäsak.
 
 This project is licensed under the GNU GPL 3.0.
 For details, see [`LICENSE`](https://github.com/masak/bel/blob/master/LICENSE).
