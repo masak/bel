@@ -1398,7 +1398,9 @@ __DATA__
 
 ; skip prnum [waiting for printer]
 
-; skip rrep [waiting for printer]
+(def rrep ((n d) (o base i10))
+  (append (irep n base)
+          (if (= d i1) nil (cons \/ (irep d base)))))
 
 (def irep (x base)
   (if (i< x base)
