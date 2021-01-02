@@ -1402,7 +1402,8 @@ __DATA__
 
 ; skip irep [waiting for printer]
 
-; skip intchar [waiting for printer]
+(def intchar (x)
+  (car (udrop x "0123456789abcdef")))
 
 ; skip prpair [waiting for printer]
 

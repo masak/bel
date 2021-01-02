@@ -6637,6 +6637,22 @@ sub new {
             SYMBOL_NIL)))), SYMBOL_NIL))), make_pair(make_symbol("x"),
             SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL))))));
 
+        $self->add_global("intchar", make_pair(make_symbol("lit"),
+            make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+            make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
+            make_pair(make_pair(make_symbol("car"),
+            make_pair(make_pair(make_symbol("udrop"), make_pair(make_symbol("x"),
+            make_pair(make_pair(make_char(48), make_pair(make_char(49),
+            make_pair(make_char(50), make_pair(make_char(51),
+            make_pair(make_char(52), make_pair(make_char(53),
+            make_pair(make_char(54), make_pair(make_char(55),
+            make_pair(make_char(56), make_pair(make_char(57),
+            make_pair(make_char(97), make_pair(make_char(98),
+            make_pair(make_char(99), make_pair(make_char(100),
+            make_pair(make_char(101), make_pair(make_char(102),
+            SYMBOL_NIL)))))))))))))))), SYMBOL_NIL))), SYMBOL_NIL)),
+            SYMBOL_NIL))))));
+
         $self->add_global("prn", make_fastfunc(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_symbol("args"), make_pair(make_pair(make_symbol("do"),
