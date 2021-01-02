@@ -1385,7 +1385,8 @@ __DATA__
 
 ; skip prc [waiting for printer]
 
-; skip ustring [waiting for printer]
+(def ustring (x names)
+  (and x (string x) (~tail [get _ names id] x)))
 
 ; skip prstring [waiting for printer]
 

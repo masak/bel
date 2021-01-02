@@ -6622,6 +6622,21 @@ sub new {
             SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL)))))),
             SYMBOL_NIL))))));
 
+        $self->add_global("ustring", make_pair(make_symbol("lit"),
+            make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+            make_pair(make_pair(make_symbol("x"), make_pair(make_symbol("names"),
+            SYMBOL_NIL)), make_pair(make_pair(make_symbol("and"),
+            make_pair(make_symbol("x"), make_pair(make_pair(make_symbol("string"),
+            make_pair(make_symbol("x"), SYMBOL_NIL)),
+            make_pair(make_pair(make_pair(make_symbol("compose"),
+            make_pair(make_symbol("no"), make_pair(make_symbol("tail"),
+            SYMBOL_NIL))), make_pair(make_pair(make_symbol("fn"),
+            make_pair(make_pair(make_symbol("_"), SYMBOL_NIL),
+            make_pair(make_pair(make_symbol("get"), make_pair(make_symbol("_"),
+            make_pair(make_symbol("names"), make_pair(make_symbol("id"),
+            SYMBOL_NIL)))), SYMBOL_NIL))), make_pair(make_symbol("x"),
+            SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL))))));
+
         $self->add_global("prn", make_fastfunc(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_symbol("args"), make_pair(make_pair(make_symbol("do"),
