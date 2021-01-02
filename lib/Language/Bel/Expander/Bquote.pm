@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-use Language::Bel::Types qw(
+use Language::Bel::Core qw(
     is_pair
     is_nil
     is_symbol_of_name

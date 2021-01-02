@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-use Language::Bel::Types qw(make_symbol);
+use Language::Bel::Core qw(make_symbol);
 use Exporter 'import';
 
 my $symbol_a = make_symbol("a");

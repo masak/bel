@@ -5,7 +5,7 @@ use 5.006;
 use strict;
 use warnings;
 
-use Language::Bel::Types qw(
+use Language::Bel::Core qw(
     make_pair
 );
 use Language::Bel::Symbols::Common qw(

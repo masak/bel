@@ -1,4 +1,4 @@
-package Language::Bel::Types;
+package Language::Bel::Core;
 
 use 5.006;
 use strict;
