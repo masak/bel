@@ -1400,7 +1400,11 @@ __DATA__
 
 ; skip rrep [waiting for printer]
 
-; skip irep [waiting for printer]
+(def irep (x base)
+  (if (i< x base)
+      (list (intchar x))
+      (let (q r) (i/ x base)
+        (snoc (irep q base) (intchar r)))))
 
 (def intchar (x)
   (car (udrop x "0123456789abcdef")))

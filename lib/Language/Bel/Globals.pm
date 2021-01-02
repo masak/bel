@@ -6637,6 +6637,25 @@ sub new {
             SYMBOL_NIL)))), SYMBOL_NIL))), make_pair(make_symbol("x"),
             SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL))))));
 
+        $self->add_global("irep", make_pair(make_symbol("lit"),
+            make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+            make_pair(make_pair(make_symbol("x"), make_pair(make_symbol("base"),
+            SYMBOL_NIL)), make_pair(make_pair(make_symbol("if"),
+            make_pair(make_pair(make_symbol("i<"), make_pair(make_symbol("x"),
+            make_pair(make_symbol("base"), SYMBOL_NIL))),
+            make_pair(make_pair(make_symbol("list"),
+            make_pair(make_pair(make_symbol("intchar"), make_pair(make_symbol("x"),
+            SYMBOL_NIL)), SYMBOL_NIL)), make_pair(make_pair(make_symbol("let"),
+            make_pair(make_pair(make_symbol("q"), make_pair(make_symbol("r"),
+            SYMBOL_NIL)), make_pair(make_pair(make_symbol("i/"),
+            make_pair(make_symbol("x"), make_pair(make_symbol("base"),
+            SYMBOL_NIL))), make_pair(make_pair(make_symbol("snoc"),
+            make_pair(make_pair(make_symbol("irep"), make_pair(make_symbol("q"),
+            make_pair(make_symbol("base"), SYMBOL_NIL))),
+            make_pair(make_pair(make_symbol("intchar"), make_pair(make_symbol("r"),
+            SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL)))),
+            SYMBOL_NIL))))));
+
         $self->add_global("intchar", make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("x"), SYMBOL_NIL),
