@@ -14,14 +14,12 @@ use Language::Bel::Core qw(
     make_char
     make_pair
     make_symbol
-);
-use Language::Bel::Primitives;
-use Language::Bel::Symbols::Common qw(
     SYMBOL_A
     SYMBOL_D
     SYMBOL_NIL
     SYMBOL_T
 );
+use Language::Bel::Primitives;
 use Language::Bel::Printer qw(
     _print
 );

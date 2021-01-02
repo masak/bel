@@ -8,12 +8,10 @@ use warnings;
 use Language::Bel::Core qw(
     make_pair
     make_symbol
+    SYMBOL_NIL
 );
 use Language::Bel::Type::Pair::RepeatList qw(
     make_repeat_list
-);
-use Language::Bel::Symbols::Common qw(
-    SYMBOL_NIL
 );
 
 use Exporter 'import';

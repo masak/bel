@@ -12,11 +12,10 @@ use Language::Bel::Core qw(
     make_symbol
     pair_car
     pair_cdr
-);
-use Language::Bel::Symbols::Common qw(
     SYMBOL_NIL
     SYMBOL_QUOTE
 );
+
 use Exporter 'import';
 
 sub _bqexpand {

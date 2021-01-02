@@ -7,8 +7,6 @@ use warnings;
 
 use Language::Bel::Core qw(
     make_pair
-);
-use Language::Bel::Symbols::Common qw(
     SYMBOL_NIL
     SYMBOL_T
 );

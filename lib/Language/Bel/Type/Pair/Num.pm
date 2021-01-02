@@ -8,8 +8,6 @@ use warnings;
 use Language::Bel::Core qw(
     make_pair
     make_symbol
-);
-use Language::Bel::Symbols::Common qw(
     SYMBOL_NIL
 );
 

@@ -21,8 +21,6 @@ use Language::Bel::Core qw(
     pair_set_car
     pair_set_cdr
     symbol_name
-);
-use Language::Bel::Symbols::Common qw(
     SYMBOL_CHAR
     SYMBOL_EOF
     SYMBOL_NIL

@@ -20,16 +20,14 @@ use Language::Bel::Core qw(
     pairs_are_identical
     symbol_name
     symbols_are_identical
+    SYMBOL_LOCK
+    SYMBOL_NIL
 );
 use Language::Bel::Type::Pair::FastFunc qw(
     is_fastfunc
 );
 use Language::Bel::Type::Pair::FutFunc qw(
     make_futfunc
-);
-use Language::Bel::Symbols::Common qw(
-    SYMBOL_LOCK
-    SYMBOL_NIL
 );
 use Language::Bel::Primitives;
 use Language::Bel::Reader qw(
