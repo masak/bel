@@ -4,7 +4,6 @@ use 5.006;
 use strict;
 use warnings;
 
-use Language::Bel::Type::Char;
 use Language::Bel::Type::Pair;
 use Language::Bel::Type::Stream;
 use Language::Bel::Type::Symbol;
@@ -96,7 +95,10 @@ sub is_symbol_of_name {
 sub make_char {
     my ($codepoint) = @_;
 
-    return Language::Bel::Type::Char->new($codepoint);
+    return bless(
+        { codepoint => $codepoint },
+        "Language::Bel::Type::Char"
+    );
 }
 
 sub make_pair {
