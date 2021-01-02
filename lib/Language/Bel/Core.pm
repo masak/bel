@@ -74,8 +74,6 @@ sub mode {
 
 package Language::Bel::Core;
 
-use Language::Bel::Type::Symbol;
-
 use Exporter 'import';
 
 sub are_identical {
@@ -205,7 +203,10 @@ sub make_stream {
 sub make_symbol {
     my ($name) = @_;
 
-    return Language::Bel::Type::Symbol->new($name);
+    return bless(
+        { name => $name },
+        "Language::Bel::Type::Symbol",
+    );
 }
 
 sub pair_car {
