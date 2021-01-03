@@ -1,4 +1,4 @@
-package Language::Bel::Type::Pair;
+package Language::Bel::Pair;
 
 use 5.006;
 use strict;
@@ -28,7 +28,7 @@ sub xdr {
     return $self->{cdr} = $cdr;
 }
 
-package Language::Bel::Type::Stream;
+package Language::Bel::Stream;
 
 sub read_char {
     my ($self) = @_;
@@ -112,7 +112,7 @@ sub chars_are_identical {
 sub is_char {
     my ($object) = @_;
 
-    return $object->isa("Language::Bel::Type::Char");
+    return $object->isa("Language::Bel::Char");
 }
 
 sub is_nil {
@@ -124,13 +124,13 @@ sub is_nil {
 sub is_pair {
     my ($object) = @_;
 
-    return $object->isa("Language::Bel::Type::Pair");
+    return $object->isa("Language::Bel::Pair");
 }
 
 sub is_stream {
     my ($object) = @_;
 
-    return $object->isa("Language::Bel::Type::Stream");
+    return $object->isa("Language::Bel::Stream");
 }
 
 sub is_string {
@@ -146,7 +146,7 @@ sub is_string {
 sub is_symbol {
     my ($object) = @_;
 
-    return $object->isa("Language::Bel::Type::Symbol");
+    return $object->isa("Language::Bel::Symbol");
 }
 
 sub is_symbol_of_name {
@@ -160,7 +160,7 @@ sub make_char {
 
     return bless(
         { codepoint => $codepoint },
-        "Language::Bel::Type::Char"
+        "Language::Bel::Char"
     );
 }
 
@@ -169,7 +169,7 @@ sub make_pair {
 
     return bless(
         { car => $car, cdr => $cdr },
-        "Language::Bel::Type::Pair",
+        "Language::Bel::Pair",
     );
 }
 
@@ -193,7 +193,7 @@ sub make_stream {
 
     return bless(
         { handle => $handle, mode => $mode },
-        "Language::Bel::Type::Stream",
+        "Language::Bel::Stream",
     );
 }
 
@@ -202,7 +202,7 @@ sub make_symbol {
 
     return bless(
         { name => $name },
-        "Language::Bel::Type::Symbol",
+        "Language::Bel::Symbol",
     );
 }
 

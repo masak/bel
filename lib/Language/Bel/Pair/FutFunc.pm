@@ -1,5 +1,5 @@
-package Language::Bel::Type::Pair::FutFunc;
-use base qw(Language::Bel::Type::Pair);
+package Language::Bel::Pair::FutFunc;
+use base qw(Language::Bel::Pair);
 
 use 5.006;
 use strict;
@@ -67,7 +67,7 @@ sub apply {
 sub make_futfunc {
     my ($pair, $fn) = @_;
 
-    return Language::Bel::Type::Pair::FutFunc->new($pair, $fn);
+    return __PACKAGE__->new($pair, $fn);
 }
 
 our @EXPORT_OK = qw(

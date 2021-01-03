@@ -19,7 +19,7 @@ use Language::Bel::Core qw(
     SYMBOL_SYMBOL
     SYMBOL_T
 );
-use Language::Bel::Type::Pair::FastFunc qw(
+use Language::Bel::Pair::FastFunc qw(
     make_fastfunc
 );
 use Language::Bel::Primitives;

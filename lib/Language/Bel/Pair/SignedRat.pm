@@ -1,5 +1,5 @@
-package Language::Bel::Type::Pair::Num;
-use base qw(Language::Bel::Type::Pair);
+package Language::Bel::Pair::SignedRat;
+use base qw(Language::Bel::Pair);
 
 use 5.006;
 use strict;
@@ -10,15 +10,19 @@ use Language::Bel::Core qw(
     make_symbol
     SYMBOL_NIL
 );
+use Language::Bel::Pair::RepeatList qw(
+    make_repeat_list
+);
 
 use Exporter 'import';
 
 sub new {
-    my ($class, $real_sr, $imag_sr) = @_;
+    my ($class, $sign, $numerator, $denominator) = @_;
 
     my $obj = {
-        real_sr => $real_sr,
-        imag_sr => $imag_sr,
+        sign => $sign,
+        numerator => $numerator,
+        denominator => $denominator,
         pair => undef,
     };
     return bless($obj, $class);
@@ -29,15 +33,12 @@ sub reify_if_needed {
 
     if (!$self->{pair}) {
         $self->{pair} = make_pair(
-            make_symbol("lit"),
+            make_symbol($self->{sign}),
             make_pair(
-                make_symbol("num"),
+                make_repeat_list($self->{numerator}),
                 make_pair(
-                    $self->{real_sr},
-                    make_pair(
-                        $self->{imag_sr},
-                        SYMBOL_NIL,
-                    ),
+                    make_repeat_list($self->{denominator}),
+                    SYMBOL_NIL,
                 ),
             ),
         );
@@ -72,14 +73,32 @@ sub xdr {
     return $self->{pair}->xdr($cdr);
 }
 
-sub make_num {
-    my ($real_sr, $imag_sr) = @_;
+sub sign {
+    my ($self) = @_;
 
-    return __PACKAGE__->new($real_sr, $imag_sr);
+    return $self->{sign};
+}
+
+sub numerator {
+    my ($self) = @_;
+
+    return $self->{numerator};
+}
+
+sub denominator {
+    my ($self) = @_;
+
+    return $self->{denominator};
+}
+
+sub make_signed_rat {
+    my ($sign, $numerator, $denominator) = @_;
+
+    return __PACKAGE__->new($sign, $numerator, $denominator);
 }
 
 our @EXPORT_OK = qw(
-    make_num
+    make_signed_rat
 );
 
 1;

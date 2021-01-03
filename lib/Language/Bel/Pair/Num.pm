@@ -1,5 +1,5 @@
-package Language::Bel::Type::Pair::RepeatList;
-use base qw(Language::Bel::Type::Pair);
+package Language::Bel::Pair::Num;
+use base qw(Language::Bel::Pair);
 
 use 5.006;
 use strict;
@@ -7,17 +7,18 @@ use warnings;
 
 use Language::Bel::Core qw(
     make_pair
+    make_symbol
     SYMBOL_NIL
-    SYMBOL_T
 );
 
 use Exporter 'import';
 
 sub new {
-    my ($class, $n) = @_;
+    my ($class, $real_sr, $imag_sr) = @_;
 
     my $obj = {
-        n => $n,
+        real_sr => $real_sr,
+        imag_sr => $imag_sr,
         pair => undef,
     };
     return bless($obj, $class);
@@ -28,8 +29,17 @@ sub reify_if_needed {
 
     if (!$self->{pair}) {
         $self->{pair} = make_pair(
-            SYMBOL_T,
-            make_repeat_list($self->{n} - 1),
+            make_symbol("lit"),
+            make_pair(
+                make_symbol("num"),
+                make_pair(
+                    $self->{real_sr},
+                    make_pair(
+                        $self->{imag_sr},
+                        SYMBOL_NIL,
+                    ),
+                ),
+            ),
         );
     }
 }
@@ -62,22 +72,14 @@ sub xdr {
     return $self->{pair}->xdr($cdr);
 }
 
-sub n {
-    my ($self) = @_;
+sub make_num {
+    my ($real_sr, $imag_sr) = @_;
 
-    return $self->{n};
-}
-
-sub make_repeat_list {
-    my ($n) = @_;
-
-    return $n > 0
-        ? __PACKAGE__->new($n)
-        : SYMBOL_NIL;
+    return __PACKAGE__->new($real_sr, $imag_sr);
 }
 
 our @EXPORT_OK = qw(
-    make_repeat_list
+    make_num
 );
 
 1;

@@ -15,10 +15,10 @@ use Language::Bel::Core qw(
     SYMBOL_QUOTE
     SYMBOL_T
 );
-use Language::Bel::Type::Pair::Num qw(
+use Language::Bel::Pair::Num qw(
     make_num
 );
-use Language::Bel::Type::Pair::SignedRat qw(
+use Language::Bel::Pair::SignedRat qw(
     make_signed_rat
 );
 use Exporter 'import';

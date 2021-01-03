@@ -23,10 +23,10 @@ use Language::Bel::Core qw(
     SYMBOL_LOCK
     SYMBOL_NIL
 );
-use Language::Bel::Type::Pair::FastFunc qw(
+use Language::Bel::Pair::FastFunc qw(
     is_fastfunc
 );
-use Language::Bel::Type::Pair::FutFunc qw(
+use Language::Bel::Pair::FutFunc qw(
     make_futfunc
 );
 use Language::Bel::Primitives;
