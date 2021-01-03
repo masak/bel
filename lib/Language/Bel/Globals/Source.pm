@@ -1385,7 +1385,8 @@ __DATA__
 
 ; skip prc [waiting for printer]
 
-; skip ustring [waiting for printer]
+(def ustring (x names)
+  (and x (string x) (~tail [get _ names id] x)))
 
 ; skip prstring [waiting for printer]
 
@@ -1397,11 +1398,18 @@ __DATA__
 
 ; skip prnum [waiting for printer]
 
-; skip rrep [waiting for printer]
+(def rrep ((n d) (o base i10))
+  (append (irep n base)
+          (if (= d i1) nil (cons \/ (irep d base)))))
 
-; skip irep [waiting for printer]
+(def irep (x base)
+  (if (i< x base)
+      (list (intchar x))
+      (let (q r) (i/ x base)
+        (snoc (irep q base) (intchar r)))))
 
-; skip intchar [waiting for printer]
+(def intchar (x)
+  (car (udrop x "0123456789abcdef")))
 
 ; skip prpair [waiting for printer]
 
