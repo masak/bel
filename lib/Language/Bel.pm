@@ -95,7 +95,6 @@ sub new {
 
                 my $message_symbol = make_symbol($message_str);
                 my $symbol_err = make_symbol("err");
-                # XXX: pass the lexical context
                 my $err_kv = $self->lookup($symbol_err, SYMBOL_NIL);
                 die "Fatal: could not find 'err'"
                     unless $err_kv && is_pair($err_kv);
