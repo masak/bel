@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-use Language::Bel::Types qw(
+use Language::Bel::Core qw(
     are_identical
     atoms_are_identical
     is_char
@@ -20,16 +20,14 @@ use Language::Bel::Types qw(
     pairs_are_identical
     symbol_name
     symbols_are_identical
-);
-use Language::Bel::Type::Pair::FastFunc qw(
-    is_fastfunc
-);
-use Language::Bel::Type::Pair::FutFunc qw(
-    make_futfunc
-);
-use Language::Bel::Symbols::Common qw(
     SYMBOL_LOCK
     SYMBOL_NIL
+);
+use Language::Bel::Pair::FastFunc qw(
+    is_fastfunc
+);
+use Language::Bel::Pair::FutFunc qw(
+    make_futfunc
 );
 use Language::Bel::Primitives;
 use Language::Bel::Reader qw(

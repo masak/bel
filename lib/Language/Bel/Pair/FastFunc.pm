@@ -1,5 +1,5 @@
-package Language::Bel::Type::Pair::FastFunc;
-use base qw(Language::Bel::Type::Pair);
+package Language::Bel::Pair::FastFunc;
+use base qw(Language::Bel::Pair);
 
 use 5.006;
 use strict;
@@ -63,13 +63,13 @@ sub where_apply {
 sub is_fastfunc {
     my ($object) = @_;
 
-    return $object->isa("Language::Bel::Type::Pair::FastFunc");
+    return $object->isa(__PACKAGE__);
 }
 
 sub make_fastfunc {
     my ($pair, $fn, $where_fn) = @_;
 
-    return Language::Bel::Type::Pair::FastFunc->new($pair, $fn, $where_fn);
+    return Language::Bel::Pair::FastFunc->new($pair, $fn, $where_fn);
 }
 
 our @EXPORT_OK = qw(

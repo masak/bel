@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-use Language::Bel::Types qw(
+use Language::Bel::Core qw(
     are_identical
     is_symbol
     make_char
@@ -12,17 +12,15 @@ use Language::Bel::Types qw(
     make_symbol
     pair_cdr
     symbol_name
-);
-use Language::Bel::Type::Pair::FastFunc qw(
-    make_fastfunc
-);
-use Language::Bel::Symbols::Common qw(
     SYMBOL_CHAR
     SYMBOL_NIL
     SYMBOL_PAIR
     SYMBOL_QUOTE
     SYMBOL_SYMBOL
     SYMBOL_T
+);
+use Language::Bel::Pair::FastFunc qw(
+    make_fastfunc
 );
 use Language::Bel::Primitives;
 use Language::Bel::Globals::FastFuncs qw(

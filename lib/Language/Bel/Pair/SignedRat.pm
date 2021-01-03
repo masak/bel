@@ -1,19 +1,17 @@
-package Language::Bel::Type::Pair::SignedRat;
-use base qw(Language::Bel::Type::Pair);
+package Language::Bel::Pair::SignedRat;
+use base qw(Language::Bel::Pair);
 
 use 5.006;
 use strict;
 use warnings;
 
-use Language::Bel::Types qw(
+use Language::Bel::Core qw(
     make_pair
     make_symbol
-);
-use Language::Bel::Type::Pair::RepeatList qw(
-    make_repeat_list
-);
-use Language::Bel::Symbols::Common qw(
     SYMBOL_NIL
+);
+use Language::Bel::Pair::RepeatList qw(
+    make_repeat_list
 );
 
 use Exporter 'import';

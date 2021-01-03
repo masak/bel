@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-use Language::Bel::Types qw(
+use Language::Bel::Core qw(
     are_identical
     char_codepoint
     is_char
@@ -21,8 +21,6 @@ use Language::Bel::Types qw(
     pair_set_car
     pair_set_cdr
     symbol_name
-);
-use Language::Bel::Symbols::Common qw(
     SYMBOL_CHAR
     SYMBOL_EOF
     SYMBOL_NIL

@@ -4,24 +4,22 @@ use 5.006;
 use strict;
 use warnings;
 
-use Language::Bel::Types qw(
+use Language::Bel::Core qw(
     make_char
     make_pair
     make_symbol
-);
-use Language::Bel::Type::Pair::Num qw(
-    make_num
-);
-use Language::Bel::Type::Pair::SignedRat qw(
-    make_signed_rat
-);
-use Language::Bel::Symbols::Common qw(
     SYMBOL_BQUOTE
     SYMBOL_COMMA
     SYMBOL_COMMA_AT
     SYMBOL_NIL
     SYMBOL_QUOTE
     SYMBOL_T
+);
+use Language::Bel::Pair::Num qw(
+    make_num
+);
+use Language::Bel::Pair::SignedRat qw(
+    make_signed_rat
 );
 use Exporter 'import';
 

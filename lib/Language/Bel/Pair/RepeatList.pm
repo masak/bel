@@ -1,14 +1,12 @@
-package Language::Bel::Type::Pair::RepeatList;
-use base qw(Language::Bel::Type::Pair);
+package Language::Bel::Pair::RepeatList;
+use base qw(Language::Bel::Pair);
 
 use 5.006;
 use strict;
 use warnings;
 
-use Language::Bel::Types qw(
+use Language::Bel::Core qw(
     make_pair
-);
-use Language::Bel::Symbols::Common qw(
     SYMBOL_NIL
     SYMBOL_T
 );
