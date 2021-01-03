@@ -11,8 +11,7 @@ plan tests => 3;
 my %exception_of = (
     # special exception for `sigerr`, which I believe was mis-specified
     sigerr => 1,
-    # special exception for `applyprim` and `formfn`, which want `eif`
-    applyprim => 1,
+    # special exception for `formfn`, which wants `eif`
     formfn => 1,
     # special exception for `randlen`, which wants `read`
     randlen => 1,
