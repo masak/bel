@@ -18,3 +18,7 @@ __DATA__
 > (append)
 nil
 
+> (let p '(b)
+    (id (cdr:append '(a) p) p))
+t
+
