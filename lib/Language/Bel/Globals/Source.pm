@@ -322,10 +322,11 @@ __DATA__
          w  (uvar)
          ps (parameters (car parms)))
     `(fn ,v
-       (let ,w (apply (fn ,(car parms) (list ,@ps))
+       (eif ,w (apply (fn ,(car parms) (list ,@ps))
                       (car ,v))
-         (let ,ps ,w
-           (let ,(cdr parms) (cdr ,v) ,@body))))))
+               (apply sigerr 'bad-form (cddr ,v))
+               (let ,ps ,w
+                 (let ,(cdr parms) (cdr ,v) ,@body))))))
 
 (def parameters (p)
   (if (no p)           nil

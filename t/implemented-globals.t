@@ -11,8 +11,6 @@ plan tests => 3;
 my %exception_of = (
     # special exception for `sigerr`, which I believe was mis-specified
     sigerr => 1,
-    # special exception for `formfn`, which wants `eif`
-    formfn => 1,
     # special exception for `randlen`, which wants `read`
     randlen => 1,
     # special exception for the bquote built-ins, which would otherwise
