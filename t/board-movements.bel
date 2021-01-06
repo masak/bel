@@ -1,0 +1,89 @@
+;; This template defines a robot with coordinates (x, y) and direction
+;; vector (dx, dy). The coordinate system has the positive y direction
+;; pointing downwards, and (0, 0) is in the upper left corner.
+;; The robot is not allowed to leave the rectangle spanned by (0, 0)
+;; (inclusive) and (w, h) (exclusive). Note that the (w, h) coordinates
+;; are not specified here; they are parameters to `run` and `runcmd`.
+(tem robot x 0 y 0 dx 0 dy -1)
+
+;; A common pattern in Bel is to define a global, initially an empty
+;; list to act as a namespace for some given purpose...
+(set actions nil)
+
+;; ...and then to define a macro that will add things to this global.
+;; Here, we want to define five actions that control the robot.
+(mac action (cmd name parms . body)
+  `(push (cons ,cmd (fn ,parms ,@body)) actions))
+
+;; The first action is a bit of an exception. It aborts the run early
+;; so that no more commands are executed. This is achieved through a
+;; `throw` action, a non-local command which will find us back in
+;; `run`, the top-level function. The list passed to `throw`
+;; conveniently serves as a return value.
+(action 0 quit (r)
+  (throw (list r!x r!y)))
+
+;; This helper function makes it easy to talk about moving the robot
+;; `r` forwards or backwards, as specified by the operator `op`.
+;; Pass `+` and you move the robot forwards; pass `-` and you move it
+;; backwards. This is then used exactly in this way in the two
+;; subsequent actions.
+(def move (op r)
+  (zap op r!x r!dx)
+  (zap op r!y r!dy))
+
+(action 1 forward (r)
+  (move + r))
+
+(action 2 backward (r)
+  (move - r))
+
+;; Changing the robot's direction comes down to cycling through the
+;; four directions (0, -1), (1, 0), (0, 1), and (-1, 0); forwards in
+;; this list if we're going clockwise, otherwise backwards. There are
+;; many ways to do this, but the below is perhaps the simplest -- the
+;; `swap` makes sure to juggle the 1 between the x and y coordinates,
+;; and the `zap inv` switches the sign at the appropriate moments.
+(action 3 turncw (r)
+  (swap r!dx r!dy)
+  (zap inv r!dx))
+
+(action 4 turnccw (r)
+  (swap r!dx r!dy)
+  (zap inv r!dy))
+
+;; If the robot ever leaves its designated rectangle, we throw an
+;; exception and the run aborts early so that no more commands are
+;; executed. This is then checked after every command, although
+;; technically it's only necessary to check after forward and
+;; backwards moves.
+(def checkbounds (v max)
+  (or (<= 0 v (- max 1))
+      (throw 'impossible-move)))
+
+;; To run an individual command, we look up the `cmd` number in
+;; our `actions` association list. If we find it there, we run its
+;; associated action and check the bounds. If we don't, we throw
+;; an exception and abort early so that no more commands are
+;; executed.
+(def runcmd (r w h cmd)
+  (aif (get cmd actions)
+       (let action (cdr it)
+         (action r)
+         (checkbounds r!x w)
+         (checkbounds r!y h))
+       (throw 'illegal-command)))
+
+;; Given some dimensions (w, h), an initial robot position (x, y),
+;; and zero or more commands (numbers 0..4), the `run` function
+;; executes the commands one by one and returns the robot's final
+;; coordinates. `catch` is the context that all three `throw`s
+;; above bubble up to. `map` is the most idiomatic way to write
+;; `foreach` in Bel.
+(def run ((w h) (x y) cmds)
+  (let r (make robot x x y y)
+    (catch
+      (map [runcmd r w h _] cmds)
+      (list r!x r!y))))
+
+(prn (run '(10 5) '(2 2) '(1 3 1 1 1 0)))
