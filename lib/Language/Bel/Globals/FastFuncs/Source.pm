@@ -21,6 +21,12 @@ use Language::Bel::Core qw(
     SYMBOL_NIL
     SYMBOL_T
 );
+use Language::Bel::Pair::Num qw(
+    make_num
+);
+use Language::Bel::Pair::SignedRat qw(
+    make_signed_rat
+);
 use Language::Bel::Primitives;
 use Language::Bel::Printer qw(
     _print
@@ -3203,6 +3209,23 @@ sub fastfunc__prs {
         }
     }
     return $result;
+}
+
+sub fastfunc__len {
+    my ($bel, $xs) = @_;
+
+    my $length = 0;
+    while (!is_nil($xs)) {
+        $xs = $bel->cdr($xs);
+        ++$length;
+    }
+
+    my $srzero = make_signed_rat("+", 0, 1);
+
+    return make_num(
+        make_signed_rat("+", $length, 1),
+        $srzero,
+    );
 }
 
 sub fastfunc__err {
