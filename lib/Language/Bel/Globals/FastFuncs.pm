@@ -458,7 +458,9 @@ sub fastfunc__variable {
             if is_symbol_of_name($e, "t")
             || is_nil($e)
             || is_symbol_of_name($e, "o")
-            || is_symbol_of_name($e, "apply");
+            || is_symbol_of_name($e, "apply")
+            || is_char($e)
+            || is_stream($e);
 
         return SYMBOL_T;
     }
