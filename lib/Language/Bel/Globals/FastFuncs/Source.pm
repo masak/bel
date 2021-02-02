@@ -448,7 +448,7 @@ sub fastfunc__variable {
 
     if (is_pair($e)) {
         my $symbol_vmark = make_symbol("vmark");
-        my $vmark = $bel->lookup($symbol_vmark, SYMBOL_NIL);
+        my $vmark = $bel->cdr($bel->lookup($symbol_vmark, SYMBOL_NIL));
         my $is_vmark = are_identical($bel->car($e), $vmark);
         return $is_vmark
             ? SYMBOL_T
@@ -474,7 +474,7 @@ sub fastfunc__inwhere {
         unless is_pair($e);
 
     my $symbol_smark = make_symbol("smark");
-    my $smark = $bel->lookup($symbol_smark, SYMBOL_NIL);
+    my $smark = $bel->cdr($bel->lookup($symbol_smark, SYMBOL_NIL));
     return SYMBOL_NIL
         unless are_identical($bel->car($e), $smark);
 
