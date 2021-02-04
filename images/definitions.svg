@@ -1,8 +1,8 @@
 <svg
         xmlns='http://www.w3.org/2000/svg'
         width='630'
-        height='410'
-        viewbox='0 0 630 410'
+        height='400'
+        viewbox='0 0 630 400'
         onclick=''>
   <style>
         text {
@@ -2710,144 +2710,144 @@
         title='&lt;anon&gt;'
       />
   <rect
-        x='206'
-        y='376'
-        width='17'
-        height='17'
-        class='feature-chars box'
-        title='load'
-      />
-  <rect
-        x='231'
-        y='381'
+        x='201'
+        y='371'
         width='17'
         height='17'
         class='done box'
         title='&lt;anon&gt;'
       />
   <rect
-        x='251'
-        y='381'
+        x='221'
+        y='371'
         width='17'
         height='17'
         class='done box'
         title='&lt;anon&gt;'
       />
   <rect
-        x='271'
-        y='381'
+        x='241'
+        y='371'
         width='17'
         height='17'
         class='done box'
         title='&lt;anon&gt;'
       />
   <rect
-        x='291'
-        y='381'
+        x='261'
+        y='371'
         width='17'
         height='17'
         class='done box'
         title='&lt;anon&gt;'
       />
   <rect
-        x='311'
-        y='381'
+        x='281'
+        y='371'
         width='17'
         height='17'
         class='done box'
         title='&lt;anon&gt;'
       />
   <rect
-        x='331'
-        y='381'
+        x='301'
+        y='371'
         width='17'
         height='17'
         class='done box'
         title='&lt;anon&gt;'
       />
   <rect
-        x='351'
-        y='381'
+        x='321'
+        y='371'
         width='17'
         height='17'
         class='done box'
         title='&lt;anon&gt;'
       />
   <rect
-        x='371'
-        y='381'
+        x='341'
+        y='371'
         width='17'
         height='17'
         class='done box'
         title='&lt;anon&gt;'
       />
   <rect
-        x='391'
-        y='381'
+        x='361'
+        y='371'
         width='17'
         height='17'
         class='done box'
         title='&lt;anon&gt;'
       />
   <rect
-        x='411'
-        y='381'
+        x='381'
+        y='371'
         width='17'
         height='17'
         class='done box'
         title='&lt;anon&gt;'
       />
   <rect
-        x='431'
-        y='381'
+        x='401'
+        y='371'
         width='17'
         height='17'
         class='done box'
         title='&lt;anon&gt;'
       />
   <rect
-        x='451'
-        y='381'
+        x='421'
+        y='371'
         width='17'
         height='17'
         class='done box'
         title='&lt;anon&gt;'
       />
   <rect
-        x='471'
-        y='381'
+        x='441'
+        y='371'
         width='17'
         height='17'
         class='done box'
         title='&lt;anon&gt;'
       />
   <rect
-        x='491'
-        y='381'
+        x='461'
+        y='371'
         width='17'
         height='17'
         class='done box'
         title='&lt;anon&gt;'
       />
   <rect
-        x='511'
-        y='381'
+        x='481'
+        y='371'
         width='17'
         height='17'
         class='done box'
         title='&lt;anon&gt;'
       />
   <rect
-        x='531'
-        y='381'
+        x='501'
+        y='371'
         width='17'
         height='17'
         class='done box'
         title='&lt;anon&gt;'
       />
   <rect
-        x='551'
-        y='381'
+        x='521'
+        y='371'
+        width='17'
+        height='17'
+        class='done box'
+        title='&lt;anon&gt;'
+      />
+  <rect
+        x='541'
+        y='371'
         width='17'
         height='17'
         class='done box'
@@ -2855,7 +2855,7 @@
       />
   <rect
         x='20'
-        y='321'
+        y='311'
         width='17'
         height='17'
         class='done box'
@@ -2863,11 +2863,11 @@
       />
   <text
         x='50'
-        y='336'
+        y='326'
       >done</text>
   <rect
         x='20'
-        y='351'
+        y='341'
         width='17'
         height='17'
         class='feature-printer box'
@@ -2875,11 +2875,11 @@
       />
   <text
         x='50'
-        y='366'
+        y='356'
       >printer</text>
   <rect
         x='20'
-        y='381'
+        y='371'
         width='17'
         height='17'
         class='feature-chars box'
@@ -2887,6 +2887,6 @@
       />
   <text
         x='50'
-        y='396'
+        y='386'
       >chars</text>
 </svg>

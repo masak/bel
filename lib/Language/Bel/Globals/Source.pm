@@ -1665,7 +1665,11 @@ __DATA__
   (let eof (join)
     (drain (read s base eof) [id _ eof])))
 
-; skip load [waiting for chars]
+(def load (name)
+  (let eof (join)
+    (withfile s name 'in
+      (til e (read s 10 eof) (id e eof)
+        (bel e)))))
 
 (mac record body
   (letu v
