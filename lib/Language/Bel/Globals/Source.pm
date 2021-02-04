@@ -1059,7 +1059,18 @@ __DATA__
 
 (set bbuf nil)
 
-; skip bitc [waiting for chars]
+(def bitc ((o s ins))
+  (let bits (get s bbuf)
+    (aif (gets (rev (cdr bits)) chars)
+         (do (pull s bbuf caris)
+             (car it))
+         (let b (rdb s)
+           (if (in b nil 'eof)
+               b
+               (do (if bits
+                       (push b (cdr bits))
+                       (push (list s b) bbuf))
+                   (bitc s)))))))
 
 (def digit (c (o base i10))
   (mem c (udrop (udrop base i16) "fedcba9876543210")))
