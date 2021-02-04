@@ -80,21 +80,12 @@ It's not fully there yet, though it's under active development.
 
 ![343 of 353 definitions](images/definitions.svg)
 
-A summary of the remaining big features:
+A summary of the remaining big feature:
 
 * **Printer**; there's a printer written in Perl already. It's largely
   feature-complete, but just like the evaluator and reader, it's not extensible
   enough. It also doesn't handle cyclic structures and named pairs, although it
   could do that.
-
-* **chars**; this global definition contains a very long Bel list of charater
-  encodings. Although it would be feasible to build the entire list
-  for millions of characters in memory (or to compromise and only build it for,
-  say the Latin-1 subset or characters), probably a saner approach would be to
-  generate this list on-demand. (Edit: Actually trying this reveals that it is
-  too slow to be practical. Recursing down this list totally kills performance,
-  and also fills the memory with pairs. It's _necessary_ to intercept the `nchar`
-  and `charn` functions, and do something more efficient than a linear scan.)
 
 ## Contributing
 
