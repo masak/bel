@@ -44,7 +44,7 @@ sub cdr {
     my $codepoint = $self->{codepoint};
 
     if ($codepoint >= 127) {
-        die "Trying to go beyond character 127; not ready for that yet";
+        return SYMBOL_NIL;
     }
 
     return make_chars_list($codepoint + 1);
