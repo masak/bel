@@ -92,6 +92,7 @@ use Language::Bel::Globals::FastFuncs qw(
     fastfunc__prn
     fastfunc__pr
     fastfunc__prs
+    fastfunc__len
     fastfunc__err
 );
 
@@ -3764,7 +3765,7 @@ sub new {
             SYMBOL_NIL)))), SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL)))))),
             SYMBOL_NIL))))));
 
-        $self->add_global("len", make_pair(make_symbol("lit"),
+        $self->add_global("len", make_fastfunc(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("xs"), SYMBOL_NIL),
             make_pair(make_pair(make_symbol("if"),
@@ -3779,7 +3780,7 @@ sub new {
             make_pair(make_symbol("inc"), make_pair(make_symbol("len"),
             make_pair(make_symbol("cdr"), SYMBOL_NIL)))),
             make_pair(make_symbol("xs"), SYMBOL_NIL)), SYMBOL_NIL)))),
-            SYMBOL_NIL))))));
+            SYMBOL_NIL))))), \&fastfunc__len));
 
         $self->add_global("charn", make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
