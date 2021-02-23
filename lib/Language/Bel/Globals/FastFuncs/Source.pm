@@ -3303,6 +3303,7 @@ our @EXPORT_OK = qw(
     fastfunc__prn
     fastfunc__pr
     fastfunc__prs
+    fastfunc__len
     fastfunc__err
 );
 
