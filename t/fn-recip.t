@@ -28,5 +28,5 @@ __DATA__
 3/25-4/25i
 
 > (recip 0)
-!ERROR: 'mistype
+!ERROR: mistype
 

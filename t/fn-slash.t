@@ -44,5 +44,5 @@ __DATA__
 -3/4i
 
 > (/ 1 0)
-!ERROR: 'mistype
+!ERROR: mistype
 

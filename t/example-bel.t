@@ -62,7 +62,7 @@ b
 (a . b)
 
 > ((fn (x|int) (cons x 'b)) 'a)
-!ERROR: 'mistype
+!ERROR: mistype
 
 (Erratum: the following has a misprint in `belexamples.txt`: `sym`
 should be `symbol`. Using the corrected version for the test.)

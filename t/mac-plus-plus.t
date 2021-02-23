@@ -58,7 +58,7 @@ __DATA__
 (1 3 3)
 
 > (++ (find [= _ 0] '(1 2 3)))
-!ERROR: 'unfindable
+!ERROR: unfindable
 
 > (let kvs '((a . 1)
              (b . 2)

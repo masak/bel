@@ -22,7 +22,7 @@ stream
 stream
 
 > (ops "rukyerw" 'in)
-!ERROR: 'notexist
+!ERROR: notexist
 
 !END: unlink("prim-ops-testfile");
 

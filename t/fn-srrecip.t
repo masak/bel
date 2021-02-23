@@ -13,7 +13,7 @@ __DATA__
 (- (t) (t))
 
 > (srrecip (list '+ i0 i1))
-!ERROR: 'mistype
+!ERROR: mistype
 
 > (srrecip (list '+ i2 i1))
 (+ (t) (t t))

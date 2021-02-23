@@ -55,7 +55,7 @@ bye
 (((c d) e) a)
 
 > (where (find pair '(a b e)))
-!ERROR: 'unfindable
+!ERROR: unfindable
 
 > (where (some pair '(a b (c d) e)))
 ((xs (c d) e) d)
@@ -67,13 +67,13 @@ bye
 ((xs b c) d)
 
 > (where (mem 'z '(a b c)))
-!ERROR: 'unfindable
+!ERROR: unfindable
 
 > (where (in 'b 'a 'b 'c))
 ((xs b c) d)
 
 > (where (in 'z 'a 'b 'c))
-!ERROR: 'unfindable
+!ERROR: unfindable
 
 > (set kvs1 '((a . 1) (b . 2) (c . 3))
        kvs2 '(((a) . 1) ((b) . 2) ((c) . 3)))
@@ -83,13 +83,13 @@ bye
 (((b . 2) (c . 3)) a)
 
 > (where (get 'd kvs1))
-!ERROR: 'unfindable
+!ERROR: unfindable
 
 > (where (get '(b) kvs2))
 ((((b) . 2) ((c) . 3)) a)
 
 > (where (get '(b) kvs2 id))
-!ERROR: 'unfindable
+!ERROR: unfindable
 
 > (set q '(b)
        kvs `(((a) . 1) (,q . two) ((c) . 3)))
