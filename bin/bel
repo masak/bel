@@ -62,7 +62,7 @@ sub repl {
             $b->read_eval_print($expr);
         };
         if ($@) {
-            print($@);
+            print("Error: $@");
         }
     }
 }
