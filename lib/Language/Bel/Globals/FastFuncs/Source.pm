@@ -1629,7 +1629,7 @@ sub fastfunc__sr_slash {
     my $yn = $bel->car($bel->cdr($y));
     my $yd = $bel->car($bel->cdr($bel->cdr($y)));
 
-    die "'mistype\n"
+    die "mistype\n"
         if is_nil($yn);
 
     my $sign = is_symbol_of_name($xs, "-")
@@ -1696,7 +1696,7 @@ sub fastfunc__srrecip {
 
     my $s = $bel->car($sr);
     my $n = $bel->car($bel->cdr($sr));
-    die "'mistype\n"
+    die "mistype\n"
         if is_nil($n);
     my $d = $bel->car($bel->cdr($bel->cdr($sr)));
 

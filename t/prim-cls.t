@@ -16,7 +16,7 @@ __DATA__
 closed
 
 > (cls f)
-!ERROR: 'already-closed
+!ERROR: already-closed
 
 > (cls 'not-a-stream)
 !ERROR: mistype

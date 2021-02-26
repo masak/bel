@@ -10,7 +10,7 @@ __DATA__
 (nil)
 
 > ((lit clo nil ((t xs pair)) xs) 'a)
-!ERROR: 'mistype
+!ERROR: mistype
 
 > (def f1 ((t xs pair))
     xs)
@@ -20,14 +20,14 @@ __DATA__
 (nil)
 
 > (f1 'a)
-!ERROR: 'mistype
+!ERROR: mistype
 
 > (def f2 ((o (t (x . y) [caris _ 'a]) '(a . b)))
     x)
 !IGNORE: result of definition
 
 > (f2 '(b b))
-!ERROR: 'mistype
+!ERROR: mistype
 
 > (f2)
 a
@@ -40,5 +40,5 @@ a
 (+ (t t t) (t t))
 
 > (f3 '+ nil '(t t t))
-!ERROR: 'mistype
+!ERROR: mistype
 

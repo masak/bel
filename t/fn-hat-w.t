@@ -28,5 +28,5 @@ __DATA__
 9/4
 
 > (^w 5 -1)
-!ERROR: 'mistype
+!ERROR: mistype
 

@@ -44,11 +44,11 @@ Language::Bel - An interpreter for Paul Graham's language Bel
 
 =head1 VERSION
 
-Version 0.50
+Version 0.51
 
 =cut
 
-our $VERSION = '0.50';
+our $VERSION = '0.51';
 
 =head1 SYNOPSIS
 
@@ -349,7 +349,7 @@ FUT
             push @{$bel->{s}}, $fu, [$e1, $a];
         }
         else {
-            die "'cannot-bind\n";
+            die "cannot-bind\n";
         }
     },
 
@@ -558,7 +558,7 @@ sub ev {
     #               m)
     #          (sigerr 'unknown-mark s r m)))
     elsif (!proper($e)) {
-        die "'malformed\n";
+        die "malformed\n";
     }
     elsif (my $form = $is_form->($e)) {
         $form->($self, pair_cdr($e), $a);
@@ -656,7 +656,7 @@ sub vref {
             );
         }
         else {
-            die "'unbound\n";
+            die "unbound\n";
         }
     }
     elsif (is_pair($it = $self->lookup($v, $a))) {
@@ -779,7 +779,7 @@ sub evmark {
         # do nothing; already popped it off the stack
     }
     elsif (is_symbol_of_name($car_e, "loc")) {
-        die "'unfindable\n";
+        die "unfindable\n";
     }
     elsif (is_symbol_of_name($car_e, "prot")) {
         my $fu = $self->fut(
@@ -949,7 +949,7 @@ sub applyf {
     }
     else {
         if (!is_pair($f) || !is_symbol_of_name(pair_car($f), "lit")) {
-            die "'cannot-apply\n";
+            die "cannot-apply\n";
         }
         # XXX: skipping `proper` check for now
         $self->applylit($f, $args, $a);
@@ -1065,7 +1065,7 @@ FUT
                 $self->applyf($cdr_it, $f_and_quoted_args, $a);
             }
             else {
-                die "'unapplyable\n";
+                die "unapplyable\n";
             }
         }
     }
@@ -1286,7 +1286,7 @@ FUT
                 $self->pass($var, $arg, $env);
             }
             else {
-                die "'mistype\n";
+                die "mistype\n";
             }
         },
     );
@@ -1362,11 +1362,11 @@ FUT
             ];
         }
         else {
-            die "'underargs\n";
+            die "underargs\n";
         }
     }
     elsif (!is_pair($arg)) {
-        die "'atom-arg\n";
+        die "atom-arg\n";
     }
     else {
         my $fu1 = $self->fut(

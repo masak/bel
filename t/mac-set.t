@@ -50,7 +50,7 @@ bye
 (a b cd e)
 
 > (set (find pair '(a b e)) 'z)
-!ERROR: 'unfindable
+!ERROR: unfindable
 
 > (let kvs '((a . 1)
              (b . 2)
@@ -63,7 +63,7 @@ bye
              (b . 2)
              (c . 3))
     (set (get 'd kvs) 5))
-!ERROR: 'unfindable
+!ERROR: unfindable
 
 > (let kvs '(((a) . 1)
              ((b) . 2)
@@ -76,5 +76,5 @@ bye
              ((b) . 2)
              ((c) . 3))
     (set (get '(b) kvs id) 5))
-!ERROR: 'unfindable
+!ERROR: unfindable
 

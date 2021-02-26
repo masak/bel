@@ -7,13 +7,13 @@ use Language::Bel::Test::DSL;
 __DATA__
 
 > (list "hello be" . \l)
-!ERROR: 'malformed
+!ERROR: malformed
 
 > (cons \e . \l)
-!ERROR: 'malformed
+!ERROR: malformed
 
 > (\e . \l)
-!ERROR: 'malformed
+!ERROR: malformed
 
 > ((lit clo nil nil))
 nil

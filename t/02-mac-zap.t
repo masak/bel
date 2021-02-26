@@ -51,7 +51,7 @@ bye
 (a b e)
 
 > (zap idfn (find pair '(a b e)))
-!ERROR: 'unfindable
+!ERROR: unfindable
 
 > (set kvs '((a . 1)
              (b . 2)
@@ -65,7 +65,7 @@ bye
 ((a . 1) (b . 5) (c . 3))
 
 > (zap idfn (get 'd kvs))
-!ERROR: 'unfindable
+!ERROR: unfindable
 
 > (set kvs '(((a) . 1)
              ((b) . 2)
@@ -79,5 +79,5 @@ bye
 (((a) . 1) ((b) . 5) ((c) . 3))
 
 > (zap (fn () 5) (get '(b) kvs id))
-!ERROR: 'unfindable
+!ERROR: unfindable
 

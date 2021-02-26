@@ -10,11 +10,11 @@ __DATA__
 c
 
 > ((lit clo nil ((a b c)) c) 'not-a-list)
-!ERROR: 'atom-arg
+!ERROR: atom-arg
 
 > ((fn ((a b c)) c) '(a b c))
 c
 
 > ((fn ((a b c)) c) 'not-a-list)
-!ERROR: 'atom-arg
+!ERROR: atom-arg
 

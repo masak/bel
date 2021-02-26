@@ -40,7 +40,7 @@ sub read_char {
 sub write_char {
     my ($self, $chr) = @_;
 
-    die "'badmode\n"
+    die "badmode\n"
         unless $self->{mode} eq "out";
 
     print {$self->{handle}} $chr;
@@ -55,7 +55,7 @@ sub stat {
 sub close {
     my ($self) = @_;
 
-    die "'already-closed\n"
+    die "already-closed\n"
         if $self->{mode} eq "closed";
 
     close($self->{handle})
@@ -183,12 +183,12 @@ sub make_stream {
     my $handle;
     if ($mode eq "out") {
         open($handle, ">", $path_str)
-            or die "'ioerror\n";
+            or die "ioerror\n";
     }
     else {
         open($handle, "<", $path_str)
-            or $! =~ /No such file/ and die "'notexist\n"
-            or die "'ioerror\n";
+            or $! =~ /No such file/ and die "notexist\n"
+            or die "ioerror\n";
     }
 
     return bless(

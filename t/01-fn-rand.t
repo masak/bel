@@ -16,5 +16,5 @@ t
 t
 
 > (rand 0)
-!ERROR: 'mistype
+!ERROR: mistype
 

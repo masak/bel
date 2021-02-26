@@ -13,5 +13,5 @@ t
 nil
 
 > ('y 'z)
-!ERROR: 'cannot-apply
+!ERROR: cannot-apply
 

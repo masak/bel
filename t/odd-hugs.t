@@ -23,11 +23,11 @@ t
 t
 
 > (tem t1 f1 nil f2)
-!ERROR: 'underargs
+!ERROR: underargs
 
 > (tem t2 f1 nil)
 !IGNORE: result of template declaration
 
 > (make t2 f1 1 f2)
-!ERROR: 'underargs
+!ERROR: underargs
 
