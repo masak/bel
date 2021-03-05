@@ -86,6 +86,8 @@ sub read_partial {
     elsif ($c eq ",") {
         ++$pos;
         my $symbol = SYMBOL_COMMA;
+        die "Unexpected end after ','"
+            if $pos >= length($expr);
         my $cc = substr($expr, $pos, 1);
         if ($cc eq "@") {
             ++$pos;
@@ -128,11 +130,14 @@ sub read_partial {
                 ++$pos;
                 last EAT_CHAR if $cc eq q["];
                 if ($cc eq q[\\]) {
+                    die "Expected something after backslash, found end of file"
+                        unless $pos < $length;
                     $cc = substr($expr, $pos, 1);
                     ++$pos;
                 }
                 push @chars, $cc;
             } while ($pos < length($expr));
+            die "Expected '\"', found end of file";
         }
         my $ast = SYMBOL_NIL;
         for my $char (reverse @chars) {
@@ -184,6 +189,7 @@ sub _rdlist {
     my $seen_element_after_dot = "";
     while ($pos < length($expr)) {
         $skip_whitespace->();
+        last unless $pos < length($expr);
         my $c = substr($expr, $pos, 1);
         if ($c eq $stopper) {
             ++$pos;
@@ -192,6 +198,8 @@ sub _rdlist {
         }
         elsif ($c eq ".") {
             ++$pos;
+            die "Expected something after '.', found end of file"
+                unless $pos < length($expr);
             my $cc = substr($expr, $pos, 1);
             if ($cc eq " ") {   # XXX: should be all `breakc`
                 $seen_dot = 1;
@@ -284,7 +292,9 @@ sub parseword {
         while ($cs ne "") {
             my $next = substr($cs, 0, 1);
             $cs = substr($cs, 1);
-            while (length($cs) && intrac(substr($cs, 0, 1)) == intrac(substr($next, 0, 1))) {
+            while (length($cs)
+                && intrac(substr($cs, 0, 1)) == intrac(substr($next, 0, 1))) {
+
                 $next .= substr($cs, 0, 1);
                 $cs = substr($cs, 1);
             }
@@ -312,12 +322,12 @@ sub parseslist {
 
     my @runs = @$runs_ref;
     my $last_rs = $runs[-1];
-    if (intrac(substr($last_rs, 0, 1))) {
+    if (length($last_rs) >= 1 && intrac(substr($last_rs, 0, 1))) {
         die "final-intrasymbol";
     }
     else {
         my $first_rs = $runs[0];
-        if (intrac(substr($first_rs, 0, 1))) {
+        if (length($first_rs) >= 1 && intrac(substr($first_rs, 0, 1))) {
             unshift @runs, "upon";
         }
         unshift @runs, ".";
@@ -391,7 +401,7 @@ sub parsecom {
 sub parseno {
     my ($cs) = @_;
 
-    if (substr($cs, 0, 1) eq "~") {
+    if (length($cs) >= 1 && substr($cs, 0, 1) eq "~") {
         if (length($cs) > 1) {
             return make_pair(
                 make_symbol("compose"),
@@ -453,7 +463,7 @@ sub maybe_wrap_in_no {
 
     return $part eq "~"
         ? make_symbol("no")
-        : substr($part, 0, 1) eq "~"
+        : length($part) >= 1 && substr($part, 0, 1) eq "~"
             ? wrap_in_compose("no", substr($part, 1))
             : make_number_or_symbol($part);
 }
@@ -549,7 +559,7 @@ sub parsei {
 
     return length($cs) > 2
         ? parsesr(substr($cs, 0, -1))
-        : substr($cs, 0, 1) eq "+"
+        : length($cs) > 0 && substr($cs, 0, 1) eq "+"
             ? $srone
             : $srminusone;
 }
