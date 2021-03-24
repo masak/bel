@@ -131,7 +131,7 @@ sub read_partial {
                 last EAT_CHAR if $cc eq q["];
                 if ($cc eq q[\\]) {
                     die "Expected something after backslash, found end of file"
-                        unless $pos < $length;
+                        unless $pos < length($expr);
                     $cc = substr($expr, $pos, 1);
                     ++$pos;
                 }
