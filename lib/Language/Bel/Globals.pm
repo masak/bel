@@ -93,6 +93,7 @@ use Language::Bel::Globals::FastFuncs qw(
     fastfunc__pr
     fastfunc__prs
     fastfunc__len
+    fastfunc__dedup
     fastfunc__err
 );
 
@@ -7786,7 +7787,7 @@ sub new {
             make_pair(SYMBOL_NIL, SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))),
             SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))))), SYMBOL_NIL))));
 
-        $self->add_global("dedup", make_pair(make_symbol("lit"),
+        $self->add_global("dedup", make_fastfunc(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("xs"),
             make_pair(make_pair(make_symbol("o"), make_pair(make_symbol("f"),
@@ -7796,7 +7797,7 @@ sub new {
             make_pair(make_pair(make_symbol("trap"),
             make_pair(make_symbol("adjoin"), make_pair(make_symbol("f"),
             SYMBOL_NIL))), make_pair(SYMBOL_NIL, make_pair(make_symbol("xs"),
-            SYMBOL_NIL)))), SYMBOL_NIL)), SYMBOL_NIL))))));
+            SYMBOL_NIL)))), SYMBOL_NIL)), SYMBOL_NIL))))), \&fastfunc__dedup));
 
         $self->add_global("insert", make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,

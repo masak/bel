@@ -3228,6 +3228,97 @@ sub fastfunc__len {
     );
 }
 
+sub fastfunc__dedup  {
+    my ($bel, $xs, $f) = @_;
+
+    my @result;
+
+    if (defined($f)) {
+        while (!is_nil($xs)) {
+            my $candidate = $bel->car($xs);
+            my $candidate_is_duplicate = 0;   # until we find an identical
+                                              # element in @results
+
+            ELEMENT:
+            for my $element (@result) {
+                if (!is_nil($bel->call($f, $element, $candidate))) {
+                    $candidate_is_duplicate = 1;
+                    last ELEMENT;
+                }
+            }
+
+            if (!$candidate_is_duplicate) {
+                push @result, $candidate;
+            }
+            $xs = $bel->cdr($xs);
+        }
+    }
+    else {
+        while (!is_nil($xs)) {
+            my $candidate = $bel->car($xs);
+            my $candidate_is_duplicate = 0;   # until we find an identical
+                                              # element in @results
+
+            ELEMENT:
+            for my $element (@result) {
+                my @stack = [$candidate, $element];
+
+                my $candidate_and_element_identical = 1;    # until proven
+                                                            # different
+                IDENTITY_CHECK:
+                while (@stack) {
+                    my @values = @{pop(@stack)};
+                    next unless @values;
+                    my $some_atom = "";
+                    for my $value (@values) {
+                        if (!is_pair($value)) {
+                            $some_atom = 1;
+                            last;
+                        }
+                    }
+                    if ($some_atom) {
+                        my $car_values = $values[0];
+                        for my $value (@values) {
+                            if (!atoms_are_identical($value, $car_values)) {
+                                $candidate_and_element_identical = 0;
+                                last IDENTITY_CHECK;
+                            }
+                        }
+                    }
+                    else {
+                        push @stack, [map { $bel->cdr($_) } @values];
+                        push @stack, [map { $bel->car($_) } @values];
+                    }
+                }
+                if ($candidate_and_element_identical) {
+                    $candidate_is_duplicate = 1;
+                    last ELEMENT;
+                }
+            }
+
+            if (!$candidate_is_duplicate) {
+                push @result, $candidate;
+            }
+            $xs = $bel->cdr($xs);
+        }
+    }
+
+    my $result = SYMBOL_NIL;
+    my $result_tail;
+    for my $e (@result) {
+        my $new_pair = make_pair($e, SYMBOL_NIL);
+        if (is_nil($result)) {
+            $result = $new_pair;
+        }
+        else {
+            $bel->xdr($result_tail, $new_pair);
+        }
+        $result_tail = $new_pair;
+    }
+
+    return $result;
+}
+
 sub fastfunc__err {
     my ($bel, $msg) = @_;
 
@@ -3304,6 +3395,7 @@ our @EXPORT_OK = qw(
     fastfunc__pr
     fastfunc__prs
     fastfunc__len
+    fastfunc__dedup
     fastfunc__err
 );
 
