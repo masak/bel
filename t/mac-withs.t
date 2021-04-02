@@ -28,3 +28,7 @@ when evaluating the expression to be bound.
       y))
 a
 
+> (withs (x 'a y)
+    (cons x y))
+(a)
+

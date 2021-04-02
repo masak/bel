@@ -12,3 +12,6 @@ __DATA__
 > (let x 'a (with (x 'b y x) y))
 a
 
+> (with (x 'a y) y)
+nil
+
