@@ -40,8 +40,16 @@ sub new {
     if (!defined($self->{output}) || ref($self->{output}) ne "CODE") {
         die "Named parameter 'output' of type CODE required";
     }
+    if (!defined($self->{read_char}) || ref($self->{read_char}) ne "CODE") {
+        die "Named parameter 'read_char' of type CODE required";
+    }
     if (!defined($self->{err}) || ref($self->{err}) ne "CODE") {
         die "Named parameter 'err' of type CODE required";
+    }
+    if (!defined($self->{rdb_buffer_of})) {
+        $self->{rdb_buffer_of} = {
+            nil => []
+        };
     }
     if (!defined($self->{wrb_buffer_of})) {
         $self->{wrb_buffer_of} = {
@@ -164,8 +172,6 @@ sub prim_rdb {
 
     return $self->{err}->("mistype")
         unless is_nil($stream) || is_stream($stream);
-    die "XXX: can't handle nil stream just yet"
-        if is_nil($stream);
     return $self->{err}->("badmode")
         if is_stream($stream) && $stream->mode() ne "in";
 
@@ -173,7 +179,9 @@ sub prim_rdb {
         ? $self->{rdb_buffer_of}{nil}
         : ($self->{rdb_buffer_of}{$stream} ||= []);
     if (@{$rdb_buffer} == 0) {
-        my $chr = $stream->read_char();
+        my $chr = is_nil($stream)
+            ? $self->{read_char}()
+            : $stream->read_char();
         if (length($chr) == 0) {
             return SYMBOL_EOF;
         }

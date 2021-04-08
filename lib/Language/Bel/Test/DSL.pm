@@ -171,10 +171,18 @@ CHECK {
     }
 
     my $actual_output = "";
-    my $b = Language::Bel->new({ output => sub {
-        my ($string) = @_;
-        $actual_output = "$actual_output$string";
-    } });
+    my $prepared_input = "Bel 9 from Outer Space\n"; 
+    my $b = Language::Bel->new({
+        output => sub {
+            my ($string) = @_;
+            $actual_output = "$actual_output$string";
+        },
+        read_char => sub {
+            my $chr = substr($prepared_input, 0, 1);
+            $prepared_input = substr($prepared_input, 1);
+            return $chr;
+        },
+    });
 
     my $todo_toggle = 0;
 

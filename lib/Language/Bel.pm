@@ -85,9 +85,16 @@ sub new {
             print($string);
         };
     }
+    if (!defined($self->{read_char})) {
+        $self->{read_char} = sub {
+            read(STDIN, my $c, 1);
+            return $c;
+        };
+    }
     if (!defined($self->{primitives})) {
         $self->{primitives} = Language::Bel::Primitives->new({
             output => $self->{output},
+            read_char => $self->{read_char},
             err => sub {
                 my ($message_str) = @_;
 
