@@ -170,7 +170,16 @@ HEADER
         print_primitive($prim_name);
     }
 
-    my @globals;
+    my @globals = (
+        {
+            name => "ins",
+            expr => SYMBOL_NIL,
+        },
+        {
+            name => "outs",
+            expr => SYMBOL_NIL,
+        },
+    );
 
     DECLARATION:
     for my $declaration (@DECLARATIONS) {

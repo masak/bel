@@ -1383,7 +1383,18 @@ __DATA__
 (mac splice args
   '(err 'comma-at-outside-list))
 
-; skip print [waiting for printer]
+(def print (x (o s outs) (o names (namedups x)) (o hist))
+  (aif (simple x)        (do (prsimple x s) hist)
+       (ustring x names) (prstring x s names hist)
+       (get x names id)  (do (prc \# s)
+                             (print (cdr it) s)
+                             (if (mem x hist id)
+                                 hist
+                                 (do (prc \= s)
+                                     (if (ustring (cdr x) names)
+                                         (prstring x s names (cons x hist))
+                                         (prpair x s names (cons x hist))))))
+                         (prpair x s names hist)))
 
 (def namedups (x (o n 0))
   (map [cons _ (++ n)] (dups (cells x) id)))
@@ -1394,20 +1405,53 @@ __DATA__
                       (cells (cdr x)
                              (cells (car x) (snoc seen x)))))
 
-; skip prc [waiting for printer]
+(def prc (c (o s outs))
+  (if (atom s)
+      (aif (get c chars)
+           (map [wrb _ s] (cdr it))
+           (err 'unknown char))
+      (enq c s))
+  c)
 
 (def ustring (x names)
   (and x (string x) (~tail [get _ names id] x)))
 
-; skip prstring [waiting for printer]
+(def prstring (x s names hist)
+  (prc \" s)
+  (presc x \" s)
+  (prc \" s)
+  hist)
 
-; skip presc [waiting for printer]
+(def presc (cs esc s)
+  (map (fn (c)
+         (if (in c esc \\) (prc \\ s))
+         (prc c s))
+       cs))
 
-; skip prsimple [waiting for printer]
+(def prsimple (x s)
+  (pcase x
+    symbol (prsymbol x s)
+    char   (do (prc \\ s) (prc x s))
+    stream (map [prc _ s] "<stream>")
+    number (prnum (numr x) (numi x) s)
+           (err 'cannot-print)))
 
-; skip prsymbol [waiting for printer]
+(def prsymbol (x s)
+  (let cs (nom x)
+    (let odd (~= (saferead (list cs)) x)
+      (if odd (prc \¦ s))
+      (presc cs \¦ s)
+      (if odd (prc \¦ s)))))
 
-; skip prnum [waiting for printer]
+(def prnum (r i s)
+  (unless (and (= r srzero) (~= i srzero))
+    (if (caris r '-) (prc \- s))
+    (map [prc _ s] (rrep (cdr r))))
+  (unless (= i srzero)
+    (print (car i) s)
+    (unless (apply = (cdr i))
+      (map [prc _ s] (rrep (cdr i))))
+    (prc \i s)))
 
 (def rrep ((n d) (o base i10))
   (append (irep n base)
@@ -1422,9 +1466,22 @@ __DATA__
 (def intchar (x)
   (car (udrop x "0123456789abcdef")))
 
-; skip prpair [waiting for printer]
+(def prpair (x s names hist)
+  (prc \( s)
+  (do1 (prelts x s names hist)
+       (prc \) s)))
 
-; skip prelts [waiting for printer]
+(def prelts ((x . rest) s names hist)
+  (let newhist (print x s names hist)
+    (if (or (and rest (simple rest))
+            (ustring rest names)
+            (get rest names id))
+        (do (map [prc _ s] " . ")
+            (print rest s names newhist))
+        (if rest
+            (do (prc \sp s)
+                (prelts rest s names newhist))
+            newhist))))
 
 (def prn args
   (map [do (print _) (prc \sp)] args)
@@ -1434,7 +1491,12 @@ __DATA__
 (def pr args
   (map prnice args))
 
-; skip prnice [waiting for printer]
+(def prnice (x (o s outs))
+  (pcase x
+    char   (prc x s)
+    string (map [prc _ s] x)
+           (print x s nil))
+  x)
 
 (def drop (n|whole xs)
   (if (= n 0)
