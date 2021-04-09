@@ -13,5 +13,5 @@ __DATA__
 nil
 
 > (peek nil)
-!ERROR: ('unboundb bitc)
+\B
 

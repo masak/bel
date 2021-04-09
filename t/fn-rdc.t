@@ -19,5 +19,5 @@ __DATA__
 nil
 
 > (rdc nil)
-!ERROR: ('unboundb bitc)
+\B
 

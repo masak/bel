@@ -25,5 +25,5 @@ nil
 ("hi")
 
 > (eatwhite nil)
-!ERROR: ('unboundb bitc)
+nil
 
