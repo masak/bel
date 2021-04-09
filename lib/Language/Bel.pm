@@ -44,11 +44,11 @@ Language::Bel - An interpreter for Paul Graham's language Bel
 
 =head1 VERSION
 
-Version 0.51
+Version 0.52
 
 =cut
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 =head1 SYNOPSIS
 
@@ -85,9 +85,16 @@ sub new {
             print($string);
         };
     }
+    if (!defined($self->{read_char})) {
+        $self->{read_char} = sub {
+            read(STDIN, my $c, 1);
+            return $c;
+        };
+    }
     if (!defined($self->{primitives})) {
         $self->{primitives} = Language::Bel::Primitives->new({
             output => $self->{output},
+            read_char => $self->{read_char},
             err => sub {
                 my ($message_str) = @_;
 

@@ -131,6 +131,7 @@ sub new {
     if (!defined($self->{primitives})) {
         $self->{primitives} = Language::Bel::Primitives->new({
             output => sub {},
+            read_char => sub {},
             err => sub {
                 die "Unexpected error while building globals",
             },

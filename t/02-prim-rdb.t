@@ -18,6 +18,9 @@ use Language::Bel::Test::DSL;
 
 __DATA__
 
+> (nof 8 (rdb nil))
+"01000010"
+
 > (set s (ops "temp3627" 'in))
 <stream>
 
