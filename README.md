@@ -25,7 +25,7 @@ After downloading Bel, you can run it like this:
 
 ```sh
 $ perl -Ilib bin/bel
-Language::Bel 0.52 -- darwin.
+Language::Bel 0.53 -- darwin.
 >
 > ;; loops
 > (set n (len (apply append prims)))
