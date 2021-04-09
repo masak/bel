@@ -8,11 +8,6 @@ use Exporter 'import';
 
 sub list {
     return (
-        chars => [
-            "(nchar 65)",
-            "\\A",
-            "('unboundb nchar)",
-        ],
         printer => [
             "(function print)",
             "clo",

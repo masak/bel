@@ -22,6 +22,9 @@ use Language::Bel::Core qw(
 use Language::Bel::Pair::FastFunc qw(
     make_fastfunc
 );
+use Language::Bel::Pair::CharsList qw(
+    make_chars_list
+);
 use Language::Bel::Primitives;
 use Language::Bel::Globals::FastFuncs qw(
     fastfunc__no
@@ -89,10 +92,14 @@ use Language::Bel::Globals::FastFuncs qw(
     fastfunc__rpart
     fastfunc__ipart
     fastfunc__real
+    fastfunc__int
+    fastfunc__pint
+    fastfunc__charn
     fastfunc__prn
     fastfunc__pr
     fastfunc__prs
     fastfunc__len
+    fastfunc__nchar
     fastfunc__dedup
     fastfunc__err
 );
@@ -140,6 +147,8 @@ sub new {
     if (!defined($self->{hash_ref}) && !defined($self->{list})) {
         $self->{hash_ref} = {};
         $self->{list} = SYMBOL_NIL;
+
+        $self->add_global("chars", make_chars_list(0));
 
         $self->add_global("car", make_prim("car"));
 
@@ -3784,14 +3793,14 @@ sub new {
             make_pair(make_symbol("xs"), SYMBOL_NIL)), SYMBOL_NIL)))),
             SYMBOL_NIL))))), \&fastfunc__len));
 
-        $self->add_global("charn", make_pair(make_symbol("lit"),
+        $self->add_global("charn", make_fastfunc(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("c"), SYMBOL_NIL),
             make_pair(make_pair(make_pair(make_symbol("compose"),
             make_pair(make_symbol("dec"), make_pair(make_symbol("pos"),
             SYMBOL_NIL))), make_pair(make_symbol("c"),
             make_pair(make_symbol("chars"), make_pair(make_symbol("caris"),
-            SYMBOL_NIL)))), SYMBOL_NIL))))));
+            SYMBOL_NIL)))), SYMBOL_NIL))))), \&fastfunc__charn));
 
         $self->add_global("<", make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
@@ -4022,7 +4031,7 @@ sub new {
             make_pair(make_symbol("comfns"), SYMBOL_NIL)))), SYMBOL_NIL))),
             SYMBOL_NIL))))));
 
-        $self->add_global("int", make_pair(make_symbol("lit"),
+        $self->add_global("int", make_fastfunc(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("n"), SYMBOL_NIL),
             make_pair(make_pair(make_symbol("and"),
@@ -4032,7 +4041,7 @@ sub new {
             make_pair(make_symbol("srden"), make_pair(make_symbol("numr"),
             SYMBOL_NIL))), make_pair(make_symbol("n"), SYMBOL_NIL)),
             make_pair(make_symbol("i1"), SYMBOL_NIL))), SYMBOL_NIL))),
-            SYMBOL_NIL))))));
+            SYMBOL_NIL))))), \&fastfunc__int));
 
         $self->add_global("whole", make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
@@ -4049,7 +4058,7 @@ sub new {
             SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL))), SYMBOL_NIL))),
             SYMBOL_NIL))))));
 
-        $self->add_global("pint", make_pair(make_symbol("lit"),
+        $self->add_global("pint", make_fastfunc(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("n"), SYMBOL_NIL),
             make_pair(make_pair(make_symbol("and"),
@@ -4061,7 +4070,7 @@ sub new {
             SYMBOL_NIL))), make_pair(make_pair(make_symbol("+"),
             make_pair(SYMBOL_NIL, make_pair(make_pair(SYMBOL_T, SYMBOL_NIL),
             SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL))), SYMBOL_NIL))),
-            SYMBOL_NIL))))));
+            SYMBOL_NIL))))), \&fastfunc__pint));
 
         $self->add_global("yc", make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
@@ -4912,6 +4921,41 @@ sub new {
             SYMBOL_NIL)), SYMBOL_NIL)))), SYMBOL_NIL))))));
 
         $self->add_global("bbuf", SYMBOL_NIL);
+
+        $self->add_global("bitc", make_pair(make_symbol("lit"),
+            make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+            make_pair(make_pair(make_pair(make_symbol("o"),
+            make_pair(make_symbol("s"), make_pair(make_symbol("ins"), SYMBOL_NIL))),
+            SYMBOL_NIL), make_pair(make_pair(make_symbol("let"),
+            make_pair(make_symbol("bits"), make_pair(make_pair(make_symbol("get"),
+            make_pair(make_symbol("s"), make_pair(make_symbol("bbuf"),
+            SYMBOL_NIL))), make_pair(make_pair(make_symbol("aif"),
+            make_pair(make_pair(make_symbol("gets"),
+            make_pair(make_pair(make_symbol("rev"),
+            make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("bits"),
+            SYMBOL_NIL)), SYMBOL_NIL)), make_pair(make_symbol("chars"),
+            SYMBOL_NIL))), make_pair(make_pair(make_symbol("do"),
+            make_pair(make_pair(make_symbol("pull"), make_pair(make_symbol("s"),
+            make_pair(make_symbol("bbuf"), make_pair(make_symbol("caris"),
+            SYMBOL_NIL)))), make_pair(make_pair(make_symbol("car"),
+            make_pair(make_symbol("it"), SYMBOL_NIL)), SYMBOL_NIL))),
+            make_pair(make_pair(make_symbol("let"), make_pair(make_symbol("b"),
+            make_pair(make_pair(make_symbol("rdb"), make_pair(make_symbol("s"),
+            SYMBOL_NIL)), make_pair(make_pair(make_symbol("if"),
+            make_pair(make_pair(make_symbol("in"), make_pair(make_symbol("b"),
+            make_pair(SYMBOL_NIL, make_pair(make_pair(SYMBOL_QUOTE,
+            make_pair(make_symbol("eof"), SYMBOL_NIL)), SYMBOL_NIL)))),
+            make_pair(make_symbol("b"), make_pair(make_pair(make_symbol("do"),
+            make_pair(make_pair(make_symbol("if"), make_pair(make_symbol("bits"),
+            make_pair(make_pair(make_symbol("push"), make_pair(make_symbol("b"),
+            make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("bits"),
+            SYMBOL_NIL)), SYMBOL_NIL))), make_pair(make_pair(make_symbol("push"),
+            make_pair(make_pair(make_symbol("list"), make_pair(make_symbol("s"),
+            make_pair(make_symbol("b"), SYMBOL_NIL))),
+            make_pair(make_symbol("bbuf"), SYMBOL_NIL))), SYMBOL_NIL)))),
+            make_pair(make_pair(make_symbol("bitc"), make_pair(make_symbol("s"),
+            SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL)))),
+            SYMBOL_NIL)))), SYMBOL_NIL)))), SYMBOL_NIL))))));
 
         $self->add_global("digit", make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
@@ -6775,6 +6819,20 @@ sub new {
             make_pair(make_symbol("xs"), SYMBOL_NIL)), SYMBOL_NIL))),
             SYMBOL_NIL)))), SYMBOL_NIL))))));
 
+        $self->add_global("nchar", make_fastfunc(make_pair(make_symbol("lit"),
+            make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+            make_pair(make_pair(make_symbol("n"), SYMBOL_NIL),
+            make_pair(make_pair(make_symbol("car"),
+            make_pair(make_pair(make_pair(make_symbol("+"),
+            make_pair(make_symbol("n"), make_pair(make_pair(make_symbol("lit"),
+            make_pair(make_symbol("num"), make_pair(make_pair(make_symbol("+"),
+            make_pair(make_pair(SYMBOL_T, SYMBOL_NIL), make_pair(make_pair(SYMBOL_T,
+            SYMBOL_NIL), SYMBOL_NIL))), make_pair(make_pair(make_symbol("+"),
+            make_pair(SYMBOL_NIL, make_pair(make_pair(SYMBOL_T, SYMBOL_NIL),
+            SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL))),
+            make_pair(make_symbol("chars"), SYMBOL_NIL)), SYMBOL_NIL)),
+            SYMBOL_NIL))))), \&fastfunc__nchar));
+
         $self->add_global("first", make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_pair(SYMBOL_T, make_pair(make_symbol("n"),
@@ -8154,6 +8212,31 @@ sub new {
             make_pair(make_pair(make_symbol("id"), make_pair(make_symbol("_"),
             make_pair(make_symbol("eof"), SYMBOL_NIL))), SYMBOL_NIL))),
             SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL))))));
+
+        $self->add_global("load", make_pair(make_symbol("lit"),
+            make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+            make_pair(make_pair(make_symbol("name"), SYMBOL_NIL),
+            make_pair(make_pair(make_symbol("let"), make_pair(make_symbol("eof"),
+            make_pair(make_pair(make_symbol("join"), SYMBOL_NIL),
+            make_pair(make_pair(make_symbol("withfile"), make_pair(make_symbol("s"),
+            make_pair(make_symbol("name"), make_pair(make_pair(SYMBOL_QUOTE,
+            make_pair(make_symbol("in"), SYMBOL_NIL)),
+            make_pair(make_pair(make_symbol("til"), make_pair(make_symbol("e"),
+            make_pair(make_pair(make_symbol("read"), make_pair(make_symbol("s"),
+            make_pair(make_pair(make_symbol("lit"), make_pair(make_symbol("num"),
+            make_pair(make_pair(make_symbol("+"), make_pair(make_pair(SYMBOL_T,
+            make_pair(SYMBOL_T, make_pair(SYMBOL_T, make_pair(SYMBOL_T,
+            make_pair(SYMBOL_T, make_pair(SYMBOL_T, make_pair(SYMBOL_T,
+            make_pair(SYMBOL_T, make_pair(SYMBOL_T, make_pair(SYMBOL_T,
+            SYMBOL_NIL)))))))))), make_pair(make_pair(SYMBOL_T, SYMBOL_NIL),
+            SYMBOL_NIL))), make_pair(make_pair(make_symbol("+"),
+            make_pair(SYMBOL_NIL, make_pair(make_pair(SYMBOL_T, SYMBOL_NIL),
+            SYMBOL_NIL))), SYMBOL_NIL)))), make_pair(make_symbol("eof"),
+            SYMBOL_NIL)))), make_pair(make_pair(make_symbol("id"),
+            make_pair(make_symbol("e"), make_pair(make_symbol("eof"), SYMBOL_NIL))),
+            make_pair(make_pair(make_symbol("bel"), make_pair(make_symbol("e"),
+            SYMBOL_NIL)), SYMBOL_NIL))))), SYMBOL_NIL))))), SYMBOL_NIL)))),
+            SYMBOL_NIL))))));
 
         $self->add_global("record", make_pair(make_symbol("lit"),
             make_pair(make_symbol("mac"), make_pair(make_pair(make_symbol("lit"),

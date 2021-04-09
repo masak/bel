@@ -24,6 +24,3 @@ __DATA__
 > s
 (" two")
 
-> (charstil nil whitec)
-!ERROR: ('unboundb bitc)
-

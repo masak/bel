@@ -1059,7 +1059,18 @@ __DATA__
 
 (set bbuf nil)
 
-; skip bitc [waiting for chars]
+(def bitc ((o s ins))
+  (let bits (get s bbuf)
+    (aif (gets (rev (cdr bits)) chars)
+         (do (pull s bbuf caris)
+             (car it))
+         (let b (rdb s)
+           (if (in b nil 'eof)
+               b
+               (do (if bits
+                       (push b (cdr bits))
+                       (push (list s b) bbuf))
+                   (bitc s)))))))
 
 (def digit (c (o base i10))
   (mem c (udrop (udrop base i16) "fedcba9876543210")))
@@ -1438,7 +1449,8 @@ __DATA__
 (vir num (f args)
   `(nth ,f ,@args))
 
-; skip nchar [waiting for chars]
+(def nchar (n)
+  (car ((+ n 1) chars)))
 
 (def first (n|whole xs)
   (if (or (= n 0) (no xs))
@@ -1653,7 +1665,11 @@ __DATA__
   (let eof (join)
     (drain (read s base eof) [id _ eof])))
 
-; skip load [waiting for chars]
+(def load (name)
+  (let eof (join)
+    (withfile s name 'in
+      (til e (read s 10 eof) (id e eof)
+        (bel e)))))
 
 (mac record body
   (letu v

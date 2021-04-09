@@ -23,6 +23,7 @@ use Language::Bel::Core qw(
 );
 use Language::Bel::Pair::Num qw(
     make_num
+    maybe_get_int
 );
 use Language::Bel::Pair::SignedRat qw(
     make_signed_rat
@@ -3165,6 +3166,275 @@ sub fastfunc__real {
     return SYMBOL_T;
 }
 
+sub fastfunc__int {
+    my ($bel, $x) = @_;
+
+    if (!is_pair($x)) {
+        return SYMBOL_NIL;
+    }
+
+    if (!is_symbol_of_name($bel->car($x), "lit")) {
+        return SYMBOL_NIL;
+    }
+
+    $x = $bel->cdr($x);
+    if (!is_pair($x)) {
+        return SYMBOL_NIL;
+    }
+
+    if (!is_symbol_of_name($bel->car($x), "num")) {
+        return SYMBOL_NIL;
+    }
+
+    $x = $bel->cdr($x);
+    if (!is_pair($x)) {
+        return SYMBOL_NIL;
+    }
+
+    {
+        my $y = $bel->car($x);
+        if (!is_pair($y)) {
+            return SYMBOL_NIL;
+        }
+
+
+        my $sign = $bel->car($y);
+        if (!(is_symbol_of_name($sign, "+") || is_symbol_of_name($sign, "-"))) {
+            return SYMBOL_NIL;
+        }
+
+        $y = $bel->cdr($y);
+        if (!is_pair($y)) {
+            return SYMBOL_NIL;
+        }
+
+        {
+            my $z = $bel->car($y);
+            while (!is_nil($z)) {
+                if (!is_pair($z)) {
+                    return SYMBOL_NIL;
+                }
+                $z = $bel->cdr($z);
+            }
+        }
+
+        $y = $bel->cdr($y);
+        if (!is_pair($y)) {
+            return SYMBOL_NIL;
+        }
+
+        my $denominator = 0;
+        {
+            my $z = $bel->car($y);
+            while (!is_nil($z)) {
+                if (!is_pair($z)) {
+                    return SYMBOL_NIL;
+                }
+                $z = $bel->cdr($z);
+                $denominator++;
+            }
+        }
+
+        if ($denominator != 1) {
+            return SYMBOL_NIL;
+        }
+    }
+
+    $x = $bel->cdr($x);
+    if (!is_pair($x)) {
+        return SYMBOL_NIL;
+    }
+
+    {
+        my $y = $bel->car($x);
+        if (!is_pair($y)) {
+            return SYMBOL_NIL;
+        }
+
+
+        my $sign = $bel->car($y);
+        if (!is_symbol_of_name($sign, "+")) {
+            return SYMBOL_NIL;
+        }
+
+        $y = $bel->cdr($y);
+        if (!is_pair($y)) {
+            return SYMBOL_NIL;
+        }
+
+        if (!is_nil($bel->car($y))) {
+            return SYMBOL_NIL;
+        }
+
+        $y = $bel->cdr($y);
+        if (!is_pair($y)) {
+            return SYMBOL_NIL;
+        }
+
+        {
+            my $z = $bel->car($y);
+            my $t = 0;
+            while (!is_nil($z)) {
+                if (!is_pair($z)) {
+                    return SYMBOL_NIL;
+                }
+                $z = $bel->cdr($z);
+                $t++;
+            }
+
+            if ($t != 1) {
+                return SYMBOL_NIL;
+            }
+        }
+    }
+
+    return SYMBOL_T;
+}
+
+sub fastfunc__pint {
+    my ($bel, $x) = @_;
+
+    if (!is_pair($x)) {
+        return SYMBOL_NIL;
+    }
+
+    if (!is_symbol_of_name($bel->car($x), "lit")) {
+        return SYMBOL_NIL;
+    }
+
+    $x = $bel->cdr($x);
+    if (!is_pair($x)) {
+        return SYMBOL_NIL;
+    }
+
+    if (!is_symbol_of_name($bel->car($x), "num")) {
+        return SYMBOL_NIL;
+    }
+
+    $x = $bel->cdr($x);
+    if (!is_pair($x)) {
+        return SYMBOL_NIL;
+    }
+
+    {
+        my $y = $bel->car($x);
+        if (!is_pair($y)) {
+            return SYMBOL_NIL;
+        }
+
+
+        my $sign = $bel->car($y);
+        if (!is_symbol_of_name($sign, "+")) {
+            return SYMBOL_NIL;
+        }
+
+        $y = $bel->cdr($y);
+        if (!is_pair($y)) {
+            return SYMBOL_NIL;
+        }
+
+        {
+            my $numerator = 0;
+            my $z = $bel->car($y);
+            while (!is_nil($z)) {
+                if (!is_pair($z)) {
+                    return SYMBOL_NIL;
+                }
+                $z = $bel->cdr($z);
+                $numerator++;
+            }
+            if ($numerator == 0) {
+                return SYMBOL_NIL;
+            }
+        }
+
+        $y = $bel->cdr($y);
+        if (!is_pair($y)) {
+            return SYMBOL_NIL;
+        }
+
+        {
+            my $denominator = 0;
+            my $z = $bel->car($y);
+            while (!is_nil($z)) {
+                if (!is_pair($z)) {
+                    return SYMBOL_NIL;
+                }
+                $z = $bel->cdr($z);
+                $denominator++;
+            }
+
+            if ($denominator != 1) {
+                return SYMBOL_NIL;
+            }
+        }
+    }
+
+    $x = $bel->cdr($x);
+    if (!is_pair($x)) {
+        return SYMBOL_NIL;
+    }
+
+    {
+        my $y = $bel->car($x);
+        if (!is_pair($y)) {
+            return SYMBOL_NIL;
+        }
+
+
+        my $sign = $bel->car($y);
+        if (!is_symbol_of_name($sign, "+")) {
+            return SYMBOL_NIL;
+        }
+
+        $y = $bel->cdr($y);
+        if (!is_pair($y)) {
+            return SYMBOL_NIL;
+        }
+
+        if (!is_nil($bel->car($y))) {
+            return SYMBOL_NIL;
+        }
+
+        $y = $bel->cdr($y);
+        if (!is_pair($y)) {
+            return SYMBOL_NIL;
+        }
+
+        {
+            my $z = $bel->car($y);
+            my $t = 0;
+            while (!is_nil($z)) {
+                if (!is_pair($z)) {
+                    return SYMBOL_NIL;
+                }
+                $z = $bel->cdr($z);
+                $t++;
+            }
+
+            if ($t != 1) {
+                return SYMBOL_NIL;
+            }
+        }
+    }
+
+    return SYMBOL_T;
+}
+
+sub fastfunc__charn {
+    my ($bel, $c) = @_;
+
+    if (!is_char($c)) {
+        die "not-a-char\n";
+    }
+
+    my $n = $c->codepoint();
+    return make_num(
+        make_signed_rat("+", $n, 1),
+        make_signed_rat("+", 0, 1),
+    );
+}
+
 sub fastfunc__prn {
     my ($bel, @args) = @_;
 
@@ -3226,6 +3496,18 @@ sub fastfunc__len {
         make_signed_rat("+", $length, 1),
         $srzero,
     );
+}
+
+sub fastfunc__nchar {
+    my ($bel, $n) = @_;
+
+    my $nn = maybe_get_int($bel, $n);
+    die "mistype\n"
+        unless defined($nn);
+    die "mistype\n"
+        unless $nn >= 0;
+
+    return make_char($nn);
 }
 
 sub fastfunc__dedup  {
@@ -3391,10 +3673,14 @@ our @EXPORT_OK = qw(
     fastfunc__rpart
     fastfunc__ipart
     fastfunc__real
+    fastfunc__int
+    fastfunc__pint
+    fastfunc__charn
     fastfunc__prn
     fastfunc__pr
     fastfunc__prs
     fastfunc__len
+    fastfunc__nchar
     fastfunc__dedup
     fastfunc__err
 );

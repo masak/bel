@@ -16,5 +16,5 @@ __DATA__
 (" and some other stuff")
 
 > (rdword nil \a i10)
-!ERROR: ('unboundb bitc)
+aBel
 
