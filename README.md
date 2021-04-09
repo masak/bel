@@ -70,7 +70,7 @@ nil
 (lit arr (lit arr 1 0 0) (lit arr 0 1 0) (lit arr 0 0 1))
 ```
 
-## State of completion
+## ...but is it feature-complete?
 
 `Language::Bel` intends to be a complete implementation of the Bel spec.
 It's not fully there yet, though it's under active development.
@@ -95,6 +95,41 @@ A summary of the remaining big features:
   too slow to be practical. Recursing down this list totally kills performance,
   and also fills the memory with pairs. It's _necessary_ to intercept the `nchar`
   and `charn` functions, and do something more efficient than a linear scan.)
+
+## ...but is it fast?
+
+*Make it work, make it right, make it fast.* &mdash; Kent Beck
+
+This Bel implementation won't be usable in practice until it runs reasonably fast,
+using various optimizations under the hood. Here is a brief summary:
+
+* **Fast global lookup** (Complete, #194). A lot of time was saved in the test suite by
+  turning the global lookup table into a hash under the hood.
+  
+* **Fast global functions** (Ongoing, #91 and #155). Instead of the interpreter
+  painstakingly following the laid-down rules of Bel interpretation (and making thousands
+  of function calls along the way), it can call into (manually) "pre-compiled" functions
+  written in Perl (working directly against the runtime/primitives). As pointed out in
+  #169, care needs to be taken when such a pre-compiled function has had a dependency
+  overridden. In the fullness of time, these Perl functions shouldn't have to be created
+  manually, but can be generated (ahead-of-time as well as at runtime) by a Bel compiler
+  (see #106).
+
+* **Fast numbers** (#140). Using Perl's numbers instead of building up and traversing the
+  data structures in Bel. The fast functions can work directly with the numbers. If a user
+  ever structurally inspects a fast number, it deoptimizes back into a plain Bel structure.
+
+* **Fast strings** (#144). Just as with numbers, fast strings use a Perl representation
+  internally. However, because strings are really just lists of characters and because
+  lists can point to each other, the strings are built up as string fragments breaking at
+  all the points where there could be a reference. That way, for example, strings can
+  share suffixes.
+
+* **Fast lists** (#221).
+
+* **Backpointer-based de-optimization**.
+
+* **A compiler**. (#106)
 
 ## Contributing
 
