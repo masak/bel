@@ -190,6 +190,8 @@ CHECK {
         if ($item->{type} eq "TEST") {
             my $input = $item->{input};
             my $expected_output = $item->{output};
+            my $displayed_expected_output = $expected_output;
+            $displayed_expected_output =~ s/\n/\\n/g;
             $actual_output = "";
 
             my $scrubbed_input = $input;
@@ -215,7 +217,7 @@ CHECK {
                 my $unwanted_error = !$expecting_error && $actual_error;
                 ok(
                     $outputs_differ || $unwanted_error,
-                    "[TODO] $scrubbed_input ==> $expected_output",
+                    "[TODO] $scrubbed_input ==> $displayed_expected_output",
                 );
 
                 $todo_toggle = 0;
@@ -233,7 +235,7 @@ CHECK {
                 is(
                     $actual_error,
                     $expected_error,
-                    "$scrubbed_input ==> $expected_output",
+                    "$scrubbed_input ==> $displayed_expected_output",
                 );
             }
             else {
@@ -248,7 +250,7 @@ CHECK {
                     is(
                         $actual_output,
                         $expected_output,
-                        "$scrubbed_input ==> $expected_output",
+                        "$scrubbed_input ==> $displayed_expected_output",
                     );
                 }
             }
