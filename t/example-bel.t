@@ -91,11 +91,9 @@ t
 > (!3 (part + 2))
 5
 
-!TODO: `print` not implemented yet
 > (to "testfile" (print 'hello))
 nil
 
-!TODO: `read` not implemented yet
 > (from "testfile" (read))
 hello
 
