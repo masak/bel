@@ -72,20 +72,8 @@ nil
 
 ## State of completion
 
-`Language::Bel` intends to be a complete implementation of the Bel spec.
-It's not fully there yet, though it's under active development.
-
-[The spec](https://github.com/masak/bel/blob/master/pg/bel.bel) contains 353 items.
-`Language::Bel` currently defines 353 of them.
-
-![353 of 353 definitions](images/definitions.svg)
-
-A summary of the remaining big feature:
-
-* **Printer**; there's a printer written in Perl already. It's largely
-  feature-complete, but just like the evaluator and reader, it's not extensible
-  enough. It also doesn't handle cyclic structures and named pairs, although it
-  could do that.
+`Language::Bel` implements all of the global definitions from [the
+specification](https://github.com/masak/bel/blob/master/pg/bel.bel).
 
 ## Contributing
 

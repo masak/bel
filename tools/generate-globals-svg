@@ -1,3 +1,0 @@
-#!/usr/bin/bash
-
-perl -Ilib -MLanguage::Bel::Globals::SVG=generate -e'print(generate())' > images/definitions.svg
