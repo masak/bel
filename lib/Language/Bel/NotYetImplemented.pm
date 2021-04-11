@@ -8,11 +8,6 @@ use Exporter 'import';
 
 sub list {
     return (
-        printer => [
-            "(function print)",
-            "clo",
-            "('unboundb print)",
-        ],
     );
 }
 
