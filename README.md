@@ -70,10 +70,52 @@ nil
 (lit arr (lit arr 1 0 0) (lit arr 0 1 0) (lit arr 0 0 1))
 ```
 
-## State of completion
+## But is it feature-complete?
 
 `Language::Bel` implements all of the global definitions from [the
 specification](https://github.com/masak/bel/blob/master/pg/bel.bel).
+
+However, there are still some non-negotiable features still waiting to be
+completed:
+
+* **Unicode**. The built-in `chars` global needs to be able to recognize
+  unicode codepoints, not just ASCII. Source files and strings ought to
+  be treated as being UTF-8-encoded by default.
+
+* **Error messages**. A runtime error can usually be traced back to a
+  specific point in source code, and given ample context and explanation.
+  The goal is to give an account of what went wrong, in full sentences,
+  and also to suggest what can be done to fix the problem. (Elm serves as
+  the inspiration here.) Currently, an error consists of only one symbol,
+  such as `mistype`.
+
+* **Debugging**. The turnaround between authoring and running a program
+  should be made as small as possible; specifically, when an error does
+  happen, the REPL should put itself in a debugging mode where it's not
+  only easy to inspect the current state of the program (including local
+  variables and the stack) but also to modify things and resume without
+  having to restart the whole program execution.
+
+* **Printer bootstrap**. The Perl printer should be replaced by the Bel
+  printer. When globals associated with the Bel printer are replaced, the
+  effects on printing should be immediate.
+
+* **Reader bootstrap**. The Perl reader should be replaced by the Bel
+  reader. When globals associated with the Bel reader are replaced, the
+  effects on reading should be immediate.
+
+* **Evaluator boostrap**. The Perl code that evaluates Bel programs (that
+  is, large parts of the module `Language::Bel` itself) should be replaced
+  by the Bel evaluator `bel` from the Bel globals. By default, this new
+  evaluator should be able to run at speeds comparable to the current Perl
+  evaluator. When globals associated with the Bel evaluator are replaced,
+  the effects on evaluation should be evident as soon as a `(bootstrap)`
+  call is made.
+
+* **Performance**. Everything needs to be faster. As a first step, there
+  should be a set of concrete performance goals to aim for, maybe ten or
+  so. These will almost certainly be achieved via compilation to a dedicated
+  bytecode format.
 
 ## Contributing
 
