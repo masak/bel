@@ -5,6 +5,7 @@ use warnings;
 use Test::More;
 
 use Language::Bel::Test qw(
+    for_each_line_in_file
     visit
 );
 
@@ -17,16 +18,14 @@ my $no_warnings = "";
 sub scan_for_missing_version_strict_warnings {
     my ($longname, $shortname) = @_;
 
-    open my $fh, "<", $shortname
-        or die "can't open $longname: $!";
-
     my $this_module_has_version = 0;
     my $this_module_uses_strict = 0;
     my $this_module_uses_warnings = 0;
 
-    while (my $line = <$fh>) {
-        $line =~ s/\r?\n$//;
+    for_each_line_in_file($shortname, sub {
+        my ($line) = @_;
 
+        chomp $line;
         if ($line eq "use 5.006;") {
             $this_module_has_version = 1;
         }
@@ -36,9 +35,7 @@ sub scan_for_missing_version_strict_warnings {
         elsif ($line eq "use warnings;") {
             $this_module_uses_warnings = 1;
         }
-    }
-
-    close $fh;
+    });
 
     if (!$this_module_has_version) {
         if (!$no_version) {

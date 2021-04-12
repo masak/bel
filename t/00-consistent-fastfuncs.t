@@ -4,6 +4,10 @@ use strict;
 use warnings;
 use Test::More;
 
+use Language::Bel::Test qw(
+    slurp_file
+);
+
 use Language::Bel::Globals::FastFuncs::Preprocessor qw(
     preprocess
 );
@@ -11,21 +15,7 @@ use Language::Bel::Globals::FastFuncs::Preprocessor qw(
 plan tests => 1;
 
 {
-    my $actual_fastfuncs;
-    {
-        open my $FASTFUNCS, "<", "lib/Language/Bel/Globals/FastFuncs.pm"
-            or die "Couldn't open fastfuncs module: $!";
-
-        my @lines;
-        while (my $line = <$FASTFUNCS>) {
-            push @lines, $line;
-        }
-
-        close $FASTFUNCS;
-
-        $actual_fastfuncs = join("", @lines);
-        $actual_fastfuncs =~ s/\r//g;   # Windows likes these; we don't
-    }
+    my $actual_fastfuncs = slurp_file("lib/Language/Bel/Globals/FastFuncs.pm");
     my $generated_fastfuncs = preprocess();
 
     is $actual_fastfuncs, $generated_fastfuncs, "the fastfuncs are up to date";
