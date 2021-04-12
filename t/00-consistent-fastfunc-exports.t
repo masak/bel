@@ -15,6 +15,8 @@ my %exported_fastfuncs;
 my $interested = 0;
 
 while (my $line = <$fh>) {
+    $line =~ s/\r\n$//;
+
     if ($line =~ /^sub (fastfunc__\w+)\b/) {
         my $name = $1;
         $defined_fastfuncs{$name} = 1;
