@@ -5,6 +5,13 @@
 A Perl 5 implementation of Paul Graham's [Bel](http://www.paulgraham.com/bel.html).
 Bel is a self-hosting Lisp dialect, released October 2019.
 
+There are many Lisp dialects in the world, but Bel distinguishes itself by
+defining a complete stack of features on a metacircular foundation.
+That includes the evaluator, the reader and printer, but also I/O, error
+handling, and a numeric tower; these are all specified as Bel code in the
+language itself. Bel is built on top of Bel; that's true of the language's
+specification, and increasingly true of this implementation.
+
 ## Installation
 
 You need [Perl](https://www.perl.org/get.html) installed.
