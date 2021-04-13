@@ -108,9 +108,46 @@ sub output_of_eval_file {
     return $output;
 }
 
+sub for_each_line_in_file {
+    my ($filename, $line_callback) = @_;
+
+    open my $fh, "<", $filename
+        or die "can't open $filename: $!";
+
+    my $exit_loop_callback_was_called = 0;
+    my $exit_loop_callback = sub {
+        $exit_loop_callback_was_called = 1;
+    };
+
+    while (my $line = <$fh>) {
+        $line =~ s/\r\n$//;
+        $line_callback->($line, $exit_loop_callback);
+        if ($exit_loop_callback_was_called) {
+            last;
+        }
+    }
+
+    close $fh
+        or die "can't close $filename";
+}
+
+sub slurp_file {
+    my ($filename) = @_;
+
+    my @lines;
+    for_each_line_in_file($filename, sub {
+        my ($line) = @_;
+        push @lines, $line;
+    });
+
+    return join("", @lines);
+}
+
 our @EXPORT = qw(
     bel_todo
+    for_each_line_in_file
     output_of_eval_file
+    slurp_file
     visit
 );
 

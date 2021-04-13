@@ -4,18 +4,20 @@ use warnings;
 
 use Test::More;
 
+use Language::Bel::Test qw(
+    for_each_line_in_file
+);
+
 plan tests => 2;
 
 my $file = "lib/Language/Bel/Globals/FastFuncs.pm";
-open my $fh, "<", $file
-    or die "can't open $file: $!";
 
 my %defined_fastfuncs;
 my %exported_fastfuncs;
 my $interested = 0;
 
-while (my $line = <$fh>) {
-    $line =~ s/\r\n$//;
+for_each_line_in_file($file, sub {
+    my ($line) = @_;
 
     if ($line =~ /^sub (fastfunc__\w+)\b/) {
         my $name = $1;
@@ -32,10 +34,7 @@ while (my $line = <$fh>) {
     elsif ($line =~ /^\);/) {
         $interested = 0;
     }
-}
-
-close $fh
-    or die "can't close $file";
+});
 
 my @defined_not_exported;
 for my $ff (keys %defined_fastfuncs) {
