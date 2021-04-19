@@ -124,6 +124,12 @@ completed:
   so. These will almost certainly be achieved via compilation to a dedicated
   bytecode format.
 
+* **Documentation**. The language needs to be thoroughly described, both at
+  a high level with general concepts and techniques, and at a lower level
+  with a complete reference of all the built-in functions and types. Some
+  tradeoffs and design decisions of this particular implementation (yes,
+  there are a few) need to be explained as well.
+
 ## Contributing
 
 If you'd like to contribute, please fork the repository and make changes as you'd like.
