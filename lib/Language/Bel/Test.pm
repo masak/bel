@@ -120,7 +120,7 @@ sub for_each_line_in_file {
     };
 
     while (my $line = <$fh>) {
-        $line =~ s/\r\n$//;
+        $line =~ s/\r?\n$//;
         $line_callback->($line, $exit_loop_callback);
         if ($exit_loop_callback_was_called) {
             last;
@@ -138,6 +138,7 @@ sub slurp_file {
     for_each_line_in_file($filename, sub {
         my ($line) = @_;
         push @lines, $line;
+        push @lines, "\n";
     });
 
     return join("", @lines);
