@@ -6,7 +6,7 @@ use Language::Bel::Test::DSL;
 
 __DATA__
 
-> (= (randlen 0) 0)
+> (= (randlen 0) nil)
 t
 
 > (<= 0 (randlen 2) 3)
