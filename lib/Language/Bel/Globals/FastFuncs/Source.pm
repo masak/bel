@@ -3606,7 +3606,7 @@ sub fastfunc__randlen {
 
     my $nn = maybe_get_int($bel, $n);
     if (!defined($nn)) {
-        die "incomparable";
+        die "incomparable\n";
     }
 
     if ($nn == 0) {
@@ -3623,6 +3623,23 @@ sub fastfunc__randlen {
 
     return make_num(
         make_signed_rat("+", $result, 1),
+        $srzero,
+    );
+}
+
+sub fastfunc__rand {
+    my ($bel, $n) = @_;
+
+    my $nn = maybe_get_int($bel, $n);
+    if (!defined($nn) || $nn < 1) {
+        die "mistype\n";
+    }
+
+    my $rand = int(rand() * $nn);
+    my $srzero = make_signed_rat("+", 0, 1);
+
+    return make_num(
+        make_signed_rat("+", $rand, 1),
         $srzero,
     );
 }
@@ -3709,6 +3726,7 @@ our @EXPORT_OK = qw(
     fastfunc__nchar
     fastfunc__dedup
     fastfunc__randlen
+    fastfunc__rand
     fastfunc__err
 );
 
