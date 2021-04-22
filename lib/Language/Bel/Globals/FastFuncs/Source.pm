@@ -3601,6 +3601,32 @@ sub fastfunc__dedup  {
     return $result;
 }
 
+sub fastfunc__randlen {
+    my ($bel, $n) = @_;
+
+    my $nn = maybe_get_int($bel, $n);
+    if (!defined($nn)) {
+        die "incomparable";
+    }
+
+    if ($nn == 0) {
+        return SYMBOL_NIL;
+    }
+
+    my $result = 0;
+    for (my $i = 0; $i < $nn; $i++) {
+        $result *= 2;
+        $result += rand() < 0.5 ? 1 : 0;
+    }
+
+    my $srzero = make_signed_rat("+", 0, 1);
+
+    return make_num(
+        make_signed_rat("+", $result, 1),
+        $srzero,
+    );
+}
+
 sub fastfunc__err {
     my ($bel, $msg) = @_;
 
@@ -3682,6 +3708,7 @@ our @EXPORT_OK = qw(
     fastfunc__len
     fastfunc__nchar
     fastfunc__dedup
+    fastfunc__randlen
     fastfunc__err
 );
 

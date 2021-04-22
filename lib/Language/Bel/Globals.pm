@@ -101,6 +101,7 @@ use Language::Bel::Globals::FastFuncs qw(
     fastfunc__len
     fastfunc__nchar
     fastfunc__dedup
+    fastfunc__randlen
     fastfunc__err
 );
 
@@ -7878,7 +7879,7 @@ sub new {
             SYMBOL_NIL)))), SYMBOL_NIL))), SYMBOL_NIL)), SYMBOL_NIL)))),
             SYMBOL_NIL))))));
 
-        $self->add_global("randlen", make_pair(make_symbol("lit"),
+        $self->add_global("randlen", make_fastfunc(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("n"), SYMBOL_NIL),
             make_pair(make_pair(make_symbol("read"),
@@ -7893,7 +7894,7 @@ sub new {
             make_pair(make_pair(SYMBOL_T, SYMBOL_NIL), SYMBOL_NIL))),
             make_pair(make_pair(make_symbol("+"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(SYMBOL_T, SYMBOL_NIL), SYMBOL_NIL))),
-            SYMBOL_NIL)))), SYMBOL_NIL))), SYMBOL_NIL))))));
+            SYMBOL_NIL)))), SYMBOL_NIL))), SYMBOL_NIL))))), \&fastfunc__randlen));
 
         $self->add_global("rand", make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
