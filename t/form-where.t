@@ -101,3 +101,9 @@ bye
 > (where (idfn 'foo))
 ((x . foo) d)
 
+> (where)
+!ERROR: bad-form
+
+> (where a b c)
+!ERROR: bad-form
+

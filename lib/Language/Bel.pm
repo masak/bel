@@ -260,7 +260,9 @@ my %forms = (
     quote => sub {
         my ($bel, $es, $a) = @_;
 
-        # XXX: skipping $es sanity check for now
+        if (is_nil($es) || !is_nil($bel->cdr($es))) {
+            die "bad-form\n";
+        }
         my $e = pair_car($es);
         push @{$bel->{r}}, $e;
     },
@@ -307,10 +309,14 @@ FUT
     #        r
     #        m))
     where => sub {
-        my ($bel, $e_new, $a) = @_;
-        my $e = $bel->car($e_new);
+        my ($bel, $es, $a) = @_;
+
+        if (is_nil($es) || !is_nil($bel->cdr($bel->cdr($es)))) {
+            die "bad-form\n";
+        }
+        my $e = $bel->car($es);
         my $smark = $bel->cdr($bel->{globals}->get_kv("smark"));
-        my $new = $bel->car($bel->cdr($e_new));
+        my $new = $bel->car($bel->cdr($es));
 
         push @{$bel->{s}}, [
             make_pair(
@@ -339,7 +345,12 @@ FUT
     dyn => sub {
         my ($bel, $es, $a) = @_;
 
-        # XXX: skipping $es sanity check for now
+        if (is_nil($es)
+            || is_nil($bel->cdr($es))
+            || is_nil($bel->cdr($bel->cdr($es)))
+            || !is_nil($bel->cdr($bel->cdr($bel->cdr($es))))) {
+            die "bad-form\n";
+        }
         my $v = $bel->car($es);
         my $e1 = $bel->car($bel->cdr($es));
         my $e2 = $bel->car($bel->cdr($bel->cdr($es)));
@@ -369,7 +380,11 @@ FUT
     after => sub {
         my ($bel, $es, $a) = @_;
 
-        # XXX: skipping $es sanity check for now
+        if (is_nil($es)
+            || is_nil($bel->cdr($es))
+            || !is_nil($bel->cdr($bel->cdr($es)))) {
+            die "bad-form\n";
+        }
         my $e1 = $bel->car($es);
         my $e2 = $bel->car($bel->cdr($es));
         my $smark = $bel->cdr($bel->{globals}->get_kv("smark"));
@@ -400,7 +415,9 @@ FUT
     thread => sub {
         my ($bel, $es, $a) = @_;
 
-        # XXX: skipping $es sanity check for now
+        if (is_nil($es) || !is_nil($bel->cdr($es))) {
+            die "bad-form\n";
+        }
         my $e = $bel->car($es);
 
         push @{$bel->{r}}, SYMBOL_NIL;
@@ -418,7 +435,9 @@ FUT
     ccc => sub {
         my ($bel, $es, $a) = @_;
 
-        # XXX: skipping $es sanity checks for now
+        if (is_nil($es) || !is_nil($bel->cdr($es))) {
+            die "bad-form\n";
+        }
         my $f = $bel->car($es);
 
         my $s = SYMBOL_NIL;
