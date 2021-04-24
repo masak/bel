@@ -511,8 +511,7 @@ __DATA__
            (sigerr 'overargs s r m)
            (with (a (car args)
                   b (cadr args))
-             ; eif v
-             (let v (case f
+             (eif v (case f
                       id   (id a b)
                       join (join a b)
                       car  (car a)
@@ -529,7 +528,7 @@ __DATA__
                       stat (stat a)
                       coin (coin)
                       sys  (sys a))
-                  ; (sigerr v s r m)
+                    (sigerr v s r m)
                     (mev s (cons v r) m))))
        (sigerr 'unknown-prim s r m)))
 
