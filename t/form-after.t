@@ -17,3 +17,12 @@ __DATA__
       x)
 2
 
+> (after)
+!ERROR: bad-form
+
+> (after a)
+!ERROR: bad-form
+
+> (after a b c)
+!ERROR: bad-form
+

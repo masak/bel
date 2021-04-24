@@ -36,3 +36,9 @@ Becuase that's how `prn` works according to spec.
 "two" 
 3
 
+> (ccc)
+!ERROR: bad-form
+
+> (ccc a b)
+!ERROR: bad-form
+

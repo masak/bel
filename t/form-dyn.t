@@ -31,3 +31,15 @@ dynamic
 > (dyn v 'dynamic (let v 'lexical v))
 dynamic
 
+> (dyn)
+!ERROR: bad-form
+
+> (dyn v)
+!ERROR: bad-form
+
+> (dyn v 'a)
+!ERROR: bad-form
+
+> (dyn v 'a 'b 'c)
+!ERROR: bad-form
+

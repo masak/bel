@@ -27,3 +27,9 @@ __DATA__
 > n
 0
 
+> (thread)
+!ERROR: bad-form
+
+> (thread a b)
+!ERROR: bad-form
+
