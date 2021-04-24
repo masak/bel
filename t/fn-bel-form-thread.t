@@ -9,3 +9,9 @@ __DATA__
 > (bel '(thread (car '(x . y))))
 x
 
+> (bel '(thread))
+!ERROR: bad-form
+
+> (bel '(thread a b))
+!ERROR: bad-form
+

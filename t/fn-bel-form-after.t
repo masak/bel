@@ -12,3 +12,12 @@ __DATA__
 > (bel '(after 3 (car 'atom)))
 !ERROR: car-on-atom
 
+> (bel '(after))
+!ERROR: bad-form
+
+> (bel '(after a))
+!ERROR: bad-form
+
+> (bel '(after a b c))
+!ERROR: bad-form
+

@@ -9,3 +9,12 @@ __DATA__
 > (bel '(quote a))
 a
 
+> (bel '(quote))
+!ERROR: bad-form
+
+> (bel '(quote a b))
+!ERROR: bad-form
+
+> (bel '(quote a b nil))
+!ERROR: bad-form
+

@@ -12,6 +12,12 @@ __DATA__
 > (bel '(where (cdr '(z . w))))
 ((z . w) d)
 
+> (bel '(where))
+!ERROR: bad-form
+
+> (bel '(where a b c))
+!ERROR: bad-form
+
 The following two tests would probably work, but they are too slow.
 Even `(bel 'k!a)` is too slow right now. Maybe later.
 
