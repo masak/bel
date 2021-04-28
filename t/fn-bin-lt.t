@@ -55,13 +55,13 @@ nil
 (t)
 
 > (bin< \F \G \C)
-t
+nil
 
 > (bin< "one" "uno" "ett")
 t
 
 > (bin< 'x 'y 'm)
-nil
+!ERROR: overargs
 
 > (bin< 0 'zero)
 !ERROR: incomparable
