@@ -17,3 +17,14 @@ __DATA__
 > k
 (lit tab (a . 1) (c . d))
 
+> (set k (table '((x . 1)
+                  (y . 2)
+                  (x . 3))))
+!IGNORE: result of definition
+
+> (tabrem k 'x)
+((y . 2))
+
+> k
+(lit tab (y . 2))
+
