@@ -91,6 +91,12 @@ sub denominator {
     return $self->{denominator};
 }
 
+sub is_signed_rat {
+    my ($object) = @_;
+
+    return $object->isa(__PACKAGE__);
+}
+
 sub make_signed_rat {
     my ($sign, $numerator, $denominator) = @_;
 
@@ -98,7 +104,11 @@ sub make_signed_rat {
 }
 
 our @EXPORT_OK = qw(
+    denominator
+    is_signed_rat
     make_signed_rat
+    numerator
+    sign
 );
 
 1;
