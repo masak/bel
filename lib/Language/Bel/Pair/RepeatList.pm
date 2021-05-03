@@ -68,6 +68,12 @@ sub n {
     return $self->{n};
 }
 
+sub is_repeat_list {
+    my ($object) = @_;
+
+    return $object->isa(__PACKAGE__);
+}
+
 sub make_repeat_list {
     my ($n) = @_;
 
@@ -77,7 +83,9 @@ sub make_repeat_list {
 }
 
 our @EXPORT_OK = qw(
+    is_repeat_list
     make_repeat_list
+    n
 );
 
 1;

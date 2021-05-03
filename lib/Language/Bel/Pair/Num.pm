@@ -12,6 +12,16 @@ use Language::Bel::Core qw(
     make_symbol
     SYMBOL_NIL
 );
+use Language::Bel::Pair::SignedRat qw(
+    denominator
+    is_signed_rat
+    numerator
+    sign
+);
+use Language::Bel::Pair::RepeatList qw(
+    is_repeat_list
+    n
+);
 
 use Exporter 'import';
 
@@ -88,6 +98,30 @@ sub make_num {
 
 sub maybe_get_int {
     my ($bel, $x) = @_;
+
+    my ($re, $im);
+    if (is_num($x)
+        && is_signed_rat($re = $x->{real_sr})
+        && is_repeat_list(numerator($re))
+        && is_repeat_list(denominator($re))
+        && is_signed_rat($im = $x->{imag_sr})
+        && is_repeat_list(numerator($im))
+        && is_repeat_list(denominator($im))) {
+
+        my $re_xn_n = n(numerator($re));
+        my $re_xd_n = n(denominator($re));
+        my $real_part = sign($re) eq "+"
+            ? $re_xn_n / $re_xd_n
+            : -$re_xn_n / $re_xd_n;
+
+        my $im_xn_n = n(numerator($im));
+        my $im_xd_n = n(denominator($im));
+        my $imaginary_part = $im_xn_n / $im_xd_n;
+
+        return $imaginary_part == 0
+            ? int($real_part)
+            : undef;
+    }
 
     # skip past the 'lit' and the 'num'
     $x = $bel->cdr($bel->cdr($x));
