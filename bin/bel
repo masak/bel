@@ -44,7 +44,13 @@ sub eval_file {
         my $ast = $p->{ast};
         my $next_pos = $p->{pos};
 
-        $b->eval($ast);
+        eval {
+            $b->eval($ast);
+        };
+        if ($@) {
+            print("Error: $@");
+            last;
+        }
 
         $source = substr($source, $next_pos);
         $source =~ s/^\s+//;
