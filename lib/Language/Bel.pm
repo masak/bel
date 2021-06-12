@@ -10,6 +10,7 @@ use Language::Bel::Core qw(
     is_char
     is_nil
     is_pair
+    is_stream
     is_string
     is_symbol
     is_symbol_of_name
@@ -626,7 +627,7 @@ sub literal {
     return (
         $is_self_evaluating->() ||
         is_char($e) ||
-        # XXX: skipping is_stream case for now
+        is_stream($e) ||
         $is_lit->() ||
         is_string($e)
     );
