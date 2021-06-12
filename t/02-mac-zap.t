@@ -27,7 +27,7 @@ __DATA__
 > (set L '(a b c))
 (a b c)
 
-> (zap (fn () 'z) (cadr L))
+> (zap (con 'z) (cadr L))
 z
 
 > L
@@ -43,7 +43,7 @@ z
 (a (c) d)
 
 > (bind f6ac4d 'hi
-    (zap (fn () 'bye) f6ac4d)
+    (zap (con 'bye) f6ac4d)
     f6ac4d)
 bye
 
@@ -58,7 +58,7 @@ bye
              (c . 3)))
 ((a . 1) (b . 2) (c . 3))
 
-> (zap (fn () 5) (cdr:get 'b kvs))
+> (zap (con 5) (cdr:get 'b kvs))
 5
 
 > kvs
@@ -72,12 +72,12 @@ bye
              ((c) . 3)))
 (((a) . 1) ((b) . 2) ((c) . 3))
 
-> (zap (fn () 5) (cdr:get '(b) kvs))
+> (zap (con 5) (cdr:get '(b) kvs))
 5
 
 > kvs
 (((a) . 1) ((b) . 5) ((c) . 3))
 
-> (zap (fn () 5) (get '(b) kvs id))
+> (zap (con 5) (get '(b) kvs id))
 !ERROR: unfindable
 
