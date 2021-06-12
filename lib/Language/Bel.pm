@@ -610,25 +610,14 @@ sub ev {
 sub literal {
     my ($e) = @_;
 
-    my $is_self_evaluating = sub {
-        return is_symbol_of_name($e, "t")
-            || is_symbol_of_name($e, "nil")
-            || is_symbol_of_name($e, "o")
-            || is_symbol_of_name($e, "apply");
-    };
-
-    my $is_lit = sub {
-        return unless is_pair($e);
-
-        my $car = pair_car($e);
-        return is_symbol_of_name($car, "lit");
-    };
-
     return (
-        $is_self_evaluating->() ||
+        is_symbol_of_name($e, "t") ||
+        is_symbol_of_name($e, "nil") ||
+        is_symbol_of_name($e, "o") ||
+        is_symbol_of_name($e, "apply") ||
         is_char($e) ||
         is_stream($e) ||
-        $is_lit->() ||
+        is_pair($e) && is_symbol_of_name(pair_car($e), "lit") ||
         is_string($e)
     );
 }
