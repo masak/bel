@@ -1808,3 +1808,6 @@ __DATA__
                     (err 'inst-nontable))))
 
 (def err args)
+
+(set bcfn (table))
+

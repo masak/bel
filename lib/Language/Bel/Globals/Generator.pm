@@ -91,6 +91,7 @@ use Language::Bel::Core qw(
     make_pair
     make_symbol
     pair_cdr
+    pair_set_cdr
     symbol_name
     SYMBOL_CHAR
     SYMBOL_NIL
@@ -98,6 +99,9 @@ use Language::Bel::Core qw(
     SYMBOL_QUOTE
     SYMBOL_SYMBOL
     SYMBOL_T
+);
+use Language::Bel::Pair::ByteFunc qw(
+    make_bytefunc
 );
 use Language::Bel::Pair::FastFunc qw(
     make_fastfunc
@@ -452,6 +456,18 @@ HEADER
         }
 
         print_global($global->{name}, $global->{expr}, $vmark, $smark);
+    }
+
+    for my $name ("no") {
+        print <<"BCFN";
+        pair_set_cdr(
+            pair_cdr(pair_cdr(\$self->{hash_ref}->{bcfn})),
+            make_pair(
+                make_pair(make_symbol("$name"), make_bytefunc(1, [])),
+                pair_cdr(pair_cdr(pair_cdr(\$self->{hash_ref}->{bcfn}))),
+            ),
+        );
+BCFN
     }
 
     print <<'FOOTER';
