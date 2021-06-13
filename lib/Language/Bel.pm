@@ -978,8 +978,12 @@ sub applyf {
         if (!is_pair($f) || !is_symbol_of_name(pair_car($f), "lit")) {
             die "cannot-apply\n";
         }
-        # XXX: skipping `proper` check for now
-        $self->applylit($f, $args, $a);
+        if (proper($f)) {
+            $self->applylit($f, $args, $a);
+        }
+        else {
+            die "bad-lit\n";
+        }
     }
 }
 

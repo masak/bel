@@ -15,3 +15,9 @@ __DATA__
 > (mmm)
 <stream>
 
+> (set f '(lit . fn))
+!IGNORE: result of 'set'
+
+> (f)
+!ERROR: bad-lit
+
