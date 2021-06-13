@@ -1026,8 +1026,12 @@ sub applylit {
             my $parms = $self->car($self->cdr($rest));
             my $body = $self->car($self->cdr($self->cdr($rest)));
 
-            # XXX: skipping `okenv` and `okparms` checks for now
-            $self->applyclo($parms, $args, $env, $body);
+            if (okenv($env) && $self->okparms($parms)) {
+                $self->applyclo($parms, $args, $env, $body);
+            }
+            else {
+                die "bad-clo\n";
+            }
         }
         elsif ($tag_name eq "mac") {
             my @stack;
@@ -1180,6 +1184,98 @@ sub tabloc {
         make_pair($cell, $self->cdr($self->cdr($tab)))
     );
     return $cell;
+}
+
+# (def okenv (a)
+#   (and (proper a) (all pair a)))
+sub okenv {
+    my ($env) = @_;
+
+    return
+        unless proper($env);
+
+    while (!is_nil($env)) {
+        return
+            if (!is_pair(pair_car($env)));
+        $env = pair_cdr($env);
+    }
+    return 1;
+}
+
+my $OKPARMS = 1;
+my $OKTOPARM = 2;
+my $OKTOPARM_CONTINUED = 3;
+
+# (def okparms (p)
+#   (if (no p)       t
+#       (variable p) t
+#       (atom p)     nil
+#       (caris p t)  (oktoparm p)
+#                    (and (if (caris (car p) o)
+#                             (oktoparm (car p))
+#                             (okparms (car p)))
+#                         (okparms (cdr p)))))
+#
+# (def oktoparm ((tag (o var) (o e) . extra))
+#   (and (okparms var) (or (= tag o) e) (no extra)))
+sub okparms {
+    my ($self, $p) = @_;
+
+    my @prefix_stack = ([$OKPARMS, $p]);
+    while (@prefix_stack) {
+        my $elem = pop(@prefix_stack);
+        my ($state, $p) = @$elem;
+        if ($state == $OKPARMS) {
+            my $car_p;
+            if (is_nil($p)) {
+                next;
+            }
+            elsif ($self->variable($p)) {
+                next;
+            }
+            elsif (!is_pair($p)) {
+                return;
+            }
+            elsif (is_symbol_of_name($car_p = $self->car($p), "t")) {
+                push(@prefix_stack, [$OKTOPARM, $p]);
+            }
+            else {
+                # added in reverse order; it's a stack
+                push(@prefix_stack, [$OKPARMS, $self->cdr($p)]);
+                if (is_pair($car_p)
+                    && is_symbol_of_name($self->car($car_p), "o")) {
+                    push(@prefix_stack, [$OKTOPARM, $car_p]);
+                }
+                else {
+                    push(@prefix_stack, [$OKPARMS, $car_p]);
+                }
+            }
+        }
+        elsif ($state == $OKTOPARM) {
+            push(@prefix_stack, [
+                $OKTOPARM_CONTINUED,
+                $p,
+            ]);
+            my $var = $self->car($self->cdr($p));
+            push(@prefix_stack, [$OKPARMS, $var]);
+        }
+        elsif ($state == $OKTOPARM_CONTINUED) {
+            my $tag = $self->car($p);
+            my $e = $self->car($self->cdr($self->cdr($p)));
+            my $extra = $self->cdr($self->cdr($self->cdr($p)));
+            if (!is_symbol_of_name($tag, "o") && is_nil($e)) {
+                return;
+            }
+            if (!is_nil($extra)) {
+                return;
+            }
+        }
+        else {
+            die "Illegal state: $state";
+        }
+    }
+
+    return 1;
 }
 
 # (def applyprim (f args s r m)
