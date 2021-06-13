@@ -145,6 +145,7 @@ sub call {
         return $fn->apply($self, @args);
     }
     elsif (is_bytefunc($fn)) {
+        die "Can't `call` a bytefunc";
         return $fn->apply($self, @args);
     }
     else {
@@ -900,7 +901,7 @@ FUT
                             push @{$self->{r}}, $e;
                         }
                         elsif (is_bytefunc($op)) {
-                            my $e = $op->apply($self, @args);
+                            my $e = $op->apply($self, $args);
                             push @{$self->{r}}, $e;
                         }
                         else {
