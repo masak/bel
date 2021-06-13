@@ -1268,7 +1268,9 @@ sub pass {
     my ($self, $pat, $arg, $env) = @_;
 
     if (is_nil($pat)) {
-        # XXX: skipping the `'overargs` case for now
+        if (!is_nil($arg)) {
+            die "overargs\n";
+        }
         push @{$self->{r}}, $env;
     }
     # XXX: skipping the literal case for now

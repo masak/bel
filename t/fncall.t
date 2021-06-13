@@ -15,3 +15,9 @@ nil
 > ('y 'z)
 !ERROR: cannot-apply
 
+> ((fn (x) 'one-param-zero-args))
+!ERROR: underargs
+
+> ((fn (x) 'one-param-two-args) t t)
+!ERROR: overargs
+
