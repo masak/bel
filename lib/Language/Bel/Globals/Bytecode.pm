@@ -8,14 +8,12 @@ use Language::Bel::Bytecode qw(
     n
     PARAM_IN
     PARAM_LAST
-    PARAM_NEXT
     PARAM_OUT
     RETURN_REG
     SET_PARAM_NEXT
     SET_PRIM_ID_REG_SYM
     SET_PRIM_TYPE_REG
     SYM_NIL
-    SYM_T
     SYM_PAIR
 );
 use Language::Bel::Pair::ByteFunc qw(
