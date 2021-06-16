@@ -124,6 +124,18 @@ sub apply {
     }
 }
 
+sub reg_count {
+    my ($self) = @_;
+
+    return $self->{reg_count};
+}
+
+sub bytes {
+    my ($self) = @_;
+
+    return $self->{bytes};
+}
+
 sub is_bytefunc {
     my ($object) = @_;
 
