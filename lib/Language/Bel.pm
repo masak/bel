@@ -23,6 +23,9 @@ use Language::Bel::Core qw(
     SYMBOL_LOCK
     SYMBOL_NIL
 );
+use Language::Bel::Pair::ByteFunc qw(
+    is_bytefunc
+);
 use Language::Bel::Pair::FastFunc qw(
     is_fastfunc
 );
@@ -44,11 +47,11 @@ Language::Bel - An interpreter for Paul Graham's language Bel
 
 =head1 VERSION
 
-Version 0.54
+Version 0.55
 
 =cut
 
-our $VERSION = '0.54';
+our $VERSION = '0.55';
 
 =head1 SYNOPSIS
 
@@ -139,6 +142,10 @@ sub call {
     my ($self, $fn, @args) = @_;
 
     if (is_fastfunc($fn)) {
+        return $fn->apply($self, @args);
+    }
+    elsif (is_bytefunc($fn)) {
+        die "Can't `call` a bytefunc";
         return $fn->apply($self, @args);
     }
     else {
@@ -891,6 +898,10 @@ FUT
                             else {
                                 $e = $op->apply($self, @args);
                             }
+                            push @{$self->{r}}, $e;
+                        }
+                        elsif (is_bytefunc($op)) {
+                            my $e = $op->apply($self, $args);
                             push @{$self->{r}}, $e;
                         }
                         else {

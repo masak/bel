@@ -11,6 +11,7 @@ use Language::Bel::Core qw(
     make_pair
     make_symbol
     pair_cdr
+    pair_set_cdr
     symbol_name
     SYMBOL_CHAR
     SYMBOL_NIL
@@ -21,6 +22,9 @@ use Language::Bel::Core qw(
 );
 use Language::Bel::Pair::FastFunc qw(
     make_fastfunc
+);
+use Language::Bel::Globals::Bytecode qw(
+    bytefunc
 );
 use Language::Bel::Pair::CharsList qw(
     make_chars_list
@@ -8807,6 +8811,23 @@ sub new {
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_symbol("args"), make_pair(SYMBOL_NIL, SYMBOL_NIL))))),
             \&fastfunc__err));
+
+        $self->add_global("bcfn", make_pair(make_symbol("lit"),
+            make_pair(make_symbol("tab"), SYMBOL_NIL)));
+        pair_set_cdr(
+            pair_cdr(pair_cdr($self->{hash_ref}->{bcfn})),
+            make_pair(
+                make_pair(make_symbol("no"), bytefunc("no")),
+                pair_cdr(pair_cdr(pair_cdr($self->{hash_ref}->{bcfn}))),
+            ),
+        );
+        pair_set_cdr(
+            pair_cdr(pair_cdr($self->{hash_ref}->{bcfn})),
+            make_pair(
+                make_pair(make_symbol("atom"), bytefunc("atom")),
+                pair_cdr(pair_cdr(pair_cdr($self->{hash_ref}->{bcfn}))),
+            ),
+        );
     }
     $self->{original_err} = $self->{primitives}->prim_cdr(
         $self->{hash_ref}->{err}
