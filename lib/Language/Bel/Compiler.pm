@@ -8,7 +8,6 @@ use Language::Bel::Bytecode qw(
     n
     PARAM_IN
     PARAM_LAST
-    PARAM_NEXT
     PARAM_OUT
     RETURN_REG
     SET_PARAM_NEXT
