@@ -23,7 +23,10 @@ use Language::Bel::Core qw(
     is_pair
     is_symbol
     is_symbol_of_name
+    make_pair
+    make_symbol
     symbol_name
+    SYMBOL_NIL
 );
 use Language::Bel::Primitives;
 use Language::Bel::Printer qw(
@@ -40,7 +43,9 @@ use Exporter 'import';
         output => sub {},
         read_char => sub {},
         err => sub {
-            die "`err` global unexpectedly call in the compiler";
+            my ($message_str) = @_;
+
+            die "Error during compilation: $message_str\n";
         },
     });
 
@@ -143,10 +148,73 @@ sub handle_expression {
     }
 }
 
+my $unique_gensym_index = 0;
+
+sub gensym {
+    return make_symbol("gensym_" . sprintf("%04d", ++$unique_gensym_index));
+}
+
+sub replace_variables {
+    my ($ast, $translation_ref) = @_;
+
+    if (is_symbol($ast)) {
+        my $name = symbol_name($ast);
+        return $translation_ref->{$name} || $ast;
+    }
+    elsif (is_pair($ast)) {
+        my $car = replace_variables(car($ast), $translation_ref);
+        my $cdr = replace_variables(cdr($ast), $translation_ref);
+        return make_pair($car, $cdr);
+    }
+    else {
+        die "Unexpected type: ", _print($ast);
+    }
+}
+
+sub nanopass_01_alpha {
+    my ($ast) = @_;
+
+    $ast = cdr($ast);
+    my $fn_name = car($ast);
+
+    $ast = cdr($ast);
+    my $args = car($ast);
+
+    die "Not general enough to handle these args yet: ", _print($args)
+        unless is_pair($args)
+            && is_symbol(car($args))
+            && is_nil(cdr($args));
+
+    my $single_param_name = symbol_name(car($args));
+
+    my $gensym = gensym();
+
+    my $body = cdr($ast);
+    my %translation = (
+        $single_param_name => $gensym,
+    );
+
+    return make_pair(
+        make_symbol("def"),
+        make_pair(
+            $fn_name,
+            make_pair(
+                make_pair(
+                    $gensym,
+                    SYMBOL_NIL,
+                ),
+                replace_variables($body, \%translation),
+            ),
+        ),
+    );
+}
+
 sub compile {
     my ($source) = @_;
 
     my $ast = read_whole($source);
+
+    die _print(nanopass_01_alpha($ast));
 
     my $def = car($ast);
 
