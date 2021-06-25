@@ -3,37 +3,12 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More;
-use Language::Bel::Bytecode qw(
-    belify_bytefunc
-);
-use Language::Bel::Compiler qw(
-    compile
+use Language::Bel::Test qw(
+    deindent
+    test_compilation
 );
 
-plan tests => 2;
-
-sub bc {
-    my ($bel_source) = @_;
-
-    return belify_bytefunc(compile($bel_source));
-}
-
-sub deindent {
-    my ($text) = @_;
-
-    my $result = join("\n", map { $_ && substr($_, 4) } split(/\n/, $text));
-    $result =~ s/^\n//;
-    return $result;
-}
-
-sub test_compilation {
-    my ($source, $target) = @_;
-    $source =~ /^\(def (\S+)/
-        or die "Couldn't parse out the name from '$source'";
-    my $name = $1;
-
-    is bc($source), $target, "compilation of `$name`";
-}
+plan tests => 1;
 
 my $source = deindent("
     (def no (x)

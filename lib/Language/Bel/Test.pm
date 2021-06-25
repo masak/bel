@@ -9,6 +9,13 @@ use Language::Bel;
 use Language::Bel::Reader qw(
     read_partial
 );
+use Language::Bel::Bytecode qw(
+    belify_bytefunc
+);
+use Language::Bel::Compiler qw(
+    compile
+);
+
 
 use Exporter 'import';
 
@@ -144,11 +151,32 @@ sub slurp_file {
     return join("", @lines);
 }
 
+sub deindent {
+    my ($text) = @_;
+
+    my $result = join("\n", map { $_ && substr($_, 4) } split(/\n/, $text));
+    $result =~ s/^\n//;
+    return $result;
+}
+
+sub test_compilation {
+    my ($source, $target) = @_;
+    $source =~ /^\(def (\S+)/
+        or die "Couldn't parse out the name from '$source'";
+    my $name = $1;
+
+    is belify_bytefunc(compile($source)),
+        $target,
+        "compilation of `$name`";
+}
+
 our @EXPORT = qw(
     bel_todo
+    deindent
     for_each_line_in_file
     output_of_eval_file
     slurp_file
+    test_compilation
     visit
 );
 
