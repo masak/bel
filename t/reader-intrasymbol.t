@@ -9,6 +9,15 @@ __DATA__
 > 'a:b:c
 (compose a b c)
 
+> ':bar
+(compose bar)
+
+> ':
+(compose)
+
+> 'foo:0:bar
+(compose foo 0 bar)
+
 > '~n
 (compose no n)
 

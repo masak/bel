@@ -376,8 +376,11 @@ sub parsecom {
 
         my $tokens = SYMBOL_NIL;
         while (@tokens) {
+            my $t = pop(@tokens);
+            next if $t eq "";
+
             $tokens = make_pair(
-                parseno(pop(@tokens)),
+                parseno($t),
                 $tokens,
             );
         }
