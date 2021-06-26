@@ -7,13 +7,13 @@
 (tem robot x 0 y 0 dx 0 dy -1)
 
 ;; A common pattern in Bel is to define a global, initially an empty
-;; list to act as a namespace for some given purpose...
-(set actions nil)
+;; table to act as a namespace for some given purpose...
+(set actions (table))
 
 ;; ...and then to define a macro that will add things to this global.
 ;; Here, we want to define five actions that control the robot.
 (mac action (cmd name parms . body)
-  `(push (cons ,cmd (fn ,parms ,@body)) actions))
+  `(set (actions ,cmd) (fn ,parms ,@body)))
 
 ;; The first action is a bit of an exception. It aborts the run early
 ;; so that no more commands are executed. This is achieved through a
@@ -67,12 +67,11 @@
 ;; an exception and abort early so that no more commands are
 ;; executed.
 (def runcmd (r w h cmd)
-  (aif (get cmd actions)
-       (let action (cdr it)
-         (action r)
-         (checkbounds r!x w)
-         (checkbounds r!y h))
-       (throw 'illegal-command)))
+  (let action (or (actions cmd)
+                  (throw 'illegal-command))
+    (action r)
+    (checkbounds r!x w)
+    (checkbounds r!y h)))
 
 ;; Given some dimensions (w, h), an initial robot position (x, y),
 ;; and zero or more commands (numbers 0..4), the `run` function
