@@ -75,6 +75,10 @@
     (checkbounds r!x w)
     (checkbounds r!y h)))
 
+(def remember (f)
+  (let s nil
+    (fn (x y) (or s (set s (f x y))))))
+
 ;; Given some dimensions (w, h), an initial robot position (x, y),
 ;; and zero or more commands (numbers 0..4), the `run` function
 ;; executes the commands one by one and returns the robot's final
@@ -84,7 +88,7 @@
 (def run ((w h) (x y) cmds)
   (let r (make robot x x y y)
     (catch
-      (map [runcmd r w h _] cmds)
+      (map [runcmd r w h _] (rem 0 cmds remember.=))
       (list r!x r!y))))
 
 (prn (run '(10 5) '(2 2) '(1 3 1 1 1 0)))
@@ -92,4 +96,6 @@
 (prn (catch (run '(3 3) '(0 0) '(4 1))))
 
 (prn (catch (run '(10 5) '(2 2) '(1 3 1 1 5))))
+
+(prn (run '(10 5) '(2 2) '(1 3 1 0 1 1)))
 
