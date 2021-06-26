@@ -8,8 +8,7 @@
   x     0
   y     0
   dx    0
-  dy    -1
-  state 'on)
+  dy    -1)
 
 ;; A common pattern in Bel is to define a global, initially an empty
 ;; table to act as a namespace for some given purpose...
@@ -19,11 +18,6 @@
 ;; Here, we want to define five actions that control the robot.
 (mac action (cmd name parms . body)
   `(set (actions ,cmd) (fn ,parms ,@body)))
-
-;; This action communicates up to the top-level function `run`
-;; that the robot is not going to accept more commands.
-(action 0 quit (r)
-  (set r!state 'off))
 
 ;; This helper function makes it easy to talk about moving the robot
 ;; `r` forwards or backwards, as specified by the operator `op`.
@@ -75,6 +69,9 @@
     (checkbounds r!x w)
     (checkbounds r!y h)))
 
+;; A helper function that takes a comparison function (such as
+;; `=`) and wraps it in a stateful function which keeps returning
+;; `t` forever after the comparison returns `t` once.
 (def remember (f)
   (let s nil
     (fn (x y) (or s (set s (f x y))))))
@@ -93,9 +90,9 @@
 
 (prn (run '(10 5) '(2 2) '(1 3 1 1 1 0)))
 
-(prn (catch (run '(3 3) '(0 0) '(4 1))))
+(prn (run '(3 3) '(0 0) '(4 1)))
 
-(prn (catch (run '(10 5) '(2 2) '(1 3 1 1 5))))
+(prn (run '(10 5) '(2 2) '(1 3 1 1 5)))
 
 (prn (run '(10 5) '(2 2) '(1 3 1 0 1 1)))
 
