@@ -76,6 +76,12 @@ sub is_primitive {
     return !!$arg_count_of{$name};
 }
 
+my $unique_gensym_index = 0;
+
+sub gensym {
+    return "gensym_" . sprintf("%04d", ++$unique_gensym_index);
+}
+
 sub handle_primitive {
     my ($op, $instructions_ref, @args) = @_;
 
@@ -85,43 +91,43 @@ sub handle_primitive {
     die "Expected $expected_arg_count for primitive `$name`, "
         . "got $actual_arg_count"
         unless $actual_arg_count == $expected_arg_count;
-    handle_expression($args[0], $instructions_ref);
+    my $a0_gensym = handle_expression($args[0], $instructions_ref);
+    my $target_gensym = gensym();
     if ($name eq "id") {
         my $symbol;
         if (is_nil($args[1])) {
-            $symbol = SYMBOL("nil");
+            $symbol = "nil";
         }
         elsif (is_pair($args[1])
             && is_symbol_of_name(car($args[1]), "quote")) {
             my $quote_cadr = car(cdr($args[1]));
             die "The quoted thing is not a symbol: ", _print($args[1])
                 unless is_symbol($quote_cadr);
-            my $symbol_name = symbol_name($quote_cadr);
-            $symbol = SYMBOL($symbol_name);
+            $symbol = symbol_name($quote_cadr);
         }
         else {
             die "Unexpected not-a-symbol";
         }
 
-        push @{$instructions_ref}, (
-            SET_PRIM_ID_REG_SYM, 0, 0, $symbol,
-        );
+        push @{$instructions_ref},
+            read_whole("($target_gensym := (prim!id $a0_gensym '$symbol))");
     }
     elsif ($name eq "type") {
-        push @{$instructions_ref}, (
-            SET_PRIM_TYPE_REG, 0, 0, n,
-        );
+        push @{$instructions_ref},
+            read_whole("($target_gensym := (prim!type $a0_gensym))");
     }
     else {
         die "Unexpected primitive `$name`";
     }
+    return $target_gensym;
 }
 
 sub handle_expression {
     my ($expr, $instructions_ref) = @_;
 
-    return
-        unless is_pair($expr);
+    if (is_symbol($expr)) {
+        return symbol_name($expr);
+    }
 
     my $op = car($expr);
     my $args = cdr($expr);
@@ -131,27 +137,24 @@ sub handle_expression {
         $args = cdr($args);
     }
 
+    my $target_gensym;
     if (is_primitive($op)) {
-        handle_primitive($op, $instructions_ref, @args);
+        $target_gensym = handle_primitive($op, $instructions_ref, @args);
     }
     elsif (is_symbol_of_name($op, "no")) {
         if (scalar(@args) != 1) {
             die "expected 1 arg: ", _print($expr);
         }
-        handle_expression($args[0], $instructions_ref);
-        push @{$instructions_ref}, (
-            SET_PRIM_ID_REG_SYM, 0, 0, SYMBOL("nil"),
-        );
+        $target_gensym = gensym();
+        my $a0_gensym = handle_expression($args[0], $instructions_ref);
+        push @{$instructions_ref},
+            read_whole("($target_gensym := (prim!id $a0_gensym))");
     }
     else {
         die "unexpected: ", _print($expr);
     }
-}
 
-my $unique_gensym_index = 0;
-
-sub gensym {
-    return make_symbol("gensym_" . sprintf("%04d", ++$unique_gensym_index));
+    return $target_gensym;
 }
 
 sub replace_variables {
@@ -187,7 +190,7 @@ sub nanopass_01_alpha {
 
     my $single_param_name = symbol_name(car($args));
 
-    my $gensym = gensym();
+    my $gensym = make_symbol(gensym());
 
     my $body = cdr($ast);
     my %translation = (
@@ -195,7 +198,7 @@ sub nanopass_01_alpha {
     );
 
     return make_pair(
-        make_symbol("def"),
+        make_symbol("def-01"),
         make_pair(
             $fn_name,
             make_pair(
@@ -209,42 +212,61 @@ sub nanopass_01_alpha {
     );
 }
 
-sub compile {
-    my ($source) = @_;
+sub listify {
+    my (@elems) = @_;
 
-    my $ast = read_whole($source);
+    my $list = SYMBOL_NIL;
+    for my $elem (reverse(@elems)) {
+        $list = make_pair($elem, $list);
+    }
 
-    die _print(nanopass_01_alpha($ast));
+    return $list;
+}
 
-    my $def = car($ast);
+sub nanopass_02_flatten {
+    my ($ast) = @_;
 
     $ast = cdr($ast);
-    my $fn_name = car($ast);
+    # skipping $fn_name
 
     $ast = cdr($ast);
     my $args = car($ast);
 
-    my @param_handling = (
-        PARAM_IN, n, n, n,
-        SET_PARAM_NEXT, 0, n, n,
-        PARAM_LAST, n, n, n,
-        PARAM_OUT, n, n, n,
-    );
-
-    $ast = cdr($ast);
+    my $body = cdr($ast);
 
     my @instructions;
-    while (!is_nil($ast)) {
-        my $statement = car($ast);
-        handle_expression($statement, \@instructions);
-        $ast = cdr($ast);
+    my $final_target_gensym = "<not set>";
+    while (!is_nil($body)) {
+        my $statement = car($body);
+        $final_target_gensym = handle_expression($statement, \@instructions);
+        $body = cdr($body);
     }
 
-    return make_bytefunc(1, [
-        @param_handling,
-        @instructions,
-        RETURN_REG, 0, n, n,
-    ]);
+    if ($final_target_gensym eq "<not set>") {
+        die "XXX need to handle this case, when the body is `nil`";
+    }
+
+    push @instructions, read_whole("(return $final_target_gensym)");
+
+    return make_pair(
+        make_symbol("def-02"),
+        make_pair(
+            $args,
+            listify(@instructions),
+        ),
+    );
+}
+
+sub compile {
+    my ($source) = @_;
+
+    my $_00 = read_whole($source);
+    my $_01 = nanopass_01_alpha($_00);
+
+    use Data::Dumper;
+    $Data::Dumper::Indent = 1;
+    print(Dumper(nanopass_02_flatten($_01)));
+    die _print(nanopass_02_flatten($_01));
 }
 
 our @EXPORT_OK = qw(
