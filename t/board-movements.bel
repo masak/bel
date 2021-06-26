@@ -4,7 +4,12 @@
 ;; The robot is not allowed to leave the rectangle spanned by (0, 0)
 ;; (inclusive) and (w, h) (exclusive). Note that the (w, h) coordinates
 ;; are not specified here; they are parameters to `run` and `runcmd`.
-(tem robot x 0 y 0 dx 0 dy -1)
+(tem robot
+  x     0
+  y     0
+  dx    0
+  dy    -1
+  state 'on)
 
 ;; A common pattern in Bel is to define a global, initially an empty
 ;; table to act as a namespace for some given purpose...
@@ -15,13 +20,10 @@
 (mac action (cmd name parms . body)
   `(set (actions ,cmd) (fn ,parms ,@body)))
 
-;; The first action is a bit of an exception. It aborts the run early
-;; so that no more commands are executed. This is achieved through a
-;; `throw` action, a non-local command which will find us back in
-;; `run`, the top-level function. The list passed to `throw`
-;; conveniently serves as a return value.
+;; This action communicates up to the top-level function `run`
+;; that the robot is not going to accept more commands.
 (action 0 quit (r)
-  (throw (list r!x r!y)))
+  (set r!state 'off))
 
 ;; This helper function makes it easy to talk about moving the robot
 ;; `r` forwards or backwards, as specified by the operator `op`.
