@@ -7,10 +7,14 @@ use warnings;
 use Test::More;
 use Language::Bel::Test;
 
-plan tests => 1;
+plan tests => 3;
 
 my $output = output_of_eval_file("t/board-movements.bel");
 
-is $output,
-    "(5 1) \nimpossible-move \nillegal-command \n",  # note the space at the end; this is spec
-    "board-movements example works";
+my @lines = split(/\n/, $output);
+
+# the spaces at the end of the output are spec; they are due to `prn`
+is $lines[0], "(5 1) ", "a valid sequence of moves";
+is $lines[1], "impossible-move ", "trying to leave the board";
+is $lines[2], "illegal-command ", "issuing an unknown command";
+
