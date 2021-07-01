@@ -1,4 +1,4 @@
-package Language::Bel::Globals::Bytecode;
+package Language::Bel::Globals::ByteFuncs;
 
 use 5.006;
 use strict;

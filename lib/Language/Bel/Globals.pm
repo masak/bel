@@ -23,7 +23,7 @@ use Language::Bel::Core qw(
 use Language::Bel::Pair::FastFunc qw(
     make_fastfunc
 );
-use Language::Bel::Globals::Bytecode qw(
+use Language::Bel::Globals::ByteFuncs qw(
     bytefunc
 );
 use Language::Bel::Pair::CharsList qw(
