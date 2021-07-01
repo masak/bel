@@ -8828,6 +8828,13 @@ sub new {
                 pair_cdr(pair_cdr(pair_cdr($self->{hash_ref}->{bcfn}))),
             ),
         );
+        pair_set_cdr(
+            pair_cdr(pair_cdr($self->{hash_ref}->{bcfn})),
+            make_pair(
+                make_pair(make_symbol("append"), bytefunc("append")),
+                pair_cdr(pair_cdr(pair_cdr($self->{hash_ref}->{bcfn}))),
+            ),
+        );
     }
     $self->{original_err} = $self->{primitives}->prim_cdr(
         $self->{hash_ref}->{err}

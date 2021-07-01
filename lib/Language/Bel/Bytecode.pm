@@ -12,10 +12,20 @@ sub SET_PARAM_NEXT { 0x02 }
 sub PARAM_LAST { 0x03 }
 sub PARAM_OUT { 0x04 }
 
-sub SET_PRIM_ID_REG_SYM { 0x10 }
-sub SET_PRIM_TYPE_REG { 0x11 }
+sub PRIM_XAR { 0x10 }
+sub PRIM_XDR { 0x11 }
+sub SET_PRIM_CAR { 0x12 }
+sub SET_PRIM_CDR { 0x13 }
+sub SET_PRIM_ID_REG_SYM { 0x14 }
+sub SET_PRIM_JOIN_REG_SYM { 0x15 }
+sub SET_PRIM_JOIN_SYM_SYM { 0x16 }
+sub SET_PRIM_TYPE_REG { 0x17 }
 
-sub SET_SYM { 0x20 }
+sub SET_REG { 0x20 }
+sub SET_SYM { 0x21 }
+
+sub JMP { 0x30 }
+sub IF_JMP { 0x31 }
 
 sub RETURN_REG { 0xF0 }
 
@@ -133,15 +143,24 @@ sub symbol_of {
 
 our @EXPORT_OK = qw(
     belify_bytefunc
+    IF_JMP
+    JMP
     n
     PARAM_IN
     PARAM_LAST
     PARAM_NEXT
     PARAM_OUT
+    PRIM_XAR
+    PRIM_XDR
     RETURN_REG
     SET_PARAM_NEXT
+    SET_PRIM_CAR
+    SET_PRIM_CDR
     SET_PRIM_ID_REG_SYM
+    SET_PRIM_JOIN_REG_SYM
+    SET_PRIM_JOIN_SYM_SYM
     SET_PRIM_TYPE_REG
+    SET_REG
     SET_SYM
     SYMBOL
 );
