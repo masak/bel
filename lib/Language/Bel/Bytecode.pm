@@ -41,7 +41,91 @@ sub SYMBOL {
 
 sub n { 0 }
 
+sub four_groups {
+    my ($array) = @_;
+
+    die "Length not divisible by 4"
+        unless scalar(@$array) % 4 == 0;
+
+    my @result;
+
+    my $index = 0;
+    while ($index < scalar(@$array)) {
+        push @result, [@$array[$index .. $index + 3]];
+        $index += 4;
+    }
+
+    return @result;
+}
+
+sub ops {
+    my ($bytefunc) = @_;
+
+    my $bytes = $bytefunc->bytes();
+    return four_groups($bytes);
+}
+
+sub belify_bytefunc {
+    my ($bytefunc) = @_;
+
+    my $r = $bytefunc->reg_count();
+    my @ops = ops($bytefunc);
+    my @instructions = map { belify_instruction($_) } @ops;
+    my $instructions = join "", map { "\n  $_" } @instructions;
+
+    return "(bytefunc $r$instructions)\n";
+}
+
+sub belify_instruction {
+    my ($op) = @_;
+    my ($opcode, $o1, $o2, $o3) = @$op;
+
+    if ($opcode == PARAM_IN) {
+        return "(param!in)";
+    }
+    elsif ($opcode == PARAM_NEXT) {
+        return "(param!next)";
+    }
+    elsif ($opcode == SET_PARAM_NEXT) {
+        my $target = "%$o1";
+        return "($target := param!next)";
+    }
+    elsif ($opcode == PARAM_LAST) {
+        return "(param!last)";
+    }
+    elsif ($opcode == PARAM_OUT) {
+        return "(param!out)";
+    }
+    elsif ($opcode == SET_PRIM_ID_REG_SYM) {
+        my $target = "%$o1";
+        my $reg = "%$o2";
+        my $sym = symbol_of($o3);
+        return "($target := prim!id $reg '$sym)";
+    }
+    elsif ($opcode == SET_PRIM_TYPE_REG) {
+        my $target = "%$o1";
+        my $reg = "%$o2";
+        return "($target := prim!type $reg)";
+    }
+    elsif ($opcode == RETURN_REG) {
+        my $reg = "%$o1";
+        return "(return $reg)";
+    }
+    else {
+        die "Unknown opcode $opcode";
+    }
+}
+
+sub symbol_of {
+    my ($index) = @_;
+    if ($index < 0 || scalar(@registered_symbols) < $index) {
+        die "Symbol index `$index` out of bounds";
+    }
+    return $registered_symbols[$index];
+}
+
 our @EXPORT_OK = qw(
+    belify_bytefunc
     n
     PARAM_IN
     PARAM_LAST
