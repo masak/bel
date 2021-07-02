@@ -9,4 +9,21 @@ binmode STDOUT, ':encoding(utf-8)';
 
 my $bel = Language::Bel->new({ output => sub {} });
 
-generate_globals($bel);
+my $generated_globals;
+do {
+    local *STDOUT;
+    open(STDOUT, ">>", \$generated_globals)
+        or die "failed to open file handle to string ($!)\n";
+
+    generate_globals($bel);     # will print into $generated_globals
+};
+
+my $globals_path = "lib/Language/Bel/Globals.pm";
+
+open(my $GLOBALS, ">", $globals_path)
+    or die "Couldn't open $globals_path: $!";
+
+print {$GLOBALS} $generated_globals;
+
+close($GLOBALS);
+
