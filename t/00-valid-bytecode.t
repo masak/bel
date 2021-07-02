@@ -17,7 +17,7 @@ use Language::Bel::Bytecode qw(
     SYM_T
     SYM_PAIR
 );
-use Language::Bel::Globals::Bytecode qw(
+use Language::Bel::Globals::ByteFuncs qw(
     bytefunc
     all_bytefuncs
 );

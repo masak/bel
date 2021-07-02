@@ -27,7 +27,7 @@ use Language::Bel::Expander::Bquote qw(
 );
 use Language::Bel::Globals::Source;
 use Language::Bel::Globals::FastFuncs;
-use Language::Bel::Globals::Bytecode qw(
+use Language::Bel::Globals::ByteFuncs qw(
     all_bytefuncs
 );
 use Language::Bel;
@@ -106,7 +106,7 @@ use Language::Bel::Core qw(
 use Language::Bel::Pair::FastFunc qw(
     make_fastfunc
 );
-use Language::Bel::Globals::Bytecode qw(
+use Language::Bel::Globals::ByteFuncs qw(
     bytefunc
 );
 use Language::Bel::Pair::CharsList qw(
