@@ -13,8 +13,7 @@ use Language::Bel::Bytecode qw(
     SET_PARAM_NEXT
     SET_PRIM_ID_REG_SYM
     SET_PRIM_TYPE_REG
-    SYM_NIL
-    SYM_PAIR
+    SYMBOL
 );
 use Language::Bel::Pair::ByteFunc qw(
     make_bytefunc
@@ -38,7 +37,7 @@ add_bytefunc("no", 1,
     SET_PARAM_NEXT, 0, n, n,
     PARAM_LAST, n, n, n,
     PARAM_OUT, n, n, n,
-    SET_PRIM_ID_REG_SYM, 0, 0, SYM_NIL,
+    SET_PRIM_ID_REG_SYM, 0, 0, SYMBOL("nil"),
     RETURN_REG, 0, n, n,
 );
 
@@ -48,8 +47,8 @@ add_bytefunc("atom", 1,
     PARAM_LAST, n, n, n,
     PARAM_OUT, n, n, n,
     SET_PRIM_TYPE_REG, 0, 0, n,
-    SET_PRIM_ID_REG_SYM, 0, 0, SYM_PAIR,
-    SET_PRIM_ID_REG_SYM, 0, 0, SYM_NIL,
+    SET_PRIM_ID_REG_SYM, 0, 0, SYMBOL("pair"),
+    SET_PRIM_ID_REG_SYM, 0, 0, SYMBOL("nil"),
     RETURN_REG, 0, n, n,
 );
 

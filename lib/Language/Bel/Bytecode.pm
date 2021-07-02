@@ -17,9 +17,27 @@ sub SET_PRIM_TYPE_REG { 0x11 }
 
 sub RETURN_REG { 0xF0 }
 
-sub SYM_NIL { 0 }
-sub SYM_T { 1 }
-sub SYM_PAIR { 2 }
+my @registered_symbols = (
+    "nil",
+    "t",
+    "pair",
+);
+
+my %index_of;
+my $index = 0;
+for my $name (@registered_symbols) {
+    $index_of{$name} = $index;
+    ++$index;
+}
+
+sub SYMBOL {
+    my ($name) = @_;
+
+    die "Unknown symbo `$name`"
+        unless defined $index_of{$name};
+
+    return $index_of{$name};
+}
 
 sub n { 0 }
 
@@ -33,9 +51,7 @@ our @EXPORT_OK = qw(
     SET_PARAM_NEXT
     SET_PRIM_ID_REG_SYM
     SET_PRIM_TYPE_REG
-    SYM_NIL
-    SYM_T
-    SYM_PAIR
+    SYMBOL
 );
 
 1;
