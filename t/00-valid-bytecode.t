@@ -13,9 +13,6 @@ use Language::Bel::Bytecode qw(
     SET_PARAM_NEXT
     SET_PRIM_ID_REG_SYM
     SET_PRIM_TYPE_REG
-    SYM_NIL
-    SYM_T
-    SYM_PAIR
 );
 use Language::Bel::Globals::ByteFuncs qw(
     bytefunc
