@@ -7,6 +7,7 @@ use warnings;
 use Language::Bel::Core qw(
     are_identical
     atoms_are_identical
+    char_codepoint
     is_char
     is_nil
     is_pair
@@ -3428,7 +3429,7 @@ sub fastfunc__charn {
         die "not-a-char\n";
     }
 
-    my $n = $c->codepoint();
+    my $n = char_codepoint($c);
     return make_num(
         make_signed_rat("+", $n, 1),
         make_signed_rat("+", 0, 1),
