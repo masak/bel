@@ -156,6 +156,7 @@ sub deindent {
 
     my $result = join("\n", map { $_ && substr($_, 4) } split(/\n/, $text));
     $result =~ s/^\n//;
+    $result .= "\n";
     return $result;
 }
 
