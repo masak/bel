@@ -22,3 +22,6 @@ nil
     (id (cdr:append '(a) p) p))
 t
 
+> (let p '(b)
+    (id (cdr:append '(a) p nil) p))
+nil
