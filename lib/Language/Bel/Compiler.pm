@@ -24,11 +24,7 @@ use Language::Bel::Core qw(
     is_nil
     is_pair
     is_symbol
-    is_symbol_of_name
-    make_pair
-    make_symbol
     symbol_name
-    SYMBOL_NIL
 );
 use Language::Bel::Printer qw(
     _print
@@ -36,15 +32,14 @@ use Language::Bel::Printer qw(
 use Language::Bel::Reader qw(
     read_whole
 );
-use Language::Bel::Compiler::Gensym qw(
-    gensym
-    is_gensym
-);
 use Language::Bel::Compiler::Pass01 qw(
     nanopass_01_alpha
 );
 use Language::Bel::Compiler::Pass02 qw(
     nanopass_02_flatten
+);
+use Language::Bel::Compiler::Pass03 qw(
+    nanopass_03_allocate_registers
 );
 use Language::Bel::Compiler::Primitives qw(
     car
@@ -52,40 +47,6 @@ use Language::Bel::Compiler::Primitives qw(
 );
 
 use Exporter 'import';
-
-sub substitute_registers {
-    my ($expr) = @_;
-
-    if (is_symbol($expr) && is_gensym($expr)) {
-        return make_symbol("%0");
-    }
-    elsif (is_pair($expr)) {
-        return make_pair(
-            substitute_registers(car($expr)),
-            substitute_registers(cdr($expr)),
-        );
-    }
-    else {
-        return $expr;
-    }
-}
-
-sub nanopass_03_allocate_registers {
-    my ($ast) = @_;
-
-    $ast = cdr($ast);
-    my $args = substitute_registers(car($ast));
-
-    my $body = cdr($ast);
-
-    return make_pair(
-        make_symbol("def-03"),
-        make_pair(
-            $args,
-            substitute_registers($body),
-        ),
-    );
-}
 
 sub ast_match {
     my ($expr, $match_ast, $captures_ref) = @_;
@@ -136,7 +97,7 @@ sub serialize_bytefunc {
     my ($ast) = @_;
 
     $ast = cdr($ast);
-    my $args = substitute_registers(car($ast));
+    # ignore argument list for now
 
     my $body = cdr($ast);
 
