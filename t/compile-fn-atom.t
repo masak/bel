@@ -4,18 +4,17 @@ use strict;
 use warnings;
 use Test::More;
 use Language::Bel::Test qw(
-    deindent
     test_compilation
 );
 
 plan tests => 1;
 
-my $source = deindent("
+my $source = "
     (def atom (x)
       (no (id (type x) 'pair)))
-");
+";
 
-my $target = deindent("
+my $target = "
     (bytefunc 1
       (param!in)
       (%0 := param!next)
@@ -25,7 +24,7 @@ my $target = deindent("
       (%0 := prim!id %0 'pair)
       (%0 := prim!id %0 'nil)
       (return %0))
-");
+";
 
 test_compilation($source, $target);
 

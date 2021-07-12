@@ -162,18 +162,19 @@ sub deindent {
 
 sub test_compilation {
     my ($source, $target) = @_;
+
+    $source = deindent($source);
     $source =~ /^\(def (\S+)/
         or die "Couldn't parse out the name from '$source'";
     my $name = $1;
 
     is belify_bytefunc(compile($source)),
-        $target,
+        deindent($target),
         "compilation of `$name`";
 }
 
 our @EXPORT = qw(
     bel_todo
-    deindent
     for_each_line_in_file
     output_of_eval_file
     slurp_file
