@@ -15,6 +15,8 @@ sub PARAM_OUT { 0x04 }
 sub SET_PRIM_ID_REG_SYM { 0x10 }
 sub SET_PRIM_TYPE_REG { 0x11 }
 
+sub SET_SYM { 0x20 }
+
 sub RETURN_REG { 0xF0 }
 
 my @registered_symbols = (
@@ -107,6 +109,11 @@ sub belify_instruction {
         my $reg = "%$o2";
         return "($target := prim!type $reg)";
     }
+    elsif ($opcode == SET_SYM) {
+        my $target = "%$o1";
+        my $sym = symbol_of($o2);
+        return "($target := '$sym)";
+    }
     elsif ($opcode == RETURN_REG) {
         my $reg = "%$o1";
         return "(return $reg)";
@@ -135,6 +142,7 @@ our @EXPORT_OK = qw(
     SET_PARAM_NEXT
     SET_PRIM_ID_REG_SYM
     SET_PRIM_TYPE_REG
+    SET_SYM
     SYMBOL
 );
 

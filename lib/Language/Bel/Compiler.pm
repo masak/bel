@@ -8,11 +8,13 @@ use Language::Bel::Bytecode qw(
     n
     PARAM_IN
     PARAM_LAST
+    PARAM_NEXT
     PARAM_OUT
     RETURN_REG
     SET_PARAM_NEXT
     SET_PRIM_ID_REG_SYM
     SET_PRIM_TYPE_REG
+    SET_SYM
     SYMBOL
 );
 use Language::Bel::Pair::ByteFunc qw(
@@ -253,7 +255,9 @@ sub nanopass_02_flatten {
     }
 
     if ($final_target_gensym eq "<not set>") {
-        die "XXX need to handle this case, when the body is `nil`";
+        my $target_gensym = gensym();
+        push @instructions, read_whole("($target_gensym := 'nil)");
+        $final_target_gensym = $target_gensym;
     }
 
     push @instructions, read_whole("(return $final_target_gensym)");
@@ -320,8 +324,8 @@ sub ast_match {
     }
     elsif (is_symbol($expr) && is_symbol($match_ast)
             && symbol_name($match_ast) eq "<sym>") {
-        my $symbol_name = symbol_name($expr);
-        push @{$captures_ref}, $symbol_name;
+        my $symbol_id = SYMBOL(symbol_name($expr));
+        push @{$captures_ref}, $symbol_id;
         return 1;
     }
     else {
@@ -371,7 +375,7 @@ sub serialize_bytefunc {
             "(% := (prim!id % '<sym>))",
             sub { my ($reg1, $reg2, $sym) = @_;
                 push @bytes, (
-                    SET_PRIM_ID_REG_SYM, $reg1, $reg2, SYMBOL($sym),
+                    SET_PRIM_ID_REG_SYM, $reg1, $reg2, $sym,
                 );
             },
 
@@ -379,6 +383,13 @@ sub serialize_bytefunc {
             sub { my ($reg1, $reg2) = @_;
                 push @bytes, (
                     SET_PRIM_TYPE_REG, $reg1, $reg2, n,
+                );
+            },
+
+            "(% := '<sym>)",
+            sub { my ($reg, $sym) = @_;
+                push @bytes, (
+                    SET_SYM, $reg, $sym, n,
                 );
             },
 
@@ -391,6 +402,12 @@ sub serialize_bytefunc {
         );
 
         $body = cdr($body);
+    }
+
+    # A little brittle, but it'll work for now
+    if (scalar(@bytes) == 4 * 6 && $bytes[4 * 4] == SET_SYM) {
+        $bytes[4 * 1 + 0] = PARAM_NEXT;
+        $bytes[4 * 1 + 1] = n;
     }
 
     return make_bytefunc($reg_count, [@bytes]);
