@@ -5,14 +5,23 @@ use strict;
 use warnings;
 
 use Language::Bel::Bytecode qw(
+    IF_JMP
+    JMP
     n
     PARAM_IN
     PARAM_LAST
     PARAM_OUT
+    PRIM_XAR
+    PRIM_XDR
     RETURN_REG
     SET_PARAM_NEXT
+    SET_PRIM_CAR
+    SET_PRIM_CDR
     SET_PRIM_ID_REG_SYM
+    SET_PRIM_JOIN_REG_SYM
+    SET_PRIM_JOIN_SYM_SYM
     SET_PRIM_TYPE_REG
+    SET_REG
     SYMBOL
 );
 use Language::Bel::Pair::ByteFunc qw(
@@ -50,6 +59,30 @@ add_bytefunc("atom", 1,
     SET_PRIM_ID_REG_SYM, 0, 0, SYMBOL("pair"),
     SET_PRIM_ID_REG_SYM, 0, 0, SYMBOL("nil"),
     RETURN_REG, 0, n, n,
+);
+
+add_bytefunc("append", 6,
+    SET_PARAM_NEXT, 0, n, n,
+    PARAM_LAST, n, n, n,
+    SET_PRIM_JOIN_SYM_SYM, 1, SYMBOL("nil"), SYMBOL("nil"),
+    SET_REG, 2, 1, n,
+    SET_PRIM_CDR, 3, 0, n,
+    IF_JMP, 3, 40, n,
+    SET_PRIM_CAR, 3, 0, n,
+    PRIM_XDR, 1, 3, n,
+    SET_PRIM_CDR, 3, 2, n,
+    RETURN_REG, 3, n, n,
+    SET_PRIM_CAR, 4, 0, n,
+    IF_JMP, 4, 56, n,
+    SET_REG, 0, 3, n,
+    JMP, 16, n, n,
+    SET_PRIM_CAR, 5, 4, n,
+    SET_PRIM_JOIN_REG_SYM, 5, 5, SYMBOL("nil"),
+    PRIM_XDR, 1, 5, n,
+    SET_REG, 1, 5, n,
+    SET_PRIM_CDR, 4, 4, n,
+    PRIM_XAR, 0, 4, n,
+    JMP, 20, n, n,
 );
 
 sub all_bytefuncs {

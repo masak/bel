@@ -5,14 +5,23 @@ use warnings;
 use Test::More;
 
 use Language::Bel::Bytecode qw(
+    IF_JMP
+    JMP
     PARAM_IN
     PARAM_LAST
     PARAM_NEXT
     PARAM_OUT
+    PRIM_XAR
+    PRIM_XDR
     RETURN_REG
     SET_PARAM_NEXT
+    SET_PRIM_CAR
+    SET_PRIM_CDR
     SET_PRIM_ID_REG_SYM
+    SET_PRIM_JOIN_REG_SYM
+    SET_PRIM_JOIN_SYM_SYM
     SET_PRIM_TYPE_REG
+    SET_REG
 );
 use Language::Bel::Globals::ByteFuncs qw(
     bytefunc
@@ -55,20 +64,20 @@ sub registers_of {
     my ($op) = @_;
     my ($opcode, $operand1, $operand2, $operand3) = @$op;
 
-    if (in($opcode, PARAM_IN, PARAM_LAST, PARAM_OUT)) {
+    if (in($opcode, PARAM_IN, PARAM_LAST, PARAM_OUT, JMP)) {
         return ();
     }
-    elsif (in($opcode, RETURN_REG, SET_PARAM_NEXT)) {
+    elsif (in($opcode, RETURN_REG, SET_PARAM_NEXT, SET_PRIM_JOIN_SYM_SYM,
+            IF_JMP)) {
         return ($operand1);
     }
-    elsif (in($opcode, SET_PRIM_TYPE_REG)) {
-        return ($operand2, $operand1);
-    }
-    elsif (in($opcode, SET_PRIM_ID_REG_SYM)) {
+    elsif (in($opcode, PRIM_XAR, PRIM_XDR, SET_PRIM_TYPE_REG,
+            SET_PRIM_ID_REG_SYM, SET_PRIM_JOIN_REG_SYM, SET_REG,
+            SET_PRIM_CAR, SET_PRIM_CDR)) {
         return ($operand2, $operand1);
     }
     else {
-        die "Unknown opcode ", $opcode;
+        die sprintf("Unknown opcode 0x%x", $opcode);
     }
 }
 
@@ -86,7 +95,8 @@ my @PARAM_OPCODES = (
     SET_PARAM_NEXT,
 );
 
-my @RETURN_OPCODES = (
+my @RETURN_OR_JMP = (
+    JMP,
     RETURN_REG,
 );
 
@@ -106,7 +116,7 @@ for my $name (@bytefuncs) {
     my $next_register_expected = 0;
     my $registers_introduced_in_sequence = 1;
 
-    my $last_instruction_is_return = 0;
+    my $last_instruction_is_return_or_jmp = 0;
 
     for my $op (ops($bytefunc)) {
         my ($opcode, $operand1, $operand2, $operand3) = @$op;
@@ -130,7 +140,7 @@ for my $name (@bytefuncs) {
             }
         }
 
-        $last_instruction_is_return = in($opcode, @RETURN_OPCODES);
+        $last_instruction_is_return_or_jmp = in($opcode, @RETURN_OR_JMP);
     }
 
     ok !$param_op_after_non_param_op,
@@ -142,7 +152,7 @@ for my $name (@bytefuncs) {
     ok $registers_introduced_in_sequence,
         "$name - registers are introduced in sequence 0..*";
 
-    ok $last_instruction_is_return,
-        "$name - the last instruction is RETURN";
+    ok $last_instruction_is_return_or_jmp,
+        "$name - the last instruction is RETURN or JMP";
 }
 
