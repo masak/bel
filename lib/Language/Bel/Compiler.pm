@@ -30,39 +30,25 @@ use Language::Bel::Core qw(
     symbol_name
     SYMBOL_NIL
 );
-use Language::Bel::Primitives;
 use Language::Bel::Printer qw(
     _print
 );
 use Language::Bel::Reader qw(
     read_whole
 );
+use Language::Bel::Compiler::Gensym qw(
+    gensym
+    is_gensym
+);
+use Language::Bel::Compiler::Pass01 qw(
+    nanopass_01_alpha
+);
+use Language::Bel::Compiler::Primitives qw(
+    car
+    cdr
+);
 
 use Exporter 'import';
-
-{
-    my $primitives = Language::Bel::Primitives->new({
-        output => sub {},
-        read_char => sub {},
-        err => sub {
-            my ($message_str) = @_;
-
-            die "Error during compilation: $message_str\n";
-        },
-    });
-
-    sub car {
-        my ($pair) = @_;
-
-        return $primitives->prim_car($pair);
-    }
-
-    sub cdr {
-        my ($pair) = @_;
-
-        return $primitives->prim_cdr($pair);
-    }
-}
 
 my %arg_count_of = (
     "id" => 2,
@@ -76,22 +62,6 @@ sub is_primitive {
         unless is_symbol($op);
     my $name = symbol_name($op);
     return !!$arg_count_of{$name};
-}
-
-my $unique_gensym_index = 0;
-
-my $GENSYM_PREFIX = "gensym_";
-
-sub gensym {
-    return $GENSYM_PREFIX . sprintf("%04d", ++$unique_gensym_index);
-}
-
-sub is_gensym {
-    my ($expr) = @_;
-
-    return is_symbol($expr)
-        && substr(symbol_name($expr), 0, length($GENSYM_PREFIX))
-            eq $GENSYM_PREFIX;
 }
 
 sub handle_primitive {
@@ -167,61 +137,6 @@ sub handle_expression {
     }
 
     return $target_gensym;
-}
-
-sub replace_variables {
-    my ($ast, $translation_ref) = @_;
-
-    if (is_symbol($ast)) {
-        my $name = symbol_name($ast);
-        return $translation_ref->{$name} || $ast;
-    }
-    elsif (is_pair($ast)) {
-        my $car = replace_variables(car($ast), $translation_ref);
-        my $cdr = replace_variables(cdr($ast), $translation_ref);
-        return make_pair($car, $cdr);
-    }
-    else {
-        die "Unexpected type: ", _print($ast);
-    }
-}
-
-sub nanopass_01_alpha {
-    my ($ast) = @_;
-
-    $ast = cdr($ast);
-    my $fn_name = car($ast);
-
-    $ast = cdr($ast);
-    my $args = car($ast);
-
-    die "Not general enough to handle these args yet: ", _print($args)
-        unless is_pair($args)
-            && is_symbol(car($args))
-            && is_nil(cdr($args));
-
-    my $single_param_name = symbol_name(car($args));
-
-    my $gensym = make_symbol(gensym());
-
-    my $body = cdr($ast);
-    my %translation = (
-        $single_param_name => $gensym,
-    );
-
-    return make_pair(
-        make_symbol("def-01"),
-        make_pair(
-            $fn_name,
-            make_pair(
-                make_pair(
-                    $gensym,
-                    SYMBOL_NIL,
-                ),
-                replace_variables($body, \%translation),
-            ),
-        ),
-    );
 }
 
 sub listify {
