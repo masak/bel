@@ -1563,7 +1563,9 @@ FUT
 sub applycont {
     my ($self, $s2, $r2, $args) = @_;
 
-    # XXX: skipping `args` error handling for now
+    if (is_nil($args) || !is_nil($self->cdr($args))) {
+        die "wrong-no-args\n";
+    }
 
     my %mem_s2;
     my $s2_copy = $s2;
