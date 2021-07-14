@@ -57,3 +57,9 @@ __DATA__
     (f9))
 !ERROR: bad-clo
 
+> ((lit cont ((x)) nil))
+!ERROR: bad-cont
+
+> ((lit cont nil (1 . 2)))
+!ERROR: bad-cont
+

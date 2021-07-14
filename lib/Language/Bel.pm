@@ -1050,10 +1050,14 @@ sub applylit {
             $self->applym($f, $quoted_args, $a);
         }
         elsif ($tag_name eq "cont") {
-            # XXX: Skipping `okstack`/`proper` check for now
             my $s2 = $self->car($rest);
             my $r2 = $self->car($self->cdr($rest));
-            $self->applycont($s2, $r2, $args);
+            if (okstack($s2) && proper($r2)) {
+                $self->applycont($s2, $r2, $args);
+            }
+            else {
+                die "bad-cont\n";
+            }
         }
         else {
             my $virfns = $self->cdr($self->{globals}->get_kv("virfns"));
@@ -1198,6 +1202,31 @@ sub okenv {
         return
             if (!is_pair(pair_car($env)));
         $env = pair_cdr($env);
+    }
+    return 1;
+}
+
+# (def okstack (s)
+#   (and (proper s)
+#        (all [and (proper _) (cdr _) (okenv (cadr _))]
+#             s)))
+sub okstack {
+    my ($s) = @_;
+
+    return
+        unless proper($s);
+
+    while (!is_nil($s)) {
+        my $elem = pair_car($s);
+
+        return
+            unless proper($elem);
+        return
+            if is_nil(pair_cdr($elem));
+        return
+            unless okenv(pair_car(pair_cdr($elem)));
+
+        $s = pair_cdr($s);
     }
     return 1;
 }
