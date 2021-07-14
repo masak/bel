@@ -1403,7 +1403,9 @@ sub pass {
         }
         push @{$self->{r}}, $env;
     }
-    # XXX: skipping the literal case for now
+    elsif (literal($pat)) {
+        die "literal-parm\n";
+    }
     elsif ($self->variable($pat)) {
         push @{$self->{r}}, make_pair(make_pair($pat, $arg), $env);
     }

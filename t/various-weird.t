@@ -63,3 +63,6 @@ __DATA__
 > ((lit cont nil (1 . 2)))
 !ERROR: bad-cont
 
+Here I would add a test for literal-parm, but I found no way to trigger it;
+everything I tried hit bad-clo instead.
+
