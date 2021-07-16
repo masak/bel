@@ -1,4 +1,4 @@
-package Language::Bel::Compiler::Pass01;
+package Language::Bel::Compiler::Pass::Alpha;
 use base qw(Language::Bel::Compiler::Pass);
 
 use 5.006;
