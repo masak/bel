@@ -1,4 +1,5 @@
-package Language::Bel::Compiler::Pass03;
+package Language::Bel::Compiler::Pass::AllocateRegisters;
+use base qw(Language::Bel::Compiler::Pass);
 
 use 5.006;
 use strict;
@@ -18,7 +19,11 @@ use Language::Bel::Compiler::Primitives qw(
     cdr
 );
 
-use Exporter 'import';
+sub new {
+    my ($class) = @_;
+
+    return $class->SUPER::new("allocate-registers");
+}
 
 sub substitute_registers {
     my ($expr) = @_;
@@ -37,8 +42,14 @@ sub substitute_registers {
     }
 }
 
-sub nanopass_03_allocate_registers {
-    my ($ast) = @_;
+# @override
+sub check_precondition {
+    # no checks
+}
+
+# @override
+sub do_translate {
+    my ($self, $ast) = @_;
 
     $ast = cdr($ast);
     my $args = substitute_registers(car($ast));
@@ -53,9 +64,5 @@ sub nanopass_03_allocate_registers {
         ),
     );
 }
-
-our @EXPORT_OK = qw(
-    nanopass_03_allocate_registers
-);
 
 1;

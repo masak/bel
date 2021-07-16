@@ -1,4 +1,5 @@
-package Language::Bel::Compiler::Pass01;
+package Language::Bel::Compiler::Pass::Alpha;
+use base qw(Language::Bel::Compiler::Pass);
 
 use 5.006;
 use strict;
@@ -24,7 +25,11 @@ use Language::Bel::Compiler::Gensym qw(
     gensym
 );
 
-use Exporter 'import';
+sub new {
+    my ($class) = @_;
+
+    return $class->SUPER::new("alpha");
+}
 
 sub replace_variables {
     my ($ast, $translation_ref) = @_;
@@ -43,19 +48,27 @@ sub replace_variables {
     }
 }
 
-sub nanopass_01_alpha {
-    my ($ast) = @_;
+# @override
+sub check_precondition {
+    my ($self, $ast) = @_;
+
+    my $args = car(cdr(cdr($ast)));
+
+    die "Not general enough to handle these args yet: ", _print($args)
+        unless is_pair($args)
+            && is_symbol(car($args))
+            && is_nil(cdr($args));
+}
+
+# @override
+sub do_translate {
+    my ($self, $ast) = @_;
 
     $ast = cdr($ast);
     my $fn_name = car($ast);
 
     $ast = cdr($ast);
     my $args = car($ast);
-
-    die "Not general enough to handle these args yet: ", _print($args)
-        unless is_pair($args)
-            && is_symbol(car($args))
-            && is_nil(cdr($args));
 
     my $single_param_name = symbol_name(car($args));
 
@@ -80,9 +93,5 @@ sub nanopass_01_alpha {
         ),
     );
 }
-
-our @EXPORT_OK = qw(
-    nanopass_01_alpha
-);
 
 1;
