@@ -135,7 +135,8 @@ sub listify {
     return $list;
 }
 
-sub translate {
+# @override
+sub do_translate {
     my ($self, $ast) = @_;
 
     $ast = cdr($ast);

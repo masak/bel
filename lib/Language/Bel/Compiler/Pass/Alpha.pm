@@ -48,7 +48,8 @@ sub replace_variables {
     }
 }
 
-sub translate {
+# @override
+sub do_translate {
     my ($self, $ast) = @_;
 
     $ast = cdr($ast);
