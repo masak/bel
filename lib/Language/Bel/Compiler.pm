@@ -13,11 +13,17 @@ use Language::Bel::Compiler::Generator qw(
 
 use Exporter 'import';
 
-my @PASSES = (
-    Language::Bel::Compiler::Pass::Alpha->new(),
-    Language::Bel::Compiler::Pass::Flatten->new(),
-    Language::Bel::Compiler::Pass::AllocateRegisters->new(),
-);
+sub make_pass {
+    my ($name) = @_;
+
+    return "Language::Bel::Compiler::Pass::$name"->new();
+}
+
+my @PASSES = map { make_pass($_) } qw<
+    Alpha
+    Flatten
+    AllocateRegisters
+>;
 
 sub compile {
     my ($source) = @_;
