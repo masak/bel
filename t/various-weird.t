@@ -60,7 +60,7 @@ __DATA__
 > ((lit cont ((x)) nil))
 !ERROR: bad-cont
 
-> ((lit cont nil (1 . 2)))
+> ((lit cont nil (x . y)))
 !ERROR: bad-cont
 
 Here I would add a test for literal-parm, but I found no way to trigger it;
