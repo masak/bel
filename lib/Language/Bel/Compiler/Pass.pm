@@ -15,7 +15,13 @@ sub new {
 sub translate {
     my ($self, $program) = @_;
 
+    $self->check_precondition($program);
+
     return $self->do_translate($program);
+}
+
+sub check_precondition {
+    # do nothing by default
 }
 
 # @abstract

@@ -49,6 +49,18 @@ sub replace_variables {
 }
 
 # @override
+sub check_precondition {
+    my ($self, $ast) = @_;
+
+    my $args = car(cdr(cdr($ast)));
+
+    die "Not general enough to handle these args yet: ", _print($args)
+        unless is_pair($args)
+            && is_symbol(car($args))
+            && is_nil(cdr($args));
+}
+
+# @override
 sub do_translate {
     my ($self, $ast) = @_;
 
@@ -57,11 +69,6 @@ sub do_translate {
 
     $ast = cdr($ast);
     my $args = car($ast);
-
-    die "Not general enough to handle these args yet: ", _print($args)
-        unless is_pair($args)
-            && is_symbol(car($args))
-            && is_nil(cdr($args));
 
     my $single_param_name = symbol_name(car($args));
 

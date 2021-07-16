@@ -136,6 +136,20 @@ sub listify {
 }
 
 # @override
+sub check_precondition {
+    my ($self, $ast) = @_;
+
+    my $body = cdr(cdr(cdr($ast)));
+
+    while (!is_nil($body)) {
+        my $statement = car($body);
+        die "Can't handle 'if' statements just yet"
+            if is_pair($statement) && is_symbol_of_name(car($statement), "if");
+        $body = cdr($body);
+    }
+}
+
+# @override
 sub do_translate {
     my ($self, $ast) = @_;
 
