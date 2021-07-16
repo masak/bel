@@ -1,4 +1,5 @@
 package Language::Bel::Compiler::Pass02;
+use base qw(Language::Bel::Compiler::Pass);
 
 use 5.006;
 use strict;
@@ -28,12 +29,16 @@ use Language::Bel::Compiler::Primitives qw(
     cdr
 );
 
-use Exporter 'import';
-
 my %arg_count_of = (
     "id" => 2,
     "type" => 1,
 );
+
+sub new {
+    my ($class) = @_;
+
+    return $class->SUPER::new("flatten");
+}
 
 sub is_primitive {
     my ($op) = @_;
@@ -130,8 +135,8 @@ sub listify {
     return $list;
 }
 
-sub nanopass_02_flatten {
-    my ($ast) = @_;
+sub translate {
+    my ($self, $ast) = @_;
 
     $ast = cdr($ast);
     # skipping $fn_name
@@ -165,9 +170,5 @@ sub nanopass_02_flatten {
         ),
     );
 }
-
-our @EXPORT_OK = qw(
-    nanopass_02_flatten
-);
 
 1;

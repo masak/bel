@@ -1,4 +1,5 @@
 package Language::Bel::Compiler::Pass01;
+use base qw(Language::Bel::Compiler::Pass);
 
 use 5.006;
 use strict;
@@ -24,7 +25,11 @@ use Language::Bel::Compiler::Gensym qw(
     gensym
 );
 
-use Exporter 'import';
+sub new {
+    my ($class) = @_;
+
+    return $class->SUPER::new("alpha");
+}
 
 sub replace_variables {
     my ($ast, $translation_ref) = @_;
@@ -43,8 +48,8 @@ sub replace_variables {
     }
 }
 
-sub nanopass_01_alpha {
-    my ($ast) = @_;
+sub translate {
+    my ($self, $ast) = @_;
 
     $ast = cdr($ast);
     my $fn_name = car($ast);
@@ -80,9 +85,5 @@ sub nanopass_01_alpha {
         ),
     );
 }
-
-our @EXPORT_OK = qw(
-    nanopass_01_alpha
-);
 
 1;
