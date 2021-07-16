@@ -43,6 +43,11 @@ sub substitute_registers {
 }
 
 # @override
+sub check_precondition {
+    # no checks
+}
+
+# @override
 sub do_translate {
     my ($self, $ast) = @_;
 
