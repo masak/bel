@@ -10,6 +10,7 @@ use Language::Bel::Core qw(
     is_char
     is_nil
     is_pair
+    is_stream
     is_string
     is_symbol
     is_symbol_of_name
@@ -609,25 +610,14 @@ sub ev {
 sub literal {
     my ($e) = @_;
 
-    my $is_self_evaluating = sub {
-        return is_symbol_of_name($e, "t")
-            || is_symbol_of_name($e, "nil")
-            || is_symbol_of_name($e, "o")
-            || is_symbol_of_name($e, "apply");
-    };
-
-    my $is_lit = sub {
-        return unless is_pair($e);
-
-        my $car = pair_car($e);
-        return is_symbol_of_name($car, "lit");
-    };
-
     return (
-        $is_self_evaluating->() ||
+        is_symbol_of_name($e, "t") ||
+        is_symbol_of_name($e, "nil") ||
+        is_symbol_of_name($e, "o") ||
+        is_symbol_of_name($e, "apply") ||
         is_char($e) ||
-        # XXX: skipping is_stream case for now
-        $is_lit->() ||
+        is_stream($e) ||
+        is_pair($e) && is_symbol_of_name(pair_car($e), "lit") ||
         is_string($e)
     );
 }
@@ -988,8 +978,12 @@ sub applyf {
         if (!is_pair($f) || !is_symbol_of_name(pair_car($f), "lit")) {
             die "cannot-apply\n";
         }
-        # XXX: skipping `proper` check for now
-        $self->applylit($f, $args, $a);
+        if (proper($f)) {
+            $self->applylit($f, $args, $a);
+        }
+        else {
+            die "bad-lit\n";
+        }
     }
 }
 
@@ -1032,8 +1026,12 @@ sub applylit {
             my $parms = $self->car($self->cdr($rest));
             my $body = $self->car($self->cdr($self->cdr($rest)));
 
-            # XXX: skipping `okenv` and `okparms` checks for now
-            $self->applyclo($parms, $args, $env, $body);
+            if (okenv($env) && $self->okparms($parms)) {
+                $self->applyclo($parms, $args, $env, $body);
+            }
+            else {
+                die "bad-clo\n";
+            }
         }
         elsif ($tag_name eq "mac") {
             my @stack;
@@ -1052,10 +1050,14 @@ sub applylit {
             $self->applym($f, $quoted_args, $a);
         }
         elsif ($tag_name eq "cont") {
-            # XXX: Skipping `okstack`/`proper` check for now
             my $s2 = $self->car($rest);
             my $r2 = $self->car($self->cdr($rest));
-            $self->applycont($s2, $r2, $args);
+            if (okstack($s2) && proper($r2)) {
+                $self->applycont($s2, $r2, $args);
+            }
+            else {
+                die "bad-cont\n";
+            }
         }
         else {
             my $virfns = $self->cdr($self->{globals}->get_kv("virfns"));
@@ -1188,6 +1190,123 @@ sub tabloc {
     return $cell;
 }
 
+# (def okenv (a)
+#   (and (proper a) (all pair a)))
+sub okenv {
+    my ($env) = @_;
+
+    return
+        unless proper($env);
+
+    while (!is_nil($env)) {
+        return
+            if (!is_pair(pair_car($env)));
+        $env = pair_cdr($env);
+    }
+    return 1;
+}
+
+# (def okstack (s)
+#   (and (proper s)
+#        (all [and (proper _) (cdr _) (okenv (cadr _))]
+#             s)))
+sub okstack {
+    my ($s) = @_;
+
+    return
+        unless proper($s);
+
+    while (!is_nil($s)) {
+        my $elem = pair_car($s);
+
+        return
+            unless proper($elem);
+        return
+            if is_nil(pair_cdr($elem));
+        return
+            unless okenv(pair_car(pair_cdr($elem)));
+
+        $s = pair_cdr($s);
+    }
+    return 1;
+}
+
+my $OKPARMS = 1;
+my $OKTOPARM = 2;
+my $OKTOPARM_CONTINUED = 3;
+
+# (def okparms (p)
+#   (if (no p)       t
+#       (variable p) t
+#       (atom p)     nil
+#       (caris p t)  (oktoparm p)
+#                    (and (if (caris (car p) o)
+#                             (oktoparm (car p))
+#                             (okparms (car p)))
+#                         (okparms (cdr p)))))
+#
+# (def oktoparm ((tag (o var) (o e) . extra))
+#   (and (okparms var) (or (= tag o) e) (no extra)))
+sub okparms {
+    my ($self, $p) = @_;
+
+    my @prefix_stack = ([$OKPARMS, $p]);
+    while (@prefix_stack) {
+        my $elem = pop(@prefix_stack);
+        my ($state, $p) = @$elem;
+        if ($state == $OKPARMS) {
+            my $car_p;
+            if (is_nil($p)) {
+                next;
+            }
+            elsif ($self->variable($p)) {
+                next;
+            }
+            elsif (!is_pair($p)) {
+                return;
+            }
+            elsif (is_symbol_of_name($car_p = $self->car($p), "t")) {
+                push(@prefix_stack, [$OKTOPARM, $p]);
+            }
+            else {
+                # added in reverse order; it's a stack
+                push(@prefix_stack, [$OKPARMS, $self->cdr($p)]);
+                if (is_pair($car_p)
+                    && is_symbol_of_name($self->car($car_p), "o")) {
+                    push(@prefix_stack, [$OKTOPARM, $car_p]);
+                }
+                else {
+                    push(@prefix_stack, [$OKPARMS, $car_p]);
+                }
+            }
+        }
+        elsif ($state == $OKTOPARM) {
+            push(@prefix_stack, [
+                $OKTOPARM_CONTINUED,
+                $p,
+            ]);
+            my $var = $self->car($self->cdr($p));
+            push(@prefix_stack, [$OKPARMS, $var]);
+        }
+        elsif ($state == $OKTOPARM_CONTINUED) {
+            my $tag = $self->car($p);
+            my $e = $self->car($self->cdr($self->cdr($p)));
+            my $extra = $self->cdr($self->cdr($self->cdr($p)));
+            if (!is_symbol_of_name($tag, "o") && is_nil($e)) {
+                return;
+            }
+            if (!is_nil($extra)) {
+                return;
+            }
+        }
+        else {
+            die "Illegal state: $state";
+        }
+    }
+
+    return 1;
+}
+
 # (def applyprim (f args s r m)
 #   (aif (some [mem f _] prims)
 #        (if (udrop (cdr it) args)
@@ -1284,7 +1403,9 @@ sub pass {
         }
         push @{$self->{r}}, $env;
     }
-    # XXX: skipping the literal case for now
+    elsif (literal($pat)) {
+        die "literal-parm\n";
+    }
     elsif ($self->variable($pat)) {
         push @{$self->{r}}, make_pair(make_pair($pat, $arg), $env);
     }
@@ -1442,7 +1563,9 @@ FUT
 sub applycont {
     my ($self, $s2, $r2, $args) = @_;
 
-    # XXX: skipping `args` error handling for now
+    if (is_nil($args) || !is_nil($self->cdr($args))) {
+        die "wrong-no-args\n";
+    }
 
     my %mem_s2;
     my $s2_copy = $s2;
