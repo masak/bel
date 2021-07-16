@@ -1,4 +1,4 @@
-package Language::Bel::Compiler::Pass02;
+package Language::Bel::Compiler::Pass::Flatten;
 use base qw(Language::Bel::Compiler::Pass);
 
 use 5.006;

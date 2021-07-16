@@ -4,9 +4,9 @@ use 5.006;
 use strict;
 use warnings;
 
-use Language::Bel::Compiler::Pass01;
-use Language::Bel::Compiler::Pass02;
-use Language::Bel::Compiler::Pass03;
+use Language::Bel::Compiler::Pass::AllocateRegisters;
+use Language::Bel::Compiler::Pass::Alpha;
+use Language::Bel::Compiler::Pass::Flatten;
 use Language::Bel::Compiler::Generator qw(
     generate_bytefunc
 );
@@ -14,9 +14,9 @@ use Language::Bel::Compiler::Generator qw(
 use Exporter 'import';
 
 my @PASSES = (
-    Language::Bel::Compiler::Pass01->new(),
-    Language::Bel::Compiler::Pass02->new(),
-    Language::Bel::Compiler::Pass03->new(),
+    Language::Bel::Compiler::Pass::Alpha->new(),
+    Language::Bel::Compiler::Pass::Flatten->new(),
+    Language::Bel::Compiler::Pass::AllocateRegisters->new(),
 );
 
 sub compile {
