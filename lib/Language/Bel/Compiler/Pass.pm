@@ -12,13 +12,19 @@ sub new {
     }, $class);
 }
 
-# abstract
 sub translate {
+    my ($self, $program) = @_;
+
+    return $self->do_translate($program);
+}
+
+# @abstract
+sub do_translate {
     my ($self) = @_;
 
     my $name = $self->{name};
 
-    die "The [$name] pass doesn't implement a 'translate' method";
+    die "The [$name] pass doesn't implement a 'do_translate' method";
 }
 
 1;

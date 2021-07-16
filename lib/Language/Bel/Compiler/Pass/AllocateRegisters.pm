@@ -42,7 +42,8 @@ sub substitute_registers {
     }
 }
 
-sub translate {
+# @override
+sub do_translate {
     my ($self, $ast) = @_;
 
     $ast = cdr($ast);
