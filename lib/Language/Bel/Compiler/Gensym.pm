@@ -19,12 +19,17 @@ sub gensym {
     return $GENSYM_PREFIX . sprintf("%04d", ++$unique_gensym_index);
 }
 
+sub starts_with {
+    my ($string, $prefix) = @_;
+
+    return substr($string, 0, length($prefix)) eq $prefix;
+}
+
 sub is_gensym {
     my ($expr) = @_;
 
     return is_symbol($expr)
-        && substr(symbol_name($expr), 0, length($GENSYM_PREFIX))
-            eq $GENSYM_PREFIX;
+        && starts_with(symbol_name($expr), $GENSYM_PREFIX);
 }
 
 our @EXPORT_OK = qw(

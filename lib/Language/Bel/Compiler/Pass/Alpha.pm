@@ -9,6 +9,7 @@ use Language::Bel::Core qw(
     is_nil
     is_pair
     is_symbol
+    is_symbol_of_name
     make_pair
     make_symbol
     symbol_name
@@ -23,6 +24,7 @@ use Language::Bel::Compiler::Primitives qw(
 );
 use Language::Bel::Compiler::Gensym qw(
     gensym
+    is_gensym
 );
 
 sub new {
@@ -92,6 +94,53 @@ sub do_translate {
             ),
         ),
     );
+}
+
+# @override
+sub check_postcondition {
+    my ($self, $ast) = @_;
+
+    my $args = car(cdr(cdr($ast)));
+    my $body = cdr(cdr(cdr($ast)));
+
+    assure_meets_postcondition($body);
+}
+
+sub is_among_symbol_names {
+    my ($value, @names) = @_;
+
+    for my $name (@names) {
+        return 1
+            if is_symbol_of_name($value, $name);
+    }
+    return '';
+}
+
+sub assure_meets_postcondition {
+    my ($value) = @_;
+
+    if (is_nil($value)) {
+        return;
+    }
+    elsif (is_pair($value) && is_symbol_of_name(car($value), "quote")) {
+        return;
+    }
+    elsif (is_pair($value)) {
+        assure_meets_postcondition(car($value));
+        assure_meets_postcondition(cdr($value));
+    }
+    elsif (is_gensym($value)) {
+        return;
+    }
+    elsif (is_among_symbol_names($value, "id", "type")) {
+        return;
+    }
+    elsif (is_symbol_of_name($value, "no")) {
+        return;         # XXX: should be generalized to "known globals"
+    }
+    else {
+        die "Doesn't meet precondition: '", _print($value), "'";
+    }
 }
 
 1;

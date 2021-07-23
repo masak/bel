@@ -23,6 +23,7 @@ use Language::Bel::Reader qw(
 );
 use Language::Bel::Compiler::Gensym qw(
     gensym
+    is_gensym
 );
 use Language::Bel::Compiler::Primitives qw(
     car
@@ -184,6 +185,104 @@ sub do_translate {
             listify(@instructions),
         ),
     );
+}
+
+# @override
+sub check_postcondition {
+    my ($self, $ast) = @_;
+
+    my $body = cdr(cdr($ast));
+
+    while (!is_nil($body)) {
+        die "body not a pair"
+            unless is_pair($body);
+
+        my $operation = car($body);
+
+        my @operands;
+        while (!is_nil($operation)) {
+            die "operation is not a pair"
+                unless is_pair($operation);
+            push @operands, car($operation);
+            $operation = cdr($operation);
+        }
+
+        my $op_name = shift(@operands);
+
+        if (is_symbol_of_name($op_name, "return")) {
+            die "expected gensym as only operand to 'return'"
+                unless scalar(@operands) == 1 && is_gensym($operands[0]);
+        }
+        elsif (is_gensym($op_name)) {
+            die "expected two operands"
+                unless scalar(@operands) == 2;
+            die "expected := immediately after gensym"
+                unless is_pair($operands[0])
+                    && is_symbol_of_name(car($operands[0]), "compose")
+                    && is_symbol_of_name(car(cdr($operands[0])), "=");
+
+            my $rhs = $operands[1];
+            my @rhs_operands;
+            while (!is_nil($rhs)) {
+                die "rhs operation is not a pair"
+                    unless is_pair($rhs);
+                push @rhs_operands, car($rhs);
+                $rhs = cdr($rhs);
+            }
+
+            my $rhs_op = shift(@rhs_operands);
+
+            if (is_pair($rhs_op)
+                && is_symbol_of_name(car($rhs_op), "prim")
+                && is_pair(car(cdr($rhs_op)))
+                && is_symbol_of_name(car(car(cdr($rhs_op))), "quote")
+                && is_symbol(car(cdr(car(cdr($rhs_op)))))) {
+
+                my $primop_name = symbol_name(car(cdr(car(cdr($rhs_op)))));
+
+                die "expected primop to be id or type"
+                    unless $primop_name eq "id" || $primop_name eq "type";
+
+                if ($primop_name eq "id") {
+                    die "expected prim!id to have 2 operands"
+                        unless scalar(@rhs_operands) == 2;
+
+                    die "expected first prim!id operand to be a gensym"
+                        unless is_gensym($rhs_operands[0]);
+
+                    die "expected second prim!id operand to be a quoted symbol"
+                        unless is_pair($rhs_operands[1])
+                            && is_symbol_of_name(car($rhs_operands[1]), "quote")
+                            && is_symbol(car(cdr($rhs_operands[1])));
+                }
+                elsif ($primop_name eq "type") {
+                    die "expected prim!type to have 1 operand"
+                        unless scalar(@rhs_operands) == 1;
+
+                    die "expected prim!type operand to be a gensym"
+                        unless is_gensym($rhs_operands[0]);
+                }
+                else {
+                    die "unexpected type of primop: $primop_name";
+                }
+            }
+            elsif (is_symbol_of_name($rhs_op, "quote")) {
+                die "expected quote to have 1 operand"
+                    unless scalar(@rhs_operands) == 1;
+
+                die "expected quote operand to be a symbol"
+                    unless is_symbol($rhs_operands[0]);
+            }
+            else {
+                die "unexpected rhs";
+            }
+        }
+        else {
+            die "unrecognized operation: ", _print(car($body));
+        }
+
+        $body = cdr($body);
+    }
 }
 
 1;

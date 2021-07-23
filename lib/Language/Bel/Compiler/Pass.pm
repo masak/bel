@@ -16,11 +16,17 @@ sub translate {
     my ($self, $program) = @_;
 
     $self->check_precondition($program);
+    my $result = $self->do_translate($program);
+    $self->check_postcondition($result);
 
-    return $self->do_translate($program);
+    return $result;
 }
 
 sub check_precondition {
+    # do nothing by default
+}
+
+sub check_postcondition {
     # do nothing by default
 }
 
