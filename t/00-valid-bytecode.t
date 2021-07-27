@@ -155,3 +155,4 @@ for my $name (@bytefuncs) {
     ok $last_instruction_is_return_or_jmp,
         "$name - the last instruction is RETURN or JMP";
 }
+
