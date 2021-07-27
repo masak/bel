@@ -147,7 +147,7 @@ for my $name (@bytefuncs) {
         "$name - no param-handling op after non-param-handling op";
 
     is $max_register_index + 1, $register_count,
-        "$name - the register index is always one below the register count";
+        "$name - max register index == register count - 1";
 
     ok $registers_introduced_in_sequence,
         "$name - registers are introduced in sequence 0..*";
@@ -155,4 +155,3 @@ for my $name (@bytefuncs) {
     ok $last_instruction_is_return_or_jmp,
         "$name - the last instruction is RETURN or JMP";
 }
-
