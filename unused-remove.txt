@@ -1,0 +1,5 @@
+# lib/Language/Bel/Globals.pm: Unused import fastfunc__i_lt
+# lib/Language/Bel/Globals.pm: Unused import fastfunc__srnum
+# lib/Language/Bel/Globals.pm: Unused import fastfunc__where__srnum
+# lib/Language/Bel/Globals.pm: Unused import fastfunc__srden
+# lib/Language/Bel/Globals.pm: Unused import fastfunc__where__srden
