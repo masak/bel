@@ -653,17 +653,6 @@ sub fastfunc__split {
     );
 }
 
-sub fastfunc__i_lt {
-    my ($bel, $xs, $ys) = @_;
-
-    while (!is_nil($xs)) {
-        $xs = $bel->cdr($xs);
-        $ys = $bel->cdr($ys);
-    }
-
-    return $ys;
-}
-
 sub fastfunc__i_plus {
     my ($bel, @args) = @_;
 
@@ -1807,42 +1796,6 @@ sub fastfunc__sr_lt {
             return $result;
         }
     }
-}
-
-sub fastfunc__srnum {
-    my ($bel, $x) = @_;
-
-    return $bel->car($bel->cdr($x));
-}
-
-sub fastfunc__where__srnum {
-    my ($bel, $x) = @_;
-
-    return make_pair(
-        $bel->cdr($x),
-        make_pair(
-            SYMBOL_A,
-            SYMBOL_NIL,
-        ),
-    );
-}
-
-sub fastfunc__srden {
-    my ($bel, $x) = @_;
-
-    return $bel->car($bel->cdr($bel->cdr($x)));
-}
-
-sub fastfunc__where__srden {
-    my ($bel, $x) = @_;
-
-    return make_pair(
-        $bel->cdr($bel->cdr($x)),
-        make_pair(
-            SYMBOL_A,
-            SYMBOL_NIL,
-        ),
-    );
 }
 
 sub fastfunc__c_plus {
@@ -3687,7 +3640,6 @@ our @EXPORT_OK = qw(
     fastfunc__fuse
     fastfunc__match
     fastfunc__split
-    fastfunc__i_lt
     fastfunc__i_plus
     fastfunc__i_minus
     fastfunc__i_star
@@ -3704,10 +3656,6 @@ our @EXPORT_OK = qw(
     fastfunc__sr_slash
     fastfunc__srrecip
     fastfunc__sr_lt
-    fastfunc__srnum
-    fastfunc__where__srnum
-    fastfunc__srden
-    fastfunc__where__srden
     fastfunc__c_plus
     fastfunc__c_star
     fastfunc__litnum
