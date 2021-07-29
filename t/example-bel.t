@@ -33,8 +33,8 @@ b
 > w
 (a (c) d (e f))
 
-> "TODO: (dedup:sort < \"abracadabra\") ==> \"abcdr\""
-"TODO: (dedup:sort < \"abracadabra\") ==> \"abcdr\""
+> (dedup:sort < "abracadabra")
+"abcdr"
 
 > (+ .05 19/20)
 1

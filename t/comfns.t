@@ -12,21 +12,21 @@ t
 > (< 5 3)
 nil
 
-> "TODO (< \\a \\c) ==> t"
-"TODO (< \\a \\c) ==> t"
+> (< \a \c)
+t
 
-> "TODO (< \\d \\b) ==> nil"
-"TODO (< \\d \\b) ==> nil"
+> (< \d \b)
+nil
 
-> "TODO (< \"aa\" \"ac\") ==> t"
-"TODO (< \"aa\" \"ac\") ==> t"
+> (< "aa" "ac")
+t
 
-> "TODO (< \"bc\" \"ab\") ==> nil"
-"TODO (< \"bc\" \"ab\") ==> nil"
+> (< "bc" "ab")
+nil
 
-> "TODO (< 'aa 'ac) ==> t"
-"TODO (< 'aa 'ac) ==> t"
+> (< 'aa 'ac)
+t
 
-> "TODO (< 'bc 'ab) ==> nil"
-"TODO (< 'bc 'ab) ==> nil"
+> (< 'bc 'ab)
+nil
 
