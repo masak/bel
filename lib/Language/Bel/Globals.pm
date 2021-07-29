@@ -107,6 +107,7 @@ use Language::Bel::Globals::FastFuncs qw(
     fastfunc__dedup
     fastfunc__randlen
     fastfunc__rand
+    fastfunc__array
     fastfunc__err
 );
 
@@ -8587,7 +8588,7 @@ sub new {
             make_pair(make_symbol("args"), SYMBOL_NIL))), SYMBOL_NIL)),
             SYMBOL_NIL))))), \&fastfunc__prs));
 
-        $self->add_global("array", make_pair(make_symbol("lit"),
+        $self->add_global("array", make_fastfunc(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("dims"),
             make_pair(make_pair(make_symbol("o"), make_pair(make_symbol("default"),
@@ -8605,7 +8606,7 @@ sub new {
             make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("dims"),
             SYMBOL_NIL)), make_pair(make_symbol("default"), SYMBOL_NIL))),
             SYMBOL_NIL))), make_pair(SYMBOL_NIL, SYMBOL_NIL))), SYMBOL_NIL))),
-            SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL))))));
+            SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL))))), \&fastfunc__array));
 
         $self->add_global("aref", make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
