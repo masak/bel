@@ -211,9 +211,9 @@ sub eval {
     while (@{$self->{s}} || @{$self->{p}}) {
         $self->ev();
 
-        # (def mev (s r (p g))  
-        #   (if (no s) 
-        #       (if p  
+        # (def mev (s r (p g))
+        #   (if (no s)
+        #       (if p
         #           (sched p g)
         #           (car r))
         #       (sched (if (cdr (binding 'lock s))
@@ -1611,6 +1611,31 @@ sub applycont {
     push @{$self->{r}}, $self->car($args);
 }
 
+sub maybe_fastfunc_name {
+    my ($self, $value) = @_;
+
+    return
+        unless is_fastfunc($value);
+
+    my $globals = $self->{globals}->list();
+
+    while (!is_nil($globals)) {
+        my $kv = $self->car($globals);
+        my $global_key = $self->car($kv);
+        my $global_value = $self->cdr($kv);
+        if ($value == $global_value) {
+            die "Not a symbol"
+                unless is_symbol($global_key);
+
+            return symbol_name($global_key);
+        }
+
+        $globals = $self->cdr($globals);
+    }
+
+    return;
+}
+
 =head1 AUTHOR
 
 Carl Mäsak, C<< <carl at masak.org> >>
@@ -1669,3 +1694,4 @@ This program is released under the following license:
 =cut
 
 1; # End of Language::Bel
+
