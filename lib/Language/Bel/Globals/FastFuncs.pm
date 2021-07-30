@@ -3597,6 +3597,39 @@ sub fastfunc__rand {
     );
 }
 
+sub fastfunc__array {
+    my ($bel, $dims, $default) = @_;
+
+    if (!defined($default)) {
+        $default = SYMBOL_NIL;
+    }
+
+    if (is_nil($dims)) {
+        return $default;
+    }
+
+    my $car_dims = $bel->car($dims);
+    my $n = maybe_get_int($bel, $car_dims);
+    die "mistype\n"
+        unless defined($n);
+    my $result = SYMBOL_NIL;
+    for (1 .. $n) {
+        $result = make_pair(
+            fastfunc__array($bel, $bel->cdr($dims), $default),
+            $result,
+        );
+    }
+    $result = make_pair(
+        make_symbol("lit"),
+        make_pair(
+            make_symbol("arr"),
+            $result,
+        ),
+    );
+
+    return $result;
+}
+
 sub fastfunc__err {
     my ($bel, $msg) = @_;
 
@@ -3675,6 +3708,7 @@ our @EXPORT_OK = qw(
     fastfunc__dedup
     fastfunc__randlen
     fastfunc__rand
+    fastfunc__array
     fastfunc__err
 );
 
