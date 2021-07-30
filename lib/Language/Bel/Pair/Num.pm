@@ -20,7 +20,6 @@ use Language::Bel::Pair::SignedRat qw(
 );
 use Language::Bel::Pair::RepeatList qw(
     is_repeat_list
-    n
 );
 
 use Exporter 'import';
@@ -108,14 +107,14 @@ sub maybe_get_int {
         && is_repeat_list(numerator($im))
         && is_repeat_list(denominator($im))) {
 
-        my $re_xn_n = n(numerator($re));
-        my $re_xd_n = n(denominator($re));
+        my $re_xn_n = numerator($re)->n();
+        my $re_xd_n = denominator($re)->n();
         my $real_part = sign($re) eq "+"
             ? $re_xn_n / $re_xd_n
             : -$re_xn_n / $re_xd_n;
 
-        my $im_xn_n = n(numerator($im));
-        my $im_xd_n = n(denominator($im));
+        my $im_xn_n = numerator($im)->n();
+        my $im_xd_n = denominator($im)->n();
         my $imaginary_part = $im_xn_n / $im_xd_n;
 
         return $imaginary_part == 0

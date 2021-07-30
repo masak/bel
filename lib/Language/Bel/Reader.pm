@@ -18,6 +18,9 @@ use Language::Bel::Core qw(
 use Language::Bel::Pair::Num qw(
     make_num
 );
+use Language::Bel::Pair::Str qw(
+    make_str
+);
 use Language::Bel::Pair::SignedRat qw(
     make_signed_rat
 );
@@ -139,13 +142,7 @@ sub read_partial {
             } while ($pos < length($expr));
             die "Expected '\"', found end of file";
         }
-        my $ast = SYMBOL_NIL;
-        for my $char (reverse @chars) {
-            $ast = make_pair(
-                make_char(ord($char)),
-                $ast,
-            );
-        }
+        my $ast = make_str(join("", @chars));
         return { ast => $ast, pos => $pos };
     }
     elsif ($c eq ";") {
