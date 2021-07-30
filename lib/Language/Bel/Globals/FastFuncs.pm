@@ -27,6 +27,7 @@ use Language::Bel::Pair::Num qw(
     maybe_get_int
 );
 use Language::Bel::Pair::Str qw(
+    is_str
     make_str
 );
 use Language::Bel::Pair::SignedRat qw(
@@ -3432,10 +3433,16 @@ sub fastfunc__prs {
 sub fastfunc__len {
     my ($bel, $xs) = @_;
 
-    my $length = 0;
-    while (!is_nil($xs)) {
-        $xs = $bel->cdr($xs);
-        ++$length;
+    my $length;
+    if (is_str($xs)) {
+        $length = length($xs->string());
+    }
+    else {
+        $length = 0;
+        while (!is_nil($xs)) {
+            $xs = $bel->cdr($xs);
+            ++$length;
+        }
     }
 
     my $srzero = make_signed_rat("+", 0, 1);
