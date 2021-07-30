@@ -449,6 +449,10 @@ HEADER
 
     my $vmark = $bel->eval(make_symbol("vmark"));
     my $smark = $bel->eval(make_symbol("smark"));
+    my $ff = sub {
+        my ($value) = @_;
+        return $bel->maybe_fastfunc_name($value);
+    };
     my $first = 1;
     for my $global (@globals) {
         if ($first) {
@@ -458,7 +462,7 @@ HEADER
             print("\n");
         }
 
-        print_global($global->{name}, $global->{expr}, $vmark, $smark);
+        print_global($global->{name}, $global->{expr}, $vmark, $smark, $ff);
     }
 
     for my $name (all_bytefuncs()) {
@@ -539,14 +543,14 @@ sub print_primitive {
 }
 
 sub print_global {
-    my ($name, $value, $vmark, $smark) = @_;
+    my ($name, $value, $vmark, $smark, $ff) = @_;
 
     my $uvars_ref = find_uvars($value, $vmark);
     for my $id (sort { $a <=> $b } values(%{$uvars_ref})) {
         print_uvar_decl($id);
     }
 
-    my $serialized = serialize($value, $vmark, $smark, $uvars_ref);
+    my $serialized = serialize($value, $vmark, $smark, $uvars_ref, $ff);
     my $mangled_name = $name;
     $mangled_name =~ s/^=/eq/;
     $mangled_name =~ s/\+/_plus/g;
@@ -557,7 +561,10 @@ sub print_global {
     $mangled_name =~ s/</_lt/g;
     my $fastfunc_name = "fastfunc__$mangled_name";
     my $fastfunc_where_name = "fastfunc__where__$mangled_name";
-    my $maybe_ff_d = $FASTFUNCS{$fastfunc_name} && $FASTFUNCS{$fastfunc_where_name}
+    my $existing_fastfunc_name = $ff->($value);
+    my $maybe_ff_d = $existing_fastfunc_name
+        ? qq[pair_cdr(\$self->get_kv("$existing_fastfunc_name"))]
+        : $FASTFUNCS{$fastfunc_name} && $FASTFUNCS{$fastfunc_where_name}
         ? "make_fastfunc($serialized, \\\&$fastfunc_name, \\\&$fastfunc_where_name)"
         : $FASTFUNCS{$fastfunc_name}
         ? "make_fastfunc($serialized, \\\&$fastfunc_name)"
@@ -602,9 +609,10 @@ sub find_uvars {
 }
 
 sub serialize {
-    my ($value, $vmark, $smark, $uvars_ref) = @_;
+    my ($value, $vmark, $smark, $uvars_ref, $ff) = @_;
 
     if (is_pair($value)) {
+        my $name;
         if (exists $uvars_ref->{$value}) {
             my $id = $uvars_ref->{$value};
             return q[$uvar_] . $id;
@@ -615,9 +623,12 @@ sub serialize {
         elsif (defined($smark) && pairs_are_identical($value, $smark)) {
             return q[pair_cdr($self->get_kv("smark"))];
         }
+        elsif ($name = $ff->($value)) {
+            return q[pair_cdr($self->get_kv("] . $name . q["))];
+        }
         else {
-            my $car = serialize(pair_car($value), $vmark, $smark, $uvars_ref);
-            my $cdr = serialize(pair_cdr($value), $vmark, $smark, $uvars_ref);
+            my $car = serialize(pair_car($value), $vmark, $smark, $uvars_ref, $ff);
+            my $cdr = serialize(pair_cdr($value), $vmark, $smark, $uvars_ref, $ff);
             return "make_pair($car, $cdr)";
         }
     }

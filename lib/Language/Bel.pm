@@ -48,11 +48,11 @@ Language::Bel - An interpreter for Paul Graham's language Bel
 
 =head1 VERSION
 
-Version 0.56
+Version 0.57
 
 =cut
 
-our $VERSION = '0.56';
+our $VERSION = '0.57';
 
 =head1 SYNOPSIS
 
@@ -211,9 +211,9 @@ sub eval {
     while (@{$self->{s}} || @{$self->{p}}) {
         $self->ev();
 
-        # (def mev (s r (p g))  
-        #   (if (no s) 
-        #       (if p  
+        # (def mev (s r (p g))
+        #   (if (no s)
+        #       (if p
         #           (sched p g)
         #           (car r))
         #       (sched (if (cdr (binding 'lock s))
@@ -1611,6 +1611,40 @@ sub applycont {
     push @{$self->{r}}, $self->car($args);
 }
 
+sub maybe_fastfunc_name {
+    my ($self, $value) = @_;
+
+    return
+        unless is_fastfunc($value);
+
+    my $globals = $self->{globals}->list();
+
+    my $found_name = undef;
+    while (!is_nil($globals)) {
+        my $kv = $self->car($globals);
+        my $global_key = $self->car($kv);
+        my $global_value = $self->cdr($kv);
+        if ($value == $global_value) {
+            die "Not a symbol"
+                unless is_symbol($global_key);
+
+            # We don't return immediately here; because we are traversing
+            # down the list of globals from the head (latest) to the tail
+            # earliest, and we are actually interested in the earliest
+            # global, in the case of duplicates. Why are there duplicates?
+            # Thanks to the caller of this function, which uses this
+            # information to alias globals (!). That is, we need to keep
+            # searching here in order to make the globals generation
+            # metacircularly stable.
+            $found_name = symbol_name($global_key);
+        }
+
+        $globals = $self->cdr($globals);
+    }
+
+    return $found_name;
+}
+
 =head1 AUTHOR
 
 Carl Mäsak, C<< <carl at masak.org> >>
@@ -1669,3 +1703,4 @@ This program is released under the following license:
 =cut
 
 1; # End of Language::Bel
+
