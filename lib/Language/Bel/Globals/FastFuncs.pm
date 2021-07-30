@@ -26,6 +26,9 @@ use Language::Bel::Pair::Num qw(
     make_num
     maybe_get_int
 );
+use Language::Bel::Pair::Str qw(
+    make_str
+);
 use Language::Bel::Pair::SignedRat qw(
     make_signed_rat
 );
@@ -3423,15 +3426,7 @@ sub fastfunc__prs {
         push(@strings, Language::Bel::Printer::prnice($_));
     }
 
-    my $result = SYMBOL_NIL;
-    while (@strings) {
-        my $string = pop(@strings);
-        for my $char (reverse(split //, $string)) {
-            my $c = make_char(ord($char));
-            $result = make_pair($c, $result);
-        }
-    }
-    return $result;
+    return make_str(join("", @strings));
 }
 
 sub fastfunc__len {
