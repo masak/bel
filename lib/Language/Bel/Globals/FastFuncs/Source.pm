@@ -192,6 +192,9 @@ sub fastfunc__proper {
 sub fastfunc__string {
     my ($bel, $x) = @_;
 
+    if (is_str($x)) {
+        return SYMBOL_T;
+    }
     while (!is_nil($x)) {
         if (!is_pair($x)) {
             return SYMBOL_NIL;
