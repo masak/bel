@@ -19,10 +19,10 @@ nil
 ((nil))
 
 > (cells '(a b c))
-((a b c) (b c) (c))
+((a . #1=(b . #2=(c))) #1 #2)
 
 > (cells '(a nil c))
-((a nil c) (nil c) (c))
+((a . #1=(nil . #2=(c))) #1 #2)
 
 > (let L '(a)
     (xar L L)

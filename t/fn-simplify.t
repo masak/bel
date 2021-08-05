@@ -16,8 +16,8 @@ __DATA__
 (+ nil (t))
 
 > (simplify '(+ (t t t t t t) (t t t t)))
-(+ (t t t) (t t))
+(+ (t t . #1=(t)) (t . #1))
 
 > (simplify '(+ (t t t t t t) (t t t)))
-(+ (t t) (t))
+(+ (t . #1=(t)) #1)
 

@@ -11,7 +11,7 @@ __DATA__
     (while (pop x)
       (push x L))
     L)
-(nil (c) (b c))
+(nil #1=(c) (b . #1))
 
 > (with (x '()
          L '())

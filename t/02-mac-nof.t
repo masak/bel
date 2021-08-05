@@ -10,6 +10,9 @@ __DATA__
 (hi hi hi hi hi)
 
 > (nof 3 '(s))
+(#1=(s) #1 #1)
+
+> (nof 3 (list 's))
 ((s) (s) (s))
 
 > (nof 0 '(s))

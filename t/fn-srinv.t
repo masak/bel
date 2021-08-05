@@ -7,7 +7,7 @@ use Language::Bel::Test::DSL;
 __DATA__
 
 > (srinv (list '+ i1 i1))
-(- (t) (t))
+(- #1=(t) #1)
 
 > (srinv (list '+ i0 i1))
 (+ nil (t))
