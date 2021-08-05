@@ -294,7 +294,7 @@ sub namedups {
     while (@stack) {
         my $current = pop(@stack);
 
-        if (!is_simple($current)) {
+        if (is_pair($current) && !is_number($current)) {
             push @{$seen_ref->{array}}, $current;
             if (!$seen_ref->{hash}->{$current}++) {
                 push @stack, pair_cdr($current), pair_car($current);
@@ -321,13 +321,6 @@ sub namedups {
         $dups{$dup} = ++$n;
     }
     return \%dups;
-}
-
-# (set simple (cor atom number))
-sub is_simple {
-    my ($x) = @_;
-
-    return !is_pair($x) || is_number($x);
 }
 
 our @EXPORT_OK = qw(
