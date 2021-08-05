@@ -30,7 +30,14 @@ my %codepoint_chars = (
 );
 
 sub _print {
-    my ($ast) = @_;
+    my ($ast, $names_ref, $hist_ref) = @_;
+
+    if (!defined($names_ref)) {
+        $names_ref = namedups($ast);
+    }
+    if (!defined($hist_ref)) {
+        $hist_ref = {};
+    }
 
     my $string_escape = sub {
         my ($string) = @_;
@@ -61,26 +68,40 @@ sub _print {
         my $i = $r_i->[1];
         return prnum($r, $i);
     }
+    elsif (is_stream($ast)) {
+        return "<stream>";
+    }
     elsif (is_pair($ast)) {
-        my @fragments = ("(");
+        my @fragments;
+        if (my $n = $names_ref->{$ast}) {
+            push @fragments, "#", $n;
+
+            if ($hist_ref->{$ast}++) {
+                return join("", @fragments);
+            }
+            else {
+                push @fragments, "=";
+                # continue printing after this `if` statement
+            }
+        }
+
+        push @fragments, "(";
         my $first_elem = 1;
         while (is_pair($ast) && !is_number($ast)) {
             if (!$first_elem) {
                 push @fragments, " ";
             }
-            push @fragments, _print(pair_car($ast));
+            push @fragments, _print(pair_car($ast), $names_ref, $hist_ref);
             $ast = pair_cdr($ast);
+            last if $names_ref->{$ast};
             $first_elem = "";
         }
         if (!is_nil($ast)) {
             push @fragments, " . ";
-            push @fragments, _print($ast);
+            push @fragments, _print($ast, $names_ref, $hist_ref);
         }
         push @fragments, ")";
         return join("", @fragments);
-    }
-    elsif (is_stream($ast)) {
-        return "<stream>";
     }
     else {
         die "unhandled: unknown thing to print";
@@ -256,6 +277,80 @@ sub prnum {
         push @result, "i";
     }
     return join "", @result;
+}
+
+# (def namedups (x (o n 0))
+#   (map [cons _ (++ n)] (dups (cells x) id)))
+sub namedups {
+    my ($x) = @_;
+
+    my $n = 0;
+    my %dups;
+    for my $dup (dups_id(cells($x))) {
+        $dups{$dup} = ++$n;
+    }
+    return \%dups;
+}
+
+# (def cells (x (o seen))
+#   (if (simple x)      seen
+#       (mem x seen id) (snoc seen x)
+#                       (cells (cdr x)
+#                              (cells (car x) (snoc seen x)))))
+sub cells {
+    my ($x, $seen_ref) = @_;
+
+    if (!defined($seen_ref)) {
+        $seen_ref = [];
+    }
+
+    if (is_simple($x)) {
+        return $seen_ref;
+    }
+    # at this point we know it's a pair
+    elsif (grep { $x == $_ } @{$seen_ref}) {
+        push @{$seen_ref}, $x;
+        return $seen_ref;
+    }
+    else {
+        push @{$seen_ref}, $x;
+        cells(pair_car($x), $seen_ref);
+        cells(pair_cdr($x), $seen_ref);
+        return $seen_ref;
+    }
+}
+
+# (def dups (xs (o f =))
+#   (if (no xs)                   nil
+#       (mem (car xs) (cdr xs) f) (cons (car xs)
+#                                       (dups (rem (car xs) (cdr xs) f) f))
+#                                 (dups (cdr xs) f)))
+sub dups_id {
+    my ($xs_arrayref) = @_;
+
+    my @result;
+    my %seen;
+    my $length = scalar(@{$xs_arrayref});
+    for my $i (0 .. ($length - 1)) {
+        my $x = $xs_arrayref->[$i];
+        next if $seen{$x}++;
+
+        for my $j (($i + 1) .. ($length - 1)) {
+            my $y = $xs_arrayref->[$j];
+            if ($x == $y) {
+                push @result, $x;
+                last;
+            }
+        }
+    }
+    return @result;
+}
+
+# (set simple (cor atom number))
+sub is_simple {
+    my ($x) = @_;
+
+    return !is_pair($x) || is_number($x);
 }
 
 our @EXPORT_OK = qw(
