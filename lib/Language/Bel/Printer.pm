@@ -284,42 +284,32 @@ sub prnum {
 sub namedups {
     my ($x) = @_;
 
-    my $seen_ref = {
-        array => [],
-        hash => {},
-    };
-
+    my @order;
+    my %count;
     my @stack = ($x);
 
     while (@stack) {
         my $current = pop(@stack);
 
         if (is_pair($current) && !is_number($current)) {
-            push @{$seen_ref->{array}}, $current;
-            if (!$seen_ref->{hash}->{$current}++) {
+            push @order, $current;
+            if (!$count{$current}++) {
                 push @stack, pair_cdr($current), pair_car($current);
             }
         }
     }
 
-    my $xs_arrayref = $seen_ref->{array};
-    my $xs_hashref = $seen_ref->{hash};
-
-    my @result;
     my %seen;
+    my $n = 0;
+    my %dups;
 
-    for my $x (@{$xs_arrayref}) {
+    for my $x (@order) {
         next if $seen{$x}++;
-        if ($xs_hashref->{$x} >= 2) {
-            push @result, $x;
+        if ($count{$x} >= 2) {
+            $dups{$x} = ++$n;
         }
     }
 
-    my $n = 0;
-    my %dups;
-    for my $dup (@result) {
-        $dups{$dup} = ++$n;
-    }
     return \%dups;
 }
 
