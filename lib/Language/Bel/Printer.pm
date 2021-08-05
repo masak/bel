@@ -301,21 +301,22 @@ sub cells {
     my ($x, $seen_ref) = @_;
 
     if (!defined($seen_ref)) {
-        $seen_ref = [];
+        $seen_ref = {
+            array => [],
+            hash => {},
+        };
     }
 
     if (is_simple($x)) {
         return $seen_ref;
     }
     # at this point we know it's a pair
-    elsif (grep { $x == $_ } @{$seen_ref}) {
-        push @{$seen_ref}, $x;
-        return $seen_ref;
-    }
     else {
-        push @{$seen_ref}, $x;
-        cells(pair_car($x), $seen_ref);
-        cells(pair_cdr($x), $seen_ref);
+        push @{$seen_ref->{array}}, $x;
+        if (!$seen_ref->{hash}->{$x}++) {
+            cells(pair_car($x), $seen_ref);
+            cells(pair_cdr($x), $seen_ref);
+        }
         return $seen_ref;
     }
 }
@@ -326,7 +327,8 @@ sub cells {
 #                                       (dups (rem (car xs) (cdr xs) f) f))
 #                                 (dups (cdr xs) f)))
 sub dups_id {
-    my ($xs_arrayref) = @_;
+    my ($xs_ref) = @_;
+    my $xs_arrayref = $xs_ref->{array};
 
     my @result;
     my %seen;
