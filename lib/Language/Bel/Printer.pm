@@ -321,30 +321,21 @@ sub cells {
     }
 }
 
-# (def dups (xs (o f =))
-#   (if (no xs)                   nil
-#       (mem (car xs) (cdr xs) f) (cons (car xs)
-#                                       (dups (rem (car xs) (cdr xs) f) f))
-#                                 (dups (cdr xs) f)))
 sub dups_id {
     my ($xs_ref) = @_;
     my $xs_arrayref = $xs_ref->{array};
+    my $xs_hashref = $xs_ref->{hash};
 
     my @result;
     my %seen;
-    my $length = scalar(@{$xs_arrayref});
-    for my $i (0 .. ($length - 1)) {
-        my $x = $xs_arrayref->[$i];
-        next if $seen{$x}++;
 
-        for my $j (($i + 1) .. ($length - 1)) {
-            my $y = $xs_arrayref->[$j];
-            if ($x == $y) {
-                push @result, $x;
-                last;
-            }
+    for my $x (@{$xs_arrayref}) {
+        next if $seen{$x}++;
+        if ($xs_hashref->{$x} >= 2) {
+            push @result, $x;
         }
     }
+
     return @result;
 }
 
