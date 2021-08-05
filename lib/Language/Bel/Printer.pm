@@ -298,27 +298,27 @@ sub namedups {
 #                       (cells (cdr x)
 #                              (cells (car x) (snoc seen x)))))
 sub cells {
-    my ($x, $seen_ref) = @_;
+    my ($x) = @_;
 
-    if (!defined($seen_ref)) {
-        $seen_ref = {
-            array => [],
-            hash => {},
-        };
-    }
+    my $seen_ref = {
+        array => [],
+        hash => {},
+    };
 
-    if (is_simple($x)) {
-        return $seen_ref;
-    }
-    # at this point we know it's a pair
-    else {
-        push @{$seen_ref->{array}}, $x;
-        if (!$seen_ref->{hash}->{$x}++) {
-            cells(pair_car($x), $seen_ref);
-            cells(pair_cdr($x), $seen_ref);
+    my @stack = ($x);
+
+    while (@stack) {
+        my $current = pop(@stack);
+
+        if (!is_simple($current)) {
+            push @{$seen_ref->{array}}, $current;
+            if (!$seen_ref->{hash}->{$current}++) {
+                push @stack, pair_cdr($current), pair_car($current);
+            }
         }
-        return $seen_ref;
     }
+
+    return $seen_ref;
 }
 
 sub dups_id {
