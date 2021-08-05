@@ -284,22 +284,6 @@ sub prnum {
 sub namedups {
     my ($x) = @_;
 
-    my $n = 0;
-    my %dups;
-    for my $dup (dups_id(cells($x))) {
-        $dups{$dup} = ++$n;
-    }
-    return \%dups;
-}
-
-# (def cells (x (o seen))
-#   (if (simple x)      seen
-#       (mem x seen id) (snoc seen x)
-#                       (cells (cdr x)
-#                              (cells (car x) (snoc seen x)))))
-sub cells {
-    my ($x) = @_;
-
     my $seen_ref = {
         array => [],
         hash => {},
@@ -318,13 +302,8 @@ sub cells {
         }
     }
 
-    return $seen_ref;
-}
-
-sub dups_id {
-    my ($xs_ref) = @_;
-    my $xs_arrayref = $xs_ref->{array};
-    my $xs_hashref = $xs_ref->{hash};
+    my $xs_arrayref = $seen_ref->{array};
+    my $xs_hashref = $seen_ref->{hash};
 
     my @result;
     my %seen;
@@ -336,7 +315,12 @@ sub dups_id {
         }
     }
 
-    return @result;
+    my $n = 0;
+    my %dups;
+    for my $dup (@result) {
+        $dups{$dup} = ++$n;
+    }
+    return \%dups;
 }
 
 # (set simple (cor atom number))
