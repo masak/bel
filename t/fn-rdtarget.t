@@ -16,8 +16,8 @@ __DATA__
 (nil)
 
 > (rdtarget '("(foo bar)") i10 "1" c nil)
-((foo bar) (("1" foo bar)))
+(#1=(foo bar) (("1" . #1)))
 
 > (rdtarget '("(quux)") i10 "2" (join) '(("1" foo bar)))
-((quux) (("2" quux) ("1" foo bar)))
+(#1=(quux) (("2" . #1) ("1" foo bar)))
 

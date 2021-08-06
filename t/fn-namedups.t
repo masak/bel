@@ -14,11 +14,21 @@ __DATA__
 
 > (let L '(a)
     (xar L L)
-    (len (namedups L)))
-1
+    (namedups L))
+((#1=(#1) . 1))
+
+> (let L '(a)
+    (xar L L)
+    L)
+#1=(#1)
 
 > (let L '(a)
     (xdr L L)
-    (len (namedups L)))
-1
+    (namedups L))
+((#1=(a . #1) . 1))
+
+> (let L '(a)
+    (xdr L L)
+    L)
+#1=(a . #1)
 
