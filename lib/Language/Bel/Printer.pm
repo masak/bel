@@ -29,83 +29,105 @@ my %codepoint_chars = (
     32 => "sp",
 );
 
+sub string_escape {
+    my ($string) = @_;
+
+    return join("", map {
+        $_ eq q["] || $_ eq q[\\] ? "\\$_" : $_
+    } split("", $string));
+}
+
+sub TOP_STATE { 1 }
+sub NEXT_ELEM { 2 }
+sub REST_ELEM { 3 }
+sub LIST_END { 4 }
+
 sub _print {
-    my ($ast, $names_ref, $hist_ref) = @_;
+    my ($ast) = @_;
 
-    if (!defined($names_ref)) {
-        $names_ref = namedups($ast);
-    }
-    if (!defined($hist_ref)) {
-        $hist_ref = {};
-    }
+    my $names_ref = namedups($ast);
+    my $hist_ref = {};
 
-    my $string_escape = sub {
-        my ($string) = @_;
+    my @fragments;
+    my @stack = (
+        [TOP_STATE, $ast],
+    );
 
-        return join("", map {
-            $_ eq q["] || $_ eq q[\\] ? "\\$_" : $_
-        } split("", $string));
-    };
+    while (@stack) {
+        my $current = pop(@stack);
+        my ($state, $data) = @{$current};
 
-    my $r_i;
-    if (is_symbol($ast)) {
-        my $name = symbol_name($ast);
-        return $name;
-    }
-    elsif (is_char($ast)) {
-        my $codepoint = char_codepoint($ast);
-        my $name = $codepoint_chars{$codepoint};
-        return $name
-            ? "\\$name"
-            : "\\" . chr($codepoint);
-    }
-    elsif (is_string($ast)) {
-        my $string = string_value($ast);
-        return q["] . $string_escape->($string) . q["];
-    }
-    elsif ($r_i = is_number($ast)) {
-        my $r = $r_i->[0];
-        my $i = $r_i->[1];
-        return prnum($r, $i);
-    }
-    elsif (is_stream($ast)) {
-        return "<stream>";
-    }
-    elsif (is_pair($ast)) {
-        my @fragments;
-        if (my $n = $names_ref->{$ast}) {
-            push @fragments, "#", $n;
+        if ($state == TOP_STATE) {
+            my $r_i;
+            if (is_symbol($data)) {
+                push @fragments, symbol_name($data);
+            }
+            elsif (is_char($data)) {
+                my $codepoint = char_codepoint($data);
+                my $name = $codepoint_chars{$codepoint};
+                push @fragments, defined($name)
+                    ? "\\$name"
+                    : "\\" . chr($codepoint);
+            }
+            elsif (is_string($data)) {
+                push @fragments,
+                    q["],
+                    string_escape(string_value($data)),
+                    q["];
+            }
+            elsif ($r_i = is_number($data)) {
+                my $r = $r_i->[0];
+                my $i = $r_i->[1];
+                push @fragments, prnum($r, $i);
+            }
+            elsif (is_stream($data)) {
+                push @fragments, "<stream>";
+            }
+            elsif (is_pair($data)) {
+                if (my $n = $names_ref->{$data}) {
+                    push @fragments, "#", $n;
 
-            if ($hist_ref->{$ast}++) {
-                return join("", @fragments);
+                    next if $hist_ref->{$data}++;
+
+                    push @fragments, "=";
+                }
+
+                push @fragments, "(";
+                push @stack,
+                    [NEXT_ELEM, pair_cdr($data)],
+                    [TOP_STATE, pair_car($data)];
             }
             else {
-                push @fragments, "=";
-                # continue printing after this `if` statement
+                die "unhandled: unknown thing to print";
             }
         }
-
-        push @fragments, "(";
-        my $first_elem = 1;
-        while (is_pair($ast) && !is_number($ast)) {
-            if (!$first_elem) {
+        elsif ($state == NEXT_ELEM) {
+            if ($names_ref->{$data} || !is_pair($data) || is_number($data)) {
+                push @stack, [REST_ELEM, $data];
+            }
+            else {
                 push @fragments, " ";
+                push @stack,
+                    [NEXT_ELEM, pair_cdr($data)],
+                    [TOP_STATE, pair_car($data)];
             }
-            push @fragments, _print(pair_car($ast), $names_ref, $hist_ref);
-            $ast = pair_cdr($ast);
-            last if $names_ref->{$ast};
-            $first_elem = "";
         }
-        if (!is_nil($ast)) {
-            push @fragments, " . ";
-            push @fragments, _print($ast, $names_ref, $hist_ref);
+        elsif ($state == REST_ELEM) {
+            push @stack, [LIST_END, undef];
+            if (!is_nil($data)) {
+                push @fragments, " . ";
+                push @stack, [TOP_STATE, $data];
+            }
         }
-        push @fragments, ")";
-        return join("", @fragments);
+        elsif ($state == LIST_END) {
+            push @fragments, ")";
+        }
+        else {
+            die "unhandled: unknown state";
+        }
     }
-    else {
-        die "unhandled: unknown thing to print";
-    }
+
+    return join("", @fragments);
 }
 
 sub prnice {
@@ -276,7 +298,7 @@ sub prnum {
         }
         push @result, "i";
     }
-    return join "", @result;
+    return @result;
 }
 
 # (def namedups (x (o n 0))
