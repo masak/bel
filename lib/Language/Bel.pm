@@ -177,13 +177,34 @@ sub read_eval_print {
     my ($self, $expr) = @_;
 
     my $ast = read_whole($expr);
-    my $eval_result = $self->eval($ast);
-    my $result_string = _print($eval_result);
+    my $result = $self->eval($ast);
 
-    $self->output($result_string);
-    $self->output("\n");
+    my $redundant = is_def_or_mac($ast) && is_lit_clo_or_mac($result);
+    if (!$redundant) {
+        my $result_string = _print($result);
+        $self->output($result_string);
+        $self->output("\n");
+    }
 
     return;
+}
+
+sub is_def_or_mac {
+    my ($ast) = @_;
+
+    return is_pair($ast)
+        && (is_symbol_of_name(pair_car($ast), "def")
+            || is_symbol_of_name(pair_car($ast), "mac"));
+}
+
+sub is_lit_clo_or_mac {
+    my ($result) = @_;
+
+    return is_pair($result)
+        && is_symbol_of_name(pair_car($result), "lit")
+        && is_pair(pair_cdr($result))
+        && (is_symbol_of_name(pair_car(pair_cdr($result)), "clo")
+            || is_symbol_of_name(pair_car(pair_cdr($result)), "mac"));
 }
 
 sub output {
