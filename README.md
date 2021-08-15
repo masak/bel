@@ -12,11 +12,11 @@ handling, and a numeric tower; these are all specified as Bel code in the
 language itself. Bel is built on top of Bel; that's true of the language's
 specification, and increasingly true of this implementation.
 
-## Installation
+## Getting started
 
 You need [Perl](https://www.perl.org/get.html) installed.
 
-Only possible to install `Language::Bel` through GitHub right now.
+Right now, the way to install and run `Language::Bel` is via GitHub.
 
 ```sh
 $ git clone https://github.com/masak/bel.git
@@ -27,6 +27,8 @@ done.
 
 At some point soon, I'll also upload this distribution to CPAN.
 Then you'll be able to install it using a CPAN installer, such as `cpanm`.
+
+## Usage
 
 After downloading Bel, you can run it like this:
 
