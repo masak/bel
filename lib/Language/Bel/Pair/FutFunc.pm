@@ -5,17 +5,13 @@ use 5.006;
 use strict;
 use warnings;
 
-use Language::Bel::Reader qw(
-    read_whole
-);
-
 use Exporter 'import';
 
 sub new {
-    my ($class, $source, $fn) = @_;
+    my ($class, $pair_factory, $fn) = @_;
 
     my $obj = {
-        source => $source,
+        pair_factory => $pair_factory,
         pair => undef,
         fn => $fn,
     };
@@ -25,9 +21,7 @@ sub new {
 sub reify_if_needed {
     my ($self) = @_;
 
-    if (!$self->{pair}) {
-        $self->{pair} = read_whole($self->{source});
-    }
+    $self->{pair} ||= $self->{pair_factory}->();
 }
 
 sub car {
@@ -65,9 +59,9 @@ sub apply {
 }
 
 sub make_futfunc {
-    my ($pair, $fn) = @_;
+    my ($pair_factory, $fn) = @_;
 
-    return __PACKAGE__->new($pair, $fn);
+    return __PACKAGE__->new($pair_factory, $fn);
 }
 
 our @EXPORT_OK = qw(

@@ -272,7 +272,7 @@ sub fut {
                 make_symbol("fut"),
                 make_pair(
                     make_futfunc(
-                        $source,
+                        sub { read_whole($source) },
                         $sub,
                     ),
                     SYMBOL_NIL,
