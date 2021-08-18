@@ -72,7 +72,6 @@ primitives
 > (set I (array '(3 3) 0))
 (lit arr (lit arr 0 0 0) (lit arr 0 0 0) (lit arr 0 0 0))
 > (def diag (m n) (m n n))
-(lit clo nil (m n) (m n n))
 > (for n 1 3 (set (diag I n) 1))
 nil
 > I
