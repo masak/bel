@@ -43,6 +43,13 @@ use Exporter 'import';
 sub fastfunc__no {
     my ($bel, $x) = @_;
 
+    if (scalar(@_) > 2) {
+        die "overargs\n";
+    }
+    if (scalar(@_) < 2) {
+        die "underargs\n";
+    }
+
     return is_nil($x) ? SYMBOL_T : SYMBOL_NIL;
 }
 
