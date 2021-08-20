@@ -710,7 +710,7 @@ sub vref {
         my $name = is_symbol($v)
             ? symbol_name($v)
             : "<not a symbol>";
-        die "('unboundb $name)\n";
+        die "(unboundb $name)\n";
     }
 }
 

@@ -7,10 +7,10 @@ use Language::Bel::Test::DSL;
 __DATA__
 
 > lock
-!ERROR: ('unboundb lock)
+!ERROR: (unboundb lock)
 
 > (let f (fn () lock) (f))
-!ERROR: ('unboundb lock)
+!ERROR: (unboundb lock)
 
 > (let f (fn () lock) (atomic (f)))
 t

@@ -7,7 +7,7 @@ use Language::Bel::Test::DSL;
 __DATA__
 
 > (let f (fn () d) (f))
-!ERROR: ('unboundb d)
+!ERROR: (unboundb d)
 
 > (let f (fn () d) (bind d 'hai (f)))
 hai
