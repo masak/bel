@@ -330,6 +330,14 @@ sub all_primitives {
 sub call {
     my ($self, $name, $_a, $_b) = @_;
 
+    if (!is_nil($_b) && ($name eq "car" || $name eq "cdr" || $name eq "type"
+        || $name eq "sym" || $name eq "nom" || $name eq "rdb" || $name eq "cls"
+        || $name eq "sys")) {
+        die "overargs\n";
+    }
+    if (!is_nil($_a) && $name eq "coin") {
+        die "overargs\n";
+    }
     if ($name eq "id") {
         return $self->prim_id($_a, $_b);
     }
@@ -377,7 +385,6 @@ sub call {
     }
     # XXX: skipping 'sys'
     else {
-        # XXX: skipping the 'unknown-prim case for now
         die "unknown-prim\n";
     }
     # XXX: skipping the `sigerr` case
