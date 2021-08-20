@@ -488,6 +488,12 @@ sub fastfunc__variable {
     }
 }
 
+sub fastfunc__bel {
+    my ($bel, $e) = @_;
+
+    return $bel->eval($e);
+}
+
 sub fastfunc__inwhere {
     my ($bel, $s) = @_;
 
@@ -3677,6 +3683,7 @@ our @EXPORT_OK = qw(
     fastfunc__where__idfn
     fastfunc__literal
     fastfunc__variable
+    fastfunc__bel
     fastfunc__inwhere
     fastfunc__pairwise
     fastfunc__foldl

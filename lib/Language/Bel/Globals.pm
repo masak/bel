@@ -59,6 +59,7 @@ use Language::Bel::Globals::FastFuncs qw(
     fastfunc__where__idfn
     fastfunc__literal
     fastfunc__variable
+    fastfunc__bel
     fastfunc__inwhere
     fastfunc__pairwise
     fastfunc__foldl
@@ -1080,7 +1081,7 @@ sub new {
             SYMBOL_NIL))), make_pair(make_symbol("id"), SYMBOL_NIL)))),
             SYMBOL_NIL))), SYMBOL_NIL))))));
 
-        $self->add_global("bel", make_pair(make_symbol("lit"),
+        $self->add_global("bel", make_fastfunc(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("e"),
             make_pair(make_pair(make_symbol("o"), make_pair(make_symbol("g"),
@@ -1091,7 +1092,7 @@ sub new {
             make_pair(SYMBOL_NIL, SYMBOL_NIL))), SYMBOL_NIL)), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("list"), make_pair(SYMBOL_NIL,
             make_pair(make_symbol("g"), SYMBOL_NIL))), SYMBOL_NIL)))),
-            SYMBOL_NIL))))));
+            SYMBOL_NIL))))), \&fastfunc__bel));
 
         $self->add_global("mev", make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
