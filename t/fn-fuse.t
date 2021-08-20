@@ -19,5 +19,8 @@ __DATA__
 nil
 
 > (fuse car '(a b c) '(1 2 3))
+!ERROR: overargs
+
+> (fuse (fn (x y) (car x)) '(a b c) '(1 2 3))
 !ERROR: car-on-atom
 
