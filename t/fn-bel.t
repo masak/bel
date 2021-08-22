@@ -72,14 +72,17 @@ x
 > (bel '(where (cdr '(z . w))))
 ((z . w) d)
 
-The following two tests would probably work, but they are too slow.
-Even `(bel 'k!a)` is too slow right now. Maybe later.
+> (bel '(where ((lit tab (a . 1)) 'a)))
+((a . 1) d)
 
-SKIP: > (bel '(where ((lit tab (a . 1)) 'a)))
-SKIP: ((a . 1) 'd)
+> (bel '(where ((lit tab (a . 1)) 'b)))
+((b) d)
 
-SKIP: > (bel '(where ((lit tab (a . 1)) 'b)))
-SKIP: ((b) 'd)
+> (bel '(set k (table '((a . 1)))))
+(lit tab (a . 1))
+
+> (bel 'k!a)
+1
 
 > (bel nil)
 nil
