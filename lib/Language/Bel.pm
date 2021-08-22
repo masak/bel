@@ -117,6 +117,7 @@ sub new {
             primitives => $self->{primitives},
         );
     }
+    $self->{state_stack} = [];
 
     return $self;
 }
@@ -216,6 +217,26 @@ sub output {
     }
 
     return;
+}
+
+sub push_eval_state {
+    my ($self) = @_;
+
+    my $state = {
+        s => $self->{s},
+        r => $self->{r},
+        p => $self->{p},
+    };
+    push @{$self->{state_stack}}, $state;
+}
+
+sub pop_eval_state {
+    my ($self) = @_;
+
+    my $state = pop @{$self->{state_stack}};
+    $self->{s} = $state->{s};
+    $self->{r} = $state->{r};
+    $self->{p} = $state->{p};
 }
 
 # (def bel (e (o g globe))

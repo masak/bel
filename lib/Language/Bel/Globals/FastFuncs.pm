@@ -491,7 +491,10 @@ sub fastfunc__variable {
 sub fastfunc__bel {
     my ($bel, $e) = @_;
 
-    return $bel->eval($e);
+    $bel->push_eval_state();
+    my $result = $bel->eval($e);
+    $bel->pop_eval_state();
+    return $result;
 }
 
 sub fastfunc__inwhere {
