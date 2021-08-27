@@ -33,6 +33,7 @@ my @registered_symbols = (
     "nil",
     "t",
     "pair",
+    "symbol",
 );
 
 my %index_of;
@@ -45,7 +46,7 @@ for my $name (@registered_symbols) {
 sub SYMBOL {
     my ($name) = @_;
 
-    die "Unknown symbo `$name`"
+    die "Unknown symbol `$name`"
         unless defined $index_of{$name};
 
     return $index_of{$name};

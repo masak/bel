@@ -44,6 +44,7 @@ my @SYMBOLS = (
     make_symbol("nil"),
     make_symbol("t"),
     make_symbol("pair"),
+    make_symbol("symbol"),
 );
 
 sub new {

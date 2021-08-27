@@ -85,6 +85,16 @@ add_bytefunc("append", 6,
     JMP, 20, n, n,
 );
 
+add_bytefunc("symbol", 1,
+    PARAM_IN, n, n, n,
+    SET_PARAM_NEXT, 0, n, n,
+    PARAM_LAST, n, n, n,
+    PARAM_OUT, n, n, n,
+    SET_PRIM_TYPE_REG, 0, 0, n,
+    SET_PRIM_ID_REG_SYM, 0, 0, SYMBOL("symbol"),
+    RETURN_REG, 0, n, n,
+);
+
 sub all_bytefuncs {
     return @all_bytefuncs;
 }
