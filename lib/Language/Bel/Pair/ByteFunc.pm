@@ -45,6 +45,7 @@ my @SYMBOLS = (
     make_symbol("t"),
     make_symbol("pair"),
     make_symbol("symbol"),
+    make_symbol("char"),
 );
 
 sub new {

@@ -34,6 +34,7 @@ my @registered_symbols = (
     "t",
     "pair",
     "symbol",
+    "char",
 );
 
 my %index_of;
