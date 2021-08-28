@@ -115,6 +115,16 @@ add_bytefunc("char", 1,
     RETURN_REG, 0, n, n,
 );
 
+add_bytefunc("stream", 1,
+    PARAM_IN, n, n, n,
+    SET_PARAM_NEXT, 0, n, n,
+    PARAM_LAST, n, n, n,
+    PARAM_OUT, n, n, n,
+    SET_PRIM_TYPE_REG, 0, 0, n,
+    SET_PRIM_ID_REG_SYM, 0, 0, SYMBOL("stream"),
+    RETURN_REG, 0, n, n,
+);
+
 sub all_bytefuncs {
     return @all_bytefuncs;
 }

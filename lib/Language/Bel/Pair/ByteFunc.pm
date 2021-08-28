@@ -46,6 +46,7 @@ my @SYMBOLS = (
     make_symbol("pair"),
     make_symbol("symbol"),
     make_symbol("char"),
+    make_symbol("stream"),
 );
 
 sub new {

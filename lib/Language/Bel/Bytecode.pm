@@ -35,6 +35,7 @@ my @registered_symbols = (
     "pair",
     "symbol",
     "char",
+    "stream",
 );
 
 my %index_of;
