@@ -35,10 +35,12 @@ use Language::Bel::Bytecode qw(
     SET_PRIM_CAR
     SET_PRIM_CDR
     SET_PRIM_ID_REG_SYM
+    SET_PRIM_JOIN_REG_REG
     SET_PRIM_JOIN_REG_SYM
     SET_PRIM_JOIN_SYM_SYM
     SET_PRIM_TYPE_REG
     SET_REG
+    SET_SYM
 );
 use Exporter 'import';
 
@@ -190,6 +192,15 @@ sub apply {
                     ? SYMBOL_T
                     : SYMBOL_NIL;
         }
+        elsif ($opcode == SET_PRIM_JOIN_REG_REG) {
+            my $target_register_no = $bytecode->[$ip + 1];
+            my $car_register_no = $bytecode->[$ip + 2];
+            my $cdr_register_no = $bytecode->[$ip + 3];
+            my $car_value = $registers[$car_register_no];
+            my $cdr_value = $registers[$cdr_register_no];
+            $registers[$target_register_no]
+                = make_pair($car_value, $cdr_value);
+        }
         elsif ($opcode == SET_PRIM_JOIN_REG_SYM) {
             my $target_register_no = $bytecode->[$ip + 1];
             my $car_register_no = $bytecode->[$ip + 2];
@@ -219,6 +230,12 @@ sub apply {
             my $target_register_no = $bytecode->[$ip + 1];
             my $register_no = $bytecode->[$ip + 2];
             $registers[$target_register_no] = $registers[$register_no];
+        }
+        elsif ($opcode == SET_SYM) {
+            my $target_register_no = $bytecode->[$ip + 1];
+            my $symbol_id = $bytecode->[$ip + 2];
+            my $symbol = $SYMBOLS[$symbol_id];
+            $registers[$target_register_no] = $symbol;
         }
         elsif ($opcode == RETURN_REG) {
             my $register_no = $bytecode->[$ip + 1];

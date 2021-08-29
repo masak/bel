@@ -20,6 +20,7 @@ use Language::Bel::Bytecode qw(
     SET_PRIM_CAR
     SET_PRIM_CDR
     SET_PRIM_ID_REG_SYM
+    SET_PRIM_JOIN_REG_REG
     SET_PRIM_JOIN_REG_SYM
     SET_PRIM_JOIN_SYM_SYM
     SET_PRIM_TYPE_REG
@@ -189,6 +190,20 @@ add_bytefunc("caddr", 1,
     SET_PRIM_CDR, 0, 0, n,
     SET_PRIM_CAR, 0, 0, n,
     RETURN_REG, 0, n, n,
+);
+
+add_bytefunc("rev", 3,
+    PARAM_IN, n, n, n,
+    SET_PARAM_NEXT, 0, n, n,
+    PARAM_LAST, n, n, n,
+    PARAM_OUT, n, n, n,
+    SET_SYM, 1, SYMBOL("nil"), n,
+    IF_JMP, 0, 28, n,
+    RETURN_REG, 1, n, n,
+    SET_PRIM_CAR, 2, 0, n,
+    SET_PRIM_JOIN_REG_REG, 1, 2, 1,
+    SET_PRIM_CDR, 0, 0, n,
+    JMP, 20, n, n,
 );
 
 sub all_bytefuncs {
