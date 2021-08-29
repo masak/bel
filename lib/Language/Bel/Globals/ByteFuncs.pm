@@ -170,6 +170,16 @@ add_bytefunc("cadr", 1,
     RETURN_REG, 0, n, n,
 );
 
+add_bytefunc("cddr", 1,
+    PARAM_IN, n, n, n,
+    SET_PARAM_NEXT, 0, n, n,
+    PARAM_LAST, n, n, n,
+    PARAM_OUT, n, n, n,
+    SET_PRIM_CDR, 0, 0, n,
+    SET_PRIM_CDR, 0, 0, n,
+    RETURN_REG, 0, n, n,
+);
+
 sub all_bytefuncs {
     return @all_bytefuncs;
 }
