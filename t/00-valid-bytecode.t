@@ -13,15 +13,19 @@ use Language::Bel::Bytecode qw(
     PARAM_OUT
     PRIM_XAR
     PRIM_XDR
+    RETURN_IF
     RETURN_REG
+    RETURN_UNLESS
     SET_PARAM_NEXT
     SET_PRIM_CAR
     SET_PRIM_CDR
     SET_PRIM_ID_REG_SYM
+    SET_PRIM_JOIN_REG_REG
     SET_PRIM_JOIN_REG_SYM
     SET_PRIM_JOIN_SYM_SYM
     SET_PRIM_TYPE_REG
     SET_REG
+    SET_SYM
 );
 use Language::Bel::Globals::ByteFuncs qw(
     bytefunc
@@ -64,17 +68,20 @@ sub registers_of {
     my ($op) = @_;
     my ($opcode, $operand1, $operand2, $operand3) = @$op;
 
-    if (in($opcode, PARAM_IN, PARAM_LAST, PARAM_OUT, JMP)) {
+    if (in($opcode, PARAM_IN, PARAM_LAST, PARAM_OUT, JMP, SET_SYM)) {
         return ();
     }
-    elsif (in($opcode, RETURN_REG, SET_PARAM_NEXT, SET_PRIM_JOIN_SYM_SYM,
-            IF_JMP)) {
+    elsif (in($opcode, RETURN_IF, RETURN_REG, RETURN_UNLESS, SET_PARAM_NEXT,
+            SET_PRIM_JOIN_SYM_SYM, IF_JMP)) {
         return ($operand1);
     }
     elsif (in($opcode, PRIM_XAR, PRIM_XDR, SET_PRIM_TYPE_REG,
             SET_PRIM_ID_REG_SYM, SET_PRIM_JOIN_REG_SYM, SET_REG,
             SET_PRIM_CAR, SET_PRIM_CDR)) {
         return ($operand2, $operand1);
+    }
+    elsif (in($opcode, SET_PRIM_JOIN_REG_REG)) {
+        return ($operand2, $operand3, $operand1);
     }
     else {
         die sprintf("Unknown opcode 0x%x", $opcode);
