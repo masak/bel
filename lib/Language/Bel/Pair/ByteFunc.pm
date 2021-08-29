@@ -28,7 +28,9 @@ use Language::Bel::Bytecode qw(
     PARAM_OUT
     PRIM_XAR
     PRIM_XDR
+    RETURN_IF
     RETURN_REG
+    RETURN_UNLESS
     SET_PARAM_NEXT
     SET_PRIM_CAR
     SET_PRIM_CDR
@@ -222,6 +224,20 @@ sub apply {
             my $register_no = $bytecode->[$ip + 1];
             my $value = $registers[$register_no];
             return $value;
+        }
+        elsif ($opcode == RETURN_IF) {
+            my $register_no = $bytecode->[$ip + 1];
+            my $value = $registers[$register_no];
+            if (!is_nil($value)) {
+                return $value;
+            }
+        }
+        elsif ($opcode == RETURN_UNLESS) {
+            my $register_no = $bytecode->[$ip + 1];
+            my $value = $registers[$register_no];
+            if (is_nil($value)) {
+                return SYMBOL_NIL;
+            }
         }
         else {
             die "Uncrecognized opcode: ", $opcode;

@@ -13,7 +13,9 @@ use Language::Bel::Bytecode qw(
     PARAM_OUT
     PRIM_XAR
     PRIM_XDR
+    RETURN_IF
     RETURN_REG
+    RETURN_UNLESS
     SET_PARAM_NEXT
     SET_PRIM_CAR
     SET_PRIM_CDR
@@ -22,6 +24,7 @@ use Language::Bel::Bytecode qw(
     SET_PRIM_JOIN_SYM_SYM
     SET_PRIM_TYPE_REG
     SET_REG
+    SET_SYM
     SYMBOL
 );
 use Language::Bel::Pair::ByteFunc qw(
@@ -123,6 +126,20 @@ add_bytefunc("stream", 1,
     SET_PRIM_TYPE_REG, 0, 0, n,
     SET_PRIM_ID_REG_SYM, 0, 0, SYMBOL("stream"),
     RETURN_REG, 0, n, n,
+);
+
+add_bytefunc("proper", 2,
+    PARAM_IN, n, n, n,
+    SET_PARAM_NEXT, 0, n, n,
+    PARAM_LAST, n, n, n,
+    PARAM_OUT, n, n, n,
+    SET_PRIM_ID_REG_SYM, 1, 0, SYMBOL("nil"),
+    RETURN_IF, 1, n, n,
+    SET_PRIM_TYPE_REG, 1, 0, n,
+    SET_PRIM_ID_REG_SYM, 1, 1, SYMBOL("pair"),
+    RETURN_UNLESS, 1, n, n,
+    SET_PRIM_CDR, 0, 0, n,
+    JMP, 16, n, n,
 );
 
 sub all_bytefuncs {

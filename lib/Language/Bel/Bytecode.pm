@@ -28,6 +28,8 @@ sub JMP { 0x30 }
 sub IF_JMP { 0x31 }
 
 sub RETURN_REG { 0xF0 }
+sub RETURN_IF { 0xF1 }
+sub RETURN_UNLESS { 0xF2 }
 
 my @registered_symbols = (
     "nil",
@@ -155,7 +157,9 @@ our @EXPORT_OK = qw(
     PARAM_OUT
     PRIM_XAR
     PRIM_XDR
+    RETURN_IF
     RETURN_REG
+    RETURN_UNLESS
     SET_PARAM_NEXT
     SET_PRIM_CAR
     SET_PRIM_CDR
