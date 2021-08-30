@@ -8278,6 +8278,76 @@ sub new {
                 pair_cdr(pair_cdr(pair_cdr($self->{hash_ref}->{bcfn}))),
             ),
         );
+        pair_set_cdr(
+            pair_cdr(pair_cdr($self->{hash_ref}->{bcfn})),
+            make_pair(
+                make_pair(make_symbol("symbol"), bytefunc("symbol")),
+                pair_cdr(pair_cdr(pair_cdr($self->{hash_ref}->{bcfn}))),
+            ),
+        );
+        pair_set_cdr(
+            pair_cdr(pair_cdr($self->{hash_ref}->{bcfn})),
+            make_pair(
+                make_pair(make_symbol("pair"), bytefunc("pair")),
+                pair_cdr(pair_cdr(pair_cdr($self->{hash_ref}->{bcfn}))),
+            ),
+        );
+        pair_set_cdr(
+            pair_cdr(pair_cdr($self->{hash_ref}->{bcfn})),
+            make_pair(
+                make_pair(make_symbol("char"), bytefunc("char")),
+                pair_cdr(pair_cdr(pair_cdr($self->{hash_ref}->{bcfn}))),
+            ),
+        );
+        pair_set_cdr(
+            pair_cdr(pair_cdr($self->{hash_ref}->{bcfn})),
+            make_pair(
+                make_pair(make_symbol("stream"), bytefunc("stream")),
+                pair_cdr(pair_cdr(pair_cdr($self->{hash_ref}->{bcfn}))),
+            ),
+        );
+        pair_set_cdr(
+            pair_cdr(pair_cdr($self->{hash_ref}->{bcfn})),
+            make_pair(
+                make_pair(make_symbol("proper"), bytefunc("proper")),
+                pair_cdr(pair_cdr(pair_cdr($self->{hash_ref}->{bcfn}))),
+            ),
+        );
+        pair_set_cdr(
+            pair_cdr(pair_cdr($self->{hash_ref}->{bcfn})),
+            make_pair(
+                make_pair(make_symbol("string"), bytefunc("string")),
+                pair_cdr(pair_cdr(pair_cdr($self->{hash_ref}->{bcfn}))),
+            ),
+        );
+        pair_set_cdr(
+            pair_cdr(pair_cdr($self->{hash_ref}->{bcfn})),
+            make_pair(
+                make_pair(make_symbol("cadr"), bytefunc("cadr")),
+                pair_cdr(pair_cdr(pair_cdr($self->{hash_ref}->{bcfn}))),
+            ),
+        );
+        pair_set_cdr(
+            pair_cdr(pair_cdr($self->{hash_ref}->{bcfn})),
+            make_pair(
+                make_pair(make_symbol("cddr"), bytefunc("cddr")),
+                pair_cdr(pair_cdr(pair_cdr($self->{hash_ref}->{bcfn}))),
+            ),
+        );
+        pair_set_cdr(
+            pair_cdr(pair_cdr($self->{hash_ref}->{bcfn})),
+            make_pair(
+                make_pair(make_symbol("caddr"), bytefunc("caddr")),
+                pair_cdr(pair_cdr(pair_cdr($self->{hash_ref}->{bcfn}))),
+            ),
+        );
+        pair_set_cdr(
+            pair_cdr(pair_cdr($self->{hash_ref}->{bcfn})),
+            make_pair(
+                make_pair(make_symbol("rev"), bytefunc("rev")),
+                pair_cdr(pair_cdr(pair_cdr($self->{hash_ref}->{bcfn}))),
+            ),
+        );
     }
     $self->{original_err} = $self->{primitives}->prim_cdr(
         $self->{hash_ref}->{err}

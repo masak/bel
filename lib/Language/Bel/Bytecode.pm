@@ -17,9 +17,10 @@ sub PRIM_XDR { 0x11 }
 sub SET_PRIM_CAR { 0x12 }
 sub SET_PRIM_CDR { 0x13 }
 sub SET_PRIM_ID_REG_SYM { 0x14 }
-sub SET_PRIM_JOIN_REG_SYM { 0x15 }
-sub SET_PRIM_JOIN_SYM_SYM { 0x16 }
-sub SET_PRIM_TYPE_REG { 0x17 }
+sub SET_PRIM_JOIN_REG_REG { 0x15 }
+sub SET_PRIM_JOIN_REG_SYM { 0x16 }
+sub SET_PRIM_JOIN_SYM_SYM { 0x17 }
+sub SET_PRIM_TYPE_REG { 0x18 }
 
 sub SET_REG { 0x20 }
 sub SET_SYM { 0x21 }
@@ -28,11 +29,16 @@ sub JMP { 0x30 }
 sub IF_JMP { 0x31 }
 
 sub RETURN_REG { 0xF0 }
+sub RETURN_IF { 0xF1 }
+sub RETURN_UNLESS { 0xF2 }
 
 my @registered_symbols = (
     "nil",
     "t",
     "pair",
+    "symbol",
+    "char",
+    "stream",
 );
 
 my %index_of;
@@ -45,7 +51,7 @@ for my $name (@registered_symbols) {
 sub SYMBOL {
     my ($name) = @_;
 
-    die "Unknown symbo `$name`"
+    die "Unknown symbol `$name`"
         unless defined $index_of{$name};
 
     return $index_of{$name};
@@ -152,11 +158,14 @@ our @EXPORT_OK = qw(
     PARAM_OUT
     PRIM_XAR
     PRIM_XDR
+    RETURN_IF
     RETURN_REG
+    RETURN_UNLESS
     SET_PARAM_NEXT
     SET_PRIM_CAR
     SET_PRIM_CDR
     SET_PRIM_ID_REG_SYM
+    SET_PRIM_JOIN_REG_REG
     SET_PRIM_JOIN_REG_SYM
     SET_PRIM_JOIN_SYM_SYM
     SET_PRIM_TYPE_REG
