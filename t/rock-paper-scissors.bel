@@ -1,0 +1,20 @@
+(set moves '(rock paper scissors))
+
+(def random-move ()
+  ((inc:rand:len moves) moves))
+
+(def wins c
+  (mem c '((rock scissors) (scissors paper) (paper rock))))
+
+(set p1 (random-move)
+     p2 (random-move))
+
+(pr "Player 1: " p1 \lf
+    "Player 2: " p2 \lf)
+
+(set result (if (wins p1 p2) "player 1 wins"
+                (wins p2 p1) "player 2 wins"
+                             "it's a tie"))
+
+(pr "Result: " result \lf)
+
