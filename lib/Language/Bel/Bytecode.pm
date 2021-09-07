@@ -63,14 +63,7 @@ my @registered_symbols = (
     "stream",
 );
 
-my @SYMBOLS = (
-    make_symbol("nil"),
-    make_symbol("t"),
-    make_symbol("pair"),
-    make_symbol("symbol"),
-    make_symbol("char"),
-    make_symbol("stream"),
-);
+my @SYMBOLS = map { make_symbol($_) } @registered_symbols;
 
 my %index_of;
 my $index = 0;
