@@ -92,7 +92,7 @@ sub apply {
 
     my $bytecode = $self->{bytes};
     my $ip = 0;
-    my @registers = 0 x $self->{reg_count};
+    my @registers = ("<uninitialized>") x $self->{reg_count};
     my $param_level = 0;
     my $arg1;
     while (1) {
