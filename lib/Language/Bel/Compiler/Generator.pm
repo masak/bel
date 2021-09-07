@@ -5,7 +5,6 @@ use strict;
 use warnings;
 
 use Language::Bel::Bytecode qw(
-    n
     param_in
     param_last
     param_next
@@ -14,8 +13,6 @@ use Language::Bel::Bytecode qw(
     prim_type_reg
     return_reg
     set
-    PARAM_NEXT
-    SET_SYM
 );
 use Language::Bel::Pair::ByteFunc qw(
     make_bytefunc
@@ -83,6 +80,13 @@ sub statement_match {
     }
 }
 
+sub is_set_sym {
+    my ($opcode) = @_;
+
+    my @bytes = set(0, "nil");
+    return $opcode == $bytes[0];
+}
+
 sub generate_bytefunc {
     my ($ast) = @_;
 
@@ -130,9 +134,8 @@ sub generate_bytefunc {
     }
 
     # A little brittle, but it'll work for now
-    if (scalar(@bytes) == 4 * 6 && $bytes[4 * 4] == SET_SYM) {
-        $bytes[4 * 1 + 0] = PARAM_NEXT;
-        $bytes[4 * 1 + 1] = n;
+    if (scalar(@bytes) == 4 * 6 && is_set_sym($bytes[4 * 4])) {
+        @bytes[4*1 .. 4*1+3] = param_next();
     }
 
     return make_bytefunc($reg_count, [@bytes]);
