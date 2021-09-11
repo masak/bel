@@ -81,6 +81,37 @@ sub SYMBOL {
     return $index_of{$name};
 }
 
+sub in {
+    my ($element, @set) = @_;
+
+    return grep { $_ == $element } @set;
+}
+
+my @PARAM_OPCODES = (
+    PARAM_IN,
+    PARAM_LAST,
+    PARAM_NEXT,
+    PARAM_OUT,
+    SET_PARAM_NEXT,
+);
+
+sub param_instruction {
+    my ($opcode) = @_;
+
+    return in($opcode, @PARAM_OPCODES);
+}
+
+my @RETURN_OR_JMP = (
+    JMP,
+    RETURN_REG,
+);
+
+sub return_or_jump {
+    my ($opcode) = @_;
+
+    return in($opcode, @RETURN_OR_JMP);
+}
+
 sub n { 0 }
 
 sub operand_is_register {
@@ -355,6 +386,34 @@ sub set {
     }
 }
 
+sub has_0_operands {
+    my ($opcode) = @_;
+
+    return in($opcode, PARAM_IN, PARAM_LAST, PARAM_OUT, JMP, SET_SYM);
+}
+
+sub has_1_operands {
+    my ($opcode) = @_;
+
+    return in($opcode,
+        RETURN_IF, RETURN_REG, RETURN_UNLESS, SET_PARAM_NEXT,
+        SET_PRIM_JOIN_SYM_SYM, IF_JMP);
+}
+
+sub has_2_operands {
+    my ($opcode) = @_;
+
+    return in($opcode, PRIM_XAR, PRIM_XDR, SET_PRIM_TYPE_REG,
+        SET_PRIM_ID_REG_SYM, SET_PRIM_JOIN_REG_SYM, SET_REG,
+        SET_PRIM_CAR, SET_PRIM_CDR);
+}
+
+sub has_3_operands {
+    my ($opcode) = @_;
+
+    return in($opcode, SET_PRIM_JOIN_REG_REG);
+}
+
 sub four_groups {
     my ($array) = @_;
 
@@ -377,6 +436,27 @@ sub ops {
 
     my $bytes = $bytefunc->bytes();
     return four_groups($bytes);
+}
+
+sub registers_of {
+    my ($op) = @_;
+    my ($opcode, $operand1, $operand2, $operand3) = @$op;
+
+    if (has_0_operands($opcode)) {
+        return ();
+    }
+    elsif (has_1_operands($opcode)) {
+        return ($operand1);
+    }
+    elsif (has_2_operands($opcode)) {
+        return ($operand2, $operand1);
+    }
+    elsif (has_3_operands($opcode)) {
+        return ($operand2, $operand3, $operand1);
+    }
+    else {
+        die sprintf("Unknown opcode 0x%x", $opcode);
+    }
 }
 
 sub belify_bytefunc {
@@ -644,9 +724,15 @@ our @EXPORT_OK = qw(
     SET_REG
     SET_SYM
     SYMBOL
+    has_0_operands
+    has_1_operands
+    has_2_operands
+    has_3_operands
     if_jmp
     jmp
     run_bytefunc
+    ops
+    param_instruction
     param_in
     param_last
     param_next
@@ -660,7 +746,9 @@ our @EXPORT_OK = qw(
     prim_type_reg
     prim_xar
     prim_xdr
+    registers_of
     return_if
+    return_or_jump
     return_reg
     return_unless
     set
