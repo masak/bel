@@ -112,8 +112,6 @@ sub return_or_jump {
     return in($opcode, @RETURN_OR_JMP);
 }
 
-sub n { 0 }
-
 sub operand_is_register {
     my ($operand) = @_;
 
@@ -145,7 +143,7 @@ sub if_jmp {
     die "Illegal instruction pointer argument to `if_jmp`"
         unless operand_is_instruction_pointer($target_ip);
 
-    return (IF_JMP, $register, $target_ip, n);
+    return (IF_JMP, $register, $target_ip, 0);
 }
 
 sub jmp {
@@ -157,35 +155,35 @@ sub jmp {
     die "Illegal instruction pointer argument to `jmp`"
         unless operand_is_instruction_pointer($target_ip);
 
-    return (JMP, $target_ip, n, n);
+    return (JMP, $target_ip, 0, 0);
 }
 
 sub param_in {
     die "`param_in` instruction expects no operands"
         unless @_ == 0;
 
-    return (PARAM_IN, n, n, n);
+    return (PARAM_IN, 0, 0, 0);
 }
 
 sub param_last {
     die "`param_last` instruction expects no operands"
         unless @_ == 0;
 
-    return (PARAM_LAST, n, n, n);
+    return (PARAM_LAST, 0, 0, 0);
 }
 
 sub param_next {
     die "`param_next` instruction expects no operands"
         unless @_ == 0;
 
-    return (PARAM_NEXT, n, n, n);
+    return (PARAM_NEXT, 0, 0, 0);
 }
 
 sub param_out {
     die "`param_out` instruction expects no operands"
         unless @_ == 0;
 
-    return (PARAM_OUT, n, n, n);
+    return (PARAM_OUT, 0, 0, 0);
 }
 
 sub prim_car {
@@ -197,7 +195,7 @@ sub prim_car {
     die "Illegal register argument to `prim_car`"
         unless operand_is_register($register);
 
-    return (PRIM_CAR, $register, n, n);
+    return (PRIM_CAR, $register, 0, 0);
 }
 
 sub prim_cdr {
@@ -209,7 +207,7 @@ sub prim_cdr {
     die "Illegal register argument to `prim_cdr`"
         unless operand_is_register($register);
 
-    return (PRIM_CDR, $register, n, n);
+    return (PRIM_CDR, $register, 0, 0);
 }
 
 sub prim_id_reg_sym {
@@ -223,7 +221,7 @@ sub prim_id_reg_sym {
     die "Illegal symbol argument to `prim_id_reg_sym`"
         unless operand_is_symbol($symbol);
 
-    return (PRIM_ID_REG_SYM, $register, SYMBOL($symbol), n);
+    return (PRIM_ID_REG_SYM, $register, SYMBOL($symbol), 0);
 }
 
 sub prim_join_reg_reg {
@@ -237,7 +235,7 @@ sub prim_join_reg_reg {
     die "Illegal second register argument to `prim_id_reg_reg`"
         unless operand_is_register($register2);
 
-    return (PRIM_JOIN_REG_REG, $register1, $register2, n);
+    return (PRIM_JOIN_REG_REG, $register1, $register2, 0);
 }
 
 sub prim_join_reg_sym {
@@ -251,7 +249,7 @@ sub prim_join_reg_sym {
     die "Illegal symbol argument to `prim_join_reg_sym`"
         unless operand_is_symbol($symbol);
 
-    return (PRIM_JOIN_REG_SYM, $register, SYMBOL($symbol), n);
+    return (PRIM_JOIN_REG_SYM, $register, SYMBOL($symbol), 0);
 }
 
 sub prim_join_sym_sym {
@@ -265,7 +263,7 @@ sub prim_join_sym_sym {
     die "Illegal second symbol argument to `prim_join_sym_sym`"
         unless operand_is_symbol($symbol2);
 
-    return (PRIM_JOIN_SYM_SYM, SYMBOL($symbol1), SYMBOL($symbol2), n);
+    return (PRIM_JOIN_SYM_SYM, SYMBOL($symbol1), SYMBOL($symbol2), 0);
 }
 
 sub prim_type_reg {
@@ -277,7 +275,7 @@ sub prim_type_reg {
     die "Illegal register argument to `prim_type_reg`"
         unless operand_is_register($register);
 
-    return (PRIM_TYPE_REG, $register, n, n);
+    return (PRIM_TYPE_REG, $register, 0, 0);
 }
 
 sub prim_xar {
@@ -291,7 +289,7 @@ sub prim_xar {
     die "Illegal second register argument to `prim_xar`"
         unless operand_is_register($register2);
 
-    return (PRIM_XAR, $register1, $register2, n);
+    return (PRIM_XAR, $register1, $register2, 0);
 }
 
 sub prim_xdr {
@@ -305,7 +303,7 @@ sub prim_xdr {
     die "Illegal second register argument to `prim_xdr`"
         unless operand_is_register($register2);
 
-    return (PRIM_XDR, $register1, $register2, n);
+    return (PRIM_XDR, $register1, $register2, 0);
 }
 
 sub return_if {
@@ -317,7 +315,7 @@ sub return_if {
     die "Illegal register argument to `return_if`"
         unless operand_is_register($register);
 
-    return (RETURN_IF, $register, n, n);
+    return (RETURN_IF, $register, 0, 0);
 }
 
 sub return_reg {
@@ -329,7 +327,7 @@ sub return_reg {
     die "Illegal register argument to `return_reg`"
         unless operand_is_register($register);
 
-    return (RETURN_REG, $register, n, n);
+    return (RETURN_REG, $register, 0, 0);
 }
 
 sub return_unless {
@@ -341,7 +339,7 @@ sub return_unless {
     die "Illegal register argument to `return_unless`"
         unless operand_is_register($register);
 
-    return (RETURN_UNLESS, $register, n, n);
+    return (RETURN_UNLESS, $register, 0, 0);
 }
 
 sub set {
@@ -355,10 +353,10 @@ sub set {
             unless operand_is_register($register1);
 
         if (operand_is_symbol($operand2)) {
-            return (SET_SYM, $register1, SYMBOL($operand2), n);
+            return (SET_SYM, $register1, SYMBOL($operand2), 0);
         }
         elsif (operand_is_register($operand2)) {
-            return (SET_REG, $register1, $operand2, n);
+            return (SET_REG, $register1, $operand2, 0);
         }
         else {
             die "Illegal second register argument to `set`: ", $operand2;
@@ -368,7 +366,7 @@ sub set {
         my ($register, $op, $r1, $r2, $r3) = @_;
 
         die "The third operand must always be 0 when wrappipng in `set`"
-            unless $r3 == n;
+            unless $r3 == 0;
 
         my $set_op = $op == PARAM_NEXT ? SET_PARAM_NEXT
             : $op == PRIM_CAR ? SET_PRIM_CAR
@@ -701,29 +699,6 @@ sub run_bytefunc {
 
 our @EXPORT_OK = qw(
     belify_bytefunc
-    IF_JMP
-    JMP
-    n
-    PARAM_IN
-    PARAM_LAST
-    PARAM_NEXT
-    PARAM_OUT
-    PRIM_XAR
-    PRIM_XDR
-    RETURN_IF
-    RETURN_REG
-    RETURN_UNLESS
-    SET_PARAM_NEXT
-    SET_PRIM_CAR
-    SET_PRIM_CDR
-    SET_PRIM_ID_REG_SYM
-    SET_PRIM_JOIN_REG_REG
-    SET_PRIM_JOIN_REG_SYM
-    SET_PRIM_JOIN_SYM_SYM
-    SET_PRIM_TYPE_REG
-    SET_REG
-    SET_SYM
-    SYMBOL
     has_0_operands
     has_1_operands
     has_2_operands
