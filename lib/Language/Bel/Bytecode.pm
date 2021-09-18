@@ -387,7 +387,8 @@ sub set {
 sub has_0_operands {
     my ($opcode) = @_;
 
-    return in($opcode, PARAM_IN, PARAM_LAST, PARAM_OUT, JMP, SET_SYM);
+    return in($opcode,
+        PARAM_IN, PARAM_NEXT, PARAM_LAST, PARAM_OUT, JMP, SET_SYM);
 }
 
 sub has_1_operands {
@@ -429,13 +430,6 @@ sub four_groups {
     return @result;
 }
 
-sub ops {
-    my ($bytefunc) = @_;
-
-    my $bytes = $bytefunc->bytes();
-    return four_groups($bytes);
-}
-
 sub registers_of {
     my ($op) = @_;
     my ($opcode, $operand1, $operand2, $operand3) = @$op;
@@ -461,7 +455,7 @@ sub belify_bytefunc {
     my ($bytefunc) = @_;
 
     my $r = $bytefunc->reg_count();
-    my @ops = ops($bytefunc);
+    my @ops = four_groups($bytefunc->bytes());
     my @instructions = map { belify_instruction($_) } @ops;
     my $instructions = join "", map { "\n  $_" } @instructions;
 
@@ -699,6 +693,7 @@ sub run_bytefunc {
 
 our @EXPORT_OK = qw(
     belify_bytefunc
+    four_groups
     has_0_operands
     has_1_operands
     has_2_operands
@@ -706,7 +701,6 @@ our @EXPORT_OK = qw(
     if_jmp
     jmp
     run_bytefunc
-    ops
     param_instruction
     param_in
     param_last

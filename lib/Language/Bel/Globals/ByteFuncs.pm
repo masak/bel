@@ -35,14 +35,14 @@ my @all_bytefuncs;
 my %bytefuncs;
 
 sub add_bytefunc {
-    my ($name, $reg_count, @bytes) = @_;
+    my ($name, @bytes) = @_;
 
-    my $bytefunc = make_bytefunc($reg_count, [@bytes]);
+    my $bytefunc = make_bytefunc([@bytes]);
     push @all_bytefuncs, $name;
     $bytefuncs{$name} = $bytefunc;
 }
 
-add_bytefunc("no", 1,
+add_bytefunc("no",
     param_in(),
     set(0, param_next()),
     param_last(),
@@ -51,7 +51,7 @@ add_bytefunc("no", 1,
     return_reg(0),
 );
 
-add_bytefunc("atom", 1,
+add_bytefunc("atom",
     param_in(),
     set(0, param_next()),
     param_last(),
@@ -62,7 +62,7 @@ add_bytefunc("atom", 1,
     return_reg(0),
 );
 
-add_bytefunc("append", 6,
+add_bytefunc("append",
     set(0, param_next()),
     param_last(),
     set(1, prim_join_sym_sym("nil", "nil")),
@@ -86,7 +86,7 @@ add_bytefunc("append", 6,
     jmp(20),
 );
 
-add_bytefunc("symbol", 1,
+add_bytefunc("symbol",
     param_in(),
     set(0, param_next()),
     param_last(),
@@ -96,7 +96,7 @@ add_bytefunc("symbol", 1,
     return_reg(0),
 );
 
-add_bytefunc("pair", 1,
+add_bytefunc("pair",
     param_in(),
     set(0, param_next()),
     param_last(),
@@ -106,7 +106,7 @@ add_bytefunc("pair", 1,
     return_reg(0),
 );
 
-add_bytefunc("char", 1,
+add_bytefunc("char",
     param_in(),
     set(0, param_next()),
     param_last(),
@@ -116,7 +116,7 @@ add_bytefunc("char", 1,
     return_reg(0),
 );
 
-add_bytefunc("stream", 1,
+add_bytefunc("stream",
     param_in(),
     set(0, param_next()),
     param_last(),
@@ -126,7 +126,7 @@ add_bytefunc("stream", 1,
     return_reg(0),
 );
 
-add_bytefunc("proper", 2,
+add_bytefunc("proper",
     param_in(),
     set(0, param_next()),
     param_last(),
@@ -140,7 +140,7 @@ add_bytefunc("proper", 2,
     jmp(16),
 );
 
-add_bytefunc("string", 2,
+add_bytefunc("string",
     param_in(),
     set(0, param_next()),
     param_last(),
@@ -158,7 +158,7 @@ add_bytefunc("string", 2,
     jmp(16),
 );
 
-add_bytefunc("cadr", 1,
+add_bytefunc("cadr",
     param_in(),
     set(0, param_next()),
     param_last(),
@@ -168,7 +168,7 @@ add_bytefunc("cadr", 1,
     return_reg(0),
 );
 
-add_bytefunc("cddr", 1,
+add_bytefunc("cddr",
     param_in(),
     set(0, param_next()),
     param_last(),
@@ -178,7 +178,7 @@ add_bytefunc("cddr", 1,
     return_reg(0),
 );
 
-add_bytefunc("caddr", 1,
+add_bytefunc("caddr",
     param_in(),
     set(0, param_next()),
     param_last(),
@@ -189,7 +189,7 @@ add_bytefunc("caddr", 1,
     return_reg(0),
 );
 
-add_bytefunc("rev", 3,
+add_bytefunc("rev",
     param_in(),
     set(0, param_next()),
     param_last(),
