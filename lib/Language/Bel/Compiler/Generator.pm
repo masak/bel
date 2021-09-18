@@ -5,17 +5,14 @@ use strict;
 use warnings;
 
 use Language::Bel::Bytecode qw(
-    n
-    PARAM_IN
-    PARAM_LAST
-    PARAM_NEXT
-    PARAM_OUT
-    RETURN_REG
-    SET_PARAM_NEXT
-    SET_PRIM_ID_REG_SYM
-    SET_PRIM_TYPE_REG
-    SET_SYM
-    SYMBOL
+    param_in
+    param_last
+    param_next
+    param_out
+    prim_id_reg_sym
+    prim_type_reg
+    return_reg
+    set
 );
 use Language::Bel::Pair::ByteFunc qw(
     make_bytefunc
@@ -58,8 +55,7 @@ sub ast_match {
     }
     elsif (is_symbol($expr) && is_symbol($match_ast)
             && symbol_name($match_ast) eq "<sym>") {
-        my $symbol_id = SYMBOL(symbol_name($expr));
-        push @{$captures_ref}, $symbol_id;
+        push @{$captures_ref}, symbol_name($expr);
         return 1;
     }
     else {
@@ -84,6 +80,13 @@ sub statement_match {
     }
 }
 
+sub is_set_sym {
+    my ($opcode) = @_;
+
+    my @bytes = set(0, "nil");
+    return $opcode == $bytes[0];
+}
+
 sub generate_bytefunc {
     my ($ast) = @_;
 
@@ -94,10 +97,10 @@ sub generate_bytefunc {
 
     my $reg_count = 1;
     my @bytes = (
-        PARAM_IN, n, n, n,
-        SET_PARAM_NEXT, 0, n, n,
-        PARAM_LAST, n, n, n,
-        PARAM_OUT, n, n, n,
+        param_in(),
+        set(0, param_next()),
+        param_last(),
+        param_out(),
     );
 
     while (!is_nil($body)) {
@@ -108,30 +111,22 @@ sub generate_bytefunc {
 
             "(% := (prim!id % '<sym>))",
             sub { my ($reg1, $reg2, $sym) = @_;
-                push @bytes, (
-                    SET_PRIM_ID_REG_SYM, $reg1, $reg2, $sym,
-                );
+                push @bytes, set($reg1, prim_id_reg_sym($reg2, $sym));
             },
 
             "(% := (prim!type %))",
             sub { my ($reg1, $reg2) = @_;
-                push @bytes, (
-                    SET_PRIM_TYPE_REG, $reg1, $reg2, n,
-                );
+                push @bytes, set($reg1, prim_type_reg($reg2));
             },
 
             "(% := '<sym>)",
             sub { my ($reg, $sym) = @_;
-                push @bytes, (
-                    SET_SYM, $reg, $sym, n,
-                );
+                push @bytes, set($reg, $sym);
             },
 
             "(return %)",
             sub { my ($reg) = @_;
-                push @bytes, (
-                    RETURN_REG, $reg, n, n,
-                );
+                push @bytes, return_reg($reg);
             },
         );
 
@@ -139,9 +134,8 @@ sub generate_bytefunc {
     }
 
     # A little brittle, but it'll work for now
-    if (scalar(@bytes) == 4 * 6 && $bytes[4 * 4] == SET_SYM) {
-        $bytes[4 * 1 + 0] = PARAM_NEXT;
-        $bytes[4 * 1 + 1] = n;
+    if (scalar(@bytes) == 4 * 6 && is_set_sym($bytes[4 * 4])) {
+        @bytes[4*1 .. 4*1+3] = param_next();
     }
 
     return make_bytefunc($reg_count, [@bytes]);

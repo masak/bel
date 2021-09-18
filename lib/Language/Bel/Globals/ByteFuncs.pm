@@ -5,28 +5,25 @@ use strict;
 use warnings;
 
 use Language::Bel::Bytecode qw(
-    IF_JMP
-    JMP
-    n
-    PARAM_IN
-    PARAM_LAST
-    PARAM_OUT
-    PRIM_XAR
-    PRIM_XDR
-    RETURN_IF
-    RETURN_REG
-    RETURN_UNLESS
-    SET_PARAM_NEXT
-    SET_PRIM_CAR
-    SET_PRIM_CDR
-    SET_PRIM_ID_REG_SYM
-    SET_PRIM_JOIN_REG_REG
-    SET_PRIM_JOIN_REG_SYM
-    SET_PRIM_JOIN_SYM_SYM
-    SET_PRIM_TYPE_REG
-    SET_REG
-    SET_SYM
-    SYMBOL
+    if_jmp
+    jmp
+    param_in
+    param_last
+    param_next
+    param_out
+    prim_car
+    prim_cdr
+    prim_id_reg_sym
+    prim_join_reg_reg
+    prim_join_reg_sym
+    prim_join_sym_sym
+    prim_type_reg
+    prim_xar
+    prim_xdr
+    return_if
+    return_reg
+    return_unless
+    set
 );
 use Language::Bel::Pair::ByteFunc qw(
     make_bytefunc
@@ -46,164 +43,164 @@ sub add_bytefunc {
 }
 
 add_bytefunc("no", 1,
-    PARAM_IN, n, n, n,
-    SET_PARAM_NEXT, 0, n, n,
-    PARAM_LAST, n, n, n,
-    PARAM_OUT, n, n, n,
-    SET_PRIM_ID_REG_SYM, 0, 0, SYMBOL("nil"),
-    RETURN_REG, 0, n, n,
+    param_in(),
+    set(0, param_next()),
+    param_last(),
+    param_out(),
+    set(0, prim_id_reg_sym(0, "nil")),
+    return_reg(0),
 );
 
 add_bytefunc("atom", 1,
-    PARAM_IN, n, n, n,
-    SET_PARAM_NEXT, 0, n, n,
-    PARAM_LAST, n, n, n,
-    PARAM_OUT, n, n, n,
-    SET_PRIM_TYPE_REG, 0, 0, n,
-    SET_PRIM_ID_REG_SYM, 0, 0, SYMBOL("pair"),
-    SET_PRIM_ID_REG_SYM, 0, 0, SYMBOL("nil"),
-    RETURN_REG, 0, n, n,
+    param_in(),
+    set(0, param_next()),
+    param_last(),
+    param_out(),
+    set(0, prim_type_reg(0)),
+    set(0, prim_id_reg_sym(0, "pair")),
+    set(0, prim_id_reg_sym(0, "nil")),
+    return_reg(0),
 );
 
 add_bytefunc("append", 6,
-    SET_PARAM_NEXT, 0, n, n,
-    PARAM_LAST, n, n, n,
-    SET_PRIM_JOIN_SYM_SYM, 1, SYMBOL("nil"), SYMBOL("nil"),
-    SET_REG, 2, 1, n,
-    SET_PRIM_CDR, 3, 0, n,
-    IF_JMP, 3, 40, n,
-    SET_PRIM_CAR, 3, 0, n,
-    PRIM_XDR, 1, 3, n,
-    SET_PRIM_CDR, 3, 2, n,
-    RETURN_REG, 3, n, n,
-    SET_PRIM_CAR, 4, 0, n,
-    IF_JMP, 4, 56, n,
-    SET_REG, 0, 3, n,
-    JMP, 16, n, n,
-    SET_PRIM_CAR, 5, 4, n,
-    SET_PRIM_JOIN_REG_SYM, 5, 5, SYMBOL("nil"),
-    PRIM_XDR, 1, 5, n,
-    SET_REG, 1, 5, n,
-    SET_PRIM_CDR, 4, 4, n,
-    PRIM_XAR, 0, 4, n,
-    JMP, 20, n, n,
+    set(0, param_next()),
+    param_last(),
+    set(1, prim_join_sym_sym("nil", "nil")),
+    set(2, 1),
+    set(3, prim_cdr(0)),
+    if_jmp(3, 40),
+    set(3, prim_car(0)),
+    prim_xdr(1, 3),
+    set(3, prim_cdr(2)),
+    return_reg(3),
+    set(4, prim_car(0)),
+    if_jmp(4, 56),
+    set(0, 3),
+    jmp(16),
+    set(5, prim_car(4)),
+    set(5, prim_join_reg_sym(5, "nil")),
+    prim_xdr(1, 5),
+    set(1, 5),
+    set(4, prim_cdr(4)),
+    prim_xar(0, 4),
+    jmp(20),
 );
 
 add_bytefunc("symbol", 1,
-    PARAM_IN, n, n, n,
-    SET_PARAM_NEXT, 0, n, n,
-    PARAM_LAST, n, n, n,
-    PARAM_OUT, n, n, n,
-    SET_PRIM_TYPE_REG, 0, 0, n,
-    SET_PRIM_ID_REG_SYM, 0, 0, SYMBOL("symbol"),
-    RETURN_REG, 0, n, n,
+    param_in(),
+    set(0, param_next()),
+    param_last(),
+    param_out(),
+    set(0, prim_type_reg(0)),
+    set(0, prim_id_reg_sym(0, "symbol")),
+    return_reg(0),
 );
 
 add_bytefunc("pair", 1,
-    PARAM_IN, n, n, n,
-    SET_PARAM_NEXT, 0, n, n,
-    PARAM_LAST, n, n, n,
-    PARAM_OUT, n, n, n,
-    SET_PRIM_TYPE_REG, 0, 0, n,
-    SET_PRIM_ID_REG_SYM, 0, 0, SYMBOL("pair"),
-    RETURN_REG, 0, n, n,
+    param_in(),
+    set(0, param_next()),
+    param_last(),
+    param_out(),
+    set(0, prim_type_reg(0)),
+    set(0, prim_id_reg_sym(0, "pair")),
+    return_reg(0),
 );
 
 add_bytefunc("char", 1,
-    PARAM_IN, n, n, n,
-    SET_PARAM_NEXT, 0, n, n,
-    PARAM_LAST, n, n, n,
-    PARAM_OUT, n, n, n,
-    SET_PRIM_TYPE_REG, 0, 0, n,
-    SET_PRIM_ID_REG_SYM, 0, 0, SYMBOL("char"),
-    RETURN_REG, 0, n, n,
+    param_in(),
+    set(0, param_next()),
+    param_last(),
+    param_out(),
+    set(0, prim_type_reg(0)),
+    set(0, prim_id_reg_sym(0, "char")),
+    return_reg(0),
 );
 
 add_bytefunc("stream", 1,
-    PARAM_IN, n, n, n,
-    SET_PARAM_NEXT, 0, n, n,
-    PARAM_LAST, n, n, n,
-    PARAM_OUT, n, n, n,
-    SET_PRIM_TYPE_REG, 0, 0, n,
-    SET_PRIM_ID_REG_SYM, 0, 0, SYMBOL("stream"),
-    RETURN_REG, 0, n, n,
+    param_in(),
+    set(0, param_next()),
+    param_last(),
+    param_out(),
+    set(0, prim_type_reg(0)),
+    set(0, prim_id_reg_sym(0, "stream")),
+    return_reg(0),
 );
 
 add_bytefunc("proper", 2,
-    PARAM_IN, n, n, n,
-    SET_PARAM_NEXT, 0, n, n,
-    PARAM_LAST, n, n, n,
-    PARAM_OUT, n, n, n,
-    SET_PRIM_ID_REG_SYM, 1, 0, SYMBOL("nil"),
-    RETURN_IF, 1, n, n,
-    SET_PRIM_TYPE_REG, 1, 0, n,
-    SET_PRIM_ID_REG_SYM, 1, 1, SYMBOL("pair"),
-    RETURN_UNLESS, 1, n, n,
-    SET_PRIM_CDR, 0, 0, n,
-    JMP, 16, n, n,
+    param_in(),
+    set(0, param_next()),
+    param_last(),
+    param_out(),
+    set(1, prim_id_reg_sym(0, "nil")),
+    return_if(1),
+    set(1, prim_type_reg(0)),
+    set(1, prim_id_reg_sym(1, "pair")),
+    return_unless(1),
+    set(0, prim_cdr(0)),
+    jmp(16),
 );
 
 add_bytefunc("string", 2,
-    PARAM_IN, n, n, n,
-    SET_PARAM_NEXT, 0, n, n,
-    PARAM_LAST, n, n, n,
-    PARAM_OUT, n, n, n,
-    SET_PRIM_ID_REG_SYM, 1, 0, SYMBOL("nil"),
-    RETURN_IF, 1, n, n,
-    SET_PRIM_TYPE_REG, 1, 0, n,
-    SET_PRIM_ID_REG_SYM, 1, 1, SYMBOL("pair"),
-    RETURN_UNLESS, 1, n, n,
-    SET_PRIM_CAR, 1, 0, n,
-    SET_PRIM_TYPE_REG, 1, 1, n,
-    SET_PRIM_ID_REG_SYM, 1, 1, SYMBOL("char"),
-    RETURN_UNLESS, 1, n, n,
-    SET_PRIM_CDR, 0, 0, n,
-    JMP, 16, n, n,
+    param_in(),
+    set(0, param_next()),
+    param_last(),
+    param_out(),
+    set(1, prim_id_reg_sym(0, "nil")),
+    return_if(1),
+    set(1, prim_type_reg(0)),
+    set(1, prim_id_reg_sym(1, "pair")),
+    return_unless(1),
+    set(1, prim_car(0)),
+    set(1, prim_type_reg(1)),
+    set(1, prim_id_reg_sym(1, "char")),
+    return_unless(1),
+    set(0, prim_cdr(0)),
+    jmp(16),
 );
 
 add_bytefunc("cadr", 1,
-    PARAM_IN, n, n, n,
-    SET_PARAM_NEXT, 0, n, n,
-    PARAM_LAST, n, n, n,
-    PARAM_OUT, n, n, n,
-    SET_PRIM_CDR, 0, 0, n,
-    SET_PRIM_CAR, 0, 0, n,
-    RETURN_REG, 0, n, n,
+    param_in(),
+    set(0, param_next()),
+    param_last(),
+    param_out(),
+    set(0, prim_cdr(0)),
+    set(0, prim_car(0)),
+    return_reg(0),
 );
 
 add_bytefunc("cddr", 1,
-    PARAM_IN, n, n, n,
-    SET_PARAM_NEXT, 0, n, n,
-    PARAM_LAST, n, n, n,
-    PARAM_OUT, n, n, n,
-    SET_PRIM_CDR, 0, 0, n,
-    SET_PRIM_CDR, 0, 0, n,
-    RETURN_REG, 0, n, n,
+    param_in(),
+    set(0, param_next()),
+    param_last(),
+    param_out(),
+    set(0, prim_cdr(0)),
+    set(0, prim_cdr(0)),
+    return_reg(0),
 );
 
 add_bytefunc("caddr", 1,
-    PARAM_IN, n, n, n,
-    SET_PARAM_NEXT, 0, n, n,
-    PARAM_LAST, n, n, n,
-    PARAM_OUT, n, n, n,
-    SET_PRIM_CDR, 0, 0, n,
-    SET_PRIM_CDR, 0, 0, n,
-    SET_PRIM_CAR, 0, 0, n,
-    RETURN_REG, 0, n, n,
+    param_in(),
+    set(0, param_next()),
+    param_last(),
+    param_out(),
+    set(0, prim_cdr(0)),
+    set(0, prim_cdr(0)),
+    set(0, prim_car(0)),
+    return_reg(0),
 );
 
 add_bytefunc("rev", 3,
-    PARAM_IN, n, n, n,
-    SET_PARAM_NEXT, 0, n, n,
-    PARAM_LAST, n, n, n,
-    PARAM_OUT, n, n, n,
-    SET_SYM, 1, SYMBOL("nil"), n,
-    IF_JMP, 0, 28, n,
-    RETURN_REG, 1, n, n,
-    SET_PRIM_CAR, 2, 0, n,
-    SET_PRIM_JOIN_REG_REG, 1, 2, 1,
-    SET_PRIM_CDR, 0, 0, n,
-    JMP, 20, n, n,
+    param_in(),
+    set(0, param_next()),
+    param_last(),
+    param_out(),
+    set(1, "nil"),
+    if_jmp(0, 28),
+    return_reg(1),
+    set(2, prim_car(0)),
+    set(1, prim_join_reg_reg(2, 1)),
+    set(0, prim_cdr(0)),
+    jmp(20),
 );
 
 sub all_bytefuncs {
