@@ -454,12 +454,11 @@ sub registers_of {
 sub belify_bytefunc {
     my ($bytefunc) = @_;
 
-    my $r = $bytefunc->reg_count();
     my @ops = four_groups($bytefunc->bytes());
     my @instructions = map { belify_instruction($_) } @ops;
     my $instructions = join "", map { "\n  $_" } @instructions;
 
-    return "(bytefunc $r$instructions)\n";
+    return "(bytefunc$instructions)\n";
 }
 
 sub belify_instruction {

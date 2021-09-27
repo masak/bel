@@ -14,7 +14,7 @@ my $source = "
 ";
 
 my $target = "
-    (bytefunc 1
+    (bytefunc
       (param!in)
       (param!next)
       (param!last)
