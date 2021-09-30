@@ -5,7 +5,7 @@ use warnings;
 use Test::More;
 
 use Language::Bel::Bytecode qw(
-    ops
+    four_groups
     param_instruction
     registers_of
     return_or_jump
@@ -41,7 +41,7 @@ for my $name (@bytefuncs) {
 
     my $last_instruction_is_return_or_jmp = 0;
 
-    for my $op (ops($bytefunc)) {
+    for my $op (four_groups($bytefunc->bytes())) {
         my ($opcode, $operand1, $operand2, $operand3) = @$op;
 
         if (!param_instruction($opcode)) {

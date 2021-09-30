@@ -138,7 +138,7 @@ sub generate_bytefunc {
         @bytes[4*1 .. 4*1+3] = param_next();
     }
 
-    return make_bytefunc($reg_count, [@bytes]);
+    return make_bytefunc([@bytes]);
 }
 
 our @EXPORT_OK = qw(

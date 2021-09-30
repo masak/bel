@@ -9,6 +9,8 @@ use Language::Bel::Core qw(
     SYMBOL_NIL
 );
 use Language::Bel::Bytecode qw(
+    four_groups
+    registers_of
     run_bytefunc
 );
 use Exporter 'import';
@@ -71,10 +73,31 @@ sub is_bytefunc {
     return $object->isa(__PACKAGE__);
 }
 
-sub make_bytefunc {
-    my ($regcount, $bytes) = @_;
+sub max {
+    my ($x, $y) = @_;
 
-    return __PACKAGE__->new($regcount, $bytes);
+    return $x > $y ? $x : $y;
+}
+
+sub number_of_registers {
+    my ($bytes) = @_;
+
+    my $max_register_index = -1;
+
+    for my $op (four_groups($bytes)) {
+        for my $register (registers_of($op)) {
+            $max_register_index = max($register, $max_register_index);
+        }
+    }
+
+    return $max_register_index + 1;
+}
+
+sub make_bytefunc {
+    my ($bytes) = @_;
+
+    my $reg_count = number_of_registers($bytes);
+    return __PACKAGE__->new($reg_count, $bytes);
 }
 
 our @EXPORT_OK = qw(
