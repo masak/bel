@@ -34,6 +34,8 @@ use Language::Bel::Globals::FastFuncs qw(
     fastfunc__no
     fastfunc__atom
     fastfunc__all
+    fastfunc__some
+    fastfunc__where__some
     fastfunc__cons
     fastfunc__append
     fastfunc__snoc
@@ -216,7 +218,7 @@ sub new {
             make_pair(SYMBOL_NIL, SYMBOL_NIL)))))), SYMBOL_NIL))))),
             \&fastfunc__all));
 
-        $self->add_global("some", make_pair(make_symbol("lit"),
+        $self->add_global("some", make_fastfunc(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("f"), make_pair(make_symbol("xs"),
             SYMBOL_NIL)), make_pair(make_pair(make_symbol("if"),
@@ -227,7 +229,8 @@ sub new {
             SYMBOL_NIL)), SYMBOL_NIL)), make_pair(make_symbol("xs"),
             make_pair(make_pair(make_symbol("some"), make_pair(make_symbol("f"),
             make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("xs"),
-            SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL)))))), SYMBOL_NIL))))));
+            SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL)))))), SYMBOL_NIL))))),
+            \&fastfunc__some, \&fastfunc__where__some));
 
         $self->add_global("reduce", make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,

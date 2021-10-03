@@ -81,6 +81,68 @@ sub fastfunc__all {
     return $loop->();
 }
 
+sub fastfunc__some {
+    my ($bel, $f, $xs) = @_;
+
+    my $loop;
+    $loop = sub {
+        while (!is_nil($xs)) {
+            return make_async_call(
+                $f,
+                [$bel->car($xs)],
+                sub {
+                    my ($result) = @_;
+                    if (!is_nil($result)) {
+                        return $xs;
+                    }
+                    $xs = $bel->cdr($xs);
+                    return $loop->();
+                },
+            );
+        }
+
+        return SYMBOL_NIL;
+    };
+
+    return $loop->();
+}
+
+sub fastfunc__where__some {
+    my ($bel, $f, $xs) = @_;
+
+    my $loop;
+    $loop = sub {
+        while (!is_nil($xs)) {
+            return make_async_call(
+                $f,
+                [$bel->car($xs)],
+                sub {
+                    my ($result) = @_;
+                    if (!is_nil($result)) {
+                        return make_pair(
+                            make_pair(
+                                make_symbol("xs"),
+                                $xs,
+                            ),
+                            make_pair(
+                                SYMBOL_D,
+                                SYMBOL_NIL,
+                            ),
+                        );
+
+                    }
+                    $xs = $bel->cdr($xs);
+                    return $loop->();
+                },
+            );
+        }
+
+        return SYMBOL_NIL;
+    };
+
+    return $loop->();
+}
+
 sub fastfunc__cons {
     my ($bel, @args) = @_;
 
@@ -3807,6 +3869,8 @@ our @EXPORT_OK = qw(
     fastfunc__no
     fastfunc__atom
     fastfunc__all
+    fastfunc__some
+    fastfunc__where__some
     fastfunc__cons
     fastfunc__append
     fastfunc__snoc
