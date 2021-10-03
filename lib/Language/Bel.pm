@@ -4,6 +4,10 @@ use 5.006;
 use strict;
 use warnings;
 
+use Language::Bel::AsyncCall qw(
+    is_async_call
+    make_async_call
+);
 use Language::Bel::Core qw(
     are_identical
     atoms_are_identical
@@ -108,7 +112,14 @@ sub new {
                 die "Fatal: could not find 'err'"
                     unless $err_kv && is_pair($err_kv);
                 my $err = $self->cdr($err_kv);
-                $self->call($err, $message_symbol);
+                return make_async_call(
+                    $err,
+                    [$message_symbol],
+                    sub {
+                        my ($result) = @_;
+                        return $result;
+                    },
+                );
             },
         });
     }
@@ -137,33 +148,6 @@ sub xdr {
     my ($self, $pair, $d) = @_;
 
     $self->{primitives}->prim_xdr($pair, $d);
-}
-
-sub call {
-    my ($self, $fn, @args) = @_;
-
-    if (is_fastfunc($fn)) {
-        return $fn->apply($self, @args);
-    }
-    elsif (is_bytefunc($fn)) {
-        die "Can't `call` a bytefunc";
-        return $fn->apply($self, @args);
-    }
-    else {
-        my $args = SYMBOL_NIL;
-        for my $arg (reverse(@args)) {
-            $args = make_pair($arg, $args);
-        }
-
-        my $s_level = scalar(@{$self->{s}});
-        $self->applyf($fn, $args, SYMBOL_NIL);
-
-        while (scalar(@{$self->{s}}) > $s_level) {
-            $self->ev();
-        }
-        my $retval = pop(@{$self->{r}});
-        return $retval;
-    }
 }
 
 =head2 read_eval_print
@@ -287,7 +271,7 @@ my %forms = (
     # (form quote ((e) a s r m)
     #   (mev s (cons e r) m))
     quote => sub {
-        my ($bel, $es, $a) = @_;
+        my ($bel, $es, $aa) = @_;
 
         if (is_nil($es) || !is_nil($bel->cdr($es))) {
             die "bad-form\n";
@@ -308,7 +292,7 @@ my %forms = (
     #            r
     #            m)))
     if => sub {
-        my ($bel, $es, $a) = @_;
+        my ($bel, $es, $aa) = @_;
 
         if (is_nil($es)) {
             push @{$bel->{r}}, SYMBOL_NIL;
@@ -322,12 +306,12 @@ my %forms = (
                       (if2 (cdr es) a s r m))
 FUT
                     sub {
-                        if2($bel, $bel->cdr($es), $a);
+                        if2($bel, $bel->cdr($es), $aa);
                     },
                 );
                 push @{$bel->{s}}, $fu;
             }
-            push @{$bel->{s}}, [$bel->car($es), $a];
+            push @{$bel->{s}}, [$bel->car($es), $aa];
         }
     },
 
@@ -338,7 +322,7 @@ FUT
     #        r
     #        m))
     where => sub {
-        my ($bel, $es, $a) = @_;
+        my ($bel, $es, $aa) = @_;
 
         if (is_nil($es) || !is_nil($bel->cdr($bel->cdr($es)))) {
             die "bad-form\n";
@@ -360,7 +344,7 @@ FUT
             ),
             SYMBOL_NIL,
         ];
-        push @{$bel->{s}}, [$e, $a];
+        push @{$bel->{s}}, [$e, $aa];
     },
 
     # (form dyn ((v e1 e2) a s r m)
@@ -372,7 +356,7 @@ FUT
     #            m)
     #       (sigerr 'cannot-bind s r m)))
     dyn => sub {
-        my ($bel, $es, $a) = @_;
+        my ($bel, $es, $aa) = @_;
 
         if (is_nil($es)
             || is_nil($bel->cdr($es))
@@ -390,10 +374,10 @@ FUT
                     (fn (s r m) (dyn2 v e2 a s r m))
 FUT
                 sub {
-                    dyn2($bel, $v, $e2, $a);
+                    dyn2($bel, $v, $e2, $aa);
                 },
             );
-            push @{$bel->{s}}, $fu, [$e1, $a];
+            push @{$bel->{s}}, $fu, [$e1, $aa];
         }
         else {
             die "cannot-bind\n";
@@ -407,7 +391,7 @@ FUT
     #        r
     #        m))
     after => sub {
-        my ($bel, $es, $a) = @_;
+        my ($bel, $es, $aa) = @_;
 
         if (is_nil($es)
             || is_nil($bel->cdr($es))
@@ -429,9 +413,9 @@ FUT
                     ),
                 ),
             ),
-            $a,
+            $aa,
         ];
-        push @{$bel->{s}}, $prot, [$e1, $a];
+        push @{$bel->{s}}, $prot, [$e1, $aa];
     },
 
     # (form thread ((e) a s r (p g))
@@ -442,7 +426,7 @@ FUT
     #                    p)
     #              g)))
     thread => sub {
-        my ($bel, $es, $a) = @_;
+        my ($bel, $es, $aa) = @_;
 
         if (is_nil($es) || !is_nil($bel->cdr($es))) {
             die "bad-form\n";
@@ -451,7 +435,7 @@ FUT
 
         push @{$bel->{r}}, SYMBOL_NIL;
 
-        my $new_thread = [[[$e, $a]], []];
+        my $new_thread = [[[$e, $aa]], []];
         push @{$bel->{p}}, $new_thread;
     },
 
@@ -462,7 +446,7 @@ FUT
     #        r
     #        m))
     ccc => sub {
-        my ($bel, $es, $a) = @_;
+        my ($bel, $es, $aa) = @_;
 
         if (is_nil($es) || !is_nil($bel->cdr($es))) {
             die "bad-form\n";
@@ -475,13 +459,13 @@ FUT
                 unless ref($entry) eq "ARRAY";
 
             my $e = $entry->[0];
-            my $a = $entry->[1];
+            my $aa = $entry->[1];
 
             $s = make_pair(
                 make_pair(
                     $e,
                     make_pair(
-                        $a,
+                        $aa,
                         SYMBOL_NIL,
                     ),
                 ),
@@ -517,7 +501,7 @@ FUT
                 SYMBOL_NIL,
             ),
         );
-        push @{$bel->{s}}, [$call_f_with_cont, $a];
+        push @{$bel->{s}}, [$call_f_with_cont, $aa];
     },
 );
 
@@ -530,13 +514,13 @@ FUT
 #        (cdr r)
 #        m))
 sub if2 {
-    my ($bel, $es, $a) = @_;
+    my ($bel, $es, $aa) = @_;
 
     my $car_r = pop(@{$bel->{r}});
     my $e = !is_nil($car_r)
         ? $bel->car($es)
         : make_pair(make_symbol("if"), $bel->cdr($es));
-    push @{$bel->{s}}, [$e, $a];
+    push @{$bel->{s}}, [$e, $aa];
 }
 
 # (def dyn2 (v e2 a s r m)
@@ -547,7 +531,7 @@ sub if2 {
 #        (cdr r)
 #        m))
 sub dyn2 {
-    my ($bel, $v, $e2, $a) = @_;
+    my ($bel, $v, $e2, $aa) = @_;
 
     my $smark = $bel->cdr($bel->{globals}->get_kv("smark"));
     my $car_r = pop(@{$bel->{r}});
@@ -562,7 +546,7 @@ sub dyn2 {
                 ),
             ),
         ), SYMBOL_NIL],
-        [$e2, $a];
+        [$e2, $aa];
 }
 
 # (def ev (((e a) . s) r m)
@@ -579,7 +563,7 @@ sub ev {
         unless ref($entry) eq "ARRAY";
 
     my $e = $entry->[0];
-    my $a = $entry->[1];
+    my $aa = $entry->[1];
 
     my $is_form = sub {
         my ($e) = @_;
@@ -595,11 +579,11 @@ sub ev {
         push @{$self->{r}}, $e;
     }
     elsif ($self->variable($e)) {
-        $self->vref($e, $a);
+        $self->vref($e, $aa);
     }
     elsif (is_pair($e)
         && $self->{globals}->is_global_of_name($self->car($e), "smark")) {
-        $self->evmark($self->cdr($e), $a);
+        $self->evmark($self->cdr($e), $aa);
     }
     # (def evmark (e a s r m)
     #   (case (car e)
@@ -616,10 +600,10 @@ sub ev {
         die "malformed\n";
     }
     elsif (my $form = $is_form->($e)) {
-        $form->($self, pair_cdr($e), $a);
+        $form->($self, pair_cdr($e), $aa);
     }
     else {
-        $self->evcall($e, $a);
+        $self->evcall($e, $aa);
     }
 }
 
@@ -683,12 +667,12 @@ sub proper {
 #              (mev s (cons (cdr it) r) m)
 #              (sigerr (list 'unboundb v) s r m)))))
 sub vref {
-    my ($self, $v, $a) = @_;
+    my ($self, $v, $aa) = @_;
 
     my $it;
     if ($it = $self->inwhere()) {
         my $car_inwhere = $self->car($it);
-        if (is_pair($it = $self->lookup($v, $a))
+        if (is_pair($it = $self->lookup($v, $aa))
             || !is_nil($car_inwhere) && ($it = $self->{globals}->install($v))) {
             pop @{$self->{s}};  # get rid of the (smark 'loc)
             push @{$self->{r}}, make_pair(
@@ -703,7 +687,7 @@ sub vref {
             die "unbound\n";
         }
     }
-    elsif (is_pair($it = $self->lookup($v, $a))) {
+    elsif (is_pair($it = $self->lookup($v, $aa))) {
         push @{$self->{r}}, pair_cdr($it);
     }
     else {
@@ -768,12 +752,12 @@ sub get {
 #         scope (cons e a)
 #         globe (cons e g))))
 sub lookup {
-    my ($self, $e, $a) = @_;
+    my ($self, $e, $aa) = @_;
 
     return $self->binding($e)
-        || get($e, $a)
+        || get($e, $aa)
         || (is_symbol($e) && $self->{globals}->get_kv(symbol_name($e)))
-        || (is_symbol_of_name($e, "scope") && make_pair($e, $a))
+        || (is_symbol_of_name($e, "scope") && make_pair($e, $aa))
         || (is_symbol_of_name($e, "globe") && make_pair($e, $self->{globals}->list()))
         || SYMBOL_NIL;
 }
@@ -813,7 +797,7 @@ sub binding {
 #               m)
 #          (sigerr 'unknown-mark s r m)))
 sub evmark {
-    my ($self, $e, $a) = @_;
+    my ($self, $e, $aa) = @_;
 
     my $car_e = $self->car($e);
     if (is_symbol_of_name($car_e, "fut")) {
@@ -834,7 +818,7 @@ FUT
                 pop @{$self->{r}};
             },
         );
-        push @{$self->{s}}, $fu, [$self->car($self->cdr($e)), $a];
+        push @{$self->{s}}, $fu, [$self->car($self->cdr($e)), $aa];
     }
     else {
         die "Unknown smark";
@@ -849,7 +833,7 @@ FUT
 #        r
 #        m))
 sub evcall {
-    my ($self, $e, $a) = @_;
+    my ($self, $e, $aa) = @_;
 
     my $fu1 = $self->fut(
         <<'FUT',
@@ -879,7 +863,7 @@ FUT
 
             my $es = pair_cdr($e);
             if ($isa_mac->($op)) {
-                $self->applym($op, $es, $a);
+                $self->applym($op, $es, $aa);
             }
             else {
                 my $fu2 = $self->fut(
@@ -890,40 +874,19 @@ FUT
 FUT
                     sub {
                         my $args = SYMBOL_NIL;
-                        my @args;
                         my $es = pair_cdr($e);
                         while (!is_nil($es)) {
                             my $arg = pop(@{$self->{r}});
                             $args = make_pair($arg, $args);
-                            unshift @args, $arg;
                             $es = pair_cdr($es);
                         }
-                        if (is_fastfunc($op)) {
-                            my $e;
-                            if ($self->inwhere() && $op->handles_where()) {
-                                $e = $op->where_apply($self, @args);
-                                if (!is_nil($e)) {
-                                    pop @{$self->{s}};  # get rid of the (smark 'loc)
-                                }
-                            }
-                            else {
-                                $e = $op->apply($self, @args);
-                            }
-                            push @{$self->{r}}, $e;
-                        }
-                        elsif (is_bytefunc($op)) {
-                            my $e = $op->apply($self, $args);
-                            push @{$self->{r}}, $e;
-                        }
-                        else {
-                            $self->applyf($op, $args, $a);
-                        }
+                        $self->evcall_inner($op, $args, $aa);
                     },
                 );
 
                 my @unevaluated_arguments;
                 while (!is_nil($es)) {
-                    push @unevaluated_arguments, [pair_car($es), $a];
+                    push @unevaluated_arguments, [pair_car($es), $aa];
                     $es = pair_cdr($es);
                 }
                 # We want to evaluate the arguments in the order `a b c`,
@@ -934,7 +897,98 @@ FUT
             }
         },
     );
-    push @{$self->{s}}, $fu1, [pair_car($e), $a];
+    push @{$self->{s}}, $fu1, [pair_car($e), $aa];
+}
+
+sub evcall_inner {
+    my ($self, $op, $args, $aa) = @_;
+
+    if (is_fastfunc($op)) {
+        my @args;
+        while (!is_nil($args)) {
+            push @args, $self->car($args);
+            $args = $self->cdr($args);
+        }
+
+        my $e;
+        if ($self->inwhere() && $op->handles_where()) {
+            my $fu = $self->fut(
+                <<'FUT',
+                    (fn (s r m)
+                        ; postprocess a where_apply call
+                    )
+FUT
+                sub {
+                    my $e = pop @{$self->{r}};
+                    if (!is_nil($e)) {
+                        pop @{$self->{s}};  # get rid of the (smark 'loc)
+                    }
+                    push @{$self->{r}}, $e;
+                },
+            );
+            push @{$self->{s}}, $fu;
+            $e = $op->where_apply($self, @args);
+        }
+        else {
+            $e = $op->apply($self, @args);
+        }
+        $self->handle_invoke_result($e, $aa);
+    }
+    else {
+        if (is_bytefunc($op)) {
+            my $e = $op->apply($self, $args);
+            push @{$self->{r}}, $e;
+        }
+        else {
+            $self->applyf($op, $args, $aa);
+        }
+    }
+}
+
+sub handle_invoke_result {
+    my ($self, $e, $aa) = @_;
+
+    if (is_async_call($e)) {
+        my $fu_func = $self->fut(
+            <<'FUT',
+                (fn (s r m)
+                  ; invoke_fn_with_args
+                )
+FUT
+            sub {
+                my $e_op = $e->fn();
+                my $e_args = $e->args_ref();
+
+                # Conversion from `$e_args` as a Perl array ref to `$args`
+                # as a Bel cons list. There's a lot of this conversion going
+                # on; maybe more than strictly necessary.
+                my $args = SYMBOL_NIL;
+                for my $arg (reverse(@{$e_args})) {
+                    $args = make_pair($arg, $args);
+                }
+
+                $self->evcall_inner($e_op, $args, $aa);
+            },
+        );
+        my $fu_cont = $self->fut(
+            <<'FUT',
+                (fn (s r m)
+                  ; invoke_cont
+                )
+FUT
+            sub {
+                my $result = pop @{$self->{r}};
+                my $e2 = $e->invoke_cont($result);
+                $self->handle_invoke_result($e2, $aa);
+            },
+        );
+        push @{$self->{s}},
+            $fu_cont,
+            $fu_func;
+    }
+    else {
+        push @{$self->{r}}, $e;
+    }
 }
 
 # (def applym (mac args a s r m)
@@ -949,7 +1003,7 @@ FUT
 #           r
 #           m))
 sub applym {
-    my ($self, $mac, $args, $a) = @_;
+    my ($self, $mac, $args, $aa) = @_;
 
     my $mac_clo = $self->car($self->cdr($self->cdr($mac)));
     my $fu = $self->fut(
@@ -961,11 +1015,11 @@ sub applym {
 FUT
         sub {
             my $macro_expansion = pop @{$self->{r}};
-            push @{$self->{s}}, [$macro_expansion, $a];
+            push @{$self->{s}}, [$macro_expansion, $aa];
         },
     );
     push @{$self->{s}}, $fu;
-    $self->applyf($mac_clo, $args, $a);
+    $self->applyf($mac_clo, $args, $aa);
 }
 
 # (def applyf (f args a s r m)
@@ -975,7 +1029,7 @@ FUT
 #                          (sigerr 'bad-lit s r m))
 #                      (sigerr 'cannot-apply s r m)))
 sub applyf {
-    my ($self, $f, $args, $a) = @_;
+    my ($self, $f, $args, $aa) = @_;
 
     if (is_symbol_of_name($f, "apply")) {
         my $apply_op = $self->car($args);
@@ -993,14 +1047,14 @@ sub applyf {
             );
         }
 
-        $self->applyf($apply_op, $apply_args, $a);
+        $self->applyf($apply_op, $apply_args, $aa);
     }
     else {
         if (!is_pair($f) || !is_symbol_of_name(pair_car($f), "lit")) {
             die "cannot-apply\n";
         }
         if (proper($f)) {
-            $self->applylit($f, $args, $a);
+            $self->applylit($f, $args, $aa);
         }
         else {
             die "bad-lit\n";
@@ -1028,7 +1082,7 @@ sub applyf {
 #                        (mev (cons (list e a) s) r m))
 #                      (sigerr 'unapplyable s r m))))))
 sub applylit {
-    my ($self, $f, $args, $a) = @_;
+    my ($self, $f, $args, $aa) = @_;
 
     my $it;
     if ($self->inwhere() && ($it = $self->findlocfn($f, $args))) {
@@ -1040,7 +1094,7 @@ sub applylit {
         my $tag_name = symbol_name($tag);
         my $rest = pair_cdr(pair_cdr($f));
         if ($tag_name eq "prim") {
-            $self->applyprim(pair_car($rest), $args);
+            $self->applyprim(pair_car($rest), $args, $aa);
         }
         elsif ($tag_name eq "clo") {
             my $env = $self->car($rest);
@@ -1068,7 +1122,7 @@ sub applylit {
                 );
             }
 
-            $self->applym($f, $quoted_args, $a);
+            $self->applym($f, $quoted_args, $aa);
         }
         elsif ($tag_name eq "cont") {
             my $s2 = $self->car($rest);
@@ -1118,11 +1172,11 @@ sub applylit {
 FUT
                     sub {
                         my $virfn_result = pop @{$self->{r}};
-                        push @{$self->{s}}, [$virfn_result, $a];
+                        push @{$self->{s}}, [$virfn_result, $aa];
                     },
                 );
                 push @{$self->{s}}, $fu;
-                $self->applyf($cdr_it, $f_and_quoted_args, $a);
+                $self->applyf($cdr_it, $f_and_quoted_args, $aa);
             }
             else {
                 die "unapplyable\n";
@@ -1355,14 +1409,54 @@ sub okparms {
 #                     (mev s (cons v r) m))))
 #        (sigerr 'unknown-prim s r m)))
 sub applyprim {
-    my ($self, $f, $args) = @_;
+    my ($self, $f, $args, $aa) = @_;
 
     my $name = symbol_name($f);
     my $_a = $self->car($args);
     my $_b = $self->car($self->cdr($args));
 
     my $v = $self->{primitives}->call($name, $_a, $_b);
-    push @{$self->{r}}, $v;
+    if (is_async_call($v)) {
+        my $fu_func = $self->fut(
+            <<'FUT',
+                (fn (s r m)
+                  ; invoke_fn_with_args
+                )
+FUT
+            sub {
+                my $v_op = $v->fn();
+                my $v_args = $v->args_ref();
+
+                # Conversion from `$v_args` as a Perl array ref to `$args`
+                # as a Bel cons list. There's a lot of this conversion going
+                # on; maybe more than strictly necessary.
+                my $args = SYMBOL_NIL;
+                for my $arg (reverse(@{$v_args})) {
+                    $args = make_pair($arg, $args);
+                }
+
+                $self->evcall_inner($v_op, $args, $aa);
+            },
+        );
+        my $fu_cont = $self->fut(
+            <<'FUT',
+                (fn (s r m)
+                  ; invoke_cont
+                )
+FUT
+            sub {
+                my $result = pop @{$self->{r}};
+                my $v2 = $v->invoke_cont($result);
+                $self->handle_invoke_result($v2, $aa);
+            },
+        );
+        push @{$self->{s}},
+            $fu_cont,
+            $fu_func;
+    }
+    else {
+        push @{$self->{r}}, $v;
+    }
 }
 
 # (def applyclo (parms args env body s r m)
@@ -1617,8 +1711,8 @@ sub applycont {
     while (!is_nil($s2)) {
         my $entry = $self->car($s2);
         my $e = $self->car($entry);
-        my $a = $self->car($self->cdr($entry));
-        unshift @{$self->{s}}, [$e, $a];
+        my $aa = $self->car($self->cdr($entry));
+        unshift @{$self->{s}}, [$e, $aa];
         $s2 = $self->cdr($s2);
     }
     unshift @{$self->{s}}, @kept_s;
