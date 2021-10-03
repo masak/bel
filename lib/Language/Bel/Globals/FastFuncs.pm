@@ -55,6 +55,32 @@ sub fastfunc__atom {
     return is_pair($x) ? SYMBOL_NIL : SYMBOL_T;
 }
 
+sub fastfunc__all {
+    my ($bel, $f, $xs) = @_;
+
+    my $loop;
+    $loop = sub {
+        while (!is_nil($xs)) {
+            return make_async_call(
+                $f,
+                [$bel->car($xs)],
+                sub {
+                    my ($result) = @_;
+                    if (is_nil($result)) {
+                        return SYMBOL_NIL;
+                    }
+                    $xs = $bel->cdr($xs);
+                    return $loop->();
+                },
+            );
+        }
+
+        return SYMBOL_T;
+    };
+
+    return $loop->();
+}
+
 sub fastfunc__cons {
     my ($bel, @args) = @_;
 
@@ -3780,6 +3806,7 @@ sub fastfunc__err {
 our @EXPORT_OK = qw(
     fastfunc__no
     fastfunc__atom
+    fastfunc__all
     fastfunc__cons
     fastfunc__append
     fastfunc__snoc

@@ -33,6 +33,7 @@ use Language::Bel::Primitives;
 use Language::Bel::Globals::FastFuncs qw(
     fastfunc__no
     fastfunc__atom
+    fastfunc__all
     fastfunc__cons
     fastfunc__append
     fastfunc__snoc
@@ -202,7 +203,7 @@ sub new {
             SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL)), SYMBOL_NIL))))),
             \&fastfunc__atom));
 
-        $self->add_global("all", make_pair(make_symbol("lit"),
+        $self->add_global("all", make_fastfunc(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("f"), make_pair(make_symbol("xs"),
             SYMBOL_NIL)), make_pair(make_pair(make_symbol("if"),
@@ -212,7 +213,8 @@ sub new {
             SYMBOL_NIL)), SYMBOL_NIL)), make_pair(make_pair(make_symbol("all"),
             make_pair(make_symbol("f"), make_pair(make_pair(make_symbol("cdr"),
             make_pair(make_symbol("xs"), SYMBOL_NIL)), SYMBOL_NIL))),
-            make_pair(SYMBOL_NIL, SYMBOL_NIL)))))), SYMBOL_NIL))))));
+            make_pair(SYMBOL_NIL, SYMBOL_NIL)))))), SYMBOL_NIL))))),
+            \&fastfunc__all));
 
         $self->add_global("some", make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
