@@ -841,6 +841,81 @@ sub fastfunc__caris {
     }
 }
 
+sub fastfunc__hug {
+    my ($bel, $xs, $f) = @_;
+
+    my @values;
+    my $cdr_xs;
+    if (defined($f)) {
+        my $loop;
+        my $after_loop;
+        my $after_even_that;
+
+        $loop = sub {
+            while (!is_nil($cdr_xs = $bel->cdr($xs))) {
+                return make_async_call(
+                    $f,
+                    [$bel->car($xs), $bel->car($cdr_xs)],
+                    sub {
+                        my ($value) = @_;
+                        push @values, $value;
+                        $xs = $bel->cdr($cdr_xs);
+                        $loop->();
+                    },
+                );
+            }
+
+            return $after_loop->();
+        };
+
+        $after_loop = sub {
+            if (!is_nil($xs)) {
+                return make_async_call(
+                    $f,
+                    [$bel->car($xs)],
+                    sub {
+                        my ($result) = @_;
+                        push @values, $result;
+                        return $after_even_that->();
+                    },
+                );
+            }
+            else {
+                return $after_even_that->();
+            }
+        };
+
+        $after_even_that = sub {
+            my $result = SYMBOL_NIL;
+            for my $value (reverse(@values)) {
+                $result = make_pair($value, $result);
+            }
+            return $result;
+        };
+
+        $loop->();
+    }
+    else {
+        while (!is_nil($cdr_xs = $bel->cdr($xs))) {
+            push @values, make_pair(
+                $bel->car($xs),
+                make_pair(
+                    $bel->car($cdr_xs),
+                    SYMBOL_NIL));
+            $xs = $bel->cdr($cdr_xs);
+        }
+        if (!is_nil($xs)) {
+            push @values, make_pair($bel->car($xs), SYMBOL_NIL);
+        }
+
+        my $result = SYMBOL_NIL;
+        for my $value (reverse(@values)) {
+            $result = make_pair($value, $result);
+        }
+        return $result;
+    }
+}
+
 sub fastfunc__rev {
     my ($bel, $xs) = @_;
 
@@ -4298,6 +4373,7 @@ our @EXPORT_OK = qw(
     fastfunc__where__find
     fastfunc__begins
     fastfunc__caris
+    fastfunc__hug
     fastfunc__rev
     fastfunc__snap
     fastfunc__udrop
