@@ -61,6 +61,7 @@ use Language::Bel::Globals::FastFuncs qw(
     fastfunc__where__caddr
     fastfunc__find
     fastfunc__where__find
+    fastfunc__begins
     fastfunc__rev
     fastfunc__snap
     fastfunc__udrop
@@ -741,7 +742,7 @@ sub new {
             SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL))))), \&fastfunc__find,
             \&fastfunc__where__find));
 
-        $self->add_global("begins", make_pair(make_symbol("lit"),
+        $self->add_global("begins", make_fastfunc(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("xs"), make_pair(make_symbol("pat"),
             make_pair(make_pair(make_symbol("o"), make_pair(make_symbol("f"),
@@ -760,7 +761,7 @@ sub new {
             SYMBOL_NIL)), make_pair(make_pair(make_symbol("cdr"),
             make_pair(make_symbol("pat"), SYMBOL_NIL)), make_pair(make_symbol("f"),
             SYMBOL_NIL)))), make_pair(SYMBOL_NIL, SYMBOL_NIL)))))))),
-            SYMBOL_NIL))))));
+            SYMBOL_NIL))))), \&fastfunc__begins));
 
         $self->add_global("caris", make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,

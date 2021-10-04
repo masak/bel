@@ -723,6 +723,77 @@ sub fastfunc__where__find {
     $loop->();
 }
 
+sub fastfunc__begins {
+    my ($bel, $xs, $pat, $f) = @_;
+
+    if (defined($f)) {
+        my $loop;
+        $loop = sub {
+            while (!is_nil($pat)) {
+                if (!is_pair($xs)) {
+                    return SYMBOL_NIL;
+                }
+                else {
+                    return make_async_call(
+                        $f,
+                        [$bel->car($xs), $bel->car($pat)],
+                        sub {
+                            my ($p) = @_;
+                            if (is_nil($p)) {
+                                return SYMBOL_NIL;
+                            }
+                            $xs = $bel->cdr($xs);
+                            $pat = $bel->cdr($pat);
+                            return $loop->();
+                        },
+                    );
+                }
+            }
+
+            return SYMBOL_T;
+        };
+
+        return $loop->();
+    }
+    else {
+        while (!is_nil($pat)) {
+            if (!is_pair($xs)) {
+                return SYMBOL_NIL;
+            }
+
+            my @stack = [$bel->car($xs), $bel->car($pat)];
+            while (@stack) {
+                my @values = @{pop(@stack)};
+                next unless @values;
+                my $some_atom = "";
+                for my $value (@values) {
+                    if (!is_pair($value)) {
+                        $some_atom = 1;
+                        last;
+                    }
+                }
+                if ($some_atom) {
+                    my $car_values = $values[0];
+                    for my $value (@values) {
+                        if (!atoms_are_identical($value, $car_values)) {
+                            return SYMBOL_NIL;
+                        }
+                    }
+                }
+                else {
+                    push @stack, [map { $bel->cdr($_) } @values];
+                    push @stack, [map { $bel->car($_) } @values];
+                }
+            }
+
+            $xs = $bel->cdr($xs);
+            $pat = $bel->cdr($pat);
+        }
+
+        return SYMBOL_T;
+    }
+}
+
 sub fastfunc__rev {
     my ($bel, $xs) = @_;
 
@@ -4178,6 +4249,7 @@ our @EXPORT_OK = qw(
     fastfunc__where__caddr
     fastfunc__find
     fastfunc__where__find
+    fastfunc__begins
     fastfunc__rev
     fastfunc__snap
     fastfunc__udrop
