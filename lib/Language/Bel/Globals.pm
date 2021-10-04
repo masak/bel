@@ -49,6 +49,8 @@ use Language::Bel::Globals::FastFuncs qw(
     fastfunc__stream
     fastfunc__proper
     fastfunc__string
+    fastfunc__mem
+    fastfunc__where__mem
     fastfunc__in
     fastfunc__where__in
     fastfunc__cadr
@@ -589,7 +591,7 @@ sub new {
             make_pair(SYMBOL_CHAR, make_pair(make_symbol("x"), SYMBOL_NIL))),
             SYMBOL_NIL))), SYMBOL_NIL))))), \&fastfunc__string));
 
-        $self->add_global("mem", make_pair(make_symbol("lit"),
+        $self->add_global("mem", make_fastfunc(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("x"), make_pair(make_symbol("ys"),
             make_pair(make_pair(make_symbol("o"), make_pair(make_symbol("f"),
@@ -599,7 +601,8 @@ sub new {
             make_pair(make_pair(make_symbol("_"), SYMBOL_NIL),
             make_pair(make_pair(make_symbol("f"), make_pair(make_symbol("_"),
             make_pair(make_symbol("x"), SYMBOL_NIL))), SYMBOL_NIL))),
-            make_pair(make_symbol("ys"), SYMBOL_NIL))), SYMBOL_NIL))))));
+            make_pair(make_symbol("ys"), SYMBOL_NIL))), SYMBOL_NIL))))),
+            \&fastfunc__mem, \&fastfunc__where__mem));
 
         $self->add_global("in", make_fastfunc(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
