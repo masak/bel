@@ -916,6 +916,44 @@ sub fastfunc__hug {
     }
 }
 
+sub fastfunc__keep {
+    my ($bel, $f, $xs) = @_;
+
+    my @values;
+    my $loop;
+    my $after_loop;
+
+    $loop = sub {
+        while (!is_nil($xs)) {
+            my $value = $bel->car($xs);
+            return make_async_call(
+                $f,
+                [$value],
+                sub {
+                    my ($result) = @_;
+                    if (!is_nil($result)) {
+                        push @values, $value;
+                    }
+                    $xs = $bel->cdr($xs);
+                    $loop->();
+                },
+            );
+        }
+
+        $after_loop->();
+    };
+
+    $after_loop = sub {
+        my $result = SYMBOL_NIL;
+        for my $value (reverse(@values)) {
+            $result = make_pair($value, $result);
+        }
+        return $result;
+    };
+
+    $loop->();
+}
+
 sub fastfunc__rev {
     my ($bel, $xs) = @_;
 
@@ -4374,6 +4412,7 @@ our @EXPORT_OK = qw(
     fastfunc__begins
     fastfunc__caris
     fastfunc__hug
+    fastfunc__keep
     fastfunc__rev
     fastfunc__snap
     fastfunc__udrop

@@ -64,6 +64,7 @@ use Language::Bel::Globals::FastFuncs qw(
     fastfunc__begins
     fastfunc__caris
     fastfunc__hug
+    fastfunc__keep
     fastfunc__rev
     fastfunc__snap
     fastfunc__udrop
@@ -819,7 +820,7 @@ sub new {
             SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL))))),
             SYMBOL_NIL))));
 
-        $self->add_global("keep", make_pair(make_symbol("lit"),
+        $self->add_global("keep", make_fastfunc(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("f"), make_pair(make_symbol("xs"),
             SYMBOL_NIL)), make_pair(make_pair(make_symbol("if"),
@@ -834,7 +835,8 @@ sub new {
             make_pair(make_symbol("xs"), SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL))),
             make_pair(make_pair(make_symbol("keep"), make_pair(make_symbol("f"),
             make_pair(make_pair(make_symbol("cdr"), make_pair(make_symbol("xs"),
-            SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL)))))), SYMBOL_NIL))))));
+            SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL)))))), SYMBOL_NIL))))),
+            \&fastfunc__keep));
 
         $self->add_global("rem", make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
