@@ -665,6 +665,64 @@ sub fastfunc__where__caddr {
     );
 }
 
+sub fastfunc__find {
+    my ($bel, $f, $xs) = @_;
+
+    my $loop;
+    $loop = sub {
+        while (!is_nil($xs)) {
+            my $value = $bel->car($xs);
+            return make_async_call(
+                $f,
+                [$value],
+                sub {
+                    my ($p) = @_;
+                    if (!is_nil($p)) {
+                        return $value;
+                    }
+                    $xs = $bel->cdr($xs);
+                    return $loop->();
+                },
+            );
+        }
+        return SYMBOL_NIL;
+    };
+
+    $loop->();
+}
+
+sub fastfunc__where__find {
+    my ($bel, $f, $xs) = @_;
+
+    my $loop;
+    $loop = sub {
+        while (!is_nil($xs)) {
+            my $value = $bel->car($xs);
+            return make_async_call(
+                $f,
+                [$value],
+                sub {
+                    my ($p) = @_;
+                    if (!is_nil($p)) {
+                        return make_pair(
+                            $xs,
+                            make_pair(
+                                SYMBOL_A,
+                                SYMBOL_NIL,
+                            ),
+                        );
+                    }
+                    $xs = $bel->cdr($xs);
+                    return $loop->();
+                },
+            );
+        }
+        return SYMBOL_NIL;
+    };
+
+    $loop->();
+}
+
 sub fastfunc__rev {
     my ($bel, $xs) = @_;
 
@@ -4118,6 +4176,8 @@ our @EXPORT_OK = qw(
     fastfunc__where__cddr
     fastfunc__caddr
     fastfunc__where__caddr
+    fastfunc__find
+    fastfunc__where__find
     fastfunc__rev
     fastfunc__snap
     fastfunc__udrop

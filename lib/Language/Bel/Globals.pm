@@ -59,6 +59,8 @@ use Language::Bel::Globals::FastFuncs qw(
     fastfunc__where__cddr
     fastfunc__caddr
     fastfunc__where__caddr
+    fastfunc__find
+    fastfunc__where__find
     fastfunc__rev
     fastfunc__snap
     fastfunc__udrop
@@ -729,14 +731,15 @@ sub new {
             make_pair(make_symbol("args"), make_pair(SYMBOL_NIL, SYMBOL_NIL))),
             SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))))), SYMBOL_NIL))));
 
-        $self->add_global("find", make_pair(make_symbol("lit"),
+        $self->add_global("find", make_fastfunc(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("f"), make_pair(make_symbol("xs"),
             SYMBOL_NIL)), make_pair(make_pair(make_symbol("aif"),
             make_pair(make_pair(make_symbol("some"), make_pair(make_symbol("f"),
             make_pair(make_symbol("xs"), SYMBOL_NIL))),
             make_pair(make_pair(make_symbol("car"), make_pair(make_symbol("it"),
-            SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL))))));
+            SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL))))), \&fastfunc__find,
+            \&fastfunc__where__find));
 
         $self->add_global("begins", make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
