@@ -143,6 +143,34 @@ sub fastfunc__where__some {
     return $loop->();
 }
 
+sub fastfunc__reduce {
+    my ($bel, $f, $xs) = @_;
+
+    my @values;
+    while (!is_nil($xs)) {
+        push @values, $bel->car($xs);
+        $xs = $bel->cdr($xs);
+    }
+
+    my $loop;
+    $loop = sub {
+        my ($result) = @_;
+
+        while (@values) {
+            my $value = pop(@values);
+            return make_async_call(
+                $f,
+                [$value, $result],
+                $loop,      # yup; eta-reduced
+            );
+        }
+
+        return $result;
+    };
+
+    $loop->(@values ? pop(@values) : SYMBOL_NIL);
+}
+
 sub fastfunc__cons {
     my ($bel, @args) = @_;
 
@@ -3871,6 +3899,7 @@ our @EXPORT_OK = qw(
     fastfunc__all
     fastfunc__some
     fastfunc__where__some
+    fastfunc__reduce
     fastfunc__cons
     fastfunc__append
     fastfunc__snoc
