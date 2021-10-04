@@ -794,6 +794,53 @@ sub fastfunc__begins {
     }
 }
 
+sub fastfunc__caris {
+    my ($bel, $x, $y, $f) = @_;
+
+    if (!is_pair($x)) {
+        return SYMBOL_NIL;
+    }
+
+    if (defined($f)) {
+        return make_async_call(
+            $f,
+            [$bel->car($x), $y],
+            sub {
+                my ($p) = @_;
+                return $p;
+            },
+        );
+    }
+    else {
+        my @stack = [$bel->car($x), $y];
+        while (@stack) {
+            my @values = @{pop(@stack)};
+            next unless @values;
+            my $some_atom = "";
+            for my $value (@values) {
+                if (!is_pair($value)) {
+                    $some_atom = 1;
+                    last;
+                }
+            }
+            if ($some_atom) {
+                my $car_values = $values[0];
+                for my $value (@values) {
+                    if (!atoms_are_identical($value, $car_values)) {
+                        return SYMBOL_NIL;
+                    }
+                }
+            }
+            else {
+                push @stack, [map { $bel->cdr($_) } @values];
+                push @stack, [map { $bel->car($_) } @values];
+            }
+        }
+
+        return SYMBOL_T;
+    }
+}
+
 sub fastfunc__rev {
     my ($bel, $xs) = @_;
 
@@ -4250,6 +4297,7 @@ our @EXPORT_OK = qw(
     fastfunc__find
     fastfunc__where__find
     fastfunc__begins
+    fastfunc__caris
     fastfunc__rev
     fastfunc__snap
     fastfunc__udrop
