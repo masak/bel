@@ -239,6 +239,62 @@ sub fastfunc__list {
     return $result;
 }
 
+sub fastfunc__map {
+    my ($bel, $f, @ls) = @_;
+
+    return SYMBOL_NIL
+        unless @ls;
+
+    my @result;
+
+    my $loop1;
+    my $after_loop1;
+
+    $loop1 = sub {
+        my @arguments;
+
+        my $loop2;
+        $loop2 = sub {
+            my ($i) = @_;
+
+            if ($i < @ls) {
+                my $list = $ls[$i];
+                return $after_loop1->()
+                    if is_nil($list);
+
+                push @arguments, $bel->car($list);
+                $ls[$i] = $bel->cdr($list);
+
+                return $loop2->($i + 1);
+            }
+            else {
+                return make_async_call(
+                    $f,
+                    [@arguments],
+                    sub {
+                        my ($result) = @_;
+                        push @result, $result;
+                        $loop1->();
+                    },
+                );
+            }
+        };
+
+        return $loop2->(0);
+    };
+
+    $after_loop1 = sub {
+        my $result = SYMBOL_NIL;
+        for my $v (reverse(@result)) {
+            $result = make_pair($v, $result);
+        }
+
+        return $result;
+    };
+
+    return $loop1->();
+}
+
 sub fastfunc__eq  {
     my ($bel, @args) = @_;
 
@@ -3904,6 +3960,7 @@ our @EXPORT_OK = qw(
     fastfunc__append
     fastfunc__snoc
     fastfunc__list
+    fastfunc__map
     fastfunc__eq
     fastfunc__symbol
     fastfunc__pair

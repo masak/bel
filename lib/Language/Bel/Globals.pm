@@ -41,6 +41,7 @@ use Language::Bel::Globals::FastFuncs qw(
     fastfunc__append
     fastfunc__snoc
     fastfunc__list
+    fastfunc__map
     fastfunc__eq
     fastfunc__symbol
     fastfunc__pair
@@ -293,7 +294,7 @@ sub new {
             make_pair(make_symbol("args"), make_pair(SYMBOL_NIL, SYMBOL_NIL))),
             SYMBOL_NIL))))), \&fastfunc__list));
 
-        $self->add_global("map", make_pair(make_symbol("lit"),
+        $self->add_global("map", make_fastfunc(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("f"), make_symbol("ls")),
             make_pair(make_pair(make_symbol("if"),
@@ -320,7 +321,7 @@ sub new {
             make_pair(make_symbol("f"), make_pair(make_pair(make_symbol("map"),
             make_pair(make_symbol("cdr"), make_pair(make_symbol("ls"),
             SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL))), SYMBOL_NIL)))))))),
-            SYMBOL_NIL))))));
+            SYMBOL_NIL))))), \&fastfunc__map));
 
         $self->add_global("fn", make_pair(make_symbol("lit"),
             make_pair(make_symbol("mac"), make_pair(make_pair(make_symbol("lit"),
