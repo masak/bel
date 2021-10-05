@@ -4,6 +4,9 @@ use 5.006;
 use strict;
 use warnings;
 
+use Language::Bel::AsyncCall qw(
+    make_async_call
+);
 use Language::Bel::Core qw(
     are_identical
     atoms_are_identical
@@ -504,15 +507,28 @@ sub fastfunc__inwhere {
 sub fastfunc__pairwise {
     my ($bel, $f, $xs) = @_;
 
-    my $cdr_xs;
-    while (!is_nil($cdr_xs = $bel->cdr($xs))) {
-        if (is_nil($bel->call($f, $bel->car($xs), $bel->car($cdr_xs)))) {
-            return SYMBOL_NIL;
-        }
-        $xs = $cdr_xs;
-    }
+    my $loop;
+    $loop = sub {
+        my $cdr_xs = $bel->cdr($xs);
+        return SYMBOL_T
+            if is_nil($cdr_xs);
 
-    return SYMBOL_T;
+        return make_async_call(
+            $f,
+            [$bel->car($xs), $bel->car($cdr_xs)],
+            sub {
+                my ($condition) = @_;
+
+                return SYMBOL_NIL
+                    if is_nil($condition);
+
+                $xs = $cdr_xs;
+                return $loop->();
+            },
+        );
+    };
+
+    return $loop->();
 }
 
 sub fastfunc__foldl {
@@ -521,13 +537,26 @@ sub fastfunc__foldl {
     return $base
         unless @args;
 
-    while (!grep { is_nil($_) } @args) {
-        my @car_args = map { $bel->car($_) } @args;
-        $base = $bel->call($f, @car_args, $base);
-        @args = map { $bel->cdr($_) } @args;
-    }
+    my $loop;
+    $loop = sub {
+        my ($base, @args) = @_;
 
-    return $base;
+        return $base
+            if grep { is_nil($_) } @args;
+
+        my @car_args = map { $bel->car($_) } @args;
+        return make_async_call(
+            $f,
+            [@car_args, $base],
+            sub {
+                my ($base) = @_;
+
+                $loop->($base, map { $bel->cdr($_) } @args);
+            },
+        );
+    };
+
+    return $loop->($base, @args);
 }
 
 sub fastfunc__foldr {
@@ -542,18 +571,32 @@ sub fastfunc__foldr {
         @args = map { $bel->cdr($_) } @args;
     }
 
-    for my $cars (reverse(@cars)) {
-        $base = $bel->call($f, @{$cars}, $base);
-    }
+    my @reverse_cars = reverse(@cars);
 
-    return $base;
+    my $loop;
+    $loop = sub {
+        my ($base, $i) = @_;
+
+        return $base
+            unless $i < @reverse_cars;
+
+        return make_async_call(
+            $f,
+            [ @{ $reverse_cars[$i] }, $base ],
+            sub {
+                my ($base) = @_;
+
+                $loop->($base, $i + 1);
+            },
+        );
+    };
+
+    return $loop->($base, 0);
 }
 
 sub fastfunc__fuse {
     my ($bel, $f, @args) = @_;
 
-    return SYMBOL_NIL
-        unless @args;
     my @sublists;
     my $min_length = -1;
     for my $list (@args) {
@@ -568,60 +611,90 @@ sub fastfunc__fuse {
             ? $length
             : $min_length;
     }
-    my @result;
-    for my $i (0..$min_length-1) {
-        push @result, $bel->call(
-            $f,
-            map { $sublists[$_]->[$i] } 0..$#sublists
-        );
-    }
-    my $result = @result ? pop(@result) : SYMBOL_NIL;
-    while (@result) {
-        my $list = pop(@result);
-        my @values;
-        while (!is_nil($list)) {
-            push @values, $bel->car($list);
-            $list = $bel->cdr($list);
-        }
-        while (@values) {
-            my $value = pop(@values);
-            $result = make_pair($value, $result);
-        }
-    }
 
-    return $result;
+    my $result_ref = [];
+    my $loop;
+    $loop = sub {
+        my ($i) = @_;
+
+        if ($i <= $min_length-1) {
+            return make_async_call(
+                $f,
+                [ map { $sublists[$_]->[$i] } 0..$#sublists ],
+                sub {
+                    my ($r) = @_;
+                    push @{ $result_ref }, $r;
+                    $loop->($i + 1);
+                },
+            );
+        }
+
+        my $result = @{ $result_ref } ? pop(@{ $result_ref }) : SYMBOL_NIL;
+        while (@{ $result_ref }) {
+            my $list = pop(@{ $result_ref });
+            my @values;
+            while (!is_nil($list)) {
+                push @values, $bel->car($list);
+                $list = $bel->cdr($list);
+            }
+            while (@values) {
+                my $value = pop(@values);
+                $result = make_pair($value, $result);
+            }
+        }
+
+        return $result;
+    };
+
+    return $loop->(0);
 }
 
 sub fastfunc__match {
     my ($bel, $x, $pat) = @_;
 
     my @stack = [$x, $pat];
-    while (@stack) {
-        my ($v0, $v1) = @{pop(@stack)};
-        if (is_symbol_of_name($v1, "t")) {
-            # succeed
-        }
-        elsif (is_pair($v1)
-            && is_symbol_of_name($bel->car($v1), "lit")
-            && is_pair($bel->cdr($v1))
-            && (is_symbol_of_name($bel->car($bel->cdr($v1)), "prim")
-                || is_symbol_of_name($bel->car($bel->cdr($v1)), "clo"))) {
-            if (is_nil($bel->call($v1, $v0))) {
-                return SYMBOL_NIL;
-            }
-        }
-        elsif (!is_pair($v0) || !is_pair($v1)) {
-            if (!atoms_are_identical($v0, $v1)) {
-                return SYMBOL_NIL;
-            }
-        }
-        else {
-            push @stack, [$bel->cdr($v0), $bel->cdr($v1)];
-            push @stack, [$bel->car($v0), $bel->car($v1)];
-        }
-    }
 
-    return SYMBOL_T;
+    my $loop;
+    $loop = sub {
+        # no parameters
+
+        while (@stack) {
+            my ($v0, $v1) = @{pop(@stack)};
+            if (is_symbol_of_name($v1, "t")) {
+                # this subgoal succeeds
+            }
+            elsif (is_pair($v1)
+                && is_symbol_of_name($bel->car($v1), "lit")
+                && is_pair($bel->cdr($v1))
+                && (is_symbol_of_name($bel->car($bel->cdr($v1)), "prim")
+                    || is_symbol_of_name($bel->car($bel->cdr($v1)), "clo"))) {
+                return make_async_call(
+                    $v1,
+                    [$v0],
+                    sub {
+                        my ($result) = @_;
+                        if (is_nil($result)) {
+                            return SYMBOL_NIL;
+                        }
+                        $loop->();
+                    },
+                );
+            }
+            elsif (!is_pair($v0) || !is_pair($v1)) {
+                if (!atoms_are_identical($v0, $v1)) {
+                    return SYMBOL_NIL;
+                }
+            }
+            else {
+                push @stack, [$bel->cdr($v0), $bel->cdr($v1)];
+                push @stack, [$bel->car($v0), $bel->car($v1)];
+            }
+        }
+
+        return SYMBOL_T;
+    };
+
+    return $loop->();
 }
 
 sub fastfunc__split {
@@ -631,32 +704,52 @@ sub fastfunc__split {
         $acc = SYMBOL_NIL;
     }
     my @acc;
-    while (!is_nil($xs)) {
-        last
-            if !is_pair($xs) || !is_nil($bel->call($f, $bel->car($xs)));
-        push(@acc, $bel->car($xs));
-        $xs = $bel->cdr($xs);
-    }
+    my $loop;
+    my $after_loop;
 
-    my @prefix;
-    while (!is_nil($acc)) {
-        push(@prefix, $bel->car($acc));
-        $acc = $bel->cdr($acc);
-    }
-    my $first = SYMBOL_NIL;
-    while (@acc) {
-        $first = make_pair(pop(@acc), $first);
-    }
-    while (@prefix) {
-        $first = make_pair(pop(@prefix), $first);
-    }
-    return make_pair(
-        $first,
-        make_pair(
-            $xs,
-            SYMBOL_NIL,
-        ),
-    );
+    $loop = sub {
+        while (!is_nil($xs)) {
+            return if !is_pair($xs);
+            return make_async_call(
+                $f,
+                [$bel->car($xs)],
+                sub {
+                    my ($result) = @_;
+                    return $after_loop->()
+                        if !is_nil($result);
+                    push(@acc, $bel->car($xs));
+                    $xs = $bel->cdr($xs);
+                    return $loop->();
+                },
+            );
+        }
+
+        $after_loop->();
+    };
+
+    $after_loop = sub {
+        my @prefix;
+        while (!is_nil($acc)) {
+            push(@prefix, $bel->car($acc));
+            $acc = $bel->cdr($acc);
+        }
+        my $first = SYMBOL_NIL;
+        while (@acc) {
+            $first = make_pair(pop(@acc), $first);
+        }
+        while (@prefix) {
+            $first = make_pair(pop(@prefix), $first);
+        }
+        return make_pair(
+            $first,
+            make_pair(
+                $xs,
+                SYMBOL_NIL,
+            ),
+        );
+    };
+
+    return $loop->();
 }
 
 sub fastfunc__i_plus {
@@ -3474,24 +3567,67 @@ sub fastfunc__dedup  {
     my @result;
 
     if (defined($f)) {
-        while (!is_nil($xs)) {
-            my $candidate = $bel->car($xs);
-            my $candidate_is_duplicate = 0;   # until we find an identical
-                                              # element in @results
+        my $loop1;
+        $loop1 = sub {
+            while (!is_nil($xs)) {
+                my $candidate = $bel->car($xs);
+                my $candidate_is_duplicate = 0;   # until we find an identical
+                                                  # element in @result
 
-            ELEMENT:
-            for my $element (@result) {
-                if (!is_nil($bel->call($f, $element, $candidate))) {
-                    $candidate_is_duplicate = 1;
-                    last ELEMENT;
+                my $loop2;
+                my $after_loop2;
+
+                $loop2 = sub {
+                    my ($i) = @_;
+
+                    if ($i < scalar(@result)) {
+                        my $element = $result[$i];
+                        return make_async_call(
+                            $f,
+                            [$element, $candidate],
+                            sub {
+                                my ($r) = @_;
+                                if (!is_nil($r)) {
+                                    $candidate_is_duplicate = 1;
+                                    return $after_loop2->();
+                                }
+                                return $loop2->($i + 1);
+                            },
+                        );
+                    }
+                    else {
+                        return $after_loop2->();
+                    }
+                };
+
+                $after_loop2 = sub {
+                    if (!$candidate_is_duplicate) {
+                        push @result, $candidate;
+                    }
+                    $xs = $bel->cdr($xs);
+                    return $loop1->();
+                };
+
+                return $loop2->(0);
+            }
+
+            my $result = SYMBOL_NIL;
+            my $result_tail;
+            for my $e (@result) {
+                my $new_pair = make_pair($e, SYMBOL_NIL);
+                if (is_nil($result)) {
+                    $result = $new_pair;
                 }
+                else {
+                    $bel->xdr($result_tail, $new_pair);
+                }
+                $result_tail = $new_pair;
             }
 
-            if (!$candidate_is_duplicate) {
-                push @result, $candidate;
-            }
-            $xs = $bel->cdr($xs);
-        }
+            return $result;
+        };
+
+        return $loop1->();
     }
     else {
         while (!is_nil($xs)) {
@@ -3541,22 +3677,22 @@ sub fastfunc__dedup  {
             }
             $xs = $bel->cdr($xs);
         }
-    }
 
-    my $result = SYMBOL_NIL;
-    my $result_tail;
-    for my $e (@result) {
-        my $new_pair = make_pair($e, SYMBOL_NIL);
-        if (is_nil($result)) {
-            $result = $new_pair;
+        my $result = SYMBOL_NIL;
+        my $result_tail;
+        for my $e (@result) {
+            my $new_pair = make_pair($e, SYMBOL_NIL);
+            if (is_nil($result)) {
+                $result = $new_pair;
+            }
+            else {
+                $bel->xdr($result_tail, $new_pair);
+            }
+            $result_tail = $new_pair;
         }
-        else {
-            $bel->xdr($result_tail, $new_pair);
-        }
-        $result_tail = $new_pair;
-    }
 
-    return $result;
+        return $result;
+    }
 }
 
 sub fastfunc__randlen {
