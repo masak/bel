@@ -1136,6 +1136,72 @@ sub fastfunc__where__get {
     }
 }
 
+sub fastfunc__put {
+    my ($bel, $k, $v, $kvs, $f) = @_;
+
+    my @values = make_pair($k, $v);
+    if (defined($f)) {
+        my $loop;
+        my $after_loop;
+
+        $loop = sub {
+            while (!is_nil($kvs)) {
+                my $kv = $bel->car($kvs);
+                return make_async_call(
+                    $f,
+                    [$k, $bel->car($kv)],
+                    sub {
+                        my ($p) = @_;
+                        if (is_nil($p)) {
+                            push @values, $kv;
+                        }
+                        $kvs = $bel->cdr($kvs);
+                        return $loop->();
+                    },
+                );
+            }
+
+            return $after_loop->();
+        };
+
+        $after_loop = sub {
+            my $result = SYMBOL_NIL;
+            for my $value (reverse(@values)) {
+                $result = make_pair($value, $result);
+            }
+            return $result;
+        };
+
+        $loop->();
+    }
+    else {
+        while (!is_nil($kvs)) {
+            my $kv = $bel->car($kvs);
+            my @stack = [$k, $bel->car($kv)];
+            while (@stack) {
+                my ($v0, $v1) = @{pop(@stack)};
+                if (!is_pair($v0) || !is_pair($v1)) {
+                    if (!atoms_are_identical($v0, $v1)) {
+                        push @values, $kv;
+                        last;
+                    }
+                }
+                else {
+                    push @stack, [$bel->cdr($v0), $bel->cdr($v1)];
+                    push @stack, [$bel->car($v0), $bel->car($v1)];
+                }
+            }
+            $kvs = $bel->cdr($kvs);
+        }
+
+        my $result = SYMBOL_NIL;
+        for my $value (reverse(@values)) {
+            $result = make_pair($value, $result);
+        }
+        return $result;
+    }
+}
+
 sub fastfunc__rev {
     my ($bel, $xs) = @_;
 
@@ -4598,6 +4664,7 @@ our @EXPORT_OK = qw(
     fastfunc__rem
     fastfunc__get
     fastfunc__where__get
+    fastfunc__put
     fastfunc__rev
     fastfunc__snap
     fastfunc__udrop

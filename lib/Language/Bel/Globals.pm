@@ -68,6 +68,7 @@ use Language::Bel::Globals::FastFuncs qw(
     fastfunc__rem
     fastfunc__get
     fastfunc__where__get
+    fastfunc__put
     fastfunc__rev
     fastfunc__snap
     fastfunc__udrop
@@ -869,7 +870,7 @@ sub new {
             make_pair(make_symbol("kvs"), SYMBOL_NIL))), SYMBOL_NIL))))),
             \&fastfunc__get, \&fastfunc__where__get));
 
-        $self->add_global("put", make_pair(make_symbol("lit"),
+        $self->add_global("put", make_fastfunc(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("k"), make_pair(make_symbol("v"),
             make_pair(make_symbol("kvs"), make_pair(make_pair(make_symbol("o"),
@@ -883,7 +884,7 @@ sub new {
             SYMBOL_NIL)), make_pair(make_pair(make_symbol("f"),
             make_pair(make_pair(make_symbol("car"), make_pair(make_symbol("x"),
             SYMBOL_NIL)), make_pair(make_symbol("y"), SYMBOL_NIL))), SYMBOL_NIL))),
-            SYMBOL_NIL)))), SYMBOL_NIL))), SYMBOL_NIL))))));
+            SYMBOL_NIL)))), SYMBOL_NIL))), SYMBOL_NIL))))), \&fastfunc__put));
 
         $self->add_global("rev", make_fastfunc(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
