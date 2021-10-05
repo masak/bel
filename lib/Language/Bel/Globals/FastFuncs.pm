@@ -954,6 +954,72 @@ sub fastfunc__keep {
     $loop->();
 }
 
+sub fastfunc__rem {
+    my ($bel, $x, $ys, $f) = @_;
+
+    my @values;
+    if (defined($f)) {
+        my $loop;
+        my $after_loop;
+
+        $loop = sub {
+            while (!is_nil($ys)) {
+                my $value = $bel->car($ys);
+                return make_async_call(
+                    $f,
+                    [$value, $x],
+                    sub {
+                        my ($p) = @_;
+                        if (is_nil($p)) {
+                            push @values, $value;
+                        }
+                        $ys = $bel->cdr($ys);
+                        return $loop->();
+                    },
+                );
+            }
+
+            return $after_loop->();
+        };
+
+        $after_loop = sub {
+            my $result = SYMBOL_NIL;
+            for my $value (reverse(@values)) {
+                $result = make_pair($value, $result);
+            }
+            return $result;
+        };
+
+        $loop->();
+    }
+    else {
+        while (!is_nil($ys)) {
+            my $value = $bel->car($ys);
+            my @stack = [$x, $value];
+            while (@stack) {
+                my ($v0, $v1) = @{pop(@stack)};
+                if (!is_pair($v0) || !is_pair($v1)) {
+                    if (!atoms_are_identical($v0, $v1)) {
+                        push @values, $value;
+                        last;
+                    }
+                }
+                else {
+                    push @stack, [$bel->cdr($v0), $bel->cdr($v1)];
+                    push @stack, [$bel->car($v0), $bel->car($v1)];
+                }
+            }
+            $ys = $bel->cdr($ys);
+        }
+
+        my $result = SYMBOL_NIL;
+        for my $value (reverse(@values)) {
+            $result = make_pair($value, $result);
+        }
+        return $result;
+    }
+}
+
 sub fastfunc__rev {
     my ($bel, $xs) = @_;
 
@@ -4413,6 +4479,7 @@ our @EXPORT_OK = qw(
     fastfunc__caris
     fastfunc__hug
     fastfunc__keep
+    fastfunc__rem
     fastfunc__rev
     fastfunc__snap
     fastfunc__udrop
