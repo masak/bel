@@ -1020,6 +1020,122 @@ sub fastfunc__rem {
     }
 }
 
+sub fastfunc__get {
+    my ($bel, $k, $kvs, $f) = @_;
+
+    if (defined($f)) {
+        my $loop;
+        $loop = sub {
+            while (!is_nil($kvs)) {
+                my $kv = $bel->car($kvs);
+                return make_async_call(
+                    $f,
+                    [$bel->car($kv), $k],
+                    sub {
+                        my ($p) = @_;
+                        if (!is_nil($p)) {
+                            return $kv;
+                        }
+                        $kvs = $bel->cdr($kvs);
+                        return $loop->();
+                    },
+                );
+            }
+
+            return SYMBOL_NIL;
+        };
+
+        $loop->();
+    }
+    else {
+        ELEM:
+        while (!is_nil($kvs)) {
+            my $kv = $bel->car($kvs);
+            my @stack = [$bel->car($kv), $k];
+            while (@stack) {
+                my ($v0, $v1) = @{pop(@stack)};
+                if (!is_pair($v0) || !is_pair($v1)) {
+                    if (!atoms_are_identical($v0, $v1)) {
+                        $kvs = $bel->cdr($kvs);
+                        next ELEM;
+                    }
+                }
+                else {
+                    push @stack, [$bel->cdr($v0), $bel->cdr($v1)];
+                    push @stack, [$bel->car($v0), $bel->car($v1)];
+                }
+            }
+            return $kv;
+        }
+
+        return SYMBOL_NIL;
+    }
+}
+
+sub fastfunc__where__get {
+    my ($bel, $k, $kvs, $f) = @_;
+
+    if (defined($f)) {
+        my $loop;
+        $loop = sub {
+            while (!is_nil($kvs)) {
+                my $kv = $bel->car($kvs);
+                return make_async_call(
+                    $f,
+                    [$bel->car($kv), $k],
+                    sub {
+                        my ($p) = @_;
+                        if (!is_nil($p)) {
+                            return make_pair(
+                                $kvs,
+                                make_pair(
+                                    SYMBOL_A,
+                                    SYMBOL_NIL,
+                                ),
+                            );
+                        }
+                        $kvs = $bel->cdr($kvs);
+                        return $loop->();
+                    },
+                );
+            }
+
+            return SYMBOL_NIL;
+        };
+
+        $loop->();
+    }
+    else {
+        ELEM:
+        while (!is_nil($kvs)) {
+            my $kv = $bel->car($kvs);
+            my @stack = [$bel->car($kv), $k];
+            while (@stack) {
+                my ($v0, $v1) = @{pop(@stack)};
+                if (!is_pair($v0) || !is_pair($v1)) {
+                    if (!atoms_are_identical($v0, $v1)) {
+                        $kvs = $bel->cdr($kvs);
+                        next ELEM;
+                    }
+                }
+                else {
+                    push @stack, [$bel->cdr($v0), $bel->cdr($v1)];
+                    push @stack, [$bel->car($v0), $bel->car($v1)];
+                }
+            }
+            return make_pair(
+                $kvs,
+                make_pair(
+                    SYMBOL_A,
+                    SYMBOL_NIL,
+                ),
+            );
+        }
+
+        return SYMBOL_NIL;
+    }
+}
+
 sub fastfunc__rev {
     my ($bel, $xs) = @_;
 
@@ -4480,6 +4596,8 @@ our @EXPORT_OK = qw(
     fastfunc__hug
     fastfunc__keep
     fastfunc__rem
+    fastfunc__get
+    fastfunc__where__get
     fastfunc__rev
     fastfunc__snap
     fastfunc__udrop
