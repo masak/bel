@@ -1,4 +1,4 @@
-package Language::Bel::Compiler::Pass::AllocateRegisters;
+package Language::Bel::Compiler::Pass::Allocate;
 use base qw(Language::Bel::Compiler::Pass);
 
 use 5.006;
