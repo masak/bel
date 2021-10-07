@@ -3,9 +3,24 @@ use 5.006;
 use strict;
 use warnings;
 
+use File::Temp qw(tempfile);
+
 use Language::Bel::Globals::Generator qw(generate_globals);
 
 binmode STDOUT, ':encoding(utf-8)';
+
+my (undef, $filename) = tempfile();
+END { unlink $filename }
+
+my $status = system(
+    "perl -T -Ilib t/00-consistent-fastfunc-exports.t " .
+    "> $filename 2>&1 > $filename"
+);
+
+if ($status != 0) {
+    system("cat $filename");
+    die "Aborting due to failed consistency test\n";
+}
 
 my $bel = Language::Bel->new({ output => sub {} });
 

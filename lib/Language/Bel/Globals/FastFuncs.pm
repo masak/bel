@@ -55,6 +55,122 @@ sub fastfunc__atom {
     return is_pair($x) ? SYMBOL_NIL : SYMBOL_T;
 }
 
+sub fastfunc__all {
+    my ($bel, $f, $xs) = @_;
+
+    my $loop;
+    $loop = sub {
+        while (!is_nil($xs)) {
+            return make_async_call(
+                $f,
+                [$bel->car($xs)],
+                sub {
+                    my ($result) = @_;
+                    if (is_nil($result)) {
+                        return SYMBOL_NIL;
+                    }
+                    $xs = $bel->cdr($xs);
+                    return $loop->();
+                },
+            );
+        }
+
+        return SYMBOL_T;
+    };
+
+    return $loop->();
+}
+
+sub fastfunc__some {
+    my ($bel, $f, $xs) = @_;
+
+    my $loop;
+    $loop = sub {
+        while (!is_nil($xs)) {
+            return make_async_call(
+                $f,
+                [$bel->car($xs)],
+                sub {
+                    my ($result) = @_;
+                    if (!is_nil($result)) {
+                        return $xs;
+                    }
+                    $xs = $bel->cdr($xs);
+                    return $loop->();
+                },
+            );
+        }
+
+        return SYMBOL_NIL;
+    };
+
+    return $loop->();
+}
+
+sub fastfunc__where__some {
+    my ($bel, $f, $xs) = @_;
+
+    my $loop;
+    $loop = sub {
+        while (!is_nil($xs)) {
+            return make_async_call(
+                $f,
+                [$bel->car($xs)],
+                sub {
+                    my ($result) = @_;
+                    if (!is_nil($result)) {
+                        return make_pair(
+                            make_pair(
+                                make_symbol("xs"),
+                                $xs,
+                            ),
+                            make_pair(
+                                SYMBOL_D,
+                                SYMBOL_NIL,
+                            ),
+                        );
+
+                    }
+                    $xs = $bel->cdr($xs);
+                    return $loop->();
+                },
+            );
+        }
+
+        return SYMBOL_NIL;
+    };
+
+    return $loop->();
+}
+
+sub fastfunc__reduce {
+    my ($bel, $f, $xs) = @_;
+
+    my @values;
+    while (!is_nil($xs)) {
+        push @values, $bel->car($xs);
+        $xs = $bel->cdr($xs);
+    }
+
+    my $loop;
+    $loop = sub {
+        my ($result) = @_;
+
+        while (@values) {
+            my $value = pop(@values);
+            return make_async_call(
+                $f,
+                [$value, $result],
+                $loop,      # yup; eta-reduced
+            );
+        }
+
+        return $result;
+    };
+
+    $loop->(@values ? pop(@values) : SYMBOL_NIL);
+}
+
 sub fastfunc__cons {
     my ($bel, @args) = @_;
 
@@ -121,6 +237,62 @@ sub fastfunc__list {
     }
 
     return $result;
+}
+
+sub fastfunc__map {
+    my ($bel, $f, @ls) = @_;
+
+    return SYMBOL_NIL
+        unless @ls;
+
+    my @result;
+
+    my $loop1;
+    my $after_loop1;
+
+    $loop1 = sub {
+        my @arguments;
+
+        my $loop2;
+        $loop2 = sub {
+            my ($i) = @_;
+
+            if ($i < @ls) {
+                my $list = $ls[$i];
+                return $after_loop1->()
+                    if is_nil($list);
+
+                push @arguments, $bel->car($list);
+                $ls[$i] = $bel->cdr($list);
+
+                return $loop2->($i + 1);
+            }
+            else {
+                return make_async_call(
+                    $f,
+                    [@arguments],
+                    sub {
+                        my ($result) = @_;
+                        push @result, $result;
+                        $loop1->();
+                    },
+                );
+            }
+        };
+
+        return $loop2->(0);
+    };
+
+    $after_loop1 = sub {
+        my $result = SYMBOL_NIL;
+        for my $v (reverse(@result)) {
+            $result = make_pair($v, $result);
+        }
+
+        return $result;
+    };
+
+    return $loop1->();
 }
 
 sub fastfunc__eq  {
@@ -208,6 +380,146 @@ sub fastfunc__string {
     }
 
     return SYMBOL_T;
+}
+
+sub fastfunc__mem {
+    my ($bel, $x, $ys, $f) = @_;
+
+    if (defined($f)) {
+        my $loop;
+        $loop = sub {
+            return SYMBOL_NIL
+                if is_nil($ys);
+
+            return make_async_call(
+                $f,
+                [$bel->car($ys), $x],
+                sub {
+                    my ($p) = @_;
+                    if (!is_nil($p)) {
+                        return $ys;
+                    }
+                    $ys = $bel->cdr($ys);
+                    return $loop->();
+                },
+            );
+        };
+
+        return $loop->();
+    }
+    else {
+        ELEMENT:
+        while (!is_nil($ys)) {
+            my @stack = [$bel->car($ys), $x];
+            while (@stack) {
+                my @values = @{pop(@stack)};
+                next unless @values;
+                my $some_atom = "";
+                for my $value (@values) {
+                    if (!is_pair($value)) {
+                        $some_atom = 1;
+                        last;
+                    }
+                }
+                if ($some_atom) {
+                    my $car_values = $values[0];
+                    for my $value (@values) {
+                        if (!atoms_are_identical($value, $car_values)) {
+                            $ys = $bel->cdr($ys);
+                            next ELEMENT;
+                        }
+                    }
+                }
+                else {
+                    push @stack, [map { $bel->cdr($_) } @values];
+                    push @stack, [map { $bel->car($_) } @values];
+                }
+            }
+
+            return $ys;
+        }
+
+        return SYMBOL_NIL;
+    }
+}
+
+sub fastfunc__where__mem {
+    my ($bel, $x, $ys, $f) = @_;
+
+    if (defined($f)) {
+        my $loop;
+        $loop = sub {
+            return SYMBOL_NIL
+                if is_nil($ys);
+
+            return make_async_call(
+                $f,
+                [$bel->car($ys), $x],
+                sub {
+                    my ($p) = @_;
+                    if (!is_nil($p)) {
+                        return make_pair(
+                            make_pair(
+                                make_symbol("xs"),
+                                $ys,
+                            ),
+                            make_pair(
+                                SYMBOL_D,
+                                SYMBOL_NIL,
+                            ),
+                        );
+                    }
+                    $ys = $bel->cdr($ys);
+                    return $loop->();
+                },
+            );
+        };
+
+        return $loop->();
+    }
+    else {
+        ELEMENT:
+        while (!is_nil($ys)) {
+            my @stack = [$bel->car($ys), $x];
+            while (@stack) {
+                my @values = @{pop(@stack)};
+                next unless @values;
+                my $some_atom = "";
+                for my $value (@values) {
+                    if (!is_pair($value)) {
+                        $some_atom = 1;
+                        last;
+                    }
+                }
+                if ($some_atom) {
+                    my $car_values = $values[0];
+                    for my $value (@values) {
+                        if (!atoms_are_identical($value, $car_values)) {
+                            $ys = $bel->cdr($ys);
+                            next ELEMENT;
+                        }
+                    }
+                }
+                else {
+                    push @stack, [map { $bel->cdr($_) } @values];
+                    push @stack, [map { $bel->car($_) } @values];
+                }
+            }
+
+            return make_pair(
+                make_pair(
+                    make_symbol("xs"),
+                    $ys,
+                ),
+                make_pair(
+                    SYMBOL_D,
+                    SYMBOL_NIL,
+                ),
+            );
+        }
+
+        return SYMBOL_NIL;
+    }
 }
 
 sub fastfunc__in {
@@ -351,6 +663,543 @@ sub fastfunc__where__caddr {
             SYMBOL_NIL,
         ),
     );
+}
+
+sub fastfunc__find {
+    my ($bel, $f, $xs) = @_;
+
+    my $loop;
+    $loop = sub {
+        while (!is_nil($xs)) {
+            my $value = $bel->car($xs);
+            return make_async_call(
+                $f,
+                [$value],
+                sub {
+                    my ($p) = @_;
+                    if (!is_nil($p)) {
+                        return $value;
+                    }
+                    $xs = $bel->cdr($xs);
+                    return $loop->();
+                },
+            );
+        }
+        return SYMBOL_NIL;
+    };
+
+    $loop->();
+}
+
+sub fastfunc__where__find {
+    my ($bel, $f, $xs) = @_;
+
+    my $loop;
+    $loop = sub {
+        while (!is_nil($xs)) {
+            my $value = $bel->car($xs);
+            return make_async_call(
+                $f,
+                [$value],
+                sub {
+                    my ($p) = @_;
+                    if (!is_nil($p)) {
+                        return make_pair(
+                            $xs,
+                            make_pair(
+                                SYMBOL_A,
+                                SYMBOL_NIL,
+                            ),
+                        );
+                    }
+                    $xs = $bel->cdr($xs);
+                    return $loop->();
+                },
+            );
+        }
+        return SYMBOL_NIL;
+    };
+
+    $loop->();
+}
+
+sub fastfunc__begins {
+    my ($bel, $xs, $pat, $f) = @_;
+
+    if (defined($f)) {
+        my $loop;
+        $loop = sub {
+            while (!is_nil($pat)) {
+                if (!is_pair($xs)) {
+                    return SYMBOL_NIL;
+                }
+                else {
+                    return make_async_call(
+                        $f,
+                        [$bel->car($xs), $bel->car($pat)],
+                        sub {
+                            my ($p) = @_;
+                            if (is_nil($p)) {
+                                return SYMBOL_NIL;
+                            }
+                            $xs = $bel->cdr($xs);
+                            $pat = $bel->cdr($pat);
+                            return $loop->();
+                        },
+                    );
+                }
+            }
+
+            return SYMBOL_T;
+        };
+
+        return $loop->();
+    }
+    else {
+        while (!is_nil($pat)) {
+            if (!is_pair($xs)) {
+                return SYMBOL_NIL;
+            }
+
+            my @stack = [$bel->car($xs), $bel->car($pat)];
+            while (@stack) {
+                my @values = @{pop(@stack)};
+                next unless @values;
+                my $some_atom = "";
+                for my $value (@values) {
+                    if (!is_pair($value)) {
+                        $some_atom = 1;
+                        last;
+                    }
+                }
+                if ($some_atom) {
+                    my $car_values = $values[0];
+                    for my $value (@values) {
+                        if (!atoms_are_identical($value, $car_values)) {
+                            return SYMBOL_NIL;
+                        }
+                    }
+                }
+                else {
+                    push @stack, [map { $bel->cdr($_) } @values];
+                    push @stack, [map { $bel->car($_) } @values];
+                }
+            }
+
+            $xs = $bel->cdr($xs);
+            $pat = $bel->cdr($pat);
+        }
+
+        return SYMBOL_T;
+    }
+}
+
+sub fastfunc__caris {
+    my ($bel, $x, $y, $f) = @_;
+
+    if (!is_pair($x)) {
+        return SYMBOL_NIL;
+    }
+
+    if (defined($f)) {
+        return make_async_call(
+            $f,
+            [$bel->car($x), $y],
+            sub {
+                my ($p) = @_;
+                return $p;
+            },
+        );
+    }
+    else {
+        my @stack = [$bel->car($x), $y];
+        while (@stack) {
+            my @values = @{pop(@stack)};
+            next unless @values;
+            my $some_atom = "";
+            for my $value (@values) {
+                if (!is_pair($value)) {
+                    $some_atom = 1;
+                    last;
+                }
+            }
+            if ($some_atom) {
+                my $car_values = $values[0];
+                for my $value (@values) {
+                    if (!atoms_are_identical($value, $car_values)) {
+                        return SYMBOL_NIL;
+                    }
+                }
+            }
+            else {
+                push @stack, [map { $bel->cdr($_) } @values];
+                push @stack, [map { $bel->car($_) } @values];
+            }
+        }
+
+        return SYMBOL_T;
+    }
+}
+
+sub fastfunc__hug {
+    my ($bel, $xs, $f) = @_;
+
+    my @values;
+    my $cdr_xs;
+    if (defined($f)) {
+        my $loop;
+        my $after_loop;
+        my $after_even_that;
+
+        $loop = sub {
+            while (!is_nil($cdr_xs = $bel->cdr($xs))) {
+                return make_async_call(
+                    $f,
+                    [$bel->car($xs), $bel->car($cdr_xs)],
+                    sub {
+                        my ($value) = @_;
+                        push @values, $value;
+                        $xs = $bel->cdr($cdr_xs);
+                        $loop->();
+                    },
+                );
+            }
+
+            return $after_loop->();
+        };
+
+        $after_loop = sub {
+            if (!is_nil($xs)) {
+                return make_async_call(
+                    $f,
+                    [$bel->car($xs)],
+                    sub {
+                        my ($result) = @_;
+                        push @values, $result;
+                        return $after_even_that->();
+                    },
+                );
+            }
+            else {
+                return $after_even_that->();
+            }
+        };
+
+        $after_even_that = sub {
+            my $result = SYMBOL_NIL;
+            for my $value (reverse(@values)) {
+                $result = make_pair($value, $result);
+            }
+            return $result;
+        };
+
+        $loop->();
+    }
+    else {
+        while (!is_nil($cdr_xs = $bel->cdr($xs))) {
+            push @values, make_pair(
+                $bel->car($xs),
+                make_pair(
+                    $bel->car($cdr_xs),
+                    SYMBOL_NIL));
+            $xs = $bel->cdr($cdr_xs);
+        }
+        if (!is_nil($xs)) {
+            push @values, make_pair($bel->car($xs), SYMBOL_NIL);
+        }
+
+        my $result = SYMBOL_NIL;
+        for my $value (reverse(@values)) {
+            $result = make_pair($value, $result);
+        }
+        return $result;
+    }
+}
+
+sub fastfunc__keep {
+    my ($bel, $f, $xs) = @_;
+
+    my @values;
+    my $loop;
+    my $after_loop;
+
+    $loop = sub {
+        while (!is_nil($xs)) {
+            my $value = $bel->car($xs);
+            return make_async_call(
+                $f,
+                [$value],
+                sub {
+                    my ($result) = @_;
+                    if (!is_nil($result)) {
+                        push @values, $value;
+                    }
+                    $xs = $bel->cdr($xs);
+                    $loop->();
+                },
+            );
+        }
+
+        $after_loop->();
+    };
+
+    $after_loop = sub {
+        my $result = SYMBOL_NIL;
+        for my $value (reverse(@values)) {
+            $result = make_pair($value, $result);
+        }
+        return $result;
+    };
+
+    $loop->();
+}
+
+sub fastfunc__rem {
+    my ($bel, $x, $ys, $f) = @_;
+
+    my @values;
+    if (defined($f)) {
+        my $loop;
+        my $after_loop;
+
+        $loop = sub {
+            while (!is_nil($ys)) {
+                my $value = $bel->car($ys);
+                return make_async_call(
+                    $f,
+                    [$value, $x],
+                    sub {
+                        my ($p) = @_;
+                        if (is_nil($p)) {
+                            push @values, $value;
+                        }
+                        $ys = $bel->cdr($ys);
+                        return $loop->();
+                    },
+                );
+            }
+
+            return $after_loop->();
+        };
+
+        $after_loop = sub {
+            my $result = SYMBOL_NIL;
+            for my $value (reverse(@values)) {
+                $result = make_pair($value, $result);
+            }
+            return $result;
+        };
+
+        $loop->();
+    }
+    else {
+        while (!is_nil($ys)) {
+            my $value = $bel->car($ys);
+            my @stack = [$x, $value];
+            while (@stack) {
+                my ($v0, $v1) = @{pop(@stack)};
+                if (!is_pair($v0) || !is_pair($v1)) {
+                    if (!atoms_are_identical($v0, $v1)) {
+                        push @values, $value;
+                        last;
+                    }
+                }
+                else {
+                    push @stack, [$bel->cdr($v0), $bel->cdr($v1)];
+                    push @stack, [$bel->car($v0), $bel->car($v1)];
+                }
+            }
+            $ys = $bel->cdr($ys);
+        }
+
+        my $result = SYMBOL_NIL;
+        for my $value (reverse(@values)) {
+            $result = make_pair($value, $result);
+        }
+        return $result;
+    }
+}
+
+sub fastfunc__get {
+    my ($bel, $k, $kvs, $f) = @_;
+
+    if (defined($f)) {
+        my $loop;
+        $loop = sub {
+            while (!is_nil($kvs)) {
+                my $kv = $bel->car($kvs);
+                return make_async_call(
+                    $f,
+                    [$bel->car($kv), $k],
+                    sub {
+                        my ($p) = @_;
+                        if (!is_nil($p)) {
+                            return $kv;
+                        }
+                        $kvs = $bel->cdr($kvs);
+                        return $loop->();
+                    },
+                );
+            }
+
+            return SYMBOL_NIL;
+        };
+
+        $loop->();
+    }
+    else {
+        ELEM:
+        while (!is_nil($kvs)) {
+            my $kv = $bel->car($kvs);
+            my @stack = [$bel->car($kv), $k];
+            while (@stack) {
+                my ($v0, $v1) = @{pop(@stack)};
+                if (!is_pair($v0) || !is_pair($v1)) {
+                    if (!atoms_are_identical($v0, $v1)) {
+                        $kvs = $bel->cdr($kvs);
+                        next ELEM;
+                    }
+                }
+                else {
+                    push @stack, [$bel->cdr($v0), $bel->cdr($v1)];
+                    push @stack, [$bel->car($v0), $bel->car($v1)];
+                }
+            }
+            return $kv;
+        }
+
+        return SYMBOL_NIL;
+    }
+}
+
+sub fastfunc__where__get {
+    my ($bel, $k, $kvs, $f) = @_;
+
+    if (defined($f)) {
+        my $loop;
+        $loop = sub {
+            while (!is_nil($kvs)) {
+                my $kv = $bel->car($kvs);
+                return make_async_call(
+                    $f,
+                    [$bel->car($kv), $k],
+                    sub {
+                        my ($p) = @_;
+                        if (!is_nil($p)) {
+                            return make_pair(
+                                $kvs,
+                                make_pair(
+                                    SYMBOL_A,
+                                    SYMBOL_NIL,
+                                ),
+                            );
+                        }
+                        $kvs = $bel->cdr($kvs);
+                        return $loop->();
+                    },
+                );
+            }
+
+            return SYMBOL_NIL;
+        };
+
+        $loop->();
+    }
+    else {
+        ELEM:
+        while (!is_nil($kvs)) {
+            my $kv = $bel->car($kvs);
+            my @stack = [$bel->car($kv), $k];
+            while (@stack) {
+                my ($v0, $v1) = @{pop(@stack)};
+                if (!is_pair($v0) || !is_pair($v1)) {
+                    if (!atoms_are_identical($v0, $v1)) {
+                        $kvs = $bel->cdr($kvs);
+                        next ELEM;
+                    }
+                }
+                else {
+                    push @stack, [$bel->cdr($v0), $bel->cdr($v1)];
+                    push @stack, [$bel->car($v0), $bel->car($v1)];
+                }
+            }
+            return make_pair(
+                $kvs,
+                make_pair(
+                    SYMBOL_A,
+                    SYMBOL_NIL,
+                ),
+            );
+        }
+
+        return SYMBOL_NIL;
+    }
+}
+
+sub fastfunc__put {
+    my ($bel, $k, $v, $kvs, $f) = @_;
+
+    my @values = make_pair($k, $v);
+    if (defined($f)) {
+        my $loop;
+        my $after_loop;
+
+        $loop = sub {
+            while (!is_nil($kvs)) {
+                my $kv = $bel->car($kvs);
+                return make_async_call(
+                    $f,
+                    [$k, $bel->car($kv)],
+                    sub {
+                        my ($p) = @_;
+                        if (is_nil($p)) {
+                            push @values, $kv;
+                        }
+                        $kvs = $bel->cdr($kvs);
+                        return $loop->();
+                    },
+                );
+            }
+
+            return $after_loop->();
+        };
+
+        $after_loop = sub {
+            my $result = SYMBOL_NIL;
+            for my $value (reverse(@values)) {
+                $result = make_pair($value, $result);
+            }
+            return $result;
+        };
+
+        $loop->();
+    }
+    else {
+        while (!is_nil($kvs)) {
+            my $kv = $bel->car($kvs);
+            my @stack = [$k, $bel->car($kv)];
+            while (@stack) {
+                my ($v0, $v1) = @{pop(@stack)};
+                if (!is_pair($v0) || !is_pair($v1)) {
+                    if (!atoms_are_identical($v0, $v1)) {
+                        push @values, $kv;
+                        last;
+                    }
+                }
+                else {
+                    push @stack, [$bel->cdr($v0), $bel->cdr($v1)];
+                    push @stack, [$bel->car($v0), $bel->car($v1)];
+                }
+            }
+            $kvs = $bel->cdr($kvs);
+        }
+
+        my $result = SYMBOL_NIL;
+        for my $value (reverse(@values)) {
+            $result = make_pair($value, $result);
+        }
+        return $result;
+    }
 }
 
 sub fastfunc__rev {
@@ -3780,10 +4629,15 @@ sub fastfunc__err {
 our @EXPORT_OK = qw(
     fastfunc__no
     fastfunc__atom
+    fastfunc__all
+    fastfunc__some
+    fastfunc__where__some
+    fastfunc__reduce
     fastfunc__cons
     fastfunc__append
     fastfunc__snoc
     fastfunc__list
+    fastfunc__map
     fastfunc__eq
     fastfunc__symbol
     fastfunc__pair
@@ -3791,6 +4645,8 @@ our @EXPORT_OK = qw(
     fastfunc__stream
     fastfunc__proper
     fastfunc__string
+    fastfunc__mem
+    fastfunc__where__mem
     fastfunc__in
     fastfunc__where__in
     fastfunc__cadr
@@ -3799,6 +4655,16 @@ our @EXPORT_OK = qw(
     fastfunc__where__cddr
     fastfunc__caddr
     fastfunc__where__caddr
+    fastfunc__find
+    fastfunc__where__find
+    fastfunc__begins
+    fastfunc__caris
+    fastfunc__hug
+    fastfunc__keep
+    fastfunc__rem
+    fastfunc__get
+    fastfunc__where__get
+    fastfunc__put
     fastfunc__rev
     fastfunc__snap
     fastfunc__udrop
