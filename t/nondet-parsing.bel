@@ -1,0 +1,39 @@
+;; Example based on https://users.monash.edu/~lloyd/tildeFP/1988BCJ/
+
+;; (type parser (cont input trace) -> (listof trace))
+;; (type cont (input trace) -> (listof trace))
+
+;; (ann fin cont)
+(def fin (input trace)
+  (if (no input)
+      (list trace)
+      nil))
+
+;; (ann letter (char) -> parser)
+(def letter (ch)
+  (fn (cont input trace)
+    (if (no input)          nil
+        (id ch (car input)) (cont (cdr input) (snoc trace ch))
+                            nil)))
+
+;; (ann seq (parser parser) -> parser)
+(def seq (p1 p2)
+  (fn (cont input trace)
+    (p1 (fn (input2 trace2)
+          (p2 cont input2 trace2))
+        input
+        (snoc trace 'seq))))
+
+;; (ann either (parser parser) -> parser)
+(def either (p1 p2)
+  (fn (cont input trace)
+    (append (p1 cont input trace)
+            (p2 cont input trace))))
+
+(set a     (letter \a)
+     aORaa (either a (seq a a))
+     S     (seq aORaa aORaa))
+
+(each match (S fin "aaa" nil)
+  (prn match))
+
