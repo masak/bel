@@ -18,6 +18,10 @@ __DATA__
 > (dedup '((a) (b) (a)) id)
 ((a) (b) (a))
 
+> (let p '(a)
+    (dedup `(,p (b) ,p) id))
+((a) (b))
+
 > (dedup '(7 3 0 9 2 4 1) >=)
 (7 9)
 
