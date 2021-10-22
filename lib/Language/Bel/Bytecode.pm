@@ -194,10 +194,12 @@ sub arg_out {
 }
 
 sub apply {
-    die "`apply` instruction expects no operands"
-        unless @_ == 0;
+    die "`apply` instruction expects exactly 1 operand"
+        unless @_ == 1;
 
-    return (APPLY, 0, 0, 0);
+    my ($register) = @_;
+
+    return (APPLY, $register, 0, 0);
 }
 
 sub param_in {
