@@ -934,14 +934,12 @@ FUT
         }
         $self->handle_invoke_result($e, $aa);
     }
+    elsif (is_bytefunc($op)) {
+        my $e = $op->apply($self, $args);
+        $self->handle_invoke_result($e, $aa);
+    }
     else {
-        if (is_bytefunc($op)) {
-            my $e = $op->apply($self, $args);
-            push @{$self->{r}}, $e;
-        }
-        else {
-            $self->applyf($op, $args, $aa);
-        }
+        $self->applyf($op, $args, $aa);
     }
 }
 
