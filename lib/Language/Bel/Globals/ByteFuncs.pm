@@ -5,6 +5,10 @@ use strict;
 use warnings;
 
 use Language::Bel::Bytecode qw(
+    apply
+    arg_in
+    arg_next
+    arg_out
     if_jmp
     jmp
     param_in
@@ -22,7 +26,8 @@ use Language::Bel::Bytecode qw(
     prim_xdr
     return_if
     return_reg
-    return_unless
+    return_nil_unless
+    return_t_unless
     set
 );
 use Language::Bel::Pair::ByteFunc qw(
@@ -60,6 +65,23 @@ add_bytefunc("atom",
     set(0, prim_id_reg_sym(0, "pair")),
     set(0, prim_id_reg_sym(0, "nil")),
     return_reg(0),
+);
+
+add_bytefunc("all",
+    param_in(),
+    set(0, param_next()),
+    set(1, param_next()),
+    param_last(),
+    param_out(),
+    return_t_unless(1),
+    set(2, prim_car(1)),
+    arg_in(),
+    arg_next(2),
+    arg_out(),
+    set(2, apply()),
+    return_nil_unless(2),
+    set(1, prim_cdr(1)),
+    jmp(20),
 );
 
 add_bytefunc("append",
@@ -135,7 +157,7 @@ add_bytefunc("proper",
     return_if(1),
     set(1, prim_type_reg(0)),
     set(1, prim_id_reg_sym(1, "pair")),
-    return_unless(1),
+    return_nil_unless(1),
     set(0, prim_cdr(0)),
     jmp(16),
 );
@@ -149,11 +171,11 @@ add_bytefunc("string",
     return_if(1),
     set(1, prim_type_reg(0)),
     set(1, prim_id_reg_sym(1, "pair")),
-    return_unless(1),
+    return_nil_unless(1),
     set(1, prim_car(0)),
     set(1, prim_type_reg(1)),
     set(1, prim_id_reg_sym(1, "char")),
-    return_unless(1),
+    return_nil_unless(1),
     set(0, prim_cdr(0)),
     jmp(16),
 );

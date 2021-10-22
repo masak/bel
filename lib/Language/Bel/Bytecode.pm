@@ -4,6 +4,9 @@ use 5.006;
 use strict;
 use warnings;
 
+use Language::Bel::AsyncCall qw(
+    make_async_call
+);
 use Language::Bel::Core qw(
     is_nil
     is_pair
@@ -50,9 +53,18 @@ sub SET_SYM { 0x31 }
 sub JMP { 0x40 }
 sub IF_JMP { 0x41 }
 
+sub ARG_IN { 0x50 }
+sub ARG_NEXT { 0x51 }
+sub ARG_OUT { 0x52 }
+
+sub APPLY { 0x60 }
+
+sub SET_APPLY { 0x70 }
+
 sub RETURN_REG { 0xF0 }
 sub RETURN_IF { 0xF1 }
-sub RETURN_UNLESS { 0xF2 }
+sub RETURN_NIL_UNLESS { 0xF2 }
+sub RETURN_T_UNLESS { 0xF3 }
 
 my @registered_symbols = (
     "nil",
@@ -156,6 +168,36 @@ sub jmp {
         unless operand_is_instruction_pointer($target_ip);
 
     return (JMP, $target_ip, 0, 0);
+}
+
+sub arg_in {
+    die "`arg_in` instruction expects no operands"
+        unless @_ == 0;
+
+    return (ARG_IN, 0, 0, 0);
+}
+
+sub arg_next {
+    die "`arg_next` instruction expects exactly 1 operand"
+        unless @_ == 1;
+
+    my ($register) = @_;
+
+    return (ARG_NEXT, $register, 0, 0);
+}
+
+sub arg_out {
+    die "`arg_out` instruction expects no operands"
+        unless @_ == 0;
+
+    return (ARG_OUT, 0, 0, 0);
+}
+
+sub apply {
+    die "`apply` instruction expects no operands"
+        unless @_ == 0;
+
+    return (APPLY, 0, 0, 0);
 }
 
 sub param_in {
@@ -330,16 +372,28 @@ sub return_reg {
     return (RETURN_REG, $register, 0, 0);
 }
 
-sub return_unless {
-    die "`return_unless` instruction expects exactly 1 operand"
+sub return_nil_unless {
+    die "`return_nil_unless` instruction expects exactly 1 operand"
         unless @_ == 1;
 
     my ($register) = @_;
 
-    die "Illegal register argument to `return_unless`"
+    die "Illegal register argument to `return_nil_unless`"
         unless operand_is_register($register);
 
-    return (RETURN_UNLESS, $register, 0, 0);
+    return (RETURN_NIL_UNLESS, $register, 0, 0);
+}
+
+sub return_t_unless {
+    die "`return_t_unless` instruction expects exactly 1 operand"
+        unless @_ == 1;
+
+    my ($register) = @_;
+
+    die "Illegal register argument to `return_t_unless`"
+        unless operand_is_register($register);
+
+    return (RETURN_T_UNLESS, $register, 0, 0);
 }
 
 sub set {
@@ -368,7 +422,8 @@ sub set {
         die "The third operand must always be 0 when wrappipng in `set`"
             unless $r3 == 0;
 
-        my $set_op = $op == PARAM_NEXT ? SET_PARAM_NEXT
+        my $set_op = $op == APPLY ? SET_APPLY
+            : $op == PARAM_NEXT ? SET_PARAM_NEXT
             : $op == PRIM_CAR ? SET_PRIM_CAR
             : $op == PRIM_CDR ? SET_PRIM_CDR
             : $op == PRIM_ID_REG_SYM ? SET_PRIM_ID_REG_SYM
@@ -388,23 +443,28 @@ sub has_0_operands {
     my ($opcode) = @_;
 
     return in($opcode,
-        PARAM_IN, PARAM_NEXT, PARAM_LAST, PARAM_OUT, JMP, SET_SYM);
+        PARAM_IN, PARAM_NEXT, PARAM_LAST, PARAM_OUT, JMP, SET_SYM, ARG_IN,
+        ARG_OUT, APPLY
+    );
 }
 
 sub has_1_operands {
     my ($opcode) = @_;
 
     return in($opcode,
-        RETURN_IF, RETURN_REG, RETURN_UNLESS, SET_PARAM_NEXT,
-        SET_PRIM_JOIN_SYM_SYM, IF_JMP);
+        RETURN_IF, RETURN_REG, SET_PARAM_NEXT,
+        SET_PRIM_JOIN_SYM_SYM, IF_JMP, ARG_NEXT, RETURN_NIL_UNLESS,
+        RETURN_T_UNLESS, SET_APPLY
+    );
 }
 
 sub has_2_operands {
     my ($opcode) = @_;
 
-    return in($opcode, PRIM_XAR, PRIM_XDR, SET_PRIM_TYPE_REG,
-        SET_PRIM_ID_REG_SYM, SET_PRIM_JOIN_REG_SYM, SET_REG,
-        SET_PRIM_CAR, SET_PRIM_CDR);
+    return in($opcode,
+        PRIM_XAR, PRIM_XDR, SET_PRIM_TYPE_REG, SET_PRIM_ID_REG_SYM,
+        SET_PRIM_JOIN_REG_SYM, SET_REG, SET_PRIM_CAR, SET_PRIM_CDR
+    );
 }
 
 sub has_3_operands {
@@ -514,18 +574,35 @@ sub symbol_of {
     return $registered_symbols[$index];
 }
 
+# unique symbol
+my $RESUMING_AT = {};
+
 sub run_bytefunc {
     my ($bytecode, $reg_count, $bel, @args) = @_;
 
-    my $ip = 0;
-    my @registers = ("<uninitialized>") x $reg_count;
     my $param_level = 0;
-    my $arg1;
+    my $hacky_first_arg;
+    my @args_to_call;
+
+    my $ip;
+    my @registers;
+    if (@args && $args[0] == $RESUMING_AT) {
+        $ip = $args[1];
+        @registers = @{ $args[2] };
+        my $target_register_no = $args[3];
+        my $result = $args[4];
+        $registers[ $target_register_no ] = $result;
+    }
+    else {
+        $ip = 0;
+        @registers = ("<uninitialized>") x $reg_count;
+    }
+
     while (1) {
         my $opcode = $bytecode->[$ip];
         if ($opcode == PARAM_IN) {
             $param_level += 1;
-            $arg1 = shift(@args);
+            $hacky_first_arg = shift(@args);
         }
         elsif ($opcode == SET_PARAM_NEXT) {
             my $reg_no = $bytecode->[$ip + 1];
@@ -534,9 +611,9 @@ sub run_bytefunc {
             }
             elsif ($param_level == 1) {
                 die "Underargs\n"
-                    if is_nil($arg1);
-                $registers[$reg_no] = $bel->car($arg1);
-                $arg1 = $bel->cdr($arg1);
+                    if is_nil($hacky_first_arg);
+                $registers[$reg_no] = $bel->car($hacky_first_arg);
+                $hacky_first_arg = $bel->cdr($hacky_first_arg);
             }
             else {
                 die "Unrecognized level $param_level\n";
@@ -545,12 +622,12 @@ sub run_bytefunc {
         elsif ($opcode == PARAM_LAST) {
             if ($param_level == 1) {
                 die "Overargs\n"
-                    unless is_nil($arg1);
+                    unless is_nil($hacky_first_arg);
             }
         }
         elsif ($opcode == PARAM_OUT) {
             $param_level -= 1;
-            $arg1 = undef;
+            $hacky_first_arg = undef;
         }
         elsif ($opcode == JMP) {
             my $branch_address = $bytecode->[$ip + 1];
@@ -565,6 +642,37 @@ sub run_bytefunc {
                 $ip = $branch_address;
                 next;
             }
+        }
+        elsif ($opcode == ARG_IN) {
+            # do nothing for now
+        }
+        elsif ($opcode == ARG_NEXT) {
+            my $register_no = $bytecode->[$ip + 1];
+            push @args_to_call, $registers[$register_no];
+        }
+        elsif ($opcode == ARG_OUT) {
+            # do nothing for now
+        }
+        elsif ($opcode == SET_APPLY) {
+            my $target_register_no = $bytecode->[$ip + 1];
+            my $fn_register_no = $bytecode->[$ip + 2];
+            return make_async_call(
+                $registers[$fn_register_no],
+                [@args_to_call],
+                sub {
+                    my ($result) = @_;
+                    return run_bytefunc(
+                        $bytecode,
+                        $reg_count,
+                        $bel,
+                        $RESUMING_AT,
+                        $ip + 4,
+                        \@registers,
+                        $target_register_no,
+                        $result,
+                    );
+                },
+            );
         }
         elsif ($opcode == SET_PRIM_CAR) {
             my $target_register_no = $bytecode->[$ip + 1];
@@ -675,15 +783,22 @@ sub run_bytefunc {
                 return $value;
             }
         }
-        elsif ($opcode == RETURN_UNLESS) {
+        elsif ($opcode == RETURN_NIL_UNLESS) {
             my $register_no = $bytecode->[$ip + 1];
             my $value = $registers[$register_no];
             if (is_nil($value)) {
                 return SYMBOL_NIL;
             }
         }
+        elsif ($opcode == RETURN_T_UNLESS) {
+            my $register_no = $bytecode->[$ip + 1];
+            my $value = $registers[$register_no];
+            if (is_nil($value)) {
+                return SYMBOL_T;
+            }
+        }
         else {
-            die "Uncrecognized opcode: ", $opcode;
+            die sprintf("Unknown opcode: 0x%x", $opcode);
         }
 
         $ip += 4;
@@ -691,6 +806,10 @@ sub run_bytefunc {
 }
 
 our @EXPORT_OK = qw(
+    apply
+    arg_in
+    arg_next
+    arg_out
     belify_bytefunc
     four_groups
     has_0_operands
@@ -718,7 +837,8 @@ our @EXPORT_OK = qw(
     return_if
     return_or_jump
     return_reg
-    return_unless
+    return_nil_unless
+    return_t_unless
     set
 );
 

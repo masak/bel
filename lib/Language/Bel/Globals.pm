@@ -8298,6 +8298,13 @@ sub new {
         pair_set_cdr(
             pair_cdr(pair_cdr($self->{hash_ref}->{bcfn})),
             make_pair(
+                make_pair(make_symbol("all"), bytefunc("all")),
+                pair_cdr(pair_cdr(pair_cdr($self->{hash_ref}->{bcfn}))),
+            ),
+        );
+        pair_set_cdr(
+            pair_cdr(pair_cdr($self->{hash_ref}->{bcfn})),
+            make_pair(
                 make_pair(make_symbol("append"), bytefunc("append")),
                 pair_cdr(pair_cdr(pair_cdr($self->{hash_ref}->{bcfn}))),
             ),
