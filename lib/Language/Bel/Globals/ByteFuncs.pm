@@ -29,6 +29,7 @@ use Language::Bel::Bytecode qw(
     return_nil_unless
     return_t_unless
     set
+    unless_jmp
 );
 use Language::Bel::Pair::ByteFunc qw(
     make_bytefunc
@@ -100,6 +101,32 @@ add_bytefunc("some",
     set(1, prim_cdr(1)),
     jmp(20),
     return_reg(1),
+);
+
+add_bytefunc("reduce",
+    param_in(),
+    set(0, param_next()),
+    set(1, param_next()),
+    param_last(),
+    param_out(),
+    set(2, "nil"),
+    set(3, prim_cdr(1)),
+    if_jmp(3, 76),
+    set(3, prim_car(1)),
+    unless_jmp(2, 72),
+    set(1, prim_car(2)),
+    arg_in(),
+    arg_next(1),
+    arg_next(3),
+    arg_out(),
+    set(3, apply(0)),
+    set(2, prim_cdr(2)),
+    jmp(36),
+    return_reg(3),
+    set(3, prim_car(1)),
+    set(2, prim_join_reg_reg(3, 2)),
+    set(1, prim_cdr(1)),
+    jmp(24),
 );
 
 add_bytefunc("append",

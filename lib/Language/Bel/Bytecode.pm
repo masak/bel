@@ -52,6 +52,7 @@ sub SET_SYM { 0x31 }
 
 sub JMP { 0x40 }
 sub IF_JMP { 0x41 }
+sub UNLESS_JMP { 0x42 }
 
 sub ARG_IN { 0x50 }
 sub ARG_NEXT { 0x51 }
@@ -156,6 +157,20 @@ sub if_jmp {
         unless operand_is_instruction_pointer($target_ip);
 
     return (IF_JMP, $register, $target_ip, 0);
+}
+
+sub unless_jmp {
+    die "`unless_jmp` instruction expects exactly 2 operands"
+        unless @_ == 2;
+
+    my ($register, $target_ip) = @_;
+
+    die "Illegal register argument to `unless_jmp`"
+        unless operand_is_register($register);
+    die "Illegal instruction pointer argument to `unless_jmp`"
+        unless operand_is_instruction_pointer($target_ip);
+
+    return (UNLESS_JMP, $register, $target_ip, 0);
 }
 
 sub jmp {
@@ -455,8 +470,8 @@ sub has_1_operands {
 
     return in($opcode,
         RETURN_IF, RETURN_REG, SET_PARAM_NEXT,
-        SET_PRIM_JOIN_SYM_SYM, IF_JMP, ARG_NEXT, RETURN_NIL_UNLESS,
-        RETURN_T_UNLESS, SET_APPLY
+        SET_PRIM_JOIN_SYM_SYM, IF_JMP, UNLESS_JMP, ARG_NEXT,
+        RETURN_NIL_UNLESS, RETURN_T_UNLESS, SET_APPLY
     );
 }
 
@@ -597,7 +612,7 @@ sub run_bytefunc {
     }
     else {
         $ip = 0;
-        @registers = ("<uninitialized>") x $reg_count;
+        @registers = (SYMBOL_NIL) x $reg_count;
     }
 
     while (1) {
@@ -641,6 +656,15 @@ sub run_bytefunc {
             my $branch_address = $bytecode->[$ip + 2];
             my $value = $registers[$register_no];
             if (!is_nil($value)) {
+                $ip = $branch_address;
+                next;
+            }
+        }
+        elsif ($opcode == UNLESS_JMP) {
+            my $register_no = $bytecode->[$ip + 1];
+            my $branch_address = $bytecode->[$ip + 2];
+            my $value = $registers[$register_no];
+            if (is_nil($value)) {
                 $ip = $branch_address;
                 next;
             }
@@ -842,6 +866,7 @@ our @EXPORT_OK = qw(
     return_nil_unless
     return_t_unless
     set
+    unless_jmp
 );
 
 1;
