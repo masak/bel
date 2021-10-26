@@ -26,8 +26,10 @@ use Exporter 'import';
 sub PARAM_IN { 0x00 }
 sub PARAM_NEXT { 0x01 }
 sub SET_PARAM_NEXT { 0x02 }
-sub PARAM_LAST { 0x03 }
-sub PARAM_OUT { 0x04 }
+sub PARAM_REST { 0x03 }
+sub SET_PARAM_REST { 0x04 }
+sub PARAM_LAST { 0x05 }
+sub PARAM_OUT { 0x06 }
 
 sub PRIM_XAR { 0x10 }
 sub PRIM_XDR { 0x11 }
@@ -238,6 +240,13 @@ sub param_next {
     return (PARAM_NEXT, 0, 0, 0);
 }
 
+sub param_rest {
+    die "`param_rest` instruction expects no operands"
+        unless @_ == 0;
+
+    return (PARAM_REST, 0, 0, 0);
+}
+
 sub param_out {
     die "`param_out` instruction expects no operands"
         unless @_ == 0;
@@ -441,6 +450,7 @@ sub set {
 
         my $set_op = $op == APPLY ? SET_APPLY
             : $op == PARAM_NEXT ? SET_PARAM_NEXT
+            : $op == PARAM_REST ? SET_PARAM_REST
             : $op == PRIM_CAR ? SET_PRIM_CAR
             : $op == PRIM_CDR ? SET_PRIM_CDR
             : $op == PRIM_ID_REG_SYM ? SET_PRIM_ID_REG_SYM
@@ -448,9 +458,7 @@ sub set {
             : $op == PRIM_JOIN_REG_REG ? SET_PRIM_JOIN_REG_REG
             : $op == PRIM_JOIN_REG_SYM ? SET_PRIM_JOIN_REG_SYM
             : $op == PRIM_JOIN_SYM_SYM ? SET_PRIM_JOIN_SYM_SYM
-            : -1;
-        die "Unexpected underlying op to `set`: ", sprintf("0x%02x", $op)
-            if $set_op == -1;
+            : die sprintf("Unexpected underlying op to `set`: 0x%02x", $op);
 
         return ($set_op, $register, $r1, $r2);
     }
@@ -460,18 +468,18 @@ sub has_0_operands {
     my ($opcode) = @_;
 
     return in($opcode,
-        PARAM_IN, PARAM_NEXT, PARAM_LAST, PARAM_OUT, JMP, SET_SYM, ARG_IN,
-        ARG_OUT, APPLY
+        PARAM_IN, PARAM_NEXT, PARAM_LAST, PARAM_OUT, PARAM_REST, JMP,
+        ARG_IN, ARG_OUT, APPLY
     );
 }
 
-sub has_1_operands {
+sub has_1_operand {
     my ($opcode) = @_;
 
     return in($opcode,
-        RETURN_IF, RETURN_REG, SET_PARAM_NEXT,
+        RETURN_IF, RETURN_REG, SET_PARAM_NEXT, SET_PARAM_REST,
         SET_PRIM_JOIN_SYM_SYM, IF_JMP, UNLESS_JMP, ARG_NEXT,
-        RETURN_NIL_UNLESS, RETURN_T_UNLESS, SET_APPLY
+        RETURN_NIL_UNLESS, RETURN_T_UNLESS, SET_APPLY, SET_SYM
     );
 }
 
@@ -514,7 +522,7 @@ sub registers_of {
     if (has_0_operands($opcode)) {
         return ();
     }
-    elsif (has_1_operands($opcode)) {
+    elsif (has_1_operand($opcode)) {
         return ($operand1);
     }
     elsif (has_2_operands($opcode)) {
@@ -597,10 +605,6 @@ my $RESUMING_AT = {};
 sub run_bytefunc {
     my ($bytecode, $reg_count, $bel, @args) = @_;
 
-    my $param_level = 0;
-    my $hacky_first_arg;
-    my @args_to_call;
-
     my $ip;
     my @registers;
     if (@args && $args[0] == $RESUMING_AT) {
@@ -615,36 +619,30 @@ sub run_bytefunc {
         @registers = (SYMBOL_NIL) x $reg_count;
     }
 
+    my @args_to_call;
+
     while (1) {
         my $opcode = $bytecode->[$ip];
-        if ($opcode == PARAM_IN) {
-            $param_level += 1;
-            $hacky_first_arg = shift(@args);
-        }
-        elsif ($opcode == SET_PARAM_NEXT) {
+        if ($opcode == SET_PARAM_NEXT) {
+            die "Underargs\n"
+                unless @args;
+
             my $reg_no = $bytecode->[$ip + 1];
-            if ($param_level == 0) {
-                $registers[$reg_no] = shift(@args);
-            }
-            elsif ($param_level == 1) {
-                die "Underargs\n"
-                    if is_nil($hacky_first_arg);
-                $registers[$reg_no] = $bel->car($hacky_first_arg);
-                $hacky_first_arg = $bel->cdr($hacky_first_arg);
-            }
-            else {
-                die "Unrecognized level $param_level\n";
+            $registers[$reg_no] = shift(@args);
+        }
+        elsif ($opcode == SET_PARAM_REST) {
+            my $reg_no = $bytecode->[$ip + 1];
+            $registers[$reg_no] = SYMBOL_NIL;
+            while (@args) {
+                $registers[$reg_no] = make_pair(
+                    pop(@args),
+                    $registers[$reg_no],
+                );
             }
         }
         elsif ($opcode == PARAM_LAST) {
-            if ($param_level == 1) {
-                die "Overargs\n"
-                    unless is_nil($hacky_first_arg);
-            }
-        }
-        elsif ($opcode == PARAM_OUT) {
-            $param_level -= 1;
-            $hacky_first_arg = undef;
+            die "Overargs\n"
+                if @args;
         }
         elsif ($opcode == JMP) {
             my $branch_address = $bytecode->[$ip + 1];
@@ -838,10 +836,6 @@ our @EXPORT_OK = qw(
     arg_out
     belify_bytefunc
     four_groups
-    has_0_operands
-    has_1_operands
-    has_2_operands
-    has_3_operands
     if_jmp
     jmp
     run_bytefunc
@@ -850,6 +844,7 @@ our @EXPORT_OK = qw(
     param_last
     param_next
     param_out
+    param_rest
     prim_car
     prim_cdr
     prim_id_reg_sym

@@ -935,7 +935,12 @@ FUT
         $self->handle_invoke_result($e, $aa);
     }
     elsif (is_bytefunc($op)) {
-        my $e = $op->apply($self, $args);
+        my @args;
+        while (!is_nil($args)) {
+            push @args, $self->car($args);
+            $args = $self->cdr($args);
+        }
+        my $e = $op->apply($self, @args);
         $self->handle_invoke_result($e, $aa);
     }
     else {

@@ -15,10 +15,8 @@ my $source = "
 
 my $target = "
     (bytefunc
-      (param!in)
       (param!next)
       (param!last)
-      (param!out)
       (%0 := 'nil)
       (return %0))
 ";
