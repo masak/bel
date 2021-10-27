@@ -183,6 +183,21 @@ add_bytefunc("snoc",
     return_reg(2),
 );
 
+add_bytefunc("list",
+    set(0, param_rest()),
+    set(1, prim_join_nil_nil()),
+    set(2, 1),
+    unless_jmp(0, 40),
+    set(3, prim_car(0)),
+    set(3, prim_join_reg_nil(3)),
+    prim_xdr(2, 3),
+    set(2, prim_cdr(2)),
+    set(0, prim_cdr(0)),
+    jmp(12),
+    set(1, prim_cdr(1)),
+    return_reg(1),
+);
+
 add_bytefunc("symbol",
     set(0, param_next()),
     param_last(),
