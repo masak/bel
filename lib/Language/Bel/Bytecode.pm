@@ -36,17 +36,17 @@ sub PRIM_XDR { 0x11 }
 sub PRIM_CAR { 0x12 }
 sub PRIM_CDR { 0x13 }
 sub PRIM_ID_REG_SYM { 0x14 }
-sub PRIM_JOIN_REG_REG { 0x15 }
-sub PRIM_JOIN_REG_SYM { 0x16 }
-sub PRIM_JOIN_SYM_SYM { 0x17 }
+sub PRIM_JOIN_NIL_NIL { 0x15 }
+sub PRIM_JOIN_REG_NIL { 0x16 }
+sub PRIM_JOIN_REG_REG { 0x17 }
 sub PRIM_TYPE_REG { 0x18 }
 
 sub SET_PRIM_CAR { 0x22 }
 sub SET_PRIM_CDR { 0x23 }
 sub SET_PRIM_ID_REG_SYM { 0x24 }
-sub SET_PRIM_JOIN_REG_REG { 0x25 }
-sub SET_PRIM_JOIN_REG_SYM { 0x26 }
-sub SET_PRIM_JOIN_SYM_SYM { 0x27 }
+sub SET_PRIM_JOIN_NIL_NIL { 0x25 }
+sub SET_PRIM_JOIN_REG_NIL { 0x26 }
+sub SET_PRIM_JOIN_REG_REG { 0x27 }
 sub SET_PRIM_TYPE_REG { 0x28 }
 
 sub SET_REG { 0x30 }
@@ -292,6 +292,25 @@ sub prim_id_reg_sym {
     return (PRIM_ID_REG_SYM, $register, SYMBOL($symbol), 0);
 }
 
+sub prim_join_nil_nil {
+    die "`prim_join_nil_nil` instruction expects exactly 0 operands"
+        unless @_ == 0;
+
+    return (PRIM_JOIN_NIL_NIL, SYMBOL("nil"), SYMBOL("nil"), 0);
+}
+
+sub prim_join_reg_nil {
+    die "`prim_join_reg_nil` instruction expects exactly 1 operand"
+        unless @_ == 1;
+
+    my ($register) = @_;
+
+    die "Illegal register argument to `prim_join_reg_sym`"
+        unless operand_is_register($register);
+
+    return (PRIM_JOIN_REG_NIL, $register, SYMBOL("nil"), 0);
+}
+
 sub prim_join_reg_reg {
     die "`prim_join_reg_reg` instruction expects exactly 2 operands"
         unless @_ == 2;
@@ -304,34 +323,6 @@ sub prim_join_reg_reg {
         unless operand_is_register($register2);
 
     return (PRIM_JOIN_REG_REG, $register1, $register2, 0);
-}
-
-sub prim_join_reg_sym {
-    die "`prim_join_reg_sym` instruction expects exactly 2 operands"
-        unless @_ == 2;
-
-    my ($register, $symbol) = @_;
-
-    die "Illegal register argument to `prim_join_reg_sym`"
-        unless operand_is_register($register);
-    die "Illegal symbol argument to `prim_join_reg_sym`"
-        unless operand_is_symbol($symbol);
-
-    return (PRIM_JOIN_REG_SYM, $register, SYMBOL($symbol), 0);
-}
-
-sub prim_join_sym_sym {
-    die "`prim_join_sym_sym` instruction expects exactly 2 operands"
-        unless @_ == 2;
-
-    my ($symbol1, $symbol2) = @_;
-
-    die "Illegal first symbol argument to `prim_join_sym_sym`"
-        unless operand_is_symbol($symbol1);
-    die "Illegal second symbol argument to `prim_join_sym_sym`"
-        unless operand_is_symbol($symbol2);
-
-    return (PRIM_JOIN_SYM_SYM, SYMBOL($symbol1), SYMBOL($symbol2), 0);
 }
 
 sub prim_type_reg {
@@ -455,9 +446,9 @@ sub set {
             : $op == PRIM_CDR ? SET_PRIM_CDR
             : $op == PRIM_ID_REG_SYM ? SET_PRIM_ID_REG_SYM
             : $op == PRIM_TYPE_REG ? SET_PRIM_TYPE_REG
+            : $op == PRIM_JOIN_NIL_NIL ? SET_PRIM_JOIN_NIL_NIL
+            : $op == PRIM_JOIN_REG_NIL ? SET_PRIM_JOIN_REG_NIL
             : $op == PRIM_JOIN_REG_REG ? SET_PRIM_JOIN_REG_REG
-            : $op == PRIM_JOIN_REG_SYM ? SET_PRIM_JOIN_REG_SYM
-            : $op == PRIM_JOIN_SYM_SYM ? SET_PRIM_JOIN_SYM_SYM
             : die sprintf("Unexpected underlying op to `set`: 0x%02x", $op);
 
         return ($set_op, $register, $r1, $r2);
@@ -478,7 +469,7 @@ sub has_1_operand {
 
     return in($opcode,
         RETURN_IF, RETURN_REG, SET_PARAM_NEXT, SET_PARAM_REST,
-        SET_PRIM_JOIN_SYM_SYM, IF_JMP, UNLESS_JMP, ARG_NEXT,
+        SET_PRIM_JOIN_NIL_NIL, IF_JMP, UNLESS_JMP, ARG_NEXT,
         RETURN_NIL_UNLESS, RETURN_T_UNLESS, SET_APPLY, SET_SYM
     );
 }
@@ -488,7 +479,7 @@ sub has_2_operands {
 
     return in($opcode,
         PRIM_XAR, PRIM_XDR, SET_PRIM_TYPE_REG, SET_PRIM_ID_REG_SYM,
-        SET_PRIM_JOIN_REG_SYM, SET_REG, SET_PRIM_CAR, SET_PRIM_CDR
+        SET_PRIM_JOIN_REG_NIL, SET_REG, SET_PRIM_CAR, SET_PRIM_CDR
     );
 }
 
@@ -759,7 +750,7 @@ sub run_bytefunc {
             $registers[$target_register_no]
                 = make_pair($car_value, $cdr_value);
         }
-        elsif ($opcode == SET_PRIM_JOIN_REG_SYM) {
+        elsif ($opcode == SET_PRIM_JOIN_REG_NIL) {
             my $target_register_no = $bytecode->[$ip + 1];
             my $car_register_no = $bytecode->[$ip + 2];
             my $cdr_symbol_id = $bytecode->[$ip + 3];
@@ -768,7 +759,7 @@ sub run_bytefunc {
             $registers[$target_register_no]
                 = make_pair($car_value, $cdr_symbol);
         }
-        elsif ($opcode == SET_PRIM_JOIN_SYM_SYM) {
+        elsif ($opcode == SET_PRIM_JOIN_NIL_NIL) {
             my $target_register_no = $bytecode->[$ip + 1];
             my $car_symbol_id = $bytecode->[$ip + 2];
             my $cdr_symbol_id = $bytecode->[$ip + 3];
@@ -848,9 +839,9 @@ our @EXPORT_OK = qw(
     prim_car
     prim_cdr
     prim_id_reg_sym
+    prim_join_nil_nil
+    prim_join_reg_nil
     prim_join_reg_reg
-    prim_join_reg_sym
-    prim_join_sym_sym
     prim_type_reg
     prim_xar
     prim_xdr

@@ -17,9 +17,9 @@ use Language::Bel::Bytecode qw(
     prim_car
     prim_cdr
     prim_id_reg_sym
+    prim_join_nil_nil
+    prim_join_reg_nil
     prim_join_reg_reg
-    prim_join_reg_sym
-    prim_join_sym_sym
     prim_type_reg
     prim_xar
     prim_xdr
@@ -138,7 +138,7 @@ add_bytefunc("cons",
 
 add_bytefunc("append",
     set(0, param_rest()),
-    set(1, prim_join_sym_sym("nil", "nil")),
+    set(1, prim_join_nil_nil()),
     set(2, 1),
     set(3, prim_cdr(0)),
     if_jmp(3, 36),
@@ -151,7 +151,7 @@ add_bytefunc("append",
     set(0, 3),
     jmp(12),
     set(5, prim_car(4)),
-    set(5, prim_join_reg_sym(5, "nil")),
+    set(5, prim_join_reg_nil(5)),
     prim_xdr(1, 5),
     set(1, 5),
     set(4, prim_cdr(4)),
@@ -163,18 +163,18 @@ add_bytefunc("snoc",
     set(0, param_rest()),
     set(1, prim_car(0)),
     set(0, prim_cdr(0)),
-    set(2, prim_join_sym_sym("nil", "nil")),
+    set(2, prim_join_nil_nil()),
     set(3, 2),
     unless_jmp(1, 48),
     set(4, prim_car(1)),
-    set(4, prim_join_reg_sym(4, "nil")),
+    set(4, prim_join_reg_nil(4)),
     prim_xdr(3, 4),
     set(3, prim_cdr(3)),
     set(1, prim_cdr(1)),
     jmp(20),
     unless_jmp(0, 76),
     set(4, prim_car(0)),
-    set(4, prim_join_reg_sym(4, "nil")),
+    set(4, prim_join_reg_nil(4)),
     prim_xdr(3, 4),
     set(3, prim_cdr(3)),
     set(0, prim_cdr(0)),
