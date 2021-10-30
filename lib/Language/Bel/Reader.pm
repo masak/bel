@@ -5,9 +5,14 @@ use strict;
 use warnings;
 
 use Language::Bel::Core qw(
+    is_pair
     make_char
     make_pair
     make_symbol
+    pair_car
+    pair_cdr
+    pair_set_car
+    pair_set_cdr
     SYMBOL_BQUOTE
     SYMBOL_COMMA
     SYMBOL_COMMA_AT
@@ -29,7 +34,7 @@ use Exporter 'import';
 sub read_whole {
     my ($expr) = @_;
 
-    return read_partial($expr, 0)->{ast};
+    return read_partial($expr, 0, {})->{ast};
 }
 
 my %char_codepoints = (
@@ -41,9 +46,12 @@ my %char_codepoints = (
 );
 
 sub read_partial {
-    my ($expr, $pos) = @_;
+    my ($expr, $pos, $share_ref) = @_;
 
-    $pos ||= 0;
+    die "pos parameter required"
+        unless defined($pos) && $pos =~ /^\d+$/;
+    die "share_ref parameter required"
+        unless defined($share_ref) && ref($share_ref) eq "HASH";
 
     my $skip_whitespace = sub {
         while ($pos < length($expr) && substr($expr, $pos, 1) =~ /\s/) {
@@ -58,6 +66,7 @@ sub read_partial {
             || $c eq ")"
             || $c eq "["
             || $c eq "]"
+            || $c eq "#"
             || $c eq " "
             || $c eq "\n";
     };
@@ -68,21 +77,21 @@ sub read_partial {
 
     my $c = substr($expr, $pos, 1);
     if ($c eq "(") {
-        return _rdlist($expr, ")", $pos);
+        return _rdlist($expr, ")", $pos, $share_ref);
     }
     elsif ($c eq "[") {
-        my $r = _rdlist($expr, "]", $pos);
+        my $r = _rdlist($expr, "]", $pos, $share_ref);
         return { ast => wrap_in_fn($r->{ast}), pos => $r->{pos} };
     }
     elsif ($c eq "'") {
         ++$pos;
-        my $r = read_partial($expr, $pos);
+        my $r = read_partial($expr, $pos, $share_ref);
         my $ast = make_pair(SYMBOL_QUOTE, make_pair($r->{ast}, SYMBOL_NIL));
         return { ast => $ast, pos => $r->{pos} };
     }
     elsif ($c eq "`") {
         ++$pos;
-        my $r = read_partial($expr, $pos);
+        my $r = read_partial($expr, $pos, $share_ref);
         my $ast = make_pair(SYMBOL_BQUOTE, make_pair($r->{ast}, SYMBOL_NIL));
         return { ast => $ast, pos => $r->{pos} };
     }
@@ -96,7 +105,7 @@ sub read_partial {
             ++$pos;
             $symbol = SYMBOL_COMMA_AT;
         }
-        my $r = read_partial($expr, $pos);
+        my $r = read_partial($expr, $pos, $share_ref);
         my $ast = make_pair($symbol, make_pair($r->{ast}, SYMBOL_NIL));
         return { ast => $ast, pos => $r->{pos} };
     }
@@ -145,11 +154,34 @@ sub read_partial {
         my $ast = make_str(join("", @chars));
         return { ast => $ast, pos => $pos };
     }
+    elsif ($c eq "#") {
+        ++$pos;
+        my $number_startpos = $pos;
+        while ($pos < length($expr) && substr($expr, $pos, 1) =~ /^\d$/) {
+            ++$pos;
+        }
+        my $name = substr($expr, $number_startpos, $pos - $number_startpos);
+        if ($pos < length($expr) && substr($expr, $pos, 1) eq "=") {
+            ++$pos;
+            $share_ref->{$name} = make_pair(SYMBOL_NIL, SYMBOL_NIL);
+            my $r = read_partial($expr, $pos, $share_ref);
+            die "bad-target"
+                unless is_pair($r->{ast});
+            pair_set_car($share_ref->{$name}, pair_car($r->{ast}));
+            pair_set_cdr($share_ref->{$name}, pair_cdr($r->{ast}));
+            return { ast => $share_ref->{$name}, pos => $r->{pos} };
+        }
+        else {
+            die "unknown-label\n"
+                unless exists $share_ref->{$name};
+            return { ast => $share_ref->{$name}, pos => $pos };
+        }
+    }
     elsif ($c eq ";") {
         while ($pos < length($expr) && substr($expr, $pos, 1) ne "\n") {
             ++$pos;
         }
-        return read_partial($expr, $pos);
+        return read_partial($expr, $pos, $share_ref);
     }
     else {  # symbol
         my $start = $pos;
@@ -171,7 +203,7 @@ sub read_partial {
 }
 
 sub _rdlist {
-    my ($expr, $stopper, $pos) = @_;
+    my ($expr, $stopper, $pos, $share_ref) = @_;
 
     my $skip_whitespace = sub {
         while ($pos < length($expr) && substr($expr, $pos, 1) =~ /\s/) {
@@ -209,7 +241,7 @@ sub _rdlist {
         if ($seen_element_after_dot) {
             die "only one element after dot allowed";
         }
-        my $r = read_partial($expr, $pos);
+        my $r = read_partial($expr, $pos, $share_ref);
         if ($seen_dot) {
             $seen_element_after_dot = 1;
         }
