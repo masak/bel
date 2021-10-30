@@ -59,7 +59,7 @@ sub output_of_eval_file {
     }
 
     while ($source) {
-        my $p = read_partial($source);
+        my $p = read_partial($source, 0, {});
         my $ast = $p->{ast};
         my $next_pos = $p->{pos};
 
