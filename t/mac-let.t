@@ -24,3 +24,8 @@ nested structure of definitions.
       (list x y)))
 (a b)
 
+> (let x 1
+    (let x (+ x 1)
+      x))
+2
+

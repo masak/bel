@@ -15,3 +15,9 @@ a
 > (with (x 'a y) y)
 nil
 
+> (let x 1
+    (with (x (+ x 1)
+           x (+ x 1))
+      x))
+2
+

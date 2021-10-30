@@ -32,3 +32,9 @@ a
     (cons x y))
 (a)
 
+> (let x 1
+    (withs (x (+ x 1)
+            x (+ x 1))
+      x))
+3
+
