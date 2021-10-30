@@ -150,10 +150,28 @@ sub xdr {
     $self->{primitives}->prim_xdr($pair, $d);
 }
 
+sub has_global {
+    my ($self, $name) = @_;
+
+    return $self->{globals}->has_global($name);
+}
+
+sub set_global {
+    my ($self, $name, $value) = @_;
+
+    $self->{globals}->set_global($name, $value);
+}
+
+sub get_global {
+    my ($self, $name) = @_;
+
+    return $self->{globals}->get_global($name);
+}
+
 =head2 read_eval_print
 
 Evaluates an expression, passed in as a string of Bel code.
-Prints the result.
+Prints the result, and returns it.
 
 =cut
 
@@ -170,7 +188,7 @@ sub read_eval_print {
         $self->output("\n");
     }
 
-    return;
+    return $result;
 }
 
 sub is_def_or_mac {
