@@ -6,11 +6,15 @@ use warnings;
 
 use Language::Bel::Core qw(
     are_identical
+    is_nil
     is_symbol
+    is_symbol_of_name
     make_char
     make_pair
     make_symbol
+    pair_car
     pair_cdr
+    pair_set_car
     pair_set_cdr
     symbol_name
     SYMBOL_CHAR
@@ -145,6 +149,34 @@ sub add_global {
 
     $self->{hash_ref}->{$name} = $kv;
     $self->{list} = make_pair($kv, $self->{list});
+}
+
+sub has_global {
+    my ($self, $name) = @_;
+
+    return exists $self->{hash_ref}->{$name};
+}
+
+sub set_global {
+    my ($self, $name, $value) = @_;
+
+    $self->{hash_ref}->{$name} = make_pair(make_symbol($name), $value);
+    my $g = $self->{list};
+    while (!is_nil($g)) {
+        my $kv = pair_car($g);
+        my $k = pair_car($kv);
+        if (is_symbol_of_name($k, $name)) {
+            pair_set_car(pair_cdr($kv), $value);
+            return;
+        }
+        $g = pair_cdr($g);
+    }
+}
+
+sub get_global {
+    my ($self, $name) = @_;
+
+    return pair_cdr($self->{hash_ref}->{$name});
 }
 
 sub new {

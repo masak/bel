@@ -5,6 +5,7 @@ use warnings;
 
 use Language::Bel;
 use Language::Bel::Reader qw(
+    read_whole
     read_partial
 );
 
@@ -57,15 +58,30 @@ sub eval_file {
     }
 }
 
+sub push_ats {
+    my ($bel, $latest_value) = @_;
+
+    if ($bel->has_global("@@")) {
+        $bel->set_global("@@@", $bel->get_global("@@"));
+    }
+
+    if ($bel->has_global("@")) {
+        $bel->set_global("@@", $bel->get_global("@"));
+    }
+
+    $bel->set_global("@", $latest_value);
+}
+
 sub repl {
-    my $b = Language::Bel->new();
+    my $bel = Language::Bel->new();
 
     print("Language::Bel ", $Language::Bel::VERSION, " -- $^O.\n");
     while (defined (my $expr = prompt("> "))) {
         next if $expr =~ /^\s*(?:;|$)/;
 
         eval {
-            $b->read_eval_print($expr);
+            my $result = $bel->read_eval_print($expr);
+            push_ats($bel, $result);
         };
         if ($@) {
             print("Error: $@");
