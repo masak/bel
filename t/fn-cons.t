@@ -21,3 +21,7 @@ nil
 > (cons 'a 'b 'c '(d e f))
 (a b c d e f)
 
+> (let p '(b)
+    (id (cdr:cons 'a p) p))
+t
+

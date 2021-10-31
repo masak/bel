@@ -15,3 +15,7 @@ nil
 > (list 'a 'b)
 (a b)
 
+> (let p '(a b c)
+    (id (apply list p) p))
+nil
+
