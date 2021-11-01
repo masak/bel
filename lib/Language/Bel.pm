@@ -144,10 +144,16 @@ sub cdr {
     $self->{primitives}->prim_cdr($pair);
 }
 
-sub xdr {
-    my ($self, $pair, $d) = @_;
+sub xar {
+    my ($self, $pair, $new_a) = @_;
 
-    $self->{primitives}->prim_xdr($pair, $d);
+    $self->{primitives}->prim_xar($pair, $new_a);
+}
+
+sub xdr {
+    my ($self, $pair, $new_d) = @_;
+
+    $self->{primitives}->prim_xdr($pair, $new_d);
 }
 
 =head2 read_eval_print
