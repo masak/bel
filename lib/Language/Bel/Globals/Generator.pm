@@ -26,6 +26,7 @@ use Language::Bel::Reader qw(
 );
 use Language::Bel::Globals::Source;
 use Language::Bel::Globals::FastFuncs;
+use Language::Bel::Globals::FastOperatives;
 use Language::Bel::Globals::ByteFuncs qw(
     all_bytefuncs
 );
@@ -46,6 +47,13 @@ my %FASTFUNCS;
 for my $name (@Language::Bel::Globals::FastFuncs::EXPORT_OK) {
     if ($name =~ /fastfunc__/) {
         $FASTFUNCS{$name} = 1;
+    }
+}
+
+my %FASTOPERATIVES;
+for my $name (@Language::Bel::Globals::FastOperatives::EXPORT_OK) {
+    if ($name =~ /fastoperative__/) {
+        $FASTOPERATIVES{$name} = 1;
     }
 }
 
@@ -249,6 +257,9 @@ use Language::Bel::Core qw(
 use Language::Bel::Pair::FastFunc qw(
     make_fastfunc
 );
+use Language::Bel::Pair::FastOperative qw(
+    make_fastoperative
+);
 use Language::Bel::Globals::ByteFuncs qw(
     bytefunc
 );
@@ -261,6 +272,17 @@ HEADER
 
     for my $name (@Language::Bel::Globals::FastFuncs::EXPORT_OK) {
         if ($name =~ /fastfunc__/) {
+            print " " x 4, $name, "\n";
+        }
+    }
+
+    print <<'HEADER';
+);
+use Language::Bel::Globals::FastOperatives qw(
+HEADER
+
+    for my $name (@Language::Bel::Globals::FastOperatives::EXPORT_OK) {
+        if ($name =~ /fastoperative__/) {
             print " " x 4, $name, "\n";
         }
     }
@@ -733,12 +755,15 @@ sub print_global {
     my $fastfunc_name = "fastfunc__$mangled_name";
     my $fastfunc_where_name = "fastfunc__where__$mangled_name";
     my $existing_fastfunc_name = $ff->($value);
+    my $fastoperative_name = "fastoperative__$mangled_name";
     my $maybe_ff_d = $existing_fastfunc_name
         ? qq[pair_cdr(\$self->get_kv("$existing_fastfunc_name"))]
         : $FASTFUNCS{$fastfunc_name} && $FASTFUNCS{$fastfunc_where_name}
         ? "make_fastfunc($serialized, \\\&$fastfunc_name, \\\&$fastfunc_where_name)"
         : $FASTFUNCS{$fastfunc_name}
         ? "make_fastfunc($serialized, \\\&$fastfunc_name)"
+        : $FASTOPERATIVES{$fastoperative_name}
+        ? "make_fastoperative($serialized, \\\&$fastoperative_name)"
         : $serialized;
     my $formatted = break_lines(qq[$ADD("$name", $maybe_ff_d);]);
     my $indented = join("\n", map { "        $_" } split("\n", $formatted));

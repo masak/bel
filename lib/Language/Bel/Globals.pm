@@ -27,6 +27,9 @@ use Language::Bel::Core qw(
 use Language::Bel::Pair::FastFunc qw(
     make_fastfunc
 );
+use Language::Bel::Pair::FastOperative qw(
+    make_fastoperative
+);
 use Language::Bel::Globals::ByteFuncs qw(
     bytefunc
 );
@@ -125,6 +128,9 @@ use Language::Bel::Globals::FastFuncs qw(
     fastfunc__rand
     fastfunc__array
     fastfunc__err
+);
+use Language::Bel::Globals::FastOperatives qw(
+    fastoperative__nof
 );
 
 sub make_prim {
@@ -7368,7 +7374,8 @@ sub new {
             SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))))),
             SYMBOL_NIL))));
 
-        $self->add_global("nof", make_pair(make_symbol("lit"),
+        $self->add_global("nof",
+            make_fastoperative(make_pair(make_symbol("lit"),
             make_pair(make_symbol("mac"), make_pair(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("n"), make_pair(make_symbol("expr"),
@@ -7386,7 +7393,7 @@ sub new {
             make_pair(SYMBOL_NIL, SYMBOL_NIL))), SYMBOL_NIL))),
             make_pair(SYMBOL_NIL, SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))),
             make_pair(SYMBOL_NIL, SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))),
-            SYMBOL_NIL))), SYMBOL_NIL))))), SYMBOL_NIL))));
+            SYMBOL_NIL))), SYMBOL_NIL))))), SYMBOL_NIL))), \&fastoperative__nof));
 
         $self->add_global("drain", make_pair(make_symbol("lit"),
             make_pair(make_symbol("mac"), make_pair(make_pair(make_symbol("lit"),
