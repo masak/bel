@@ -13,6 +13,9 @@ use Language::Bel::Core qw(
     SYMBOL_NIL
     SYMBOL_T
 );
+use Language::Bel::Globals::FastFuncs qw(
+    fastfunc__eq
+);
 use Language::Bel::Pair::Num qw(
     maybe_get_int
 );
@@ -107,6 +110,74 @@ sub fastoperative__and {
     return $loop->(0);
 }
 
+sub fastoperative__case {
+    my ($bel, $denv, $expr_, @args) = @_;
+
+    my $expr = undef;
+
+    my $loop;
+    $loop = sub {
+        my ($index) = @_;
+
+        while ($index < @args) {
+            if ($index == @args - 1) {
+                return make_async_eval(
+                    $args[$index],
+                    $denv,
+                    sub {
+                        my ($r) = @_;
+                        return $r;
+                    },
+                );
+            }
+            else {
+                if (defined($expr)) {
+                    my $eq = fastfunc__eq($bel, $expr, $args[$index]);
+                    if (!is_nil($eq)) {
+                        return make_async_eval(
+                            $args[$index + 1],
+                            $denv,
+                            sub {
+                                my ($r) = @_;
+                                return $r;
+                            },
+                        );
+                    }
+                    else {
+                        return $loop->($index + 2);
+                    }
+                }
+                else {
+                    return make_async_eval(
+                        $expr_,
+                        $denv,
+                        sub {
+                            $expr = $_[0];
+                            my $eq = fastfunc__eq($bel, $expr, $args[$index]);
+                            if (!is_nil($eq)) {
+                                return make_async_eval(
+                                    $args[$index + 1],
+                                    $denv,
+                                    sub {
+                                        my ($r) = @_;
+                                        return $r;
+                                    },
+                                );
+                            }
+                            else {
+                                return $loop->($index + 2);
+                            }
+                        },
+                    );
+                }
+            }
+        }
+
+        return SYMBOL_NIL;
+    };
+    return $loop->(0);
+}
+
 sub fastoperative__nof {
     my ($bel, $denv, $n_, $expr_) = @_;
 
@@ -147,6 +218,7 @@ our @EXPORT_OK = qw(
     fastoperative__do
     fastoperative__or
     fastoperative__and
+    fastoperative__case
     fastoperative__nof
 );
 
