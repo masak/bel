@@ -132,6 +132,7 @@ use Language::Bel::Globals::FastFuncs qw(
 use Language::Bel::Globals::FastOperatives qw(
     fastoperative__do
     fastoperative__or
+    fastoperative__and
     fastoperative__nof
 );
 
@@ -549,7 +550,8 @@ sub new {
             SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL)))), SYMBOL_NIL)))),
             SYMBOL_NIL))))), SYMBOL_NIL))), \&fastoperative__or));
 
-        $self->add_global("and", make_pair(make_symbol("lit"),
+        $self->add_global("and",
+            make_fastoperative(make_pair(make_symbol("lit"),
             make_pair(make_symbol("mac"), make_pair(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_symbol("args"),
@@ -561,7 +563,7 @@ sub new {
             make_pair(make_pair(make_symbol("or"), make_pair(make_symbol("args"),
             make_pair(make_pair(SYMBOL_QUOTE, make_pair(make_pair(SYMBOL_T,
             SYMBOL_NIL), SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL))),
-            SYMBOL_NIL))))), SYMBOL_NIL))));
+            SYMBOL_NIL))))), SYMBOL_NIL))), \&fastoperative__and));
 
         $self->add_global("=", make_fastfunc(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
