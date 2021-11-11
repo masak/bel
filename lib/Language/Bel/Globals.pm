@@ -115,6 +115,7 @@ use Language::Bel::Globals::FastFuncs qw(
     fastfunc__int
     fastfunc__pint
     fastfunc__charn
+    fastfunc__deq
     fastfunc__prn
     fastfunc__pr
     fastfunc__prs
@@ -4302,7 +4303,7 @@ sub new {
             SYMBOL_NIL)), make_pair(make_symbol("q"), SYMBOL_NIL))),
             SYMBOL_NIL))))));
 
-        $self->add_global("deq", make_pair(make_symbol("lit"),
+        $self->add_global("deq", make_fastfunc(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("q"), SYMBOL_NIL),
             make_pair(make_pair(make_symbol("atomic"),
@@ -4313,7 +4314,7 @@ sub new {
             make_pair(make_symbol("q"), make_pair(make_pair(make_symbol("cdr"),
             make_pair(make_pair(make_symbol("car"), make_pair(make_symbol("q"),
             SYMBOL_NIL)), SYMBOL_NIL)), SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL)),
-            SYMBOL_NIL))))));
+            SYMBOL_NIL))))), \&fastfunc__deq));
 
         $self->add_global("set", make_pair(make_symbol("lit"),
             make_pair(make_symbol("mac"), make_pair(make_pair(make_symbol("lit"),

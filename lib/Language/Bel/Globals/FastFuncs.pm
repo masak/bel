@@ -4337,6 +4337,14 @@ sub fastfunc__charn {
     );
 }
 
+sub fastfunc__deq {
+    my ($bel, $q) = @_;
+
+    my $do1 = $bel->car($bel->car($q));
+    $bel->xar($q, $bel->cdr($bel->car($q)));
+    return $do1;
+}
+
 sub fastfunc__prn {
     my ($bel, @args) = @_;
 
@@ -4707,6 +4715,7 @@ our @EXPORT_OK = qw(
     fastfunc__int
     fastfunc__pint
     fastfunc__charn
+    fastfunc__deq
     fastfunc__prn
     fastfunc__pr
     fastfunc__prs
