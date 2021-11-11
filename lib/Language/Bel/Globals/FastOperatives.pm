@@ -8,6 +8,7 @@ use Language::Bel::AsyncEval qw(
     make_async_eval
 );
 use Language::Bel::Core qw(
+    is_nil
     make_pair
     SYMBOL_NIL
 );
@@ -40,6 +41,35 @@ sub fastoperative__do {
         }
 
         return $result;
+    };
+    return $loop->(0);
+}
+
+sub fastoperative__or {
+    my ($bel, $denv, @args) = @_;
+
+    my $loop;
+    $loop = sub {
+        my ($index) = @_;
+
+        while ($index < @args) {
+            my $arg_ = $args[$index];
+            return make_async_eval(
+                $arg_,
+                $denv,
+                sub {
+                    my ($r) = @_;
+                    if (!is_nil($r)) {
+                        return $r;
+                    }
+                    else {
+                        return $loop->($index + 1);
+                    }
+                },
+            );
+        }
+
+        return SYMBOL_NIL;
     };
     return $loop->(0);
 }
@@ -82,6 +112,7 @@ sub fastoperative__nof {
 
 our @EXPORT_OK = qw(
     fastoperative__do
+    fastoperative__or
     fastoperative__nof
 );
 
