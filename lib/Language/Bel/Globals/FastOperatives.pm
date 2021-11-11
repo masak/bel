@@ -17,6 +17,33 @@ use Language::Bel::Pair::Num qw(
 
 use Exporter 'import';
 
+sub fastoperative__do {
+    my ($bel, $denv, @args) = @_;
+
+    my $result = SYMBOL_NIL;
+
+    my $loop;
+    $loop = sub {
+        my ($index) = @_;
+
+        while ($index < @args) {
+            my $arg_ = $args[$index];
+            return make_async_eval(
+                $arg_,
+                $denv,
+                sub {
+                    my ($r) = @_;
+                    $result = $r;
+                    return $loop->($index + 1);
+                },
+            );
+        }
+
+        return $result;
+    };
+    return $loop->(0);
+}
+
 sub fastoperative__nof {
     my ($bel, $denv, $n_, $expr_) = @_;
 
@@ -54,6 +81,7 @@ sub fastoperative__nof {
 }
 
 our @EXPORT_OK = qw(
+    fastoperative__do
     fastoperative__nof
 );
 

@@ -130,6 +130,7 @@ use Language::Bel::Globals::FastFuncs qw(
     fastfunc__err
 );
 use Language::Bel::Globals::FastOperatives qw(
+    fastoperative__do
     fastoperative__nof
 );
 
@@ -438,7 +439,7 @@ sub new {
             make_pair(SYMBOL_NIL, make_pair(make_pair(make_symbol("list"),
             make_pair(make_symbol("vmark"), SYMBOL_NIL)), SYMBOL_NIL))))));
 
-        $self->add_global("do", make_pair(make_symbol("lit"),
+        $self->add_global("do", make_fastoperative(make_pair(make_symbol("lit"),
             make_pair(make_symbol("mac"), make_pair(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_symbol("args"),
@@ -451,7 +452,7 @@ sub new {
             SYMBOL_NIL)), make_pair(make_pair(make_symbol("uvar"), SYMBOL_NIL),
             make_pair(make_symbol("y"), SYMBOL_NIL)))), make_pair(make_symbol("x"),
             SYMBOL_NIL))), SYMBOL_NIL))), make_pair(make_symbol("args"),
-            SYMBOL_NIL))), SYMBOL_NIL))))), SYMBOL_NIL))));
+            SYMBOL_NIL))), SYMBOL_NIL))))), SYMBOL_NIL))), \&fastoperative__do));
 
         $self->add_global("let", make_pair(make_symbol("lit"),
             make_pair(make_symbol("mac"), make_pair(make_pair(make_symbol("lit"),
