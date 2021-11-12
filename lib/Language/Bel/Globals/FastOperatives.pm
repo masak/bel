@@ -10,6 +10,7 @@ use Language::Bel::AsyncEval qw(
 use Language::Bel::Core qw(
     is_nil
     make_pair
+    make_symbol
     SYMBOL_NIL
     SYMBOL_T
 );
@@ -196,6 +197,45 @@ sub fastoperative__iflet {
     return $loop->(0);
 }
 
+sub fastoperative__aif {
+    my ($bel, $denv, @args) = @_;
+
+    my $loop;
+    $loop = sub {
+        my ($index) = @_;
+
+        if ($index >= @args - 1) {
+            return make_async_eval(
+                $args[$index] || SYMBOL_NIL,
+                $denv,
+            );
+        }
+        else {
+            return make_async_eval(
+                $args[$index],
+                $denv,
+                sub {
+                    my ($value) = @_;
+                    if (!is_nil($value)) {
+                        my $extended_denv = make_pair(
+                            make_pair(make_symbol("it"), $value),
+                            $denv,
+                        );
+                        return make_async_eval(
+                            $args[$index + 1],
+                            $extended_denv,
+                        );
+                    }
+                    else {
+                        return $loop->($index + 2);
+                    }
+                },
+            );
+        }
+    };
+    return $loop->(0);
+}
+
 sub fastoperative__nof {
     my ($bel, $denv, $n_, $expr_) = @_;
 
@@ -238,6 +278,7 @@ our @EXPORT_OK = qw(
     fastoperative__and
     fastoperative__case
     fastoperative__iflet
+    fastoperative__aif
     fastoperative__nof
 );
 
