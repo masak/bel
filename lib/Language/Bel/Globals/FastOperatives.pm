@@ -121,27 +121,13 @@ sub fastoperative__case {
 
         while ($index < @args) {
             if ($index == @args - 1) {
-                return make_async_eval(
-                    $args[$index],
-                    $denv,
-                    sub {
-                        my ($r) = @_;
-                        return $r;
-                    },
-                );
+                return make_async_eval($args[$index], $denv);
             }
             else {
                 if (defined($expr)) {
                     my $eq = fastfunc__eq($bel, $expr, $args[$index]);
                     if (!is_nil($eq)) {
-                        return make_async_eval(
-                            $args[$index + 1],
-                            $denv,
-                            sub {
-                                my ($r) = @_;
-                                return $r;
-                            },
-                        );
+                        return make_async_eval($args[$index + 1], $denv);
                     }
                     else {
                         return $loop->($index + 2);
@@ -158,10 +144,6 @@ sub fastoperative__case {
                                 return make_async_eval(
                                     $args[$index + 1],
                                     $denv,
-                                    sub {
-                                        my ($r) = @_;
-                                        return $r;
-                                    },
                                 );
                             }
                             else {
@@ -186,14 +168,7 @@ sub fastoperative__iflet {
         my ($index) = @_;
 
         if ($index >= @args - 1) {
-            return make_async_eval(
-                $args[$index] || SYMBOL_NIL,
-                $denv,
-                sub {
-                    my ($r) = @_;
-                    return $r;
-                },
-            );
+            return make_async_eval($args[$index] || SYMBOL_NIL, $denv);
         }
         else {
             return make_async_eval(
@@ -209,10 +184,6 @@ sub fastoperative__iflet {
                         return make_async_eval(
                             $args[$index + 1],
                             $extended_denv,
-                            sub {
-                                my ($r) = @_;
-                                return $r;
-                            },
                         );
                     }
                     else {

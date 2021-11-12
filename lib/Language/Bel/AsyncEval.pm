@@ -32,7 +32,9 @@ sub denv {
 sub invoke_cont {
     my ($self, $value) = @_;
 
-    return $self->{cont_sub}->($value);
+    return defined($self->{cont_sub})
+        ? $self->{cont_sub}->($value)
+        : $value;
 }
 
 sub is_async_eval {
