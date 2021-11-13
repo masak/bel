@@ -320,6 +320,39 @@ sub fastoperative__pcase {
     return $loop->(0);
 }
 
+my $UNSET = {};
+
+sub fastoperative__do1 {
+    my ($bel, $denv, @args) = @_;
+
+    my $result = $UNSET;
+
+    my $loop;
+    $loop = sub {
+        my ($index) = @_;
+
+        while ($index < @args) {
+            my $arg_ = $args[$index];
+            return make_async_eval(
+                $arg_,
+                $denv,
+                sub {
+                    my ($r) = @_;
+                    if ($result == $UNSET) {
+                        $result = $r;
+                    }
+                    return $loop->($index + 1);
+                },
+            );
+        }
+
+        return $result == $UNSET
+            ? SYMBOL_NIL
+            : $result;
+    };
+    return $loop->(0);
+}
+
 sub fastoperative__nof {
     my ($bel, $denv, $n_, $expr_) = @_;
 
@@ -364,6 +397,7 @@ our @EXPORT_OK = qw(
     fastoperative__iflet
     fastoperative__aif
     fastoperative__pcase
+    fastoperative__do1
     fastoperative__nof
 );
 

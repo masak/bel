@@ -137,6 +137,7 @@ use Language::Bel::Globals::FastOperatives qw(
     fastoperative__iflet
     fastoperative__aif
     fastoperative__pcase
+    fastoperative__do1
     fastoperative__nof
 );
 
@@ -4106,7 +4107,8 @@ sub new {
             make_pair(make_symbol("args"), SYMBOL_NIL))), SYMBOL_NIL))),
             SYMBOL_NIL))))));
 
-        $self->add_global("do1", make_pair(make_symbol("lit"),
+        $self->add_global("do1",
+            make_fastoperative(make_pair(make_symbol("lit"),
             make_pair(make_symbol("mac"), make_pair(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_symbol("args"), make_pair(make_pair(make_symbol("letu"),
@@ -4120,7 +4122,7 @@ sub new {
             SYMBOL_NIL)), make_pair(make_pair(make_symbol("cons"),
             make_pair(make_symbol("v"), make_pair(SYMBOL_NIL, SYMBOL_NIL))),
             SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))),
-            SYMBOL_NIL))), SYMBOL_NIL))))), SYMBOL_NIL))));
+            SYMBOL_NIL))), SYMBOL_NIL))))), SYMBOL_NIL))), \&fastoperative__do1));
 
         $self->add_global("gets", make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
