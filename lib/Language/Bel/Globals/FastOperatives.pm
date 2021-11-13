@@ -12,6 +12,7 @@ use Language::Bel::Core qw(
     make_pair
     make_symbol
     SYMBOL_NIL
+    SYMBOL_QUOTE
     SYMBOL_T
 );
 use Language::Bel::Globals::FastFuncs qw(
@@ -236,6 +237,89 @@ sub fastoperative__aif {
     return $loop->(0);
 }
 
+sub fastoperative__pcase {
+    my ($bel, $denv, $expr_, @args) = @_;
+
+    my $expr = undef;
+
+    my $loop;
+    $loop = sub {
+        my ($index) = @_;
+
+        while ($index < @args) {
+            if ($index == @args - 1) {
+                return make_async_eval(
+                    $args[$index],
+                    $denv,
+                );
+            }
+            else {
+                if (defined($expr)) {
+                    return make_async_eval(
+                        make_pair(
+                            $args[$index],
+                            make_pair(
+                                make_pair(
+                                    SYMBOL_QUOTE,
+                                    make_pair(
+                                        $expr,
+                                        SYMBOL_NIL,
+                                    ),
+                                ),
+                                SYMBOL_NIL,
+                            ),
+                        ),
+                        $denv,
+                        sub {
+                            my ($eq) = @_;
+                            return !is_nil($eq)
+                                ? make_async_eval($args[$index + 1], $denv)
+                                : $loop->($index + 2);
+                        },
+                    );
+                }
+                else {
+                    return make_async_eval(
+                        $expr_,
+                        $denv,
+                        sub {
+                            $expr = $_[0];
+
+                            return make_async_eval(
+                                make_pair(
+                                    $args[$index],
+                                    make_pair(
+                                        make_pair(
+                                            SYMBOL_QUOTE,
+                                            make_pair(
+                                                $expr,
+                                                SYMBOL_NIL,
+                                            ),
+                                        ),
+                                        SYMBOL_NIL,
+                                    ),
+                                ),
+                                $denv,
+                                sub {
+                                    my ($eq) = @_;
+                                    return !is_nil($eq)
+                                        ? make_async_eval(
+                                            $args[$index + 1],
+                                            $denv)
+                                        : $loop->($index + 2);
+                                },
+                            );
+                        },
+                    );
+                }
+            }
+        }
+
+        return SYMBOL_NIL;
+    };
+    return $loop->(0);
+}
+
 sub fastoperative__nof {
     my ($bel, $denv, $n_, $expr_) = @_;
 
@@ -279,6 +363,7 @@ our @EXPORT_OK = qw(
     fastoperative__case
     fastoperative__iflet
     fastoperative__aif
+    fastoperative__pcase
     fastoperative__nof
 );
 
