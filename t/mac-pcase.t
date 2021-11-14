@@ -44,3 +44,37 @@ five
     function 'five)
 nil
 
+The following few tests assert that if the pcase doesn't contain any cases --
+either nothing or at most the default -- the expression isn't even evaluated.
+
+> (let E nil
+    (pcase (do (zap snoc E 'evaluated)
+              'foo)
+      symbol (zap snoc E 'matched))
+    E)
+(evaluated matched)
+
+> (let E nil
+    (pcase (do (zap snoc E 'evaluated)
+              'foo)
+      'boo))
+boo
+
+> (let E nil
+    (pcase (do (zap snoc E 'evaluated)
+              'foo)
+      'boo)
+    E)
+nil
+
+> (let E nil
+    (pcase (do (zap snoc E 'evaluated)
+              'foo)))
+nil
+
+> (let E nil
+    (pcase (do (zap snoc E 'evaluated)
+              'foo))
+    E)
+nil
+
