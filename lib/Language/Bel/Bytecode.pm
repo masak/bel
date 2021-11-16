@@ -26,25 +26,27 @@ use Exporter 'import';
 sub PARAM_IN { 0x00 }
 sub PARAM_NEXT { 0x01 }
 sub SET_PARAM_NEXT { 0x02 }
-sub PARAM_LAST { 0x03 }
-sub PARAM_OUT { 0x04 }
+sub PARAM_REST { 0x03 }
+sub SET_PARAM_REST { 0x04 }
+sub PARAM_LAST { 0x05 }
+sub PARAM_OUT { 0x06 }
 
 sub PRIM_XAR { 0x10 }
 sub PRIM_XDR { 0x11 }
 sub PRIM_CAR { 0x12 }
 sub PRIM_CDR { 0x13 }
 sub PRIM_ID_REG_SYM { 0x14 }
-sub PRIM_JOIN_REG_REG { 0x15 }
-sub PRIM_JOIN_REG_SYM { 0x16 }
-sub PRIM_JOIN_SYM_SYM { 0x17 }
+sub PRIM_JOIN_NIL_NIL { 0x15 }
+sub PRIM_JOIN_REG_NIL { 0x16 }
+sub PRIM_JOIN_REG_REG { 0x17 }
 sub PRIM_TYPE_REG { 0x18 }
 
 sub SET_PRIM_CAR { 0x22 }
 sub SET_PRIM_CDR { 0x23 }
 sub SET_PRIM_ID_REG_SYM { 0x24 }
-sub SET_PRIM_JOIN_REG_REG { 0x25 }
-sub SET_PRIM_JOIN_REG_SYM { 0x26 }
-sub SET_PRIM_JOIN_SYM_SYM { 0x27 }
+sub SET_PRIM_JOIN_NIL_NIL { 0x25 }
+sub SET_PRIM_JOIN_REG_NIL { 0x26 }
+sub SET_PRIM_JOIN_REG_REG { 0x27 }
 sub SET_PRIM_TYPE_REG { 0x28 }
 
 sub SET_REG { 0x30 }
@@ -52,6 +54,7 @@ sub SET_SYM { 0x31 }
 
 sub JMP { 0x40 }
 sub IF_JMP { 0x41 }
+sub UNLESS_JMP { 0x42 }
 
 sub ARG_IN { 0x50 }
 sub ARG_NEXT { 0x51 }
@@ -158,6 +161,20 @@ sub if_jmp {
     return (IF_JMP, $register, $target_ip, 0);
 }
 
+sub unless_jmp {
+    die "`unless_jmp` instruction expects exactly 2 operands"
+        unless @_ == 2;
+
+    my ($register, $target_ip) = @_;
+
+    die "Illegal register argument to `unless_jmp`"
+        unless operand_is_register($register);
+    die "Illegal instruction pointer argument to `unless_jmp`"
+        unless operand_is_instruction_pointer($target_ip);
+
+    return (UNLESS_JMP, $register, $target_ip, 0);
+}
+
 sub jmp {
     die "`jmp` instruction expects exactly 1 operand"
         unless @_ == 1;
@@ -194,10 +211,12 @@ sub arg_out {
 }
 
 sub apply {
-    die "`apply` instruction expects no operands"
-        unless @_ == 0;
+    die "`apply` instruction expects exactly 1 operand"
+        unless @_ == 1;
 
-    return (APPLY, 0, 0, 0);
+    my ($register) = @_;
+
+    return (APPLY, $register, 0, 0);
 }
 
 sub param_in {
@@ -219,6 +238,13 @@ sub param_next {
         unless @_ == 0;
 
     return (PARAM_NEXT, 0, 0, 0);
+}
+
+sub param_rest {
+    die "`param_rest` instruction expects no operands"
+        unless @_ == 0;
+
+    return (PARAM_REST, 0, 0, 0);
 }
 
 sub param_out {
@@ -266,6 +292,25 @@ sub prim_id_reg_sym {
     return (PRIM_ID_REG_SYM, $register, SYMBOL($symbol), 0);
 }
 
+sub prim_join_nil_nil {
+    die "`prim_join_nil_nil` instruction expects exactly 0 operands"
+        unless @_ == 0;
+
+    return (PRIM_JOIN_NIL_NIL, SYMBOL("nil"), SYMBOL("nil"), 0);
+}
+
+sub prim_join_reg_nil {
+    die "`prim_join_reg_nil` instruction expects exactly 1 operand"
+        unless @_ == 1;
+
+    my ($register) = @_;
+
+    die "Illegal register argument to `prim_join_reg_sym`"
+        unless operand_is_register($register);
+
+    return (PRIM_JOIN_REG_NIL, $register, SYMBOL("nil"), 0);
+}
+
 sub prim_join_reg_reg {
     die "`prim_join_reg_reg` instruction expects exactly 2 operands"
         unless @_ == 2;
@@ -278,34 +323,6 @@ sub prim_join_reg_reg {
         unless operand_is_register($register2);
 
     return (PRIM_JOIN_REG_REG, $register1, $register2, 0);
-}
-
-sub prim_join_reg_sym {
-    die "`prim_join_reg_sym` instruction expects exactly 2 operands"
-        unless @_ == 2;
-
-    my ($register, $symbol) = @_;
-
-    die "Illegal register argument to `prim_join_reg_sym`"
-        unless operand_is_register($register);
-    die "Illegal symbol argument to `prim_join_reg_sym`"
-        unless operand_is_symbol($symbol);
-
-    return (PRIM_JOIN_REG_SYM, $register, SYMBOL($symbol), 0);
-}
-
-sub prim_join_sym_sym {
-    die "`prim_join_sym_sym` instruction expects exactly 2 operands"
-        unless @_ == 2;
-
-    my ($symbol1, $symbol2) = @_;
-
-    die "Illegal first symbol argument to `prim_join_sym_sym`"
-        unless operand_is_symbol($symbol1);
-    die "Illegal second symbol argument to `prim_join_sym_sym`"
-        unless operand_is_symbol($symbol2);
-
-    return (PRIM_JOIN_SYM_SYM, SYMBOL($symbol1), SYMBOL($symbol2), 0);
 }
 
 sub prim_type_reg {
@@ -424,16 +441,15 @@ sub set {
 
         my $set_op = $op == APPLY ? SET_APPLY
             : $op == PARAM_NEXT ? SET_PARAM_NEXT
+            : $op == PARAM_REST ? SET_PARAM_REST
             : $op == PRIM_CAR ? SET_PRIM_CAR
             : $op == PRIM_CDR ? SET_PRIM_CDR
             : $op == PRIM_ID_REG_SYM ? SET_PRIM_ID_REG_SYM
             : $op == PRIM_TYPE_REG ? SET_PRIM_TYPE_REG
+            : $op == PRIM_JOIN_NIL_NIL ? SET_PRIM_JOIN_NIL_NIL
+            : $op == PRIM_JOIN_REG_NIL ? SET_PRIM_JOIN_REG_NIL
             : $op == PRIM_JOIN_REG_REG ? SET_PRIM_JOIN_REG_REG
-            : $op == PRIM_JOIN_REG_SYM ? SET_PRIM_JOIN_REG_SYM
-            : $op == PRIM_JOIN_SYM_SYM ? SET_PRIM_JOIN_SYM_SYM
-            : -1;
-        die "Unexpected underlying op to `set`: ", sprintf("0x%02x", $op)
-            if $set_op == -1;
+            : die sprintf("Unexpected underlying op to `set`: 0x%02x", $op);
 
         return ($set_op, $register, $r1, $r2);
     }
@@ -443,18 +459,18 @@ sub has_0_operands {
     my ($opcode) = @_;
 
     return in($opcode,
-        PARAM_IN, PARAM_NEXT, PARAM_LAST, PARAM_OUT, JMP, SET_SYM, ARG_IN,
-        ARG_OUT, APPLY
+        PARAM_IN, PARAM_NEXT, PARAM_LAST, PARAM_OUT, PARAM_REST, JMP,
+        ARG_IN, ARG_OUT, APPLY
     );
 }
 
-sub has_1_operands {
+sub has_1_operand {
     my ($opcode) = @_;
 
     return in($opcode,
-        RETURN_IF, RETURN_REG, SET_PARAM_NEXT,
-        SET_PRIM_JOIN_SYM_SYM, IF_JMP, ARG_NEXT, RETURN_NIL_UNLESS,
-        RETURN_T_UNLESS, SET_APPLY
+        RETURN_IF, RETURN_REG, SET_PARAM_NEXT, SET_PARAM_REST,
+        SET_PRIM_JOIN_NIL_NIL, IF_JMP, UNLESS_JMP, ARG_NEXT,
+        RETURN_NIL_UNLESS, RETURN_T_UNLESS, SET_APPLY, SET_SYM
     );
 }
 
@@ -463,7 +479,7 @@ sub has_2_operands {
 
     return in($opcode,
         PRIM_XAR, PRIM_XDR, SET_PRIM_TYPE_REG, SET_PRIM_ID_REG_SYM,
-        SET_PRIM_JOIN_REG_SYM, SET_REG, SET_PRIM_CAR, SET_PRIM_CDR
+        SET_PRIM_JOIN_REG_NIL, SET_REG, SET_PRIM_CAR, SET_PRIM_CDR
     );
 }
 
@@ -497,7 +513,7 @@ sub registers_of {
     if (has_0_operands($opcode)) {
         return ();
     }
-    elsif (has_1_operands($opcode)) {
+    elsif (has_1_operand($opcode)) {
         return ($operand1);
     }
     elsif (has_2_operands($opcode)) {
@@ -580,10 +596,6 @@ my $RESUMING_AT = {};
 sub run_bytefunc {
     my ($bytecode, $reg_count, $bel, @args) = @_;
 
-    my $param_level = 0;
-    my $hacky_first_arg;
-    my @args_to_call;
-
     my $ip;
     my @registers;
     if (@args && $args[0] == $RESUMING_AT) {
@@ -595,39 +607,33 @@ sub run_bytefunc {
     }
     else {
         $ip = 0;
-        @registers = ("<uninitialized>") x $reg_count;
+        @registers = (SYMBOL_NIL) x $reg_count;
     }
+
+    my @args_to_call;
 
     while (1) {
         my $opcode = $bytecode->[$ip];
-        if ($opcode == PARAM_IN) {
-            $param_level += 1;
-            $hacky_first_arg = shift(@args);
-        }
-        elsif ($opcode == SET_PARAM_NEXT) {
+        if ($opcode == SET_PARAM_NEXT) {
+            die "Underargs\n"
+                unless @args;
+
             my $reg_no = $bytecode->[$ip + 1];
-            if ($param_level == 0) {
-                $registers[$reg_no] = shift(@args);
-            }
-            elsif ($param_level == 1) {
-                die "Underargs\n"
-                    if is_nil($hacky_first_arg);
-                $registers[$reg_no] = $bel->car($hacky_first_arg);
-                $hacky_first_arg = $bel->cdr($hacky_first_arg);
-            }
-            else {
-                die "Unrecognized level $param_level\n";
+            $registers[$reg_no] = shift(@args);
+        }
+        elsif ($opcode == SET_PARAM_REST) {
+            my $reg_no = $bytecode->[$ip + 1];
+            $registers[$reg_no] = SYMBOL_NIL;
+            while (@args) {
+                $registers[$reg_no] = make_pair(
+                    pop(@args),
+                    $registers[$reg_no],
+                );
             }
         }
         elsif ($opcode == PARAM_LAST) {
-            if ($param_level == 1) {
-                die "Overargs\n"
-                    unless is_nil($hacky_first_arg);
-            }
-        }
-        elsif ($opcode == PARAM_OUT) {
-            $param_level -= 1;
-            $hacky_first_arg = undef;
+            die "Overargs\n"
+                if @args;
         }
         elsif ($opcode == JMP) {
             my $branch_address = $bytecode->[$ip + 1];
@@ -639,6 +645,15 @@ sub run_bytefunc {
             my $branch_address = $bytecode->[$ip + 2];
             my $value = $registers[$register_no];
             if (!is_nil($value)) {
+                $ip = $branch_address;
+                next;
+            }
+        }
+        elsif ($opcode == UNLESS_JMP) {
+            my $register_no = $bytecode->[$ip + 1];
+            my $branch_address = $bytecode->[$ip + 2];
+            my $value = $registers[$register_no];
+            if (is_nil($value)) {
                 $ip = $branch_address;
                 next;
             }
@@ -735,7 +750,7 @@ sub run_bytefunc {
             $registers[$target_register_no]
                 = make_pair($car_value, $cdr_value);
         }
-        elsif ($opcode == SET_PRIM_JOIN_REG_SYM) {
+        elsif ($opcode == SET_PRIM_JOIN_REG_NIL) {
             my $target_register_no = $bytecode->[$ip + 1];
             my $car_register_no = $bytecode->[$ip + 2];
             my $cdr_symbol_id = $bytecode->[$ip + 3];
@@ -744,7 +759,7 @@ sub run_bytefunc {
             $registers[$target_register_no]
                 = make_pair($car_value, $cdr_symbol);
         }
-        elsif ($opcode == SET_PRIM_JOIN_SYM_SYM) {
+        elsif ($opcode == SET_PRIM_JOIN_NIL_NIL) {
             my $target_register_no = $bytecode->[$ip + 1];
             my $car_symbol_id = $bytecode->[$ip + 2];
             my $cdr_symbol_id = $bytecode->[$ip + 3];
@@ -812,10 +827,6 @@ our @EXPORT_OK = qw(
     arg_out
     belify_bytefunc
     four_groups
-    has_0_operands
-    has_1_operands
-    has_2_operands
-    has_3_operands
     if_jmp
     jmp
     run_bytefunc
@@ -824,12 +835,13 @@ our @EXPORT_OK = qw(
     param_last
     param_next
     param_out
+    param_rest
     prim_car
     prim_cdr
     prim_id_reg_sym
+    prim_join_nil_nil
+    prim_join_reg_nil
     prim_join_reg_reg
-    prim_join_reg_sym
-    prim_join_sym_sym
     prim_type_reg
     prim_xar
     prim_xdr
@@ -840,6 +852,7 @@ our @EXPORT_OK = qw(
     return_nil_unless
     return_t_unless
     set
+    unless_jmp
 );
 
 1;
