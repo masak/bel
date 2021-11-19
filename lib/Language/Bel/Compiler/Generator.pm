@@ -5,8 +5,10 @@ use strict;
 use warnings;
 
 use Language::Bel::Bytecode qw(
-    param_last
-    param_next
+    err_if
+    params
+    prim_car
+    prim_cdr
     prim_id_reg_sym
     prim_type_reg
     return_reg
@@ -95,8 +97,10 @@ sub generate_bytefunc {
 
     my $reg_count = 1;
     my @bytes = (
-        set(0, param_next()),
-        param_last(),
+        set(0, params()),
+        set(1, prim_cdr(0)),
+        err_if(1, "overargs"),
+        set(0, prim_car(0)),
     );
 
     while (!is_nil($body)) {
@@ -130,8 +134,8 @@ sub generate_bytefunc {
     }
 
     # A little brittle, but it'll work for now
-    if (scalar(@bytes) == 4 * 4 && is_set_sym($bytes[4 * 2])) {
-        @bytes[4*0 .. 4*0+3] = param_next();
+    if (scalar(@bytes) == 6 * 4 && is_set_sym($bytes[4 * 4])) {
+        splice(@bytes, 0, 4 * 4);
     }
 
     return make_bytefunc([@bytes]);

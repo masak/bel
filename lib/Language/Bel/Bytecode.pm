@@ -23,13 +23,8 @@ use Language::Bel::Core qw(
 );
 use Exporter 'import';
 
-sub PARAM_IN { 0x00 }
-sub PARAM_NEXT { 0x01 }
-sub SET_PARAM_NEXT { 0x02 }
-sub PARAM_REST { 0x03 }
-sub SET_PARAM_REST { 0x04 }
-sub PARAM_LAST { 0x05 }
-sub PARAM_OUT { 0x06 }
+sub PARAMS { 0x00 }
+sub SET_PARAMS { 0x01 }
 
 sub PRIM_XAR { 0x10 }
 sub PRIM_XDR { 0x11 }
@@ -64,6 +59,8 @@ sub APPLY { 0x60 }
 
 sub SET_APPLY { 0x70 }
 
+sub ERR_IF { 0xE0 }
+
 sub RETURN_REG { 0xF0 }
 sub RETURN_IF { 0xF1 }
 sub RETURN_NIL_UNLESS { 0xF2 }
@@ -76,6 +73,7 @@ my @registered_symbols = (
     "symbol",
     "char",
     "stream",
+    "overargs",
 );
 
 my @SYMBOLS = map { make_symbol($_) } @registered_symbols;
@@ -102,18 +100,10 @@ sub in {
     return grep { $_ == $element } @set;
 }
 
-my @PARAM_OPCODES = (
-    PARAM_IN,
-    PARAM_LAST,
-    PARAM_NEXT,
-    PARAM_OUT,
-    SET_PARAM_NEXT,
-);
-
 sub param_instruction {
     my ($opcode) = @_;
 
-    return in($opcode, @PARAM_OPCODES);
+    return $opcode == SET_PARAMS;
 }
 
 my @RETURN_OR_JMP = (
@@ -219,39 +209,11 @@ sub apply {
     return (APPLY, $register, 0, 0);
 }
 
-sub param_in {
-    die "`param_in` instruction expects no operands"
+sub params {
+    die "`params` instruction expects no operands"
         unless @_ == 0;
 
-    return (PARAM_IN, 0, 0, 0);
-}
-
-sub param_last {
-    die "`param_last` instruction expects no operands"
-        unless @_ == 0;
-
-    return (PARAM_LAST, 0, 0, 0);
-}
-
-sub param_next {
-    die "`param_next` instruction expects no operands"
-        unless @_ == 0;
-
-    return (PARAM_NEXT, 0, 0, 0);
-}
-
-sub param_rest {
-    die "`param_rest` instruction expects no operands"
-        unless @_ == 0;
-
-    return (PARAM_REST, 0, 0, 0);
-}
-
-sub param_out {
-    die "`param_out` instruction expects no operands"
-        unless @_ == 0;
-
-    return (PARAM_OUT, 0, 0, 0);
+    return (PARAMS, 0, 0, 0);
 }
 
 sub prim_car {
@@ -365,6 +327,21 @@ sub prim_xdr {
     return (PRIM_XDR, $register1, $register2, 0);
 }
 
+sub err_if {
+    die "`err_if` instruction expects exactly 2 operands"
+        unless @_ == 2;
+
+    my ($register, $symbol) = @_;
+
+    die "Illegal register argument to `err_if`"
+        unless operand_is_register($register);
+
+    die "Illegal symbol name argument to `err_if`"
+        unless operand_is_symbol($symbol);
+
+    return (ERR_IF, $register, SYMBOL($symbol), 0);
+}
+
 sub return_if {
     die "`return_if` instruction expects exactly 1 operand"
         unless @_ == 1;
@@ -440,8 +417,7 @@ sub set {
             unless $r3 == 0;
 
         my $set_op = $op == APPLY ? SET_APPLY
-            : $op == PARAM_NEXT ? SET_PARAM_NEXT
-            : $op == PARAM_REST ? SET_PARAM_REST
+            : $op == PARAMS ? SET_PARAMS
             : $op == PRIM_CAR ? SET_PRIM_CAR
             : $op == PRIM_CDR ? SET_PRIM_CDR
             : $op == PRIM_ID_REG_SYM ? SET_PRIM_ID_REG_SYM
@@ -459,8 +435,7 @@ sub has_0_operands {
     my ($opcode) = @_;
 
     return in($opcode,
-        PARAM_IN, PARAM_NEXT, PARAM_LAST, PARAM_OUT, PARAM_REST, JMP,
-        ARG_IN, ARG_OUT, APPLY
+        PARAMS, JMP, ARG_IN, ARG_OUT, APPLY
     );
 }
 
@@ -468,9 +443,9 @@ sub has_1_operand {
     my ($opcode) = @_;
 
     return in($opcode,
-        RETURN_IF, RETURN_REG, SET_PARAM_NEXT, SET_PARAM_REST,
-        SET_PRIM_JOIN_NIL_NIL, IF_JMP, UNLESS_JMP, ARG_NEXT,
-        RETURN_NIL_UNLESS, RETURN_T_UNLESS, SET_APPLY, SET_SYM
+        RETURN_IF, RETURN_REG, SET_PARAMS, SET_PRIM_JOIN_NIL_NIL, IF_JMP,
+        UNLESS_JMP, ARG_NEXT, ERR_IF, RETURN_NIL_UNLESS, RETURN_T_UNLESS,
+        SET_APPLY, SET_SYM
     );
 }
 
@@ -541,21 +516,19 @@ sub belify_instruction {
     my ($op) = @_;
     my ($opcode, $o1, $o2, $o3) = @$op;
 
-    if ($opcode == PARAM_IN) {
-        return "(param!in)";
-    }
-    elsif ($opcode == PARAM_NEXT) {
-        return "(param!next)";
-    }
-    elsif ($opcode == SET_PARAM_NEXT) {
+    if ($opcode == SET_PARAMS) {
         my $target = "%$o1";
-        return "($target := param!next)";
+        return "($target := params)";
     }
-    elsif ($opcode == PARAM_LAST) {
-        return "(param!last)";
+    elsif ($opcode == SET_PRIM_CAR) {
+        my $target = "%$o1";
+        my $reg = "%$o2";
+        return "($target := prim!car $reg)";
     }
-    elsif ($opcode == PARAM_OUT) {
-        return "(param!out)";
+    elsif ($opcode == SET_PRIM_CDR) {
+        my $target = "%$o1";
+        my $reg = "%$o2";
+        return "($target := prim!cdr $reg)";
     }
     elsif ($opcode == SET_PRIM_ID_REG_SYM) {
         my $target = "%$o1";
@@ -573,12 +546,17 @@ sub belify_instruction {
         my $sym = symbol_of($o2);
         return "($target := '$sym)";
     }
+    elsif ($opcode == ERR_IF) {
+        my $reg = "%$o1";
+        my $sym = symbol_of($o2);
+        return "(err!if $reg '$sym)";
+    }
     elsif ($opcode == RETURN_REG) {
         my $reg = "%$o1";
         return "(return $reg)";
     }
     else {
-        die "Unknown opcode $opcode";
+        die sprintf("Unknown opcode 0x%02x", $opcode);
     }
 }
 
@@ -614,26 +592,14 @@ sub run_bytefunc {
 
     while (1) {
         my $opcode = $bytecode->[$ip];
-        if ($opcode == SET_PARAM_NEXT) {
-            die "Underargs\n"
-                unless @args;
+        if ($opcode == SET_PARAMS) {
+            my $args = SYMBOL_NIL;
+            for my $arg (reverse(@args)) {
+                $args = make_pair($arg, $args);
+            }
 
             my $reg_no = $bytecode->[$ip + 1];
-            $registers[$reg_no] = shift(@args);
-        }
-        elsif ($opcode == SET_PARAM_REST) {
-            my $reg_no = $bytecode->[$ip + 1];
-            $registers[$reg_no] = SYMBOL_NIL;
-            while (@args) {
-                $registers[$reg_no] = make_pair(
-                    pop(@args),
-                    $registers[$reg_no],
-                );
-            }
-        }
-        elsif ($opcode == PARAM_LAST) {
-            die "Overargs\n"
-                if @args;
+            $registers[$reg_no] = $args;
         }
         elsif ($opcode == JMP) {
             my $branch_address = $bytecode->[$ip + 1];
@@ -786,6 +752,16 @@ sub run_bytefunc {
             my $symbol = $SYMBOLS[$symbol_id];
             $registers[$target_register_no] = $symbol;
         }
+        elsif ($opcode == ERR_IF) {
+            my $register_no = $bytecode->[$ip + 1];
+            my $value = $registers[$register_no];
+            my $symbol_id = $bytecode->[$ip + 2];
+            my $symbol = $SYMBOLS[$symbol_id];
+            my $symbol_name = symbol_name($symbol);
+            if (!is_nil($value)) {
+                $bel->{primitives}{err}->($symbol_name);
+            }
+        }
         elsif ($opcode == RETURN_REG) {
             my $register_no = $bytecode->[$ip + 1];
             my $value = $registers[$register_no];
@@ -826,16 +802,13 @@ our @EXPORT_OK = qw(
     arg_next
     arg_out
     belify_bytefunc
+    err_if
     four_groups
     if_jmp
     jmp
     run_bytefunc
     param_instruction
-    param_in
-    param_last
-    param_next
-    param_out
-    param_rest
+    params
     prim_car
     prim_cdr
     prim_id_reg_sym
