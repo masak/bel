@@ -396,6 +396,49 @@ sub fastoperative__whenlet {
     );
 }
 
+sub fastoperative__awhen {
+    my ($bel, $denv, $expr_, @body) = @_;
+
+    return make_async_eval(
+        $expr_,
+        $denv,
+        sub {
+            my ($value) = @_;
+
+            return SYMBOL_NIL
+                if is_nil($value);
+
+            my $extended_denv = make_pair(
+                make_pair(make_symbol("it"), $value),
+                $denv,
+            );
+
+            my $result = SYMBOL_NIL;
+
+            my $loop;
+            $loop = sub {
+                my ($index) = @_;
+
+                while ($index < @body) {
+                    my $statement_ = $body[$index];
+                    return make_async_eval(
+                        $statement_,
+                        $extended_denv,
+                        sub {
+                            my ($r) = @_;
+                            $result = $r;
+                            return $loop->($index + 1);
+                        },
+                    );
+                }
+
+                return $result;
+            };
+            return $loop->(0);
+        },
+    );
+}
+
 sub fastoperative__nof {
     my ($bel, $denv, $n_, $expr_) = @_;
 
@@ -442,6 +485,7 @@ our @EXPORT_OK = qw(
     fastoperative__pcase
     fastoperative__do1
     fastoperative__whenlet
+    fastoperative__awhen
     fastoperative__nof
 );
 
