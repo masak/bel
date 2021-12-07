@@ -483,6 +483,63 @@ sub fastoperative__whilet {
 
 }
 
+sub fastoperative__loop {
+    my ($bel, $denv, $var_, $init_, $update_, $test_, @body) = @_;
+
+    return make_async_eval(
+        $init_,
+        $denv,
+        sub {
+            my ($init) = @_;
+
+            my $loop;
+            $loop = sub {
+                my ($value) = @_;
+
+                my $extended_denv = make_pair(
+                    make_pair($var_, $value),
+                    $denv,
+                );
+
+                return make_async_eval(
+                    $test_,
+                    $extended_denv,
+                    sub {
+                        my ($condition) = @_;
+
+                        return SYMBOL_NIL
+                            if is_nil($condition);
+
+                        my $statement_loop;
+                        $statement_loop = sub {
+                            my ($index) = @_;
+
+                            while ($index < @body) {
+                                my $statement_ = $body[$index];
+                                return make_async_eval(
+                                    $statement_,
+                                    $extended_denv,
+                                    sub {
+                                        return $statement_loop->($index + 1);
+                                    },
+                                );
+                            }
+
+                            return make_async_eval(
+                                $update_,
+                                $extended_denv,
+                                $loop,
+                            );
+                        };
+                        return $statement_loop->(0);
+                    },
+                );
+            };
+            return $loop->($init);
+        },
+    );
+}
+
 sub fastoperative__nof {
     my ($bel, $denv, $n_, $expr_) = @_;
 
@@ -531,6 +588,7 @@ our @EXPORT_OK = qw(
     fastoperative__whenlet
     fastoperative__awhen
     fastoperative__whilet
+    fastoperative__loop
     fastoperative__nof
 );
 
