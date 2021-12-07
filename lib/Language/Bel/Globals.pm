@@ -138,6 +138,7 @@ use Language::Bel::Globals::FastOperatives qw(
     fastoperative__aif
     fastoperative__pcase
     fastoperative__do1
+    fastoperative__whenlet
     fastoperative__nof
 );
 
@@ -6818,7 +6819,8 @@ sub new {
             SYMBOL_NIL)))), SYMBOL_NIL))), make_pair(make_symbol("xs"),
             SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))))));
 
-        $self->add_global("whenlet", make_pair(make_symbol("lit"),
+        $self->add_global("whenlet",
+            make_fastoperative(make_pair(make_symbol("lit"),
             make_pair(make_symbol("mac"), make_pair(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("var"), make_pair(make_symbol("expr"),
@@ -6832,7 +6834,8 @@ sub new {
             SYMBOL_NIL)), make_pair(make_pair(make_symbol("append"),
             make_pair(make_symbol("body"), make_pair(SYMBOL_NIL, SYMBOL_NIL))),
             SYMBOL_NIL))), make_pair(SYMBOL_NIL, SYMBOL_NIL))), SYMBOL_NIL))),
-            SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))))), SYMBOL_NIL))));
+            SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))))), SYMBOL_NIL))),
+            \&fastoperative__whenlet));
 
         $self->add_global("awhen", make_pair(make_symbol("lit"),
             make_pair(make_symbol("mac"), make_pair(make_pair(make_symbol("lit"),
