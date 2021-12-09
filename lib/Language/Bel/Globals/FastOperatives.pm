@@ -585,6 +585,63 @@ sub fastoperative__while {
     );
 }
 
+sub fastoperative__til {
+    my ($bel, $denv, $var_, $expr_, $test_, @body) = @_;
+
+    return make_async_eval(
+        $expr_,
+        $denv,
+        sub {
+            my ($init) = @_;
+
+            my $loop;
+            $loop = sub {
+                my ($value) = @_;
+
+                my $extended_denv = make_pair(
+                    make_pair($var_, $value),
+                    $denv,
+                );
+
+                return make_async_eval(
+                    $test_,
+                    $extended_denv,
+                    sub {
+                        my ($condition) = @_;
+
+                        return SYMBOL_NIL
+                            unless is_nil($condition);
+
+                        my $statement_loop;
+                        $statement_loop = sub {
+                            my ($index) = @_;
+
+                            while ($index < @body) {
+                                my $statement_ = $body[$index];
+                                return make_async_eval(
+                                    $statement_,
+                                    $extended_denv,
+                                    sub {
+                                        return $statement_loop->($index + 1);
+                                    },
+                                );
+                            }
+
+                            return make_async_eval(
+                                $expr_,
+                                $extended_denv,
+                                $loop,
+                            );
+                        };
+                        return $statement_loop->(0);
+                    },
+                );
+            };
+            return $loop->($init);
+        },
+    );
+}
+
 sub fastoperative__nof {
     my ($bel, $denv, $n_, $expr_) = @_;
 
@@ -635,6 +692,7 @@ our @EXPORT_OK = qw(
     fastoperative__whilet
     fastoperative__loop
     fastoperative__while
+    fastoperative__til
     fastoperative__nof
 );
 

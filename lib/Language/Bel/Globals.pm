@@ -143,6 +143,7 @@ use Language::Bel::Globals::FastOperatives qw(
     fastoperative__whilet
     fastoperative__loop
     fastoperative__while
+    fastoperative__til
     fastoperative__nof
 );
 
@@ -7248,7 +7249,8 @@ sub new {
             SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))))), SYMBOL_NIL))),
             \&fastoperative__while));
 
-        $self->add_global("til", make_pair(make_symbol("lit"),
+        $self->add_global("til",
+            make_fastoperative(make_pair(make_symbol("lit"),
             make_pair(make_symbol("mac"), make_pair(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("var"), make_pair(make_symbol("expr"),
@@ -7266,7 +7268,7 @@ sub new {
             SYMBOL_NIL))), make_pair(make_pair(make_symbol("append"),
             make_pair(make_symbol("body"), make_pair(SYMBOL_NIL, SYMBOL_NIL))),
             SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))),
-            SYMBOL_NIL))), SYMBOL_NIL))))), SYMBOL_NIL))));
+            SYMBOL_NIL))), SYMBOL_NIL))))), SYMBOL_NIL))), \&fastoperative__til));
 
         $self->add_global("for", make_pair(make_symbol("lit"),
             make_pair(make_symbol("mac"), make_pair(make_pair(make_symbol("lit"),
