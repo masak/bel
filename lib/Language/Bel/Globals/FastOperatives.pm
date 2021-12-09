@@ -642,6 +642,50 @@ sub fastoperative__til {
     );
 }
 
+sub fastoperative__repeat {
+    my ($bel, $denv, $n_, @body) = @_;
+
+    return make_async_eval(
+        $n_,
+        $denv,
+        sub {
+            my ($n) = @_;
+            my $nn = maybe_get_int($bel, $n);
+            die "mistype\n"
+                unless defined($nn);
+            my $loop;
+            $loop = sub {
+                my ($iteration) = @_;
+
+                while ($iteration < $nn) {
+                    my $statement_loop;
+                    $statement_loop = sub {
+                        my ($index) = @_;
+
+                        while ($index < @body) {
+                            my $statement_ = $body[$index];
+                            return make_async_eval(
+                                $statement_,
+                                $denv,
+                                sub {
+                                    return $statement_loop->($index + 1);
+                                },
+                            );
+                        }
+
+                        return $loop->($iteration + 1);
+                    };
+
+                    return $statement_loop->(0);
+                }
+
+                return SYMBOL_NIL;
+            };
+            return $loop->(0);
+        },
+    );
+}
+
 sub fastoperative__nof {
     my ($bel, $denv, $n_, $expr_) = @_;
 
@@ -693,6 +737,7 @@ our @EXPORT_OK = qw(
     fastoperative__loop
     fastoperative__while
     fastoperative__til
+    fastoperative__repeat
     fastoperative__nof
 );
 

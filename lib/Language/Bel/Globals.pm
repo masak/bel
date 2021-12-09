@@ -144,6 +144,7 @@ use Language::Bel::Globals::FastOperatives qw(
     fastoperative__loop
     fastoperative__while
     fastoperative__til
+    fastoperative__repeat
     fastoperative__nof
 );
 
@@ -7313,7 +7314,8 @@ sub new {
             SYMBOL_NIL))), make_pair(SYMBOL_NIL, SYMBOL_NIL))), SYMBOL_NIL))),
             SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))))), SYMBOL_NIL))));
 
-        $self->add_global("repeat", make_pair(make_symbol("lit"),
+        $self->add_global("repeat",
+            make_fastoperative(make_pair(make_symbol("lit"),
             make_pair(make_symbol("mac"), make_pair(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("n"), make_symbol("body")),
@@ -7332,7 +7334,7 @@ sub new {
             make_pair(make_symbol("n"), make_pair(make_pair(make_symbol("append"),
             make_pair(make_symbol("body"), make_pair(SYMBOL_NIL, SYMBOL_NIL))),
             SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))),
-            SYMBOL_NIL))))), SYMBOL_NIL))));
+            SYMBOL_NIL))))), SYMBOL_NIL))), \&fastoperative__repeat));
 
         $self->add_global("poll", make_pair(make_symbol("lit"),
             make_pair(make_symbol("mac"), make_pair(make_pair(make_symbol("lit"),
