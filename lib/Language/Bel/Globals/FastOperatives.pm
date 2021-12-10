@@ -771,6 +771,74 @@ sub fastoperative__nof {
     );
 }
 
+sub fastoperative__drain {
+    my ($bel, $denv, $expr_, $f_) = @_;
+
+    my $result = make_pair(SYMBOL_NIL, SYMBOL_NIL);
+    my $result_tail = $result;
+
+    my $loop;
+    $loop = sub {
+        return make_async_eval(
+            $expr_,
+            $denv,
+            sub {
+                my ($expr) = @_;
+
+                if (defined($f_)) {
+                    return make_async_eval(
+                        $f_,
+                        $denv,
+                        sub {
+                            my ($f) = @_;
+
+                            return make_async_eval(
+                                make_pair(
+                                    $f,
+                                    make_pair(
+                                        make_pair(
+                                            SYMBOL_QUOTE,
+                                            make_pair(
+                                                $expr,
+                                                SYMBOL_NIL,
+                                            ),
+                                        ),
+                                        SYMBOL_NIL,
+                                    ),
+                                ),
+                                $denv,
+                                sub {
+                                    my ($condition) = @_;
+
+                                    return $bel->cdr($result)
+                                        if !is_nil($condition);
+
+                                    my $new_elem = make_pair($expr, SYMBOL_NIL);
+                                    $bel->xdr($result_tail, $new_elem);
+                                    $result_tail = $new_elem;
+
+                                    return $loop->();
+                                },
+                            );
+                        },
+                    );
+                }
+                else {
+                    return $bel->cdr($result)
+                        if is_nil($expr);
+
+                    my $new_elem = make_pair($expr, SYMBOL_NIL);
+                    $bel->xdr($result_tail, $new_elem);
+                    $result_tail = $new_elem;
+
+                    return $loop->();
+                }
+            },
+        );
+    };
+    $loop->();
+}
+
 our @EXPORT_OK = qw(
     fastoperative__do
     fastoperative__or
@@ -789,6 +857,7 @@ our @EXPORT_OK = qw(
     fastoperative__repeat
     fastoperative__poll
     fastoperative__nof
+    fastoperative__drain
 );
 
 1;

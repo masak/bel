@@ -147,6 +147,7 @@ use Language::Bel::Globals::FastOperatives qw(
     fastoperative__repeat
     fastoperative__poll
     fastoperative__nof
+    fastoperative__drain
 );
 
 sub make_prim {
@@ -7431,7 +7432,8 @@ sub new {
             make_pair(SYMBOL_NIL, SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))),
             SYMBOL_NIL))), SYMBOL_NIL))))), SYMBOL_NIL))), \&fastoperative__nof));
 
-        $self->add_global("drain", make_pair(make_symbol("lit"),
+        $self->add_global("drain",
+            make_fastoperative(make_pair(make_symbol("lit"),
             make_pair(make_symbol("mac"), make_pair(make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
             make_pair(make_pair(make_symbol("expr"),
@@ -7461,7 +7463,7 @@ sub new {
             SYMBOL_NIL))), SYMBOL_NIL))), make_pair(SYMBOL_NIL, SYMBOL_NIL))),
             SYMBOL_NIL))), SYMBOL_NIL))), make_pair(SYMBOL_NIL, SYMBOL_NIL))),
             SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))), SYMBOL_NIL))))),
-            SYMBOL_NIL))));
+            SYMBOL_NIL))), \&fastoperative__drain));
 
         $self->add_global("^w", make_pair(make_symbol("lit"),
             make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
