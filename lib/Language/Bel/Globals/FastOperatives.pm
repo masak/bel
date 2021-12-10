@@ -686,6 +686,55 @@ sub fastoperative__repeat {
     );
 }
 
+sub fastoperative__poll {
+    my ($bel, $denv, $expr_, $f_) = @_;
+
+    return make_async_eval(
+        $f_,
+        $denv,
+        sub {
+            my ($f) = @_;
+
+            my $loop;
+            $loop = sub {
+                return make_async_eval(
+                    $expr_,
+                    $denv,
+                    sub {
+                        my ($expr) = @_;
+
+                        return make_async_eval(
+                            make_pair(
+                                $f,
+                                make_pair(
+                                    make_pair(
+                                        SYMBOL_QUOTE,
+                                        make_pair(
+                                            $expr,
+                                            SYMBOL_NIL,
+                                        ),
+                                    ),
+                                    SYMBOL_NIL,
+                                ),
+                            ),
+                            $denv,
+                            sub {
+                                my ($condition) = @_;
+
+                                return $expr
+                                    if !is_nil($condition);
+
+                                return $loop->();
+                            },
+                        );
+                    },
+                );
+            };
+            return $loop->();
+        },
+    );
+}
+
 sub fastoperative__nof {
     my ($bel, $denv, $n_, $expr_) = @_;
 
@@ -738,6 +787,7 @@ our @EXPORT_OK = qw(
     fastoperative__while
     fastoperative__til
     fastoperative__repeat
+    fastoperative__poll
     fastoperative__nof
 );
 
