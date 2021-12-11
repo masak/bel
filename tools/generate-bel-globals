@@ -22,6 +22,16 @@ if ($status != 0) {
     die "Aborting due to failed consistency test\n";
 }
 
+$status = system(
+    "perl -T -Ilib t/00-consistent-fastoperative-exports.t " .
+    "> $filename 2>&1 > $filename"
+);
+
+if ($status != 0) {
+    system("cat $filename");
+    die "Aborting due to failed consistency test\n";
+}
+
 my $bel = Language::Bel->new({ output => sub {} });
 
 my $generated_globals;

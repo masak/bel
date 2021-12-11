@@ -38,6 +38,10 @@ sub invoke_cont {
 sub is_async_call {
     my ($value) = @_;
 
+    if (!ref($value)) {
+        use Carp;
+        confess "undefined value in is_async_call: $value";
+    }
     return $value->isa(__PACKAGE__);
 }
 

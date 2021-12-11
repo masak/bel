@@ -8,6 +8,9 @@ use Language::Bel::AsyncCall qw(
     is_async_call
     make_async_call
 );
+use Language::Bel::AsyncEval qw(
+    is_async_eval
+);
 use Language::Bel::Core qw(
     are_identical
     atoms_are_identical
@@ -34,6 +37,9 @@ use Language::Bel::Pair::ByteFunc qw(
 use Language::Bel::Pair::FastFunc qw(
     is_fastfunc
 );
+use Language::Bel::Pair::FastOperative qw(
+    is_fastoperative
+);
 use Language::Bel::Pair::FutFunc qw(
     make_futfunc
 );
@@ -52,11 +58,11 @@ Language::Bel - An interpreter for Paul Graham's language Bel
 
 =head1 VERSION
 
-Version 0.61
+Version 0.62
 
 =cut
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 =head1 SYNOPSIS
 
@@ -886,7 +892,16 @@ FUT
             };
 
             my $es = pair_cdr($e);
-            if ($isa_mac->($op)) {
+            if (is_fastoperative($op)) {
+                my @args;
+                while (!is_nil($es)) {
+                    push @args, pair_car($es);
+                    $es = pair_cdr($es);
+                }
+                my $result = $op->apply($self, $aa, @args);
+                $self->handle_invoke_result($result, $aa);
+            }
+            elsif ($isa_mac->($op)) {
                 $self->applym($op, $es, $aa);
             }
             else {
@@ -1012,6 +1027,24 @@ FUT
         push @{$self->{s}},
             $fu_cont,
             $fu_func;
+    }
+    elsif (is_async_eval($e)) {
+        my $entry = [$e->expr(), $e->denv()];
+        my $fu_cont = $self->fut(
+            <<'FUT',
+                (fn (s r m)
+                  ; invoke_cont
+                )
+FUT
+            sub {
+                my $result = pop @{$self->{r}};
+                my $e2 = $e->invoke_cont($result);
+                $self->handle_invoke_result($e2, $aa);
+            },
+        );
+        push @{$self->{s}},
+            $fu_cont,
+            $entry;
     }
     else {
         push @{$self->{r}}, $e;

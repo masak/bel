@@ -1,4 +1,4 @@
-package Language::Bel::Pair::FastFunc;
+package Language::Bel::Pair::FastOperative;
 use base qw(Language::Bel::Pair);
 
 use 5.006;
@@ -8,12 +8,11 @@ use warnings;
 use Exporter 'import';
 
 sub new {
-    my ($class, $pair, $fn, $where_fn) = @_;
+    my ($class, $pair, $fn) = @_;
 
     my $obj = {
         pair => $pair,
         fn => $fn,
-        where_fn => $where_fn,
     };
     return bless($obj, $class);
 }
@@ -42,39 +41,27 @@ sub xdr {
     return $self->{pair}->xdr($cdr);
 }
 
-sub handles_where {
-    my ($self) = @_;
-
-    return ref($self->{where_fn}) eq "CODE";
-}
-
 sub apply {
-    my ($self, $bel, @args) = @_;
+    my ($self, $bel, $denv, @args) = @_;
 
-    return $self->{fn}->($bel, @args);
+    return $self->{fn}->($bel, $denv, @args);
 }
 
-sub where_apply {
-    my ($self, $bel, @args) = @_;
-
-    return $self->{where_fn}->($bel, @args);
-}
-
-sub is_fastfunc {
+sub is_fastoperative {
     my ($object) = @_;
 
     return $object->isa(__PACKAGE__);
 }
 
-sub make_fastfunc {
-    my ($pair, $fn, $where_fn) = @_;
+sub make_fastoperative {
+    my ($pair, $fn) = @_;
 
-    return __PACKAGE__->new($pair, $fn, $where_fn);
+    return __PACKAGE__->new($pair, $fn);
 }
 
 our @EXPORT_OK = qw(
-    is_fastfunc
-    make_fastfunc
+    is_fastoperative
+    make_fastoperative
 );
 
 1;

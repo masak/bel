@@ -30,3 +30,9 @@ so any side effects from them are still visible.
     y)
 hey
 
+A (rare) edge case which nevertheless works is that of an empty
+sequence of `do1` expressions.
+
+> (do1)
+nil
+
