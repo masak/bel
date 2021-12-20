@@ -16,8 +16,10 @@ my $source = "
 
 my $target = "
     (bytefunc
-      (%0 := param!next)
-      (param!last)
+      (%0 := params)
+      (%1 := prim!cdr %0)
+      (err!if %1 'overargs)
+      (%0 := prim!car %0)
       (%0 := prim!type %0)
       (%0 := prim!id %0 'pair)
       (%0 := prim!id %0 'nil)
