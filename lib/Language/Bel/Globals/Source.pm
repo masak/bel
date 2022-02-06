@@ -1811,3 +1811,5 @@ __DATA__
 
 (set bcfn (table))
 
+(def prompt ((o msg)))
+

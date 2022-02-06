@@ -129,6 +129,7 @@ use Language::Bel::Globals::FastFuncs qw(
     fastfunc__rand
     fastfunc__array
     fastfunc__err
+    fastfunc__prompt
 );
 use Language::Bel::Globals::FastOperatives qw(
     fastoperative__do
@@ -8359,6 +8360,12 @@ sub new {
 
         $self->add_global("bcfn", make_pair(make_symbol("lit"),
             make_pair(make_symbol("tab"), SYMBOL_NIL)));
+
+        $self->add_global("prompt", make_fastfunc(make_pair(make_symbol("lit"),
+            make_pair(make_symbol("clo"), make_pair(SYMBOL_NIL,
+            make_pair(make_pair(make_pair(make_symbol("o"),
+            make_pair(make_symbol("msg"), SYMBOL_NIL)), SYMBOL_NIL),
+            make_pair(SYMBOL_NIL, SYMBOL_NIL))))), \&fastfunc__prompt));
         pair_set_cdr(
             pair_cdr(pair_cdr($self->{hash_ref}->{bcfn})),
             make_pair(
