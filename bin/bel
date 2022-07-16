@@ -19,42 +19,48 @@ sub prompt {
     return $input;
 }
 
-if (@ARGV == 1) {
-    my ($source_file) = $ARGV[0];
-    eval_file($source_file);
+if (@ARGV) {
+    eval_files(@ARGV);
 }
 else {
     repl();
 }
 
-sub eval_file {
-    my ($source_file) = @_;
+sub eval_files {
+    my (@files) = @_;
+
+    for my $file (@files) {
+        die "Bel source file not found: $file\n"
+            unless -f $file;
+    }
 
     my $b = Language::Bel->new();
 
-    my $source;
-    {
-        local $/;
-        open my $fh, '<', $source_file
-            or die "can't open $source_file for reading: $!";
-        $source = <$fh>;
-    }
-
-    while ($source) {
-        my $p = read_partial($source, 0, {});
-        my $ast = $p->{ast};
-        my $next_pos = $p->{pos};
-
-        eval {
-            $b->eval($ast);
-        };
-        if ($@) {
-            print("Error: $@");
-            last;
+    for my $file (@files) {
+        my $source;
+        {
+            local $/;
+            open my $fh, '<', $file
+                or die "can't open $file for reading: $!";
+            $source = <$fh>;
         }
 
-        $source = substr($source, $next_pos);
-        $source =~ s/^\s+//;
+        while ($source) {
+            my $p = read_partial($source, 0, {});
+            my $ast = $p->{ast};
+            my $next_pos = $p->{pos};
+
+            eval {
+                $b->eval($ast);
+            };
+            if ($@) {
+                print("Error: $@");
+                last;
+            }
+
+            $source = substr($source, $next_pos);
+            $source =~ s/^\s+//;
+        }
     }
 }
 
