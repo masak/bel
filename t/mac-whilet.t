@@ -43,3 +43,14 @@ nil
 > K
 (d c b a)
 
+> (set x '((a b) (c d) (e f))
+       y '())
+nil
+
+> (whilet (e1 e2) (pop x)
+    (push e2 y))
+nil
+
+> y
+(f d b)
+

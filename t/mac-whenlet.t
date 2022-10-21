@@ -35,4 +35,13 @@ nil
 > x
 "original"
 
+> (whenlet (a b . c) '(1 2 3 4 5)
+    (list a b c)
+    b)
+2
+
+> (whenlet (a b . c) nil
+    (list a b c)
+    c)
+nil
 
