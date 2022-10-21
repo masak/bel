@@ -162,42 +162,6 @@ sub fastoperative__case {
     return $loop->(0);
 }
 
-sub fastoperative__iflet {
-    my ($bel, $denv, $var_, @args) = @_;
-
-    my $loop;
-    $loop = sub {
-        my ($index) = @_;
-
-        if ($index >= @args - 1) {
-            return make_async_eval($args[$index] || SYMBOL_NIL, $denv);
-        }
-        else {
-            return make_async_eval(
-                $args[$index],
-                $denv,
-                sub {
-                    my ($value) = @_;
-                    if (!is_nil($value)) {
-                        my $extended_denv = make_pair(
-                            make_pair($var_, $value),
-                            $denv,
-                        );
-                        return make_async_eval(
-                            $args[$index + 1],
-                            $extended_denv,
-                        );
-                    }
-                    else {
-                        return $loop->($index + 2);
-                    }
-                },
-            );
-        }
-    };
-    return $loop->(0);
-}
-
 sub fastoperative__aif {
     my ($bel, $denv, @args) = @_;
 
@@ -353,49 +317,6 @@ sub fastoperative__do1 {
     return $loop->(0);
 }
 
-sub fastoperative__whenlet {
-    my ($bel, $denv, $var_, $expr_, @body) = @_;
-
-    return make_async_eval(
-        $expr_,
-        $denv,
-        sub {
-            my ($value) = @_;
-
-            return SYMBOL_NIL
-                if is_nil($value);
-
-            my $extended_denv = make_pair(
-                make_pair($var_, $value),
-                $denv,
-            );
-
-            my $result = SYMBOL_NIL;
-
-            my $loop;
-            $loop = sub {
-                my ($index) = @_;
-
-                while ($index < @body) {
-                    my $statement_ = $body[$index];
-                    return make_async_eval(
-                        $statement_,
-                        $extended_denv,
-                        sub {
-                            my ($r) = @_;
-                            $result = $r;
-                            return $loop->($index + 1);
-                        },
-                    );
-                }
-
-                return $result;
-            };
-            return $loop->(0);
-        },
-    );
-}
-
 sub fastoperative__awhen {
     my ($bel, $denv, $expr_, @body) = @_;
 
@@ -437,50 +358,6 @@ sub fastoperative__awhen {
             return $loop->(0);
         },
     );
-}
-
-sub fastoperative__whilet {
-    my ($bel, $denv, $var_, $expr_, @body) = @_;
-
-    my $while_loop;
-    $while_loop = sub {
-        return make_async_eval(
-            $expr_,
-            $denv,
-            sub {
-                my ($value) = @_;
-
-                return SYMBOL_NIL
-                    if is_nil($value);
-
-                my $extended_denv = make_pair(
-                    make_pair($var_, $value),
-                    $denv,
-                );
-
-                my $statement_loop;
-                $statement_loop = sub {
-                    my ($index) = @_;
-
-                    while ($index < @body) {
-                        my $statement_ = $body[$index];
-                        return make_async_eval(
-                            $statement_,
-                            $extended_denv,
-                            sub {
-                                return $statement_loop->($index + 1);
-                            },
-                        );
-                    }
-
-                    return $while_loop->();
-                };
-                return $statement_loop->(0);
-            },
-        );
-    };
-    return $while_loop->();
-
 }
 
 sub fastoperative__loop {
@@ -844,13 +721,10 @@ our @EXPORT_OK = qw(
     fastoperative__or
     fastoperative__and
     fastoperative__case
-    fastoperative__iflet
     fastoperative__aif
     fastoperative__pcase
     fastoperative__do1
-    fastoperative__whenlet
     fastoperative__awhen
-    fastoperative__whilet
     fastoperative__loop
     fastoperative__while
     fastoperative__til
