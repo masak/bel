@@ -23,3 +23,13 @@ nil
     'e)
 e
 
+> (iflet (a b . c) '(1 2 3 4 5)
+    (list a b c)
+    'flurken)
+(1 2 (3 4 5))
+
+> (iflet (a b . c) nil
+    (list a b c)
+    'gherkin)
+gherkin
+
