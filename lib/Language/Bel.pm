@@ -58,11 +58,11 @@ Language::Bel - An interpreter for Paul Graham's language Bel
 
 =head1 VERSION
 
-Version 0.63
+Version 0.64
 
 =cut
 
-our $VERSION = '0.63';
+our $VERSION = '0.64';
 
 =head1 SYNOPSIS
 
@@ -1177,7 +1177,13 @@ sub applylit {
             my $quoted_args = SYMBOL_NIL;
             while (@stack) {
                 $quoted_args = make_pair(
-                    pop(@stack),
+                    make_pair(
+                        make_symbol("quote"),
+                        make_pair(
+                            pop(@stack),
+                            SYMBOL_NIL,
+                        ),
+                    ),
                     $quoted_args,
                 );
             }
