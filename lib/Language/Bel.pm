@@ -1177,7 +1177,13 @@ sub applylit {
             my $quoted_args = SYMBOL_NIL;
             while (@stack) {
                 $quoted_args = make_pair(
-                    pop(@stack),
+                    make_pair(
+                        make_symbol("quote"),
+                        make_pair(
+                            pop(@stack),
+                            SYMBOL_NIL,
+                        ),
+                    ),
                     $quoted_args,
                 );
             }
