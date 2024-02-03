@@ -20,6 +20,7 @@ use Language::Bel::Core qw(
     make_char
     make_pair
     make_symbol
+    string_value
     SYMBOL_A
     SYMBOL_D
     SYMBOL_NIL
@@ -4634,6 +4635,25 @@ sub fastfunc__err {
     die _print($msg), "\n";
 }
 
+sub fastfunc__prompt {
+    my ($bel, $msg) = @_;
+
+    if (defined($msg) && !is_nil($msg)) {
+        die "mistype\n"
+            if is_nil(fastfunc__string($bel, $msg));
+        $bel->output(is_str($msg)
+            ? $msg->string()
+            : string_value($msg));
+    }
+    my $input_line = <>;
+    if (!defined($input_line)) {
+        $bel->output("\n");
+        die "eof\n";
+    }
+    chomp $input_line;
+    return make_str($input_line);
+}
+
 our @EXPORT_OK = qw(
     fastfunc__no
     fastfunc__atom
@@ -4726,6 +4746,7 @@ our @EXPORT_OK = qw(
     fastfunc__rand
     fastfunc__array
     fastfunc__err
+    fastfunc__prompt
 );
 
 1;
