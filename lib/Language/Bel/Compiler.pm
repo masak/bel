@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-use Language::Bel::Compiler::Pass::AllocateRegisters;
+use Language::Bel::Compiler::Pass::Allocate;
 use Language::Bel::Compiler::Pass::Alpha;
 use Language::Bel::Compiler::Pass::Flatten;
 use Language::Bel::Compiler::Generator qw(
@@ -22,7 +22,7 @@ sub make_pass {
 my @PASSES = map { make_pass($_) } qw<
     Alpha
     Flatten
-    AllocateRegisters
+    Allocate
 >;
 
 sub compile {
