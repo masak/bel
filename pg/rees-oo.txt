@@ -1,0 +1,143 @@
+;; from https://www.paulgraham.com/reesoo.html
+
+(Jonathan Rees had a really interesting response to Why Arc isn't Especially Object-Oriented, which he has allowed me to reproduce here.)
+
+Here is an a la carte menu of features or properties that are related to these terms; I have heard OO defined to be many different subsets of this list.
+
+1. Encapsulation - the ability to syntactically hide the implementation of a type. E.g. in C or Pascal you always know whether something is a struct or an array, but in CLU and Java you can hide the difference.
+
+2. Protection - the inability of the client of a type to detect its implementation. This guarantees that a behavior-preserving change to an implementation will not break its clients, and also makes sure that things like passwords don't leak out.
+
+3. Ad hoc polymorphism - functions and data structures with parameters that can take on values of many different types.
+
+4. Parametric polymorphism - functions and data structures that parameterize over arbitrary values (e.g. list of anything). ML and Lisp both have this. Java doesn't quite because of its non-Object types.
+
+5. Everything is an object - all values are objects. True in Smalltalk (?) but not in Java (because of int and friends).
+
+6. All you can do is send a message (AYCDISAM) = Actors model - there is no direct manipulation of objects, only communication with (or invocation of) them. The presence of fields in Java violates this.
+
+7. Specification inheritance = subtyping - there are distinct types known to the language with the property that a value of one type is as good as a value of another for the purposes of type correctness. (E.g. Java interface inheritance.)
+
+8. Implementation inheritance/reuse - having written one pile of code, a similar pile (e.g. a superset) can be generated in a controlled manner, i.e. the code doesn't have to be copied and edited. A limited and peculiar kind of abstraction. (E.g. Java class inheritance.)
+
+9. Sum-of-product-of-function pattern - objects are (in effect) restricted to be functions that take as first argument a distinguished method key argument that is drawn from a finite set of simple names.
+
+ So OO is not a well defined concept. Some people (eg. Abelson and Sussman?) say Lisp is OO, by which they mean {3,4,5,7} (with the proviso that all types are in the programmers' heads). Java is supposed to be OO because of {1,2,3,7,8,9}. E is supposed to be more OO than Java because it has {1,2,3,4,5,7,9} and almost has 6; 8 (subclassing) is seen as antagonistic to E's goals and not necessary for OO.
+
+The conventional Simula 67-like pattern of class and instance will get you {1,3,7,9}, and I think many people take this as a definition of OO.
+
+Because OO is a moving target, OO zealots will choose some subset of this menu by whim and then use it to try to convince you that you are a loser.
+
+Perhaps part of the confusion - and you say this in a different way in your little memo - is that the C/C++ folks see OO as a liberation from a world that has nothing resembling a first-class functions, while Lisp folks see OO as a prison since it limits their use of functions/objects to the style of (9.). In that case, the only way OO can be defended is in the same manner as any other game or discipline -- by arguing that by giving something up (e.g. the freedom to throw eggs at your neighbor's house) you gain something that you want (assurance that your neighbor won't put you in jail).
+
+This is related to Lisp being oriented to the solitary hacker and discipline-imposing languages being oriented to social packs, another point you mention. In a pack you want to restrict everyone else's freedom as much as possible to reduce their ability to interfere with and take advantage of you, and the only way to do that is by either becoming chief (dangerous and unlikely) or by submitting to the same rules that they do. If you submit to rules, you then want the rules to be liberal so that you have a chance of doing most of what you want to do, but not so liberal that others nail you.
+
+In such a pack-programming world, the language is a constitution or set of by-laws, and the interpreter/compiler/QA dept. acts in part as a rule checker/enforcer/police force. Co-programmers want to know: If I work with your code, will this help me or hurt me? Correctness is undecidable (and generally unenforceable), so managers go with whatever rule set (static type system, language restrictions, "lint" program, etc.) shows up at the door when the project starts.
+
+I recently contributed to a discussion of anti-OO on the e-lang list. My main anti-OO message (actually it only attacks points 5/6) was http://www.eros-os.org/pipermail/e-lang/2001-October/005852.html. The followups are interesting but I don't think they're all threaded properly.
+
+(Here are the pet definitions of terms used above:
+
+* Value = something that can be passed to some function (abstraction). (I exclude exotic compile-time things like parameters to macros and to parameterized types and modules.)
+
+* Object = a value that has function-like behavior, i.e. you can invoke a method on it or call it or send it a message or something like that. Some people define object more strictly along the lines of 9. above, while others (e.g. CLTL) are more liberal. This is what makes "everything is an object" a vacuous statement in the absence of clear definitions.
+
+* In some languages the "call" is curried and the key-to-method mapping can sometimes be done at compile time. This technicality can cloud discussions of OO in C++ and related languages.
+
+* Function = something that can be combined with particular parameter(s) to produce some result. Might or might not be the same as object depending on the language.
+
+* Type = a description of the space of values over which a function is meaningfully parameterized. I include both types known to the language and types that exist in the programmer's mind or in documentation.
+                                                                                                                           
+)
+                                                                                                                           
+;; from https://people.csail.mit.edu/gregs/ll1-discuss-archive-html/msg00678.html
+                                                                                                                           
+Allow me to clarify.  The message was written in haste for a friendly
+audience, so was not as coherent as it might have been.
+
+My main point is that "object-oriented" and "object" are not well
+defined, and before you engage anyone in a discussion of them with
+anyone, you need to agree on definitions.
+
+I think there are three main definitions of "object" in use:
+  a. Simula-67's (also Java's), which is fundamentally my item 9
+     (objects have a set of named methods) and secondarily item 8
+     (implementation inheritance)
+  b. Actors, which is item 6 (message passing) with 2 and 1 as corollaries
+  c. Lisp objects, items 4-5 (with or without items 6, 8, or 9)
+
+I ignore my own advice starting in the paragraph that says "the C/C++
+folks see OO as ...".  Here I am doing just what I tell everyone not
+to do, which is to assume a particular definition.  The definition I
+used in this paragraph was Simula's.
+
+I also ignore my advice in my anti-OO rant on e-lang.  The thread
+there was mainly anti-OO sensu Actors, but I also included some
+anti-Simula-OO stuff in there.
+
+It appears you [Scott McKey] assumed I was critiquing the Lisp
+definition, when I meant the Simula definition.  This merely
+reinforces my point that the terminology situation is abominable.
+
+If CLOS and Dylan claim to be OO, then their definition of OO has to
+be Lisp's (c, above).  But they obviously aren't OO in the Simula or
+Actors senses.  This is exactly what you like about them.  But the
+terminology confusion may contribute to the lack of acceptance of
+generic functions in mainstream languages.  You are trying to invade
+linguistic territory (the space of the meaning of "OO") where you're
+not wanted.  I can see why you'd want to do that, since OO has such
+cachet, but perhaps a different buzzword would be in order.
+
+  Dylan advocate: "Dylan is OO [sensu Lisp] and a better OO [sensu Lisp]
+  than Java."  True.
+
+  Java/Smalltalk/Actors advocate: "How can you possibly say that Dylan
+  is OO [sensu Simula or Actors]?  It isn't OO at all."  Also true.
+
+Now, as to which definition is the "best" -- well, if you don't care
+about my opinions, stop reading.
+
+I'm agnostic on which definition of OO is best.  If I were interested
+I would do some scholarship to find the historical precedent for its
+use in the 1960's and 1970's, starting with Simula-67, Actors, and
+Smalltalk, and advocate use of those definitions.  If it turned out
+that the Lisp world or someone else used the terms technically earlier
+than that, I'd probably advocate that usage.
+
+Another approach is to allow mob rule - to take OO to mean what the
+majority of the software industry takes it to mean.  In this case it
+clearly has the Simula/Java meaning.
+
+I don't know how to trace the precedent of the Lisp definition.  My
+hunch is that it's relatively late, perhaps having to do with Hewitt
+(1974) and/or the growth of new types (yes, "object" types) in Maclisp
+and Interlisp.  When I was at MIT in 1979 the term "object" still felt
+new and stylish.  But no one said Lisp itself was object-oriented that
+I can remember, until maybe Sussman and Abelson's course came along
+(scholarship anyone?).
+
+As far as I know, only people with Lisp and academic backgrounds take
+the Lisp and Actors definitions seriously, even though they are the
+more principled ones.
+
+As for OO programming, I actually like and use and implement OO
+techniques in all three senses.  They are fine when positioned as
+tools drawn from a larger toolkit.  A Scheme implementation I worked
+on in the '80's was deeply OO in a somewhat Simula-ish sense, and Kent
+Pitman and I invented a nice generic function syntax and semantics for
+it (which, many years later, was adopted and extended by CLOS and then
+Dylan).  I can't say that CLOS is to my taste, but I did add simple
+generic functions with n-way dispatch to Scheme 48 fairly recently,
+around 1993 (this turned out to be poorly executed, but that's another
+story).  So what homework haven't I done?
+
+I don't think languages should be fundamentally OO in any of the three
+senses, but any disagreement along these lines can probably be
+remedied by a redefinition of terms.
+
+I don't see how you can say I'm an anti-OO zealot.  It's only when any
+of the three models is put forth as a world view or panacea (as in
+Java), or when people talk past one another because they fail to be
+clear on terminology, that I get huffy.
+
+Jonathan                                                                                                                           
