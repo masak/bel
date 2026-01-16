@@ -1874,7 +1874,7 @@ L<https://metacpan.org/release/Language-Bel>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2019-2024 by Carl Mäsak.
+This software is Copyright (c) 2019-2026 by Carl Mäsak.
 
 This program is released under the following license:
 
