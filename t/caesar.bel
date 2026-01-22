@@ -1,0 +1,28 @@
+;; Caesar encoding/decoding
+;; Ported from https://github.com/koka-lang/koka/blob/4ef04cd7cfa965c413a985dfaabbfb69a4c64d11/samples/basic/caesar.kk
+
+(def prlf args
+  (map pr args)
+  (pr \lf))
+
+(set char->int charn
+     int->char nchar)
+
+(mac letdef ((f . fbody) . body)
+  `(let ,f (fn ,@fbody)
+     ,@body))
+
+(def encode (s|string (o shift|int 3))
+  (letdef (encode-char (c)
+    (if (~<= \a c \z)
+        c
+        (withs (base (- (char->int c) (char->int \a))
+                rot  (mod (+ base shift) 26))
+          (int->char (+ rot (char->int \a))))))
+    (map encode-char s)))
+
+(def caesar (s|string)
+  (encode s 3))
+
+(prlf (caesar "hello"))
+
